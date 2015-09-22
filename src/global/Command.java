@@ -19,7 +19,7 @@ public class Command {
 		return commandType;
 	}
 	
-	public getTask() {
+	public Task getTask() {
 		return task;
 	}
 	

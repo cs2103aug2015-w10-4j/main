@@ -21,8 +21,8 @@ public class Logic {
 	}
 	public Logic(){
 		UIObject = new UI();
-		parserObject = new parserObject();
-		storageObject = new storageObject();
+		parserObject = new Parser();
+		storageObject = new Storage();
 	}
 	public void start(){
 		showWelcomeMessage();
