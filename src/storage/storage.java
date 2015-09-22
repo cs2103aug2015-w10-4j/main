@@ -11,6 +11,12 @@ import java.util.Scanner;
 public class storage {
 	public static String filePath="save.txt";
 	
+	/**
+	 * save task in the file
+	 * @param ArrayList<Task>task    ArrayList that stores the tasks
+	 * @return   true if file is saved
+	 * @throws IOException 
+	 */
 public static boolean writeitem(ArrayList<Task>task) throws IOException{
 	String content = "";
 	for(int i = 0; i <task.size(); i ++){
@@ -26,10 +32,13 @@ public static boolean writeitem(ArrayList<Task>task) throws IOException{
 	return true;
 }
 
-//save result to a path
-//input: new path (path to save)
-//return true if path exists
-//return false if path does not exist
+/**
+ *save result to a path
+ *
+ * @param path path is a String contain the path of file to save
+ * @return   true if location changes
+ * @throws IOException
+ */
 public static boolean saveFileToPath(String path) throws IOException{
 	File file = new File(path);
 	if (!file.exists()){
@@ -41,6 +50,11 @@ public static boolean saveFileToPath(String path) throws IOException{
 	return true;
 }
 
+/**
+ * the function read the saved file and return ArrayList that holds tasks
+ * @return     ArrayList that contain tasks that has created
+ * @throws FileNotFoundException if there is no file in the filePath
+ */
 public static ArrayList<Task> getItemList() throws FileNotFoundException{
 	File file = new File(filePath);
 	Scanner sc = new Scanner(file);
