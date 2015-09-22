@@ -3,30 +3,32 @@ package global;
 public class Command {
 
 	private Type commandType;
-	private String description;
+	private Task task;
 	
 	public enum Type {
 		add, edit, delete, display, exit;
 	}
 	
-	public Command(Type commandType, String description) {
+	public Command(Type commandType, Task task){ 
 		this.commandType = commandType;
-		this.description = description;
+		this.task = task;
 	}
 	
+	// --------------- getter methods --------------------
 	public Type getCommandType() {
 		return commandType;
 	}
 	
-	public String getDescription() {
-		return description;
+	public getTask() {
+		return task;
 	}
 	
+	// --------------- setter methods ------------------- 
 	public void setCommandType(Type commandType) {
 		this.commandType = commandType;
 	}
 	
-	public void setDescription(String description) {
-		this.description = description;
+	public void setTask(Task task) {
+		this.task = task;
 	}
 }
