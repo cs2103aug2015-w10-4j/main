@@ -1,5 +1,6 @@
 package logic;
 import java.util.ArrayList;
+
 import ui.UI;
 import parser.Parser;
 import storage.Storage;
@@ -32,9 +33,16 @@ public class Logic {
 		UIObject.showToUser(MESSAGE_WELCOME);
 	}
 	public void readUserInput(){
-		String userInput = UIObject.promptUser(MESSAGE_PROMPT_COMMAND);
-		Command commandObject = parserObject.parseCommand(userInput);
-		boolean executionResult = executeCommand(commandObject);
+		String userInput;
+		try {
+			userInput = UIObject.promptUser(MESSAGE_PROMPT_COMMAND);
+			Command commandObject = parserObject.parseCommand(userInput);
+			boolean executionResult = executeCommand(commandObject);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 	}
 	public boolean executeCommand(Command commandObject){
 		Command.Type commandType = commandObject.getCommandType();
@@ -50,19 +58,23 @@ public class Logic {
 		}else if(commandType == Command.Type.exit){
 			exitProgram();
 		}
+		return true;
 	}
 	
 	public boolean addItem(Task userTask){
 		listOfTasks.add(userTask);
+		return true;
 	}
 	public boolean deleteItem(Task userTask){
 		int index = userTask.getIndex();
 		listOfTasks.remove(index);
+		return true;
 	}
 	public boolean editItem(Task userTask){
 		int index = userTask.getIndex();
 		listOfTasks.remove(index);
 		listOfTasks.add(index, userTask);
+		return true;
 	}
 	public boolean displayItems(){
 		String stringToDisplay = "";
@@ -70,8 +82,10 @@ public class Logic {
 			stringToDisplay += (i+1) + ". " + listOfTasks.get(i) + "\n";
 		}
 		UIObject.showToUser(stringToDisplay);
+		return true;
 	}
 	public boolean exitProgram(){
 		System.exit(1);
+		return true;
 	}
 }
