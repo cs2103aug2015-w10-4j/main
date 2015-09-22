@@ -1,4 +1,4 @@
-package storage;
+package global;
 
 //data structure to store tasks
 
