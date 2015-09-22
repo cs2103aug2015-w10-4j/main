@@ -16,9 +16,9 @@ public class Logic {
 	
 	public static String MESSAGE_WELCOME = "Welcome to Tasky! This is an open source project";
 	public static String MESSAGE_PROMPT_COMMAND = "command :";
-	public static String MESSAGE_SUCCESS_ADD = "Item successfull added.";
-	public static String MESSAGE_SUCCESS_DELETE = "Item successfull deleted.";
-	public static String MESSAGE_SUCCESS_EDIT = "Item successfull edited.";
+	public static String MESSAGE_SUCCESS_ADD = "Item successfully added.";
+	public static String MESSAGE_SUCCESS_DELETE = "Item successfully deleted.";
+	public static String MESSAGE_SUCCESS_EDIT = "Item successfully edited.";
 	public static String MESSAGE_SUCCESS_EXIT = "Exiting program...";
 	public static String ERROR_WRITING_FILE = "Error writing file.";
 	public static String WARNING_INVALID_ARGUMENT = "Warning: Invalid argument for command";
@@ -91,7 +91,7 @@ public class Logic {
 			return WARNING_INVALID_ARGUMENT;
 		}
 		int index = Integer.parseInt(argumentList.get(0));
-		if(argumentList.size() < index || index < 1){
+		if(listOfTasks.size() < index || index < 1){
 			return WARNING_INVALID_INDEX;
 		}else{
 			listOfTasks.remove(index - 1);
