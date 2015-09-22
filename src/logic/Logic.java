@@ -1,4 +1,5 @@
 package logic;
+import java.io.IOException;
 import java.util.ArrayList;
 
 import ui.UI;
@@ -15,6 +16,13 @@ public class Logic {
 	
 	public static String MESSAGE_WELCOME = "Welcome to Tasky! This is an open source project";
 	public static String MESSAGE_PROMPT_COMMAND = "command :";
+	public static String MESSAGE_SUCCESS_ADD = "Item successfull added.";
+	public static String MESSAGE_SUCCESS_DELETE = "Item successfull deleted.";
+	public static String MESSAGE_SUCCESS_EDIT = "Item successfull edited.";
+	public static String MESSAGE_SUCCESS_EXIT = "Exiting program...";
+	public static String ERROR_WRITING_FILE = "Error writing file.";
+	public static String WARNING_NO_COMMAND_HANDLER = "Warning: Handler for this command type has not been defined.";
+	public static String WARNING_INVALID_COMMAND = "Warning: Invalid command.";
 	
 	public static void main(String[] args){
 		Logic logicObject = new Logic();
@@ -33,59 +41,68 @@ public class Logic {
 		UIObject.showToUser(MESSAGE_WELCOME);
 	}
 	public void readUserInput(){
-		String userInput;
+		
 		try {
-			userInput = UIObject.promptUser(MESSAGE_PROMPT_COMMAND);
-			Command commandObject = parserObject.parseCommand(userInput);
-			boolean executionResult = executeCommand(commandObject);
+			while (true) {
+				String userInput = UIObject.promptUser(MESSAGE_PROMPT_COMMAND);
+				Command commandObject = parserObject.parseCommand(userInput);
+				String executionResult = executeCommand(commandObject);
+				UIObject.showToUser(executionResult);
+				storageObject.writeitem(listOfTasks);
+			}
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
+			// 
 			e.printStackTrace();
+		} catch (IOException e) {
+			// error writing
+			UIObject.showToUser(ERROR_WRITING_FILE);
 		}
 		
 	}
-	public boolean executeCommand(Command commandObject){
+	public String executeCommand(Command commandObject){
+		if(commandObject == null){
+			return WARNING_INVALID_COMMAND;
+		}
 		Command.Type commandType = commandObject.getCommandType();
 		Task userTask = commandObject.getTask();
 		if(commandType == Command.Type.add){
-			addItem(userTask);
+			return addItem(userTask);
 		}else if(commandType == Command.Type.delete){
-			deleteItem(userTask);
+			return deleteItem(userTask);
 		}else if(commandType == Command.Type.edit){
-			editItem(userTask);
+			return editItem(userTask);
 		}else if(commandType == Command.Type.display){
-			displayItems();
+			return displayItems();
 		}else if(commandType == Command.Type.exit){
-			exitProgram();
+			return exitProgram();
 		}
-		return true;
+		return WARNING_NO_COMMAND_HANDLER;
 	}
 	
-	public boolean addItem(Task userTask){
+	public String addItem(Task userTask){
 		listOfTasks.add(userTask);
-		return true;
+		return MESSAGE_SUCCESS_ADD;
 	}
-	public boolean deleteItem(Task userTask){
+	public String deleteItem(Task userTask){
 		int index = userTask.getIndex();
 		listOfTasks.remove(index);
-		return true;
+		return MESSAGE_SUCCESS_DELETE;
 	}
-	public boolean editItem(Task userTask){
+	public String editItem(Task userTask){
 		int index = userTask.getIndex();
 		listOfTasks.remove(index);
 		listOfTasks.add(index, userTask);
-		return true;
+		return MESSAGE_SUCCESS_EDIT;
 	}
-	public boolean displayItems(){
+	public String displayItems(){
 		String stringToDisplay = "";
 		for(int i = 0; i < listOfTasks.size(); i++){
 			stringToDisplay += (i+1) + ". " + listOfTasks.get(i) + "\n";
 		}
-		UIObject.showToUser(stringToDisplay);
-		return true;
+		return stringToDisplay;
 	}
-	public boolean exitProgram(){
+	public String exitProgram(){
 		System.exit(1);
-		return true;
+		return MESSAGE_SUCCESS_EXIT;
 	}
 }

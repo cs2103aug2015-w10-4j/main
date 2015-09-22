@@ -56,7 +56,9 @@ public class UI {
 				userInputField.wait();
 			}
 		}
-		return userInputField.getText();
+		String userInput = userInputField.getText();
+		userInputField.setText("");
+		return userInput;
 	}
 	
 	public boolean showToUser(String toShow) {
