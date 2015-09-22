@@ -7,20 +7,17 @@ import global.Command;
 import global.Task;
 
 public class Logic {
-<<<<<<< HEAD
-	public static void main(String[] args) {
-=======
 	UI UIObject;
 	Parser parserObject;
 	Storage storageObject;
-	ArrayList<com.sun.jmx.snmp.tasks.Task> listOfTasks = new ArrayList<Task>();
+	ArrayList<Task> listOfTasks = new ArrayList<Task>();
 	
 	public static String MESSAGE_WELCOME = "Welcome to Tasky! This is an open source project";
 	public static String MESSAGE_PROMPT_COMMAND = "command :";
 	
 	public static void main(String[] args){
-		
->>>>>>> d08f8af18e113ebed2cbe15674d6130111951c11
+		Logic logicObject = new Logic();
+		logicObject.start();
 	}
 	public Logic(){
 		UIObject = new UI();
@@ -50,6 +47,8 @@ public class Logic {
 			editItem(userTask);
 		}else if(commandType == Command.Type.display){
 			displayItems();
+		}else if(commandType == Command.Type.exit){
+			exitProgram();
 		}
 	}
 	
@@ -71,5 +70,8 @@ public class Logic {
 			stringToDisplay += (i+1) + ". " + listOfTasks.get(i) + "\n";
 		}
 		UIObject.showToUser(stringToDisplay);
+	}
+	public boolean exitProgram(){
+		System.exit(1);
 	}
 }
