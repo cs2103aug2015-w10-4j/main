@@ -4,15 +4,10 @@ package global;
 
 public class Task {
 	String name;
-	int index;
 
 	//constructor
 	public Task(String name){
 		this.name = name;
-	}
-
-	public Task(int index){
-		this.index = index;
 	}
 
 	//public methods
@@ -25,15 +20,6 @@ public class Task {
 	//change the name of the task
 	public Boolean replaceName(String newName){
 		this.name = newName;
-		return true;
-	}
-
-	public int getIndex(){
-		return index;
-	}
-
-	public Boolean replaceIndex(int index){
-		this.index = index;
 		return true;
 	}
 

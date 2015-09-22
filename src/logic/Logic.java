@@ -21,8 +21,10 @@ public class Logic {
 	public static String MESSAGE_SUCCESS_EDIT = "Item successfull edited.";
 	public static String MESSAGE_SUCCESS_EXIT = "Exiting program...";
 	public static String ERROR_WRITING_FILE = "Error writing file.";
-	public static String WARNING_NO_COMMAND_HANDLER = "Warning: Handler for this command type has not been defined.";
+	public static String WARNING_INVALID_ARGUMENT = "Warning: Invalid argument for command";
 	public static String WARNING_INVALID_COMMAND = "Warning: Invalid command.";
+	public static String WARNING_NO_COMMAND_HANDLER = "Warning: Handler for this command type has not been defined.";
+	public static String WARNING_INVALID_INDEX = "Warning: There is no item at this index.";
 	
 	public static void main(String[] args){
 		Logic logicObject = new Logic();
@@ -65,12 +67,13 @@ public class Logic {
 		}
 		Command.Type commandType = commandObject.getCommandType();
 		Task userTask = commandObject.getTask();
+		ArrayList<String> argumentList = commandObject.getArguments();
 		if(commandType == Command.Type.add){
 			return addItem(userTask);
 		}else if(commandType == Command.Type.delete){
-			return deleteItem(userTask);
+			return deleteItem(argumentList);
 		}else if(commandType == Command.Type.edit){
-			return editItem(userTask);
+			return editItem(userTask, argumentList);
 		}else if(commandType == Command.Type.display){
 			return displayItems();
 		}else if(commandType == Command.Type.exit){
@@ -83,13 +86,23 @@ public class Logic {
 		listOfTasks.add(userTask);
 		return MESSAGE_SUCCESS_ADD;
 	}
-	public String deleteItem(Task userTask){
-		int index = userTask.getIndex();
-		listOfTasks.remove(index);
+	public String deleteItem(ArrayList<String> argumentList){
+		if(argumentList == null || argumentList.isEmpty()){
+			return WARNING_INVALID_ARGUMENT;
+		}
+		int index = Integer.parseInt(argumentList.get(0));
+		if(argumentList.size() < index || index < 1){
+			return WARNING_INVALID_INDEX;
+		}else{
+			listOfTasks.remove(index - 1);
+		}
 		return MESSAGE_SUCCESS_DELETE;
 	}
-	public String editItem(Task userTask){
-		int index = userTask.getIndex();
+	public String editItem(Task userTask, ArrayList<String> argumentList){
+		if(argumentList == null || argumentList.isEmpty()){
+			return WARNING_INVALID_ARGUMENT;
+		}
+		int index = Integer.parseInt(argumentList.get(0));
 		listOfTasks.remove(index);
 		listOfTasks.add(index, userTask);
 		return MESSAGE_SUCCESS_EDIT;
@@ -97,7 +110,7 @@ public class Logic {
 	public String displayItems(){
 		String stringToDisplay = "";
 		for(int i = 0; i < listOfTasks.size(); i++){
-			stringToDisplay += (i+1) + ". " + listOfTasks.get(i) + "\n";
+			stringToDisplay += (i+1) + ". " + listOfTasks.get(i).getName() + "\n";
 		}
 		return stringToDisplay;
 	}
