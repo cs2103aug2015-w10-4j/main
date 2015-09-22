@@ -10,7 +10,7 @@ public class Logic {
 	UI UIObject;
 	Parser parserObject;
 	Storage storageObject;
-	ArrayList<com.sun.jmx.snmp.tasks.Task> listOfTasks = new ArrayList<Task>();
+	ArrayList<Task> listOfTasks = new ArrayList<Task>();
 	
 	public static String MESSAGE_WELCOME = "Welcome to Tasky! This is an open source project";
 	public static String MESSAGE_PROMPT_COMMAND = "command :";
