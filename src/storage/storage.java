@@ -12,14 +12,14 @@ import global.Task;
 public class Storage {
 	public static String filePath="save.txt";
 	/**
-	 * save task in the file
+	 * Saves the list of tasks in the file
 	 * @param ArrayList<Task>task    ArrayList that stores the tasks
 	 * @return   true if file is saved
 	 * @throws IOException 
 	 */
-	public boolean writeitem(ArrayList<Task> task) throws IOException{
+	public boolean writeItemList(ArrayList<Task> task) throws IOException {
 		String content = "";
-		for(int i = 0; i <task.size(); i ++){
+		for (int i = 0; i <task.size(); i ++) {
 			content += task.get(i).getName() + "\r\n";
 		}
 	
@@ -33,13 +33,13 @@ public class Storage {
 	}
 
 	/**
-	 *save result to a path
+	 * Saves path to text file
 	 *
 	 * @param path path is a String contain the path of file to save
 	 * @return   true if location changes
 	 * @throws IOException
 	 */
-	public boolean saveFileToPath(String path) throws IOException{
+	public boolean saveFileToPath(String path) throws IOException {
 		File file = new File(path);
 		if (!file.exists()){
 			file.createNewFile();
@@ -51,8 +51,8 @@ public class Storage {
 	}
 
 	/**
-	 * the function read the saved file and return ArrayList that holds tasks
-	 * @return     ArrayList that contain tasks that has created
+	 * Reads the saved file and returns the ArrayList of tasks
+	 * @return ArrayList of tasks read from file
 	 * @throws FileNotFoundException if there is no file in the filePath
 	 */
 	public ArrayList<Task> getItemList() throws FileNotFoundException{
@@ -60,8 +60,8 @@ public class Storage {
 		Scanner sc = new Scanner(file);
 		ArrayList<Task>tasklist = new ArrayList<Task>();
 	
-		while (sc.hasNext()){
-			String taskName=sc.next();
+		while (sc.hasNext()) {
+			String taskName = sc.next();
 			Task tempTask = new Task(taskName);
 			tasklist.add(tempTask);
 		}

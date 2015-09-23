@@ -1,39 +1,34 @@
 package global;
 
-//data structure to store tasks
-
+/**
+ * This is a data structure to store the details of a task
+ */
 public class Task {
+	/*
+	 * Declaration of variables
+	 */
 	String name;
-	int index;
 
-	//constructor
-	public Task(String name){
+	/*
+	 * Constructor
+	 */
+	public Task(String name) {
 		this.name = name;
 	}
 
-	public Task(int index){
-		this.index = index;
-	}
+	
+	/*
+	 * Public methods
+	 */
 
-	//public methods
-
-	//return the name of the task
-	public String getName(){	
+	//returns the name of the task
+	public String getName() {	
 		return name;
 	}
 
 	//change the name of the task
-	public Boolean replaceName(String newName){
+	public Boolean replaceName(String newName) {
 		this.name = newName;
-		return true;
-	}
-
-	public int getIndex(){
-		return index;
-	}
-
-	public Boolean replaceIndex(int index){
-		this.index = index;
 		return true;
 	}
 

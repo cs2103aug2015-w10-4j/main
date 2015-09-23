@@ -12,27 +12,27 @@ public class Command {
 		add, edit, delete, display, exit;
 	}
 	
-	public Command(Type commandType){ 
-		this.commandType = commandType;
+	public Command(Type commandType) { 
+		setCommandType(commandType);
+		this.task = null;
+		this.argumentList = null;
 	}
-	public Command(Type commandType, Task task){ 
-		this.commandType = commandType;
-		this.task = task;
-	}
-	
-	public Command(Type commandType, String[] args){ 
-		this.commandType = commandType;
-		for(int i = 0; i < args.length; i++){
-			argumentList.add(args[i]);
-		}
+	public Command(Type commandType, Task task) { 
+		setCommandType(commandType);
+		setTask(task);
+		this.argumentList = null;
 	}
 	
-	public Command(Type commandType, String[] args, Task task){ 
-		this.commandType = commandType;
-		this.task = task;
-		for(int i = 0; i < args.length; i++){
-			argumentList.add(args[i]);
-		}
+	public Command(Type commandType, String[] args) { 
+		setCommandType(commandType);
+		setArguments(args);
+		this.task = null;
+	}
+	
+	public Command(Type commandType, String[] args, Task task) { 
+		setCommandType(commandType);
+		setTask(task);
+		setArguments(args);
 	}
 	
 	// --------------- getter methods --------------------
@@ -44,6 +44,10 @@ public class Command {
 		return task;
 	}
 	
+	public ArrayList<String> getArguments() {
+		return argumentList;
+	}
+	
 	// --------------- setter methods ------------------- 
 	public void setCommandType(Type commandType) {
 		this.commandType = commandType;
@@ -51,5 +55,12 @@ public class Command {
 	
 	public void setTask(Task task) {
 		this.task = task;
+	}
+	
+	public void setArguments(String[] args) {
+		argumentList = new ArrayList<String>();
+		for(int i = 0; i < args.length; i++){
+			argumentList.add(args[i]);
+		}
 	}
 }
