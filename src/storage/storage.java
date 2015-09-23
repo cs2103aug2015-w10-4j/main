@@ -12,7 +12,7 @@ import global.Task;
 public class Storage {
 	public static String filePath="save.txt";
 	/**
-	 * save task in the file
+	 * Saves the list of tasks in the file
 	 * @param ArrayList<Task>task    ArrayList that stores the tasks
 	 * @return   true if file is saved
 	 * @throws IOException 
@@ -33,7 +33,7 @@ public class Storage {
 	}
 
 	/**
-	 *save result to a path
+	 * Saves path to text file
 	 *
 	 * @param path path is a String contain the path of file to save
 	 * @return   true if location changes
@@ -51,7 +51,7 @@ public class Storage {
 	}
 
 	/**
-	 * the function read the saved file and return ArrayList that holds tasks
+	 * Reads the saved file and returns the ArrayList of tasks
 	 * @return     ArrayList that contain tasks that has created
 	 * @throws FileNotFoundException if there is no file in the filePath
 	 */

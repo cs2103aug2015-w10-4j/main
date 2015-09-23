@@ -1,4 +1,5 @@
 package logic;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -20,7 +21,9 @@ public class Logic {
 	public static String MESSAGE_SUCCESS_DELETE = "Item successfully deleted.";
 	public static String MESSAGE_SUCCESS_EDIT = "Item successfully edited.";
 	public static String MESSAGE_SUCCESS_EXIT = "Exiting program...";
+	public static String MESSAGE_DISPLAY_LINEITEM = "%d. %s\n";
 	public static String ERROR_WRITING_FILE = "Error writing file.";
+	public static String ERROR_FILE_NOT_FOUND = "Error file not found";
 	public static String WARNING_INVALID_ARGUMENT = "Warning: Invalid argument for command";
 	public static String WARNING_INVALID_COMMAND = "Warning: Invalid command.";
 	public static String WARNING_NO_COMMAND_HANDLER = "Warning: Handler for this command type has not been defined.";
@@ -34,6 +37,11 @@ public class Logic {
 		UIObject = new UI();
 		parserObject = new Parser();
 		storageObject = new Storage();
+		try {
+			listOfTasks = storageObject.getItemList();
+		} catch (FileNotFoundException e) {
+			UIObject.showToUser(ERROR_FILE_NOT_FOUND);
+		}
 	}
 	public void start(){
 		showWelcomeMessage();
@@ -90,11 +98,11 @@ public class Logic {
 		if(argumentList == null || argumentList.isEmpty()){
 			return WARNING_INVALID_ARGUMENT;
 		}
-		int index = Integer.parseInt(argumentList.get(0));
-		if(listOfTasks.size() < index || index < 1){
-			return WARNING_INVALID_INDEX;
+		int index = Integer.parseInt(argumentList.get(0)) - 1;
+		if(isValidIndex(index)){
+			listOfTasks.remove(index);
 		}else{
-			listOfTasks.remove(index - 1);
+			return WARNING_INVALID_INDEX;
 		}
 		return MESSAGE_SUCCESS_DELETE;
 	}
@@ -102,15 +110,22 @@ public class Logic {
 		if(argumentList == null || argumentList.isEmpty()){
 			return WARNING_INVALID_ARGUMENT;
 		}
-		int index = Integer.parseInt(argumentList.get(0));
-		listOfTasks.remove(index);
+		int index = Integer.parseInt(argumentList.get(0)) - 1;
+		if(isValidIndex(index)){
+			listOfTasks.remove(index);
+		}else{
+			return WARNING_INVALID_INDEX;
+		}
 		listOfTasks.add(index, userTask);
 		return MESSAGE_SUCCESS_EDIT;
+	}
+	public boolean isValidIndex(int index){
+		return !(index > listOfTasks.size() - 1 || index < 0);
 	}
 	public String displayItems(){
 		String stringToDisplay = "";
 		for(int i = 0; i < listOfTasks.size(); i++){
-			stringToDisplay += (i+1) + ". " + listOfTasks.get(i).getName() + "\n";
+			stringToDisplay += String.format(MESSAGE_DISPLAY_LINEITEM, i+1, listOfTasks.get(i).getName());
 		}
 		return stringToDisplay;
 	}
