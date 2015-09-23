@@ -10,7 +10,8 @@ import java.util.Scanner;
 import global.Task;
 
 public class Storage {
-	public static String filePath="save.txt";
+	public static String FILE_PATH = "save.txt";
+	public static String FILE_TASKLINE = "%s\r\n";
 	/**
 	 * Saves the list of tasks in the file
 	 * @param ArrayList<Task>task    ArrayList that stores the tasks
@@ -20,10 +21,10 @@ public class Storage {
 	public boolean writeItemList(ArrayList<Task> task) throws IOException {
 		String content = "";
 		for (int i = 0; i <task.size(); i ++) {
-			content += task.get(i).getName() + "\r\n";
+			content += String.format(FILE_TASKLINE,task.get(i).getName());
 		}
 	
-		File file = new File(filePath);
+		File file = new File(FILE_PATH);
 		FileWriter fw = new FileWriter(file.getAbsoluteFile());
 		BufferedWriter bw = new BufferedWriter(fw);
 		bw.write(content);
@@ -43,10 +44,10 @@ public class Storage {
 		File file = new File(path);
 		if (!file.exists()){
 			file.createNewFile();
-			filePath = path;
+			FILE_PATH = path;
 			return false;
 		}
-		filePath = path;
+		FILE_PATH = path;
 		return true;
 	}
 
@@ -56,7 +57,7 @@ public class Storage {
 	 * @throws FileNotFoundException if there is no file in the filePath
 	 */
 	public ArrayList<Task> getItemList() throws FileNotFoundException{
-		File file = new File(filePath);
+		File file = new File(FILE_PATH);
 		Scanner sc = new Scanner(file);
 		ArrayList<Task>tasklist = new ArrayList<Task>();
 	
