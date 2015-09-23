@@ -12,24 +12,24 @@ public class Command {
 		add, edit, delete, display, exit;
 	}
 	
-	public Command(Type commandType){ 
+	public Command(Type commandType) { 
 		setCommandType(commandType);
 		this.task = null;
 		this.argumentList = null;
 	}
-	public Command(Type commandType, Task task){ 
+	public Command(Type commandType, Task task) { 
 		setCommandType(commandType);
 		setTask(task);
 		this.argumentList = null;
 	}
 	
-	public Command(Type commandType, String[] args){ 
+	public Command(Type commandType, String[] args) { 
 		setCommandType(commandType);
 		setArguments(args);
 		this.task = null;
 	}
 	
-	public Command(Type commandType, String[] args, Task task){ 
+	public Command(Type commandType, String[] args, Task task) { 
 		setCommandType(commandType);
 		setTask(task);
 		setArguments(args);
@@ -44,7 +44,7 @@ public class Command {
 		return task;
 	}
 	
-	public ArrayList<String> getArguments(){
+	public ArrayList<String> getArguments() {
 		return argumentList;
 	}
 	
@@ -57,7 +57,7 @@ public class Command {
 		this.task = task;
 	}
 	
-	public void setArguments(String[] args){
+	public void setArguments(String[] args) {
 		argumentList = new ArrayList<String>();
 		for(int i = 0; i < args.length; i++){
 			argumentList.add(args[i]);

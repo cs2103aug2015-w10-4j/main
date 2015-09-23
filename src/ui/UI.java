@@ -11,7 +11,9 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
 public class UI {
-	
+	/*
+	 * Declaration of variables
+	 */
 	private final int displayRowCount = 20;
 	private final int displayColumnCount = 40;
 	private final int userInputFieldLength = 30;
@@ -19,14 +21,18 @@ public class UI {
 	
 	private final String frameTitle = "Tasky";
 	
+	/*
+	 * Initialisation of GUI variables
+	 */
 	JFrame frame = new JFrame(frameTitle);
 	JPanel mainPanel = new JPanel(new BorderLayout(5, 5));
 	JTextArea displayArea = new JTextArea(displayRowCount, displayColumnCount);
 	JLabel promptLabel = new JLabel("command: ", promptLength);
 	JTextField userInputField = new JTextField(userInputFieldLength);
 	
-	String userFeedback;
-	
+	/*
+	 * Constructor
+	 */
 	public UI() {
 		userInputField.setEditable(false);
 		displayArea.setEditable(false);
@@ -48,6 +54,12 @@ public class UI {
 		frame.setVisible(true);
 	}
 	
+	/**
+	 * Prompt message and obtain userinput
+	 * @param prompt message to prompt user
+	 * @return userInput
+	 * @throws InterruptedException
+	 */
 	public String promptUser(String prompt) throws InterruptedException {
 		promptLabel.setText(prompt);
 		userInputField.setEditable(true);

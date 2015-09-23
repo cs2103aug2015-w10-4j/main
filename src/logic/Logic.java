@@ -10,11 +10,18 @@ import global.Command;
 import global.Task;
 
 public class Logic {
+	
+	/*
+	 * Declaration of object variables
+	 */
 	UI UIObject;
 	Parser parserObject;
 	Storage storageObject;
 	ArrayList<Task> listOfTasks = new ArrayList<Task>();
 	
+	/*
+	 * Static strings - errors, warnings and messages
+	 */
 	public static String MESSAGE_WELCOME = "Welcome to Tasky! This is an open source project";
 	public static String MESSAGE_PROMPT_COMMAND = "command :";
 	public static String MESSAGE_SUCCESS_ADD = "Item successfully added.";
@@ -28,11 +35,19 @@ public class Logic {
 	public static String WARNING_INVALID_COMMAND = "Warning: Invalid command.";
 	public static String WARNING_NO_COMMAND_HANDLER = "Warning: Handler for this command type has not been defined.";
 	public static String WARNING_INVALID_INDEX = "Warning: There is no item at this index.";
+	public static String WARNING_UI_INTERRUPTED = "Warning: UI prompt has been interrupted";
 	
+	
+	/*
+	 * Main program
+	 */
 	public static void main(String[] args){
 		Logic logicObject = new Logic();
 		logicObject.start();
 	}
+	/*
+	 * Constructor to initialize object variables
+	 */
 	public Logic(){
 		UIObject = new UI();
 		parserObject = new Parser();
@@ -50,25 +65,36 @@ public class Logic {
 	public void showWelcomeMessage(){
 		UIObject.showToUser(MESSAGE_WELCOME);
 	}
+	
+	/**
+	 * Repeatedly
+	 *  Reads the user input, parses the command, executes the command object,
+	 *  shows the result in UI, writes latest task list to file
+	 * until the program exits
+	 */
 	public void readUserInput(){
-		
 		try {
 			while (true) {
 				String userInput = UIObject.promptUser(MESSAGE_PROMPT_COMMAND);
 				Command commandObject = parserObject.parseCommand(userInput);
 				String executionResult = executeCommand(commandObject);
 				UIObject.showToUser(executionResult);
-				storageObject.writeitem(listOfTasks);
+				storageObject.writeItemList(listOfTasks);
 			}
 		} catch (InterruptedException e) {
-			// 
-			e.printStackTrace();
+			// something interrupted the UI's wait for user input
+			UIObject.showToUser(WARNING_UI_INTERRUPTED);
 		} catch (IOException e) {
 			// error writing
 			UIObject.showToUser(ERROR_WRITING_FILE);
 		}
 		
 	}
+	
+	/**
+	 * Executes a command based on commandObject
+	 * @return a string to be shown to user
+	 */
 	public String executeCommand(Command commandObject){
 		if(commandObject == null){
 			return WARNING_INVALID_COMMAND;
@@ -94,34 +120,60 @@ public class Logic {
 		listOfTasks.add(userTask);
 		return MESSAGE_SUCCESS_ADD;
 	}
+	
+	/**
+	 * Deletes an item from the list of tasks in memory
+	 * @param argumentList the index string is read from position 0
+	 * @return status string
+	 */
 	public String deleteItem(ArrayList<String> argumentList){
 		if(argumentList == null || argumentList.isEmpty()){
 			return WARNING_INVALID_ARGUMENT;
 		}
-		int index = Integer.parseInt(argumentList.get(0)) - 1;
-		if(isValidIndex(index)){
-			listOfTasks.remove(index);
-		}else{
-			return WARNING_INVALID_INDEX;
+		try {
+			int index = Integer.parseInt(argumentList.get(0)) - 1;
+			if(isValidIndex(index)){
+				listOfTasks.remove(index);
+			}else{
+				return WARNING_INVALID_INDEX;
+			}
+			return MESSAGE_SUCCESS_DELETE;
+		} catch (NumberFormatException e){
+			return WARNING_INVALID_ARGUMENT;
 		}
-		return MESSAGE_SUCCESS_DELETE;
+		
 	}
+	
+	/**
+	 * Replaces an item from the list of tasks in memory with the new userTask
+	 * @param userTask the new task to be replaced with
+	 * @param argumentList the index string is read from position 0
+	 * @return status string
+	 */
 	public String editItem(Task userTask, ArrayList<String> argumentList){
 		if(argumentList == null || argumentList.isEmpty()){
 			return WARNING_INVALID_ARGUMENT;
 		}
-		int index = Integer.parseInt(argumentList.get(0)) - 1;
-		if(isValidIndex(index)){
-			listOfTasks.remove(index);
-		}else{
-			return WARNING_INVALID_INDEX;
+		try {
+			int index = Integer.parseInt(argumentList.get(0)) - 1;
+			if(isValidIndex(index)){
+				listOfTasks.remove(index);
+			}else{
+				return WARNING_INVALID_INDEX;
+			}
+			listOfTasks.add(index, userTask);
+		} catch (NumberFormatException e) {
+			return WARNING_INVALID_ARGUMENT;
 		}
-		listOfTasks.add(index, userTask);
 		return MESSAGE_SUCCESS_EDIT;
 	}
 	public boolean isValidIndex(int index){
 		return !(index > listOfTasks.size() - 1 || index < 0);
 	}
+	
+	/**
+	 * @return string to be displayed
+	 */
 	public String displayItems(){
 		String stringToDisplay = "";
 		for(int i = 0; i < listOfTasks.size(); i++){
