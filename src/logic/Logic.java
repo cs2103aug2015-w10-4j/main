@@ -22,20 +22,20 @@ public class Logic {
 	/*
 	 * Static strings - errors, warnings and messages
 	 */
-	public static String MESSAGE_WELCOME = "Welcome to Tasky! This is an open source project";
-	public static String MESSAGE_PROMPT_COMMAND = "command :";
-	public static String MESSAGE_SUCCESS_ADD = "Item successfully added.";
-	public static String MESSAGE_SUCCESS_DELETE = "Item successfully deleted.";
-	public static String MESSAGE_SUCCESS_EDIT = "Item successfully edited.";
-	public static String MESSAGE_SUCCESS_EXIT = "Exiting program...";
-	public static String MESSAGE_DISPLAY_TASKLINE = "%d. %s\r\n";
-	public static String ERROR_WRITING_FILE = "Error writing file.";
-	public static String ERROR_FILE_NOT_FOUND = "Error file not found";
-	public static String WARNING_INVALID_ARGUMENT = "Warning: Invalid argument for command";
-	public static String WARNING_INVALID_COMMAND = "Warning: Invalid command.";
-	public static String WARNING_NO_COMMAND_HANDLER = "Warning: Handler for this command type has not been defined.";
-	public static String WARNING_INVALID_INDEX = "Warning: There is no item at this index.";
-	public static String WARNING_UI_INTERRUPTED = "Warning: UI prompt has been interrupted";
+	public static final String MESSAGE_WELCOME = "Welcome to Tasky! This is an open source project";
+	public static final String MESSAGE_PROMPT_COMMAND = "command :";
+	public static final String MESSAGE_SUCCESS_ADD = "Item successfully added.";
+	public static final String MESSAGE_SUCCESS_DELETE = "Item successfully deleted.";
+	public static final String MESSAGE_SUCCESS_EDIT = "Item successfully edited.";
+	public static final String MESSAGE_SUCCESS_EXIT = "Exiting program...";
+	public static final String MESSAGE_DISPLAY_TASKLINE = "%d. %s\r\n";
+	public static final String ERROR_WRITING_FILE = "Error writing file.";
+	public static final String ERROR_FILE_NOT_FOUND = "Error file not found";
+	public static final String WARNING_INVALID_ARGUMENT = "Warning: Invalid argument for command";
+	public static final String WARNING_INVALID_COMMAND = "Warning: Invalid command.";
+	public static final String WARNING_NO_COMMAND_HANDLER = "Warning: Handler for this command type has not been defined.";
+	public static final String WARNING_INVALID_INDEX = "Warning: There is no item at this index.";
+	public static final String WARNING_UI_INTERRUPTED = "Warning: UI prompt has been interrupted";
 	
 	
 	/*
@@ -73,22 +73,23 @@ public class Logic {
 	 * until the program exits
 	 */
 	public void readUserInput(){
-		try {
-			while (true) {
+		while (true) {
+			try {
 				String userInput = UIObject.promptUser(MESSAGE_PROMPT_COMMAND);
 				Command commandObject = parserObject.parseCommand(userInput);
 				String executionResult = executeCommand(commandObject);
 				UIObject.showToUser(executionResult);
 				storageObject.writeItemList(listOfTasks);
+			} catch (InterruptedException e) {
+				// something interrupted the UI's wait for user input
+				UIObject.showToUser(WARNING_UI_INTERRUPTED);
+			} catch (IOException e) {
+				// error writing
+				UIObject.showToUser(ERROR_WRITING_FILE);
+			} catch (Exception e) {
+				UIObject.showToUser(e.getMessage());
 			}
-		} catch (InterruptedException e) {
-			// something interrupted the UI's wait for user input
-			UIObject.showToUser(WARNING_UI_INTERRUPTED);
-		} catch (IOException e) {
-			// error writing
-			UIObject.showToUser(ERROR_WRITING_FILE);
 		}
-		
 	}
 	
 	/**
@@ -181,6 +182,7 @@ public class Logic {
 		}
 		return stringToDisplay;
 	}
+	
 	public String exitProgram(){
 		System.exit(1);
 		return MESSAGE_SUCCESS_EXIT;
