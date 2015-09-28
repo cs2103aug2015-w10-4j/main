@@ -3,6 +3,8 @@ package parser;
 import global.Command;
 import global.Task;
 
+import java.util.Date;
+
 public class Parser {
 	/**
 	 * Parses the command string based on keyword
@@ -19,13 +21,22 @@ public class Parser {
 	private static final String COMMAND_EXIT = "exit";
 	private static final String COMMAND_DISPLAY = "display";
 	private static final String COMMAND_SAVEPATH = "savepath";
+	private static final String ARGUMENTS_DATE = "date";
 			
 	public Command parseCommand(String command) throws Exception {
 		String[] args = command.split(" ");
 		Command commandObject;
 		if (args[0].equalsIgnoreCase(COMMAND_ADD)) {
 			try {
-				commandObject = new Command(Command.Type.ADD, new Task(args[1]));
+				Task taskObj = new Task(args[1]);
+				if (args[1].contains(";")) {
+					String[] newArgs = args[1].split(";");
+					if (newArgs[0].equalsIgnoreCase(ARGUMENTS_DATE)) {
+						taskObj.setDate(new Date());
+					}
+				}
+				commandObject = new Command(Command.Type.ADD, taskObj);
+				
 			}
 			catch (ArrayIndexOutOfBoundsException e) {
 				throw new Exception(String.format(WARNING_INSUFFICIENT_ARGUMENT, args[0]));
