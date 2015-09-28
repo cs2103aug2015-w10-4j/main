@@ -3,7 +3,10 @@ package parser;
 import global.Command;
 import global.Task;
 
-import java.util.Date;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 
 public class Parser {
 	/**
@@ -22,18 +25,21 @@ public class Parser {
 	private static final String COMMAND_DISPLAY = "display";
 	private static final String COMMAND_SAVEPATH = "savepath";
 	private static final String ARGUMENTS_DATE = "date";
-			
+	private static final String ARGUMENTS_SEPARATOR = ";";
+	
+	private static final String[] months = {"jan", "feb", "mar", "apr", "may", "june", "july", "aug",
+		"sep", "oct", "nov", "dec"};
+	
 	public Command parseCommand(String command) throws Exception {
-		String[] args = command.split(" ");
+		String[] args = command.split(" ", 2);
 		Command commandObject;
 		if (args[0].equalsIgnoreCase(COMMAND_ADD)) {
 			try {
-				Task taskObj = new Task(args[1]);
-				if (args[1].contains(";")) {
-					String[] newArgs = args[1].split(";");
-					if (newArgs[0].equalsIgnoreCase(ARGUMENTS_DATE)) {
-						taskObj.setDate(new Date());
-					}
+				Task taskObj = new Task();
+				if (args[1].contains(ARGUMENTS_SEPARATOR)) {
+					parseArguments(args[1], taskObj);
+				} else {
+					taskObj.setName(args[1]);
 				}
 				commandObject = new Command(Command.Type.ADD, taskObj);
 				
@@ -65,6 +71,41 @@ public class Parser {
 			commandObject = null;
 		}
 		return commandObject;
+	}
+
+	/*
+	 * Parses raw data fed from Storage through Logic into Task objects
+	 */
+	public ArrayList<Task> parseRawTaskList(ArrayList<String> rawList) {
+		ArrayList<Task> taskList = new ArrayList<Task>();
+		for (int i = 0; i < rawList.size(); i++) {
+			Task taskObj = new Task();
+			if (rawList.get(i).contains(ARGUMENTS_SEPARATOR)) {
+				parseArguments(rawList.get(i), taskObj);
+			} else {
+				taskObj.setName(rawList.get(i));
+			}
+			taskList.add(taskObj);
+		}
+		return taskList;
+	}
+	
+	/*
+	 * parses arguments after separator
+	 * pre-condition: String arg must contain ARGUMENTS_SEPARATOR
+	 */
+	public void parseArguments(String arg, Task taskObj) {
+		String[] newArgs = arg.split(";");
+		taskObj.setName(newArgs[0]);
+		String[] dateArgs = newArgs[1].split(" ");
+		if (dateArgs[0].equalsIgnoreCase(ARGUMENTS_DATE)) {
+			int day = Integer.parseInt(dateArgs[1]);
+			int month = Arrays.binarySearch(months, dateArgs[2]);
+			int year = Integer.parseInt(dateArgs[3]);
+			
+			Calendar date = new GregorianCalendar(year, month, day);
+			taskObj.setDate(date);
+		}
 	}
 	
 }

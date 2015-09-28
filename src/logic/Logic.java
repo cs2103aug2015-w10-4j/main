@@ -1,13 +1,15 @@
 package logic;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.ArrayList;
-
-import ui.UI;
-import parser.Parser;
-import storage.Storage;
 import global.Command;
 import global.Task;
+
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+
+import parser.Parser;
+import storage.Storage;
+import ui.UI;
 
 public class Logic {
 	
@@ -19,6 +21,9 @@ public class Logic {
 	Storage storageObject;
 	ArrayList<Task> listOfTasks = new ArrayList<Task>();
 	
+	// date format converter
+	private static SimpleDateFormat sdf = new SimpleDateFormat("dd MMM yyyy");
+	
 	/*
 	 * Static strings - errors, warnings and messages
 	 */
@@ -28,8 +33,10 @@ public class Logic {
 	public static final String MESSAGE_SUCCESS_DELETE = "Item successfully deleted.";
 	public static final String MESSAGE_SUCCESS_EDIT = "Item successfully edited.";
 	public static final String MESSAGE_SUCCESS_EXIT = "Exiting program...";
-	public static final String MESSAGE_DISPLAY_TASKLINE = "%d. %s\r\n";
+	public static final String MESSAGE_DISPLAY_TASKLINE = "%d. %s ";
+	public static final String MESSAGE_DISPLAY_NEWLINE = "\r\n"; // isolated this string for ease of concatenation
 	public static final String MESSAGE_DISPLAY_EMPTY = "No items to display.";
+	public static final String ARGUMENTS_SEPARATOR = ";";
 	public static final String ERROR_WRITING_FILE = "Error writing file.";
 	public static final String ERROR_FILE_NOT_FOUND = "Error file not found";
 	public static final String WARNING_INVALID_ARGUMENT = "Warning: Invalid argument for command";
@@ -54,7 +61,8 @@ public class Logic {
 		parserObject = new Parser();
 		storageObject = new Storage();
 		try {
-			listOfTasks = storageObject.getItemList();
+			ArrayList<String> rawTaskList = storageObject.getItemList();
+			listOfTasks = parserObject.parseRawTaskList(rawTaskList);
 		} catch (FileNotFoundException e) {
 			UIObject.showToUser(ERROR_FILE_NOT_FOUND);
 		}
@@ -177,7 +185,7 @@ public class Logic {
 	}
 	
 	/**
-	 * @return string to be displayed
+	 * @return string to be displayed, in the form of "[taskname] ;[date]"
 	 */
 	public String displayItems() {
 		if (listOfTasks.isEmpty()) {
@@ -186,6 +194,10 @@ public class Logic {
 		String stringToDisplay = "";
 		for (int i = 0; i < listOfTasks.size(); i++) {
 			stringToDisplay += String.format(MESSAGE_DISPLAY_TASKLINE, i + 1, listOfTasks.get(i).getName());
+			if (listOfTasks.get(i).getDate() != null) {
+				stringToDisplay += ARGUMENTS_SEPARATOR + sdf.format(listOfTasks.get(i).getDate().getTime());
+			}
+			stringToDisplay += MESSAGE_DISPLAY_NEWLINE;
 		}
 		return stringToDisplay;
 	}

@@ -1,6 +1,7 @@
 package global;
 
-import java.util.Date;
+import java.util.Calendar;
+
 
 /**
  * This is a data structure to store the details of a task
@@ -10,18 +11,23 @@ public class Task {
 	 * Declaration of variables
 	 */
 	String name;
-	Date date;
+	Calendar date;
 
 	/*
 	 * Constructor
 	 */
+	
 	public Task(String name) {
 		this.name = name;
 	}
 	
-	public Task(String name, Date date) {
+	public Task(String name, Calendar date) {
 		this(name);
 		this.date = date;
+	}
+	
+	public Task() {
+		this(null, null);
 	}
 
 	
@@ -35,14 +41,18 @@ public class Task {
 	}
 
 	//change the name of the task
-	public Boolean replaceName(String newName) {
+	public boolean setName(String newName) {
 		this.name = newName;
 		return true;
 	}
 	
-	public boolean setDate(Date date) {
+	public boolean setDate(Calendar date) {
 		this.date = date;
 		return true;
+	}
+	
+	public Calendar getDate() {
+		return date;
 	}
 
 }
