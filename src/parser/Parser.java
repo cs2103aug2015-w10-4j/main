@@ -56,8 +56,7 @@ public class Parser {
 			currentCommand = Command.Type.display;
 			commandObject = new Command(currentCommand);
 		} else if (args[0].equalsIgnoreCase(COMMAND_SAVEPATH)) {
-			currentCommand = Command.Type.savepath;
-			commandObject = new Command(currentCommand)
+			commandObject = new Command(Command.Type.savepath);
 		} else {
 			commandObject = null;
 		}
