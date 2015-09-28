@@ -29,6 +29,7 @@ public class Logic {
 	public static final String MESSAGE_SUCCESS_EDIT = "Item successfully edited.";
 	public static final String MESSAGE_SUCCESS_EXIT = "Exiting program...";
 	public static final String MESSAGE_DISPLAY_TASKLINE = "%d. %s\r\n";
+	public static final String MESSAGE_DISPLAY_EMPTY = "No items to display.";
 	public static final String ERROR_WRITING_FILE = "Error writing file.";
 	public static final String ERROR_FILE_NOT_FOUND = "Error file not found";
 	public static final String WARNING_INVALID_ARGUMENT = "Warning: Invalid argument for command";
@@ -179,6 +180,9 @@ public class Logic {
 	 * @return string to be displayed
 	 */
 	public String displayItems() {
+		if (listOfTasks.isEmpty()) {
+			return MESSAGE_DISPLAY_EMPTY;
+		}
 		String stringToDisplay = "";
 		for (int i = 0; i < listOfTasks.size(); i++) {
 			stringToDisplay += String.format(MESSAGE_DISPLAY_TASKLINE, i + 1, listOfTasks.get(i).getName());
