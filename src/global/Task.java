@@ -1,6 +1,5 @@
 package global;
 
-import java.sql.Time;
 import java.util.Date;
 
 /**
@@ -19,18 +18,15 @@ public class Task {
 	public Task(String name) {
 		this.name = name;
 	}
-    
-	//timeStr: year month date hour minute (2014 06 04 24 24)
-	@SuppressWarnings("deprecation")
-	public Task(String name,String timeStr){
-		String [] timeArr = timeStr.split(" ");
-		this.date = new Date(Integer.parseInt(timeArr[0]) , Integer.parseInt(timeArr[1]) , Integer.parseInt(timeArr[2]) ,
-				Integer.parseInt(timeArr[3]) , Integer.parseInt(timeArr[4]));
-		this.name = name;
+	
+	public Task(String name, Date date) {
+		this(name);
+		this.date = date;
 	}
+
 	
 	/*
-	 * Accessor
+	 * Public methods
 	 */
 
 	//returns the name of the task
@@ -43,15 +39,9 @@ public class Task {
 	 * @return   time, format : year month date hour minute (2014 06 04 24 24)
 	 * @SuppressWarnings("deprecation")
 	 */
-	@SuppressWarnings("deprecation")
-	public String getTime() {
-		return date.getYear() + " " + date.getMonth() + " " + 
-	date.getDate() + " " + date.getHours() + " " +date.getMinutes();
+	public Date getTime() {
+		return this.date;
 	}
-
-	/*
-	 * mutator
-	 */
 
 	//change the name of the task
 	public Boolean replaceName(String newName) {
@@ -59,20 +49,11 @@ public class Task {
 		return true;
 	}
 	
-	/**
-	 * always return true currently
-	 * @return  time, format : year month date hour minute (2014 06 04 24 24)
-	 * @SuppressWarnings("deprecation")
-	 */
-	@SuppressWarnings("deprecation")
-	public boolean setTime(String timeStr){
-		String [] timeArr = timeStr.split(" ");
-		this.date.setYear(Integer.parseInt(timeArr[0]));
-		this.date.setMonth(Integer.parseInt(timeArr[1]));
-		this.date.setDate(Integer.parseInt(timeArr[2]));
-		this.date.setHours(Integer.parseInt(timeArr[3]));
-		this.date.setMinutes(Integer.parseInt(timeArr[4]));
-	return true;
+	public boolean setDate(Date date) {
+		this.date = date;
+		return true;
 	}
 
 }
+
+
