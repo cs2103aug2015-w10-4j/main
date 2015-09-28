@@ -29,7 +29,7 @@ public class UI {
 	private final String frameTitle = "Tasky";
 	
 	/*
-	 * Initialisation of GUI variables
+	 * Initialization of GUI variables
 	 */
 	JFrame frame = new JFrame(frameTitle);
 	JPanel mainPanel = new JPanel(new BorderLayout(5, 5));
@@ -82,7 +82,7 @@ public class UI {
 	}
 	
 	/**
-	 * Prompt message and obtain userinput
+	 * Prompt message and obtain user input
 	 * @param prompt message to prompt user
 	 * @return userInput
 	 * @throws InterruptedException

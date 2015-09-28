@@ -12,6 +12,7 @@ import global.Task;
 public class Storage {
 	public static String FILE_PATH = "save.txt";
 	public static String FILE_TASKLINE = "%s\r\n";
+	
 	/**
 	 * Saves the list of tasks in the file
 	 * @param ArrayList<Task>task    ArrayList that stores the tasks
@@ -28,7 +29,6 @@ public class Storage {
 		FileWriter fw = new FileWriter(file.getAbsoluteFile());
 		BufferedWriter bw = new BufferedWriter(fw);
 		bw.write(content);
-	//bw.newLine();
 		bw.close();
 		return true;
 	}
@@ -56,7 +56,7 @@ public class Storage {
 	 * @return ArrayList of tasks read from file
 	 * @throws FileNotFoundException if there is no file in the filePath
 	 */
-	public ArrayList<Task> getItemList() throws FileNotFoundException{
+	public ArrayList<Task> getItemList() throws FileNotFoundException {
 		File file = new File(FILE_PATH);
 		Scanner sc = new Scanner(file);
 		ArrayList<Task>tasklist = new ArrayList<Task>();
