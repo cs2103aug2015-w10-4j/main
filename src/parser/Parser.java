@@ -5,15 +5,14 @@ import global.Task;
 
 public class Parser {
 	
+	// warning messages
+	private static final String WARNING_INSUFFICIENT_ARGUMENT = "Warning: '%s': insufficient command arguments";
+	
 	/**
 	 * Parses the command string based on keyword
 	 * @param command
 	 * @return commandObject to be executed, or null if invalid
 	 */
-	
-	// warning messages
-	private static final String WARNING_INSUFFICIENT_ARGUMENT = "Warning: '%s': insufficient command arguments";
-	
 	public Command parseCommand(String command) throws Exception {
 		String[] args = command.split(" ");
 		Command.Type currentCommand;

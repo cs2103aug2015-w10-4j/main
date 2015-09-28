@@ -40,14 +40,15 @@ public class Logic {
 	/*
 	 * Main program
 	 */
-	public static void main(String[] args){
+	public static void main(String[] args) {
 		Logic logicObject = new Logic();
 		logicObject.start();
 	}
+	
 	/*
 	 * Constructor to initialize object variables
 	 */
-	public Logic(){
+	public Logic() {
 		UIObject = new UI();
 		parserObject = new Parser();
 		storageObject = new Storage();
@@ -57,11 +58,13 @@ public class Logic {
 			UIObject.showToUser(ERROR_FILE_NOT_FOUND);
 		}
 	}
-	public void start(){
+	
+	public void start() {
 		showWelcomeMessage();
 		readUserInput();
 	}
-	public void showWelcomeMessage(){
+	
+	public void showWelcomeMessage() {
 		UIObject.showToUser(MESSAGE_WELCOME);
 	}
 	
@@ -71,7 +74,7 @@ public class Logic {
 	 *  shows the result in UI, writes latest task list to file
 	 * until the program exits
 	 */
-	public void readUserInput(){
+	public void readUserInput() {
 		while (true) {
 			try {
 				String userInput = UIObject.promptUser(MESSAGE_PROMPT_COMMAND);
@@ -95,7 +98,7 @@ public class Logic {
 	 * Executes a command based on commandObject
 	 * @return a string to be shown to user
 	 */
-	public String executeCommand(Command commandObject){
+	public String executeCommand(Command commandObject) {
 		if (commandObject == null) {
 			return WARNING_INVALID_COMMAND;
 		}
@@ -116,7 +119,7 @@ public class Logic {
 		return WARNING_NO_COMMAND_HANDLER;
 	}
 	
-	public String addItem(Task userTask){
+	public String addItem(Task userTask) {
 		listOfTasks.add(userTask);
 		return MESSAGE_SUCCESS_ADD;
 	}
@@ -126,19 +129,19 @@ public class Logic {
 	 * @param argumentList the index string is read from position 0
 	 * @return status string
 	 */
-	public String deleteItem(ArrayList<String> argumentList){
-		if(argumentList == null || argumentList.isEmpty()){
+	public String deleteItem(ArrayList<String> argumentList) {
+		if (argumentList == null || argumentList.isEmpty()) {
 			return WARNING_INVALID_ARGUMENT;
 		}
 		try {
 			int index = Integer.parseInt(argumentList.get(0)) - 1;
-			if(isValidIndex(index)){
+			if (isValidIndex(index)) {
 				listOfTasks.remove(index);
-			}else{
+			} else {
 				return WARNING_INVALID_INDEX;
 			}
 			return MESSAGE_SUCCESS_DELETE;
-		} catch (NumberFormatException e){
+		} catch (NumberFormatException e) {
 			return WARNING_INVALID_ARGUMENT;
 		}
 		
@@ -150,15 +153,15 @@ public class Logic {
 	 * @param argumentList the index string is read from position 0
 	 * @return status string
 	 */
-	public String editItem(Task userTask, ArrayList<String> argumentList){
-		if(argumentList == null || argumentList.isEmpty()){
+	public String editItem(Task userTask, ArrayList<String> argumentList) {
+		if (argumentList == null || argumentList.isEmpty()) {
 			return WARNING_INVALID_ARGUMENT;
 		}
 		try {
 			int index = Integer.parseInt(argumentList.get(0)) - 1;
-			if(isValidIndex(index)){
+			if (isValidIndex(index)) {
 				listOfTasks.remove(index);
-			}else{
+			} else {
 				return WARNING_INVALID_INDEX;
 			}
 			listOfTasks.add(index, userTask);
@@ -168,22 +171,22 @@ public class Logic {
 		return MESSAGE_SUCCESS_EDIT;
 	}
 	
-	public boolean isValidIndex(int index){
-		return !(index > listOfTasks.size() - 1 || index < 0);
+	public boolean isValidIndex(int index) {
+		return index >= 0 && index < listOfTasks.size();
 	}
 	
 	/**
 	 * @return string to be displayed
 	 */
-	public String displayItems(){
+	public String displayItems() {
 		String stringToDisplay = "";
-		for(int i = 0; i < listOfTasks.size(); i++){
+		for (int i = 0; i < listOfTasks.size(); i++) {
 			stringToDisplay += String.format(MESSAGE_DISPLAY_TASKLINE, i + 1, listOfTasks.get(i).getName());
 		}
 		return stringToDisplay;
 	}
 	
-	public String exitProgram(){
+	public String exitProgram() {
 		System.exit(1);
 		return MESSAGE_SUCCESS_EXIT;
 	}

@@ -56,7 +56,7 @@ public class Storage {
 	 * @return ArrayList of tasks read from file
 	 * @throws FileNotFoundException if there is no file in the filePath
 	 */
-	public ArrayList<Task> getItemList() throws FileNotFoundException{
+	public ArrayList<Task> getItemList() throws FileNotFoundException {
 		File file = new File(FILE_PATH);
 		Scanner sc = new Scanner(file);
 		ArrayList<Task>tasklist = new ArrayList<Task>();
