@@ -9,7 +9,7 @@ public class Command {
 	private Task task;
 	
 	public enum Type {
-		add, edit, delete, display, exit;
+		ADD, EDIT, DELETE, DISPLAY, EXIT;
 	}
 	
 	public Command(Type commandType) { 
@@ -17,6 +17,7 @@ public class Command {
 		this.task = null;
 		this.argumentList = null;
 	}
+	
 	public Command(Type commandType, Task task) { 
 		setCommandType(commandType);
 		setTask(task);

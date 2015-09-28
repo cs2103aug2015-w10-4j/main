@@ -37,7 +37,6 @@ public class Logic {
 	public static final String WARNING_INVALID_INDEX = "Warning: There is no item at this index.";
 	public static final String WARNING_UI_INTERRUPTED = "Warning: UI prompt has been interrupted";
 	
-	
 	/*
 	 * Main program
 	 */
@@ -97,21 +96,21 @@ public class Logic {
 	 * @return a string to be shown to user
 	 */
 	public String executeCommand(Command commandObject){
-		if(commandObject == null){
+		if (commandObject == null) {
 			return WARNING_INVALID_COMMAND;
 		}
 		Command.Type commandType = commandObject.getCommandType();
 		Task userTask = commandObject.getTask();
 		ArrayList<String> argumentList = commandObject.getArguments();
-		if(commandType == Command.Type.add){
+		if (commandType == Command.Type.ADD) {
 			return addItem(userTask);
-		}else if(commandType == Command.Type.delete){
+		} else if(commandType == Command.Type.DELETE) {
 			return deleteItem(argumentList);
-		}else if(commandType == Command.Type.edit){
+		} else if(commandType == Command.Type.EDIT) {
 			return editItem(userTask, argumentList);
-		}else if(commandType == Command.Type.display){
+		} else if(commandType == Command.Type.DISPLAY) {
 			return displayItems();
-		}else if(commandType == Command.Type.exit){
+		} else if(commandType == Command.Type.EXIT) {
 			return exitProgram();
 		}
 		return WARNING_NO_COMMAND_HANDLER;
@@ -168,6 +167,7 @@ public class Logic {
 		}
 		return MESSAGE_SUCCESS_EDIT;
 	}
+	
 	public boolean isValidIndex(int index){
 		return !(index > listOfTasks.size() - 1 || index < 0);
 	}
@@ -178,7 +178,7 @@ public class Logic {
 	public String displayItems(){
 		String stringToDisplay = "";
 		for(int i = 0; i < listOfTasks.size(); i++){
-			stringToDisplay += String.format(MESSAGE_DISPLAY_TASKLINE, i+1, listOfTasks.get(i).getName());
+			stringToDisplay += String.format(MESSAGE_DISPLAY_TASKLINE, i + 1, listOfTasks.get(i).getName());
 		}
 		return stringToDisplay;
 	}

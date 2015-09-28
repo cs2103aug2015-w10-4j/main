@@ -19,7 +19,7 @@ public class Parser {
 		Command.Type currentCommand;
 		Command commandObject;
 		if (args[0].equalsIgnoreCase("add")) {
-			currentCommand = Command.Type.add;
+			currentCommand = Command.Type.ADD;
 			try {
 				commandObject = new Command(currentCommand, new Task(args[1]));
 			}
@@ -27,7 +27,7 @@ public class Parser {
 				throw new Exception(String.format(WARNING_INSUFFICIENT_ARGUMENT, args[0]));
 			}
 		} else if (args[0].equalsIgnoreCase("edit")) {
-			currentCommand = Command.Type.edit;
+			currentCommand = Command.Type.EDIT;
 			if (args.length >= 3) {
 				String[] indexToDelete = {args[1]};
 				commandObject = new Command(currentCommand, indexToDelete, new Task(args[2]));
@@ -35,7 +35,7 @@ public class Parser {
 				throw new Exception(String.format(WARNING_INSUFFICIENT_ARGUMENT, args[0]));
 			}
 		} else if (args[0].equalsIgnoreCase("delete")) {
-			currentCommand = Command.Type.delete;
+			currentCommand = Command.Type.DELETE;
 			if (args.length >= 2) { // this is to be edited when the parser becomes more complete
 				String[] indexToDelete = {args[1]};
 				commandObject = new Command(currentCommand, indexToDelete);
@@ -43,14 +43,15 @@ public class Parser {
 				throw new Exception(String.format(WARNING_INSUFFICIENT_ARGUMENT, args[0]));
 			}
 		} else if (args[0].equalsIgnoreCase("exit")) {
-			currentCommand = Command.Type.exit;
+			currentCommand = Command.Type.EXIT;
 			commandObject = new Command(currentCommand);
 		} else if (args[0].equalsIgnoreCase("display")) {
-			currentCommand = Command.Type.display;
+			currentCommand = Command.Type.DISPLAY;
 			commandObject = new Command(currentCommand);
 		} else {
 			commandObject = null;
 		}
 		return commandObject;
 	}
+	
 }
