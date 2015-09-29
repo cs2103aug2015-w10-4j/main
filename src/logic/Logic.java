@@ -153,7 +153,7 @@ public class Logic {
 			String[] indexString = {Integer.toString(index + 1)};
 			if (!pushToHistory(new Command(Command.Type.DELETE, indexString))) {
 				return WARNING_CANNOT_WRITE_TO_HISTORY;
-			};
+			}
 			
 			return MESSAGE_SUCCESS_ADD;	
 		} catch (NumberFormatException e) {
@@ -178,7 +178,7 @@ public class Logic {
 				String[] indexString = {Integer.toString(index + 1)};
 				if (!pushToHistory(new Command(Command.Type.ADD, indexString, taskRemoved))) {
 					return WARNING_CANNOT_WRITE_TO_HISTORY;
-				};
+				}
 				
 				listOfTasks.remove(index);
 			} else {
