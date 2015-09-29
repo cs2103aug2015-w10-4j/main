@@ -25,7 +25,7 @@ public class Parser {
 	private static final String COMMAND_EXIT = "exit";
 	private static final String COMMAND_DISPLAY = "display";
 	private static final String COMMAND_SAVEPATH = "savepath";
-	private static final String ARGUMENTS_DATE = "date";
+	private static final String DATE_ARGUMENTS = "date";
 	private static final String SEPARATOR_ARGUMENTS = ";";
 	
 	private static final String[] months = {"jan", "feb", "mar", "apr", "may", "jun", "jul", "aug",
@@ -107,7 +107,7 @@ public class Parser {
 		String[] newArgs = arg.split(";");
 		taskObj.setName(newArgs[0]);
 		String[] dateArgs = newArgs[1].split(" ");
-		if (dateArgs[0].equalsIgnoreCase(ARGUMENTS_DATE)) {
+		if (dateArgs[0].equalsIgnoreCase(DATE_ARGUMENTS)) {
 			int day = Integer.parseInt(dateArgs[1]);
 			int month = Arrays.binarySearch(months, dateArgs[2]);
 			int year = Integer.parseInt(dateArgs[3]);

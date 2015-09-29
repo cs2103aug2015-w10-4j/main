@@ -145,7 +145,7 @@ public class Logic {
 			int index;
 			if (argumentList == null || argumentList.isEmpty()) {
 				index = listOfTasks.size();
-			}else{
+			} else {
 				index = Integer.parseInt(argumentList.get(0)) - 1;
 			}
 			listOfTasks.add(index, userTask);
@@ -176,7 +176,7 @@ public class Logic {
 				//handle history
 				Task taskRemoved = listOfTasks.get(index);
 				String[] indexString = {Integer.toString(index + 1)};
-				if(!pushToHistory(new Command(Command.Type.ADD, indexString, taskRemoved))){
+				if (!pushToHistory(new Command(Command.Type.ADD, indexString, taskRemoved))) {
 					return WARNING_CANNOT_WRITE_TO_HISTORY;
 				};
 				
@@ -208,9 +208,9 @@ public class Logic {
 				//handle history
 				Task taskEdited = listOfTasks.get(index);
 				String[] indexString = {Integer.toString(index + 1)};
-				if(!pushToHistory(new Command(Command.Type.ADD, indexString, taskEdited))){
+				if (!pushToHistory(new Command(Command.Type.ADD, indexString, taskEdited))) {
 					return WARNING_CANNOT_WRITE_TO_HISTORY;
-				};
+				}
 				
 				listOfTasks.remove(index);
 			} else {
@@ -244,14 +244,14 @@ public class Logic {
 					stringToDisplay += SEPARATOR_DISPLAY_FIELDS + dateFormat.format(listOfTasks.get(i).getDate().getTime());
 				}
 			}
-				stringToDisplay += MESSAGE_DISPLAY_NEWLINE;
+			stringToDisplay += MESSAGE_DISPLAY_NEWLINE;
 		}
 		return stringToDisplay;
 	}
 	
 	public String undoCommand(){
 		Command previousCommand = historyObject.getPreviousCommand();
-		if(previousCommand == null){
+		if (previousCommand == null) {
 			return WARNING_NO_HISTORY;
 		}
 		return executeCommand(previousCommand);

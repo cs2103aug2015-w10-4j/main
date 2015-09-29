@@ -4,17 +4,19 @@ import java.util.ArrayList;
 
 public class History {
 	ArrayList<Command> commandHistoryList  = new ArrayList<Command>();
-	public boolean pushCommand(Command commandObject){
+	
+	public boolean pushCommand(Command commandObject) {
 		commandHistoryList.add(commandObject);
 		return true;
 	}
-	public Command getPreviousCommand(){
+	
+	public Command getPreviousCommand() {
 		int historySize = commandHistoryList.size();
-		if(historySize > 0){
+		if (historySize > 0) {
 			Command commandObjectToReturn = commandHistoryList.get(historySize - 1);
 			commandHistoryList.remove(historySize - 1);
 			return commandObjectToReturn;
-		}else{
+		} else {
 			return null;
 		}
 	}

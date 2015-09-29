@@ -39,7 +39,7 @@ public class Storage {
 					content += ARGUMENTS_SEPERATOR + ARGUMENTS_DATE + sdf.format(task.get(i).getDate().getTime());
 				}
 			}
-				content += FILE_NEWLINE;
+			content += FILE_NEWLINE;
 		}
 	
 		File file = new File(FILE_PATH);
@@ -59,7 +59,7 @@ public class Storage {
 	 */
 	public boolean saveFileToPath(String path) throws IOException {
 		File file = new File(path);
-		if (!file.exists()){
+		if (!file.exists()) {
 			file.createNewFile();
 			FILE_PATH = path;
 			return false;

@@ -2,7 +2,6 @@ package global;
 
 import java.util.Calendar;
 
-
 /**
  * This is a data structure to store the details of a task
  */
@@ -10,13 +9,12 @@ public class Task {
 	/*
 	 * Declaration of variables
 	 */
-	String name;
-	Calendar date;
+	String name = null;
+	Calendar date = null;
 
 	/*
 	 * Constructor
 	 */
-	
 	public Task(String name) {
 		this.name = name;
 	}
@@ -27,7 +25,7 @@ public class Task {
 	}
 	
 	public Task() {
-		this(null, null);
+		
 	}
 
 	
