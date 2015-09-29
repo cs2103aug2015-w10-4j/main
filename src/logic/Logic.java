@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import parser.Parser;
 import storage.Storage;
 import ui.UI;
+import history.History;
 
 public class Logic {
 	
@@ -19,10 +20,11 @@ public class Logic {
 	UI UIObject;
 	Parser parserObject;
 	Storage storageObject;
+	History historyObject;
 	ArrayList<Task> listOfTasks = new ArrayList<Task>();
 	
 	// date format converter
-	private static SimpleDateFormat sdf = new SimpleDateFormat("dd MMM yyyy");
+	private static SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM yyyy");
 	
 	/*
 	 * Static strings - errors, warnings and messages
@@ -33,10 +35,11 @@ public class Logic {
 	public static final String MESSAGE_SUCCESS_DELETE = "Item successfully deleted.";
 	public static final String MESSAGE_SUCCESS_EDIT = "Item successfully edited.";
 	public static final String MESSAGE_SUCCESS_EXIT = "Exiting program...";
-	public static final String MESSAGE_DISPLAY_TASKLINE = "%d. %s ";
+	public static final String MESSAGE_DISPLAY_TASKLINE_INDEX = "%d. ";
 	public static final String MESSAGE_DISPLAY_NEWLINE = "\r\n"; // isolated this string for ease of concatenation
 	public static final String MESSAGE_DISPLAY_EMPTY = "No items to display.";
-	public static final String ARGUMENTS_SEPARATOR = ";";
+	public static final String SEPARATOR_ARGUMENTS = ";";
+	public static final String SEPARATOR_DISPLAY_FIELDS = "|";
 	public static final String ERROR_WRITING_FILE = "Error writing file.";
 	public static final String ERROR_FILE_NOT_FOUND = "Error file not found";
 	public static final String WARNING_INVALID_ARGUMENT = "Warning: Invalid argument for command";
@@ -44,7 +47,8 @@ public class Logic {
 	public static final String WARNING_NO_COMMAND_HANDLER = "Warning: Handler for this command type has not been defined.";
 	public static final String WARNING_INVALID_INDEX = "Warning: There is no item at this index.";
 	public static final String WARNING_UI_INTERRUPTED = "Warning: UI prompt has been interrupted";
-	
+	public static final String WARNING_NO_HISTORY = "Warning: No history found";
+	public static final String WARNING_CANNOT_WRITE_TO_HISTORY = "Warning: Unable to store command in history";
 	/*
 	 * Main program
 	 */
@@ -60,9 +64,10 @@ public class Logic {
 		UIObject = new UI();
 		parserObject = new Parser();
 		storageObject = new Storage();
+		historyObject = new History();
 		try {
-			ArrayList<String> rawTaskList = storageObject.getItemList();
-			listOfTasks = parserObject.parseRawTaskList(rawTaskList);
+			ArrayList<String> fileData = storageObject.getItemList();
+			listOfTasks = parserObject.parseFileData(fileData);
 		} catch (FileNotFoundException e) {
 			UIObject.showToUser(ERROR_FILE_NOT_FOUND);
 		}
@@ -98,6 +103,7 @@ public class Logic {
 				// error writing
 				UIObject.showToUser(ERROR_WRITING_FILE);
 			} catch (Exception e) {
+				// error in user command
 				UIObject.showToUser(e.getMessage());
 			}
 		}
@@ -114,23 +120,45 @@ public class Logic {
 		Command.Type commandType = commandObject.getCommandType();
 		Task userTask = commandObject.getTask();
 		ArrayList<String> argumentList = commandObject.getArguments();
-		if (commandType == Command.Type.ADD) {
-			return addItem(userTask);
-		} else if(commandType == Command.Type.DELETE) {
-			return deleteItem(argumentList);
-		} else if(commandType == Command.Type.EDIT) {
-			return editItem(userTask, argumentList);
-		} else if(commandType == Command.Type.DISPLAY) {
-			return displayItems();
-		} else if(commandType == Command.Type.EXIT) {
-			return exitProgram();
+		switch (commandType) {
+			case ADD:
+				return addItem(userTask, argumentList);
+			case DELETE:
+				historyObject.pushCommand(commandObject);
+				return deleteItem(argumentList);
+			case EDIT:
+				historyObject.pushCommand(commandObject);
+				return editItem(userTask, argumentList);
+			case DISPLAY:
+				return displayItems();
+			case UNDO:
+				return undoCommand();
+			case EXIT:
+				return exitProgram();
+			default:
 		}
 		return WARNING_NO_COMMAND_HANDLER;
 	}
 	
-	public String addItem(Task userTask) {
-		listOfTasks.add(userTask);
-		return MESSAGE_SUCCESS_ADD;
+	public String addItem(Task userTask, ArrayList<String> argumentList) {
+		try {
+			int index;
+			if (argumentList == null || argumentList.isEmpty()) {
+				index = listOfTasks.size();
+			}else{
+				index = Integer.parseInt(argumentList.get(0)) - 1;
+			}
+			listOfTasks.add(index, userTask);
+			//handle history
+			String[] indexString = {Integer.toString(index + 1)};
+			if (!pushToHistory(new Command(Command.Type.DELETE, indexString))) {
+				return WARNING_CANNOT_WRITE_TO_HISTORY;
+			};
+			
+			return MESSAGE_SUCCESS_ADD;	
+		} catch (NumberFormatException e) {
+			return WARNING_INVALID_ARGUMENT;
+		}
 	}
 	
 	/**
@@ -145,10 +173,18 @@ public class Logic {
 		try {
 			int index = Integer.parseInt(argumentList.get(0)) - 1;
 			if (isValidIndex(index)) {
+				//handle history
+				Task taskRemoved = listOfTasks.get(index);
+				String[] indexString = {Integer.toString(index + 1)};
+				if(!pushToHistory(new Command(Command.Type.ADD, indexString, taskRemoved))){
+					return WARNING_CANNOT_WRITE_TO_HISTORY;
+				};
+				
 				listOfTasks.remove(index);
 			} else {
 				return WARNING_INVALID_INDEX;
 			}
+			
 			return MESSAGE_SUCCESS_DELETE;
 		} catch (NumberFormatException e) {
 			return WARNING_INVALID_ARGUMENT;
@@ -169,6 +205,13 @@ public class Logic {
 		try {
 			int index = Integer.parseInt(argumentList.get(0)) - 1;
 			if (isValidIndex(index)) {
+				//handle history
+				Task taskEdited = listOfTasks.get(index);
+				String[] indexString = {Integer.toString(index + 1)};
+				if(!pushToHistory(new Command(Command.Type.ADD, indexString, taskEdited))){
+					return WARNING_CANNOT_WRITE_TO_HISTORY;
+				};
+				
 				listOfTasks.remove(index);
 			} else {
 				return WARNING_INVALID_INDEX;
@@ -193,13 +236,29 @@ public class Logic {
 		}
 		String stringToDisplay = "";
 		for (int i = 0; i < listOfTasks.size(); i++) {
-			stringToDisplay += String.format(MESSAGE_DISPLAY_TASKLINE, i + 1, listOfTasks.get(i).getName());
-			if (listOfTasks.get(i).getDate() != null) {
-				stringToDisplay += ARGUMENTS_SEPARATOR + sdf.format(listOfTasks.get(i).getDate().getTime());
+			Task curTask = listOfTasks.get(i);
+			stringToDisplay += String.format(MESSAGE_DISPLAY_TASKLINE_INDEX, i + 1);
+			if(curTask != null){
+				stringToDisplay += listOfTasks.get(i).getName();
+				if (curTask.getDate() != null) {
+					stringToDisplay += SEPARATOR_DISPLAY_FIELDS + dateFormat.format(listOfTasks.get(i).getDate().getTime());
+				}
 			}
-			stringToDisplay += MESSAGE_DISPLAY_NEWLINE;
+				stringToDisplay += MESSAGE_DISPLAY_NEWLINE;
 		}
 		return stringToDisplay;
+	}
+	
+	public String undoCommand(){
+		Command previousCommand = historyObject.getPreviousCommand();
+		if(previousCommand == null){
+			return WARNING_NO_HISTORY;
+		}
+		return executeCommand(previousCommand);
+	}
+		
+	public boolean pushToHistory(Command commandObject){
+		return historyObject.pushCommand(commandObject);
 	}
 	
 	public String exitProgram() {

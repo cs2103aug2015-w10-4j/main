@@ -21,22 +21,29 @@ public class Parser {
 	private static final String COMMAND_ADD = "add";
 	private static final String COMMAND_EDIT = "edit";
 	private static final String COMMAND_DELETE = "delete";
+	private static final String COMMAND_UNDO = "undo";
 	private static final String COMMAND_EXIT = "exit";
 	private static final String COMMAND_DISPLAY = "display";
 	private static final String COMMAND_SAVEPATH = "savepath";
 	private static final String ARGUMENTS_DATE = "date";
-	private static final String ARGUMENTS_SEPARATOR = ";";
+	private static final String SEPARATOR_ARGUMENTS = ";";
 	
-	private static final String[] months = {"jan", "feb", "mar", "apr", "may", "june", "july", "aug",
+	private static final String[] months = {"jan", "feb", "mar", "apr", "may", "jun", "jul", "aug",
 		"sep", "oct", "nov", "dec"};
 	
+	/**
+	 * Parses the string provided and returns the corresponding object
+	 * @param command user input
+	 * @return Command object for execution
+	 * @throws Exception parsing error message
+	 */
 	public Command parseCommand(String command) throws Exception {
 		String[] args = command.split(" ", 2);
 		Command commandObject;
 		if (args[0].equalsIgnoreCase(COMMAND_ADD)) {
 			try {
 				Task taskObj = new Task();
-				if (args[1].contains(ARGUMENTS_SEPARATOR)) {
+				if (args[1].contains(SEPARATOR_ARGUMENTS)) {
 					parseArguments(args[1], taskObj);
 				} else {
 					taskObj.setName(args[1]);
@@ -48,7 +55,7 @@ public class Parser {
 				throw new Exception(String.format(WARNING_INSUFFICIENT_ARGUMENT, args[0]));
 			}
 		} else if (args[0].equalsIgnoreCase(COMMAND_EDIT)) {
-			if (args.length >= 3) {
+			if (args.length >= 3) { // LW, this will not have enough arguments since args is split into maximum of 2 parts
 				String[] indexToDelete = {args[1]};
 				commandObject = new Command(Command.Type.EDIT, indexToDelete, new Task(args[2]));
 			} else {
@@ -65,6 +72,8 @@ public class Parser {
 			commandObject = new Command(Command.Type.EXIT);
 		} else if (args[0].equalsIgnoreCase(COMMAND_DISPLAY)) {
 			commandObject = new Command(Command.Type.DISPLAY);
+		} else if (args[0].equalsIgnoreCase(COMMAND_UNDO)) {
+			commandObject = new Command(Command.Type.UNDO);
 		} else if (args[0].equalsIgnoreCase(COMMAND_SAVEPATH)) {
 			commandObject = new Command(Command.Type.SAVEPATH);
 		} else {
@@ -76,14 +85,14 @@ public class Parser {
 	/*
 	 * Parses raw data fed from Storage through Logic into Task objects
 	 */
-	public ArrayList<Task> parseRawTaskList(ArrayList<String> rawList) {
+	public ArrayList<Task> parseFileData(ArrayList<String> fileData) {
 		ArrayList<Task> taskList = new ArrayList<Task>();
-		for (int i = 0; i < rawList.size(); i++) {
+		for (int i = 0; i < fileData.size(); i++) {
 			Task taskObj = new Task();
-			if (rawList.get(i).contains(ARGUMENTS_SEPARATOR)) {
-				parseArguments(rawList.get(i), taskObj);
+			if (fileData.get(i).contains(SEPARATOR_ARGUMENTS)) {
+				parseArguments(fileData.get(i), taskObj);
 			} else {
-				taskObj.setName(rawList.get(i));
+				taskObj.setName(fileData.get(i));
 			}
 			taskList.add(taskObj);
 		}
@@ -91,8 +100,8 @@ public class Parser {
 	}
 	
 	/*
-	 * parses arguments after separator
-	 * pre-condition: String arg must contain ARGUMENTS_SEPARATOR
+	 * Parses arguments after separator
+	 * pre-condition: String must contain ARGUMENTS_SEPARATOR
 	 */
 	public void parseArguments(String arg, Task taskObj) {
 		String[] newArgs = arg.split(";");

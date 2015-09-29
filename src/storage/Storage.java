@@ -24,7 +24,7 @@ public class Storage {
 	
 	/**
 	 * Saves the list of tasks in the file
-	 * @param ArrayList<Task> task ArrayList that stores the RAW tasks as Strings in text file
+	 * @param ArrayList<Task> ArrayList that stores the RAW tasks as Strings in text file
 	 * Task data is saved in the following format: "[taskname];[date]" on each line. To be improved
 	 * @return true if file is saved
 	 * @throws IOException 
@@ -32,11 +32,14 @@ public class Storage {
 	public boolean writeItemList(ArrayList<Task> task) throws IOException {
 		String content = "";
 		for (int i = 0; i <task.size(); i ++) {
-			content += task.get(i).getName();
-			if (task.get(i).getDate() != null) {
-				content += ARGUMENTS_SEPERATOR + ARGUMENTS_DATE + sdf.format(task.get(i).getDate().getTime());
+			Task curTask = task.get(i);
+			if(curTask != null){
+				content += curTask.getName();
+				if (curTask.getDate() != null) {
+					content += ARGUMENTS_SEPERATOR + ARGUMENTS_DATE + sdf.format(task.get(i).getDate().getTime());
+				}
 			}
-			content += FILE_NEWLINE;
+				content += FILE_NEWLINE;
 		}
 	
 		File file = new File(FILE_PATH);
@@ -51,7 +54,7 @@ public class Storage {
 	 * Saves path to text file
 	 *
 	 * @param path path is a String contain the path of file to save
-	 * @return   true if location changes
+	 * @return true if location changes
 	 * @throws IOException
 	 */
 	public boolean saveFileToPath(String path) throws IOException {
