@@ -67,8 +67,7 @@ public class Logic {
 		storageObject = new Storage();
 		historyObject = new History();
 		try {
-			ArrayList<String> fileData = storageObject.getItemList();
-			listOfTasks = parserObject.parseFileData(fileData);
+			listOfTasks = storageObject.getItemList();
 		} catch (FileNotFoundException e) {
 			UIObject.showToUser(ERROR_FILE_NOT_FOUND);
 		}
@@ -76,7 +75,7 @@ public class Logic {
 	
 	void start() {
 		showWelcomeMessage();
-		readUserInput();
+		readAndExecuteUserInput();
 	}
 	
 	void showWelcomeMessage() {
@@ -89,12 +88,12 @@ public class Logic {
 	 *  shows the result in UI, writes latest task list to file
 	 * until the program exits
 	 */
-	void readUserInput() {
+	void readAndExecuteUserInput() {
 		while (true) {
 			try {
 				String userInput = UIObject.promptUser(MESSAGE_PROMPT_COMMAND);
 				Command commandObject = parserObject.parseCommand(userInput);
-				String executionResult = executeCommand(commandObject);
+				String executionResult = executeCommand(commandObject, true);
 				UIObject.showToUser(executionResult);
 				storageObject.writeItemList(listOfTasks);
 			} catch (InterruptedException e) {
@@ -104,7 +103,7 @@ public class Logic {
 				// error writing
 				UIObject.showToUser(ERROR_WRITING_FILE);
 			} catch (Exception e) {
-				// error in user command
+				// warning from parsing user command
 				UIObject.showToUser(e.getMessage());
 			}
 		}
@@ -112,9 +111,9 @@ public class Logic {
 	
 	/**
 	 * Executes a command based on commandObject
-	 * @return a string to be shown to user
+	 * @return status string to be shown to user
 	 */
-	String executeCommand(Command commandObject) {
+	String executeCommand(Command commandObject, boolean shouldPushToHistory) {
 		if (commandObject == null) {
 			return ERROR_INVALID_COMMAND;
 		}
@@ -123,13 +122,13 @@ public class Logic {
 		ArrayList<String> argumentList = commandObject.getArguments();
 		switch (commandType) {
 			case ADD:
-				return addItem(userTask, argumentList);
+				return addItem(userTask, argumentList, shouldPushToHistory);
 			case DELETE:
 				historyObject.pushCommand(commandObject);
-				return deleteItem(argumentList);
+				return deleteItem(argumentList, shouldPushToHistory);
 			case EDIT:
 				historyObject.pushCommand(commandObject);
-				return editItem(userTask, argumentList);
+				return editItem(userTask, argumentList, shouldPushToHistory);
 			case DISPLAY:
 				return displayItems();
 			case UNDO:
@@ -143,19 +142,22 @@ public class Logic {
 		return ERROR_NO_COMMAND_HANDLER;
 	}
 	
-	String addItem(Task userTask, ArrayList<String> argumentList) {
+	String addItem(Task userTask, ArrayList<String> argumentList, boolean shouldPushToHistory) {
 		try {
 			int index;
-			if (argumentList == null || argumentList.isEmpty()) {
+			if (isEmptyArgumentList(argumentList)) {
 				index = listOfTasks.size();
 			} else {
 				index = Integer.parseInt(argumentList.get(0)) - 1;
 			}
 			listOfTasks.add(index, userTask);
-			//handle history
-			String[] indexString = {Integer.toString(index + 1)};
-			if (!pushToHistory(new Command(Command.Type.DELETE, indexString))) {
-				return ERROR_CANNOT_WRITE_TO_HISTORY;
+			
+			if(shouldPushToHistory){
+				//	handle history
+				String[] indexString = {Integer.toString(index + 1)};
+				if (!pushToHistory(new Command(Command.Type.DELETE, indexString))) {
+					return ERROR_CANNOT_WRITE_TO_HISTORY;
+				}
 			}
 			
 			return MESSAGE_SUCCESS_ADD;	
@@ -169,18 +171,21 @@ public class Logic {
 	 * @param argumentList the index string is read from position 0
 	 * @return status string
 	 */
-	String deleteItem(ArrayList<String> argumentList) {
-		if (argumentList == null || argumentList.isEmpty()) {
+	String deleteItem(ArrayList<String> argumentList, boolean shouldPushToHistory) {
+		if (isEmptyArgumentList(argumentList)) {
 			return ERROR_INVALID_ARGUMENT;
 		}
 		try {
 			int index = Integer.parseInt(argumentList.get(0)) - 1;
 			if (isValidIndex(index)) {
+				
 				//handle history
-				Task taskRemoved = listOfTasks.get(index);
-				String[] indexString = {Integer.toString(index + 1)};
-				if (!pushToHistory(new Command(Command.Type.ADD, indexString, taskRemoved))) {
-					return ERROR_CANNOT_WRITE_TO_HISTORY;
+				if(shouldPushToHistory){
+					Task taskRemoved = listOfTasks.get(index);
+					String[] indexString = {Integer.toString(index + 1)};
+					if (!pushToHistory(new Command(Command.Type.ADD, indexString, taskRemoved))) {
+						return ERROR_CANNOT_WRITE_TO_HISTORY;
+					}
 				}
 				
 				listOfTasks.remove(index);
@@ -201,18 +206,21 @@ public class Logic {
 	 * @param argumentList the index string is read from position 0
 	 * @return status string
 	 */
-	String editItem(Task userTask, ArrayList<String> argumentList) {
-		if (argumentList == null || argumentList.isEmpty()) {
+	String editItem(Task userTask, ArrayList<String> argumentList, boolean shouldPushToHistory) {
+		if (isEmptyArgumentList(argumentList)) {
 			return ERROR_INVALID_ARGUMENT;
 		}
 		try {
 			int index = Integer.parseInt(argumentList.get(0)) - 1;
 			if (isValidIndex(index)) {
-				//handle history
-				Task taskEdited = listOfTasks.get(index);
-				String[] indexString = {Integer.toString(index + 1)};
-				if (!pushToHistory(new Command(Command.Type.ADD, indexString, taskEdited))) {
-					return ERROR_CANNOT_WRITE_TO_HISTORY;
+				
+				if(shouldPushToHistory){
+					//	handle history
+					Task taskEdited = listOfTasks.get(index);
+					String[] indexString = {Integer.toString(index + 1)};
+					if (!pushToHistory(new Command(Command.Type.ADD, indexString, taskEdited))) {
+						return ERROR_CANNOT_WRITE_TO_HISTORY;
+					}
 				}
 				
 				listOfTasks.remove(index);
@@ -257,7 +265,7 @@ public class Logic {
 		if (previousCommand == null) {
 			return ERROR_NO_HISTORY;
 		}
-		return executeCommand(previousCommand);
+		return executeCommand(previousCommand, false);
 	}
 		
 	boolean pushToHistory(Command commandObject){
@@ -265,7 +273,7 @@ public class Logic {
 	}
 	
 	String saveFilePath(ArrayList<String> argumentList){
-		if (argumentList == null || argumentList.isEmpty()) {
+		if (isEmptyArgumentList(argumentList)) {
 			return ERROR_INVALID_ARGUMENT;
 		}
 		String filePath = argumentList.get(0);
@@ -279,6 +287,13 @@ public class Logic {
 		} catch (IOException e) {
 			return ERROR_CREATING_FILE;
 		}
+	}
+	
+	boolean isEmptyArgumentList(ArrayList<String> argumentList) {
+		if (argumentList == null || argumentList.isEmpty()) {
+			return true;
+		}
+		return false;
 	}
 	
 	String exitProgram() {
