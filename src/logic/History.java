@@ -1,4 +1,4 @@
-package history;
+package logic;
 import global.Command;
 import java.util.ArrayList;
 

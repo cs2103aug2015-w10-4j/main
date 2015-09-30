@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import parser.Parser;
 import storage.Storage;
 import ui.UI;
-import history.History;
 
 public class Logic {
 	
@@ -27,7 +26,7 @@ public class Logic {
 	private static SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM yyyy");
 	
 	/*
-	 * Static strings - errors, warnings and messages
+	 * Static strings - errors and messages
 	 */
 	public static final String MESSAGE_WELCOME = "Welcome to Tasky! This is an open source project";
 	public static final String MESSAGE_PROMPT_COMMAND = "command :";
@@ -35,20 +34,22 @@ public class Logic {
 	public static final String MESSAGE_SUCCESS_DELETE = "Item successfully deleted.";
 	public static final String MESSAGE_SUCCESS_EDIT = "Item successfully edited.";
 	public static final String MESSAGE_SUCCESS_EXIT = "Exiting program...";
+	public static final String MESSAGE_SUCCESS_CHANGE_FILE_PATH = "File path successfully changed.";
+	public static final String MESSAGE_SUCCESS_SAME_FILE_PATH = "File path not changed.";
 	public static final String MESSAGE_DISPLAY_TASKLINE_INDEX = "%d. ";
 	public static final String MESSAGE_DISPLAY_NEWLINE = "\r\n"; // isolated this string for ease of concatenation
 	public static final String MESSAGE_DISPLAY_EMPTY = "No items to display.";
-	public static final String SEPARATOR_ARGUMENTS = ";";
 	public static final String SEPARATOR_DISPLAY_FIELDS = "|";
-	public static final String ERROR_WRITING_FILE = "Error writing file.";
-	public static final String ERROR_FILE_NOT_FOUND = "Error file not found";
-	public static final String WARNING_INVALID_ARGUMENT = "Warning: Invalid argument for command";
-	public static final String WARNING_INVALID_COMMAND = "Warning: Invalid command.";
-	public static final String WARNING_NO_COMMAND_HANDLER = "Warning: Handler for this command type has not been defined.";
-	public static final String WARNING_INVALID_INDEX = "Warning: There is no item at this index.";
-	public static final String WARNING_UI_INTERRUPTED = "Warning: UI prompt has been interrupted";
-	public static final String WARNING_NO_HISTORY = "Warning: No history found";
-	public static final String WARNING_CANNOT_WRITE_TO_HISTORY = "Warning: Unable to store command in history";
+	public static final String ERROR_WRITING_FILE = "Error: Unable to write file.";
+	public static final String ERROR_CREATING_FILE = "Error: Unable to create file.";
+	public static final String ERROR_FILE_NOT_FOUND = "Error: File not found";
+	public static final String ERROR_INVALID_ARGUMENT = "Error: Invalid argument for command";
+	public static final String ERROR_INVALID_COMMAND = "Error: Invalid command.";
+	public static final String ERROR_NO_COMMAND_HANDLER = "Error: Handler for this command type has not been defined.";
+	public static final String ERROR_INVALID_INDEX = "Error: There is no item at this index.";
+	public static final String ERROR_UI_INTERRUPTED = "Error: UI prompt has been interrupted";
+	public static final String ERROR_NO_HISTORY = "Error: No history found";
+	public static final String ERROR_CANNOT_WRITE_TO_HISTORY = "Error: Unable to store command in history";
 	/*
 	 * Main program
 	 */
@@ -98,7 +99,7 @@ public class Logic {
 				storageObject.writeItemList(listOfTasks);
 			} catch (InterruptedException e) {
 				// something interrupted the UI's wait for user input
-				UIObject.showToUser(WARNING_UI_INTERRUPTED);
+				UIObject.showToUser(ERROR_UI_INTERRUPTED);
 			} catch (IOException e) {
 				// error writing
 				UIObject.showToUser(ERROR_WRITING_FILE);
@@ -115,7 +116,7 @@ public class Logic {
 	 */
 	public String executeCommand(Command commandObject) {
 		if (commandObject == null) {
-			return WARNING_INVALID_COMMAND;
+			return ERROR_INVALID_COMMAND;
 		}
 		Command.Type commandType = commandObject.getCommandType();
 		Task userTask = commandObject.getTask();
@@ -133,11 +134,13 @@ public class Logic {
 				return displayItems();
 			case UNDO:
 				return undoCommand();
+			case SAVEPATH:
+				return saveFilePath(argumentList);
 			case EXIT:
 				return exitProgram();
 			default:
 		}
-		return WARNING_NO_COMMAND_HANDLER;
+		return ERROR_NO_COMMAND_HANDLER;
 	}
 	
 	public String addItem(Task userTask, ArrayList<String> argumentList) {
@@ -152,12 +155,12 @@ public class Logic {
 			//handle history
 			String[] indexString = {Integer.toString(index + 1)};
 			if (!pushToHistory(new Command(Command.Type.DELETE, indexString))) {
-				return WARNING_CANNOT_WRITE_TO_HISTORY;
+				return ERROR_CANNOT_WRITE_TO_HISTORY;
 			}
 			
 			return MESSAGE_SUCCESS_ADD;	
 		} catch (NumberFormatException e) {
-			return WARNING_INVALID_ARGUMENT;
+			return ERROR_INVALID_ARGUMENT;
 		}
 	}
 	
@@ -168,7 +171,7 @@ public class Logic {
 	 */
 	public String deleteItem(ArrayList<String> argumentList) {
 		if (argumentList == null || argumentList.isEmpty()) {
-			return WARNING_INVALID_ARGUMENT;
+			return ERROR_INVALID_ARGUMENT;
 		}
 		try {
 			int index = Integer.parseInt(argumentList.get(0)) - 1;
@@ -177,17 +180,17 @@ public class Logic {
 				Task taskRemoved = listOfTasks.get(index);
 				String[] indexString = {Integer.toString(index + 1)};
 				if (!pushToHistory(new Command(Command.Type.ADD, indexString, taskRemoved))) {
-					return WARNING_CANNOT_WRITE_TO_HISTORY;
+					return ERROR_CANNOT_WRITE_TO_HISTORY;
 				}
 				
 				listOfTasks.remove(index);
 			} else {
-				return WARNING_INVALID_INDEX;
+				return ERROR_INVALID_INDEX;
 			}
 			
 			return MESSAGE_SUCCESS_DELETE;
 		} catch (NumberFormatException e) {
-			return WARNING_INVALID_ARGUMENT;
+			return ERROR_INVALID_ARGUMENT;
 		}
 		
 	}
@@ -200,7 +203,7 @@ public class Logic {
 	 */
 	public String editItem(Task userTask, ArrayList<String> argumentList) {
 		if (argumentList == null || argumentList.isEmpty()) {
-			return WARNING_INVALID_ARGUMENT;
+			return ERROR_INVALID_ARGUMENT;
 		}
 		try {
 			int index = Integer.parseInt(argumentList.get(0)) - 1;
@@ -209,16 +212,16 @@ public class Logic {
 				Task taskEdited = listOfTasks.get(index);
 				String[] indexString = {Integer.toString(index + 1)};
 				if (!pushToHistory(new Command(Command.Type.ADD, indexString, taskEdited))) {
-					return WARNING_CANNOT_WRITE_TO_HISTORY;
+					return ERROR_CANNOT_WRITE_TO_HISTORY;
 				}
 				
 				listOfTasks.remove(index);
 			} else {
-				return WARNING_INVALID_INDEX;
+				return ERROR_INVALID_INDEX;
 			}
 			listOfTasks.add(index, userTask);
 		} catch (NumberFormatException e) {
-			return WARNING_INVALID_ARGUMENT;
+			return ERROR_INVALID_ARGUMENT;
 		}
 		return MESSAGE_SUCCESS_EDIT;
 	}
@@ -252,13 +255,30 @@ public class Logic {
 	public String undoCommand(){
 		Command previousCommand = historyObject.getPreviousCommand();
 		if (previousCommand == null) {
-			return WARNING_NO_HISTORY;
+			return ERROR_NO_HISTORY;
 		}
 		return executeCommand(previousCommand);
 	}
 		
 	public boolean pushToHistory(Command commandObject){
 		return historyObject.pushCommand(commandObject);
+	}
+	
+	public String saveFilePath(ArrayList<String> argumentList){
+		if (argumentList == null || argumentList.isEmpty()) {
+			return ERROR_INVALID_ARGUMENT;
+		}
+		String filePath = argumentList.get(0);
+		try {
+			boolean locationChanged = storageObject.saveFileToPath(filePath);
+			if (locationChanged) {
+				return MESSAGE_SUCCESS_CHANGE_FILE_PATH;
+			}else{
+				return MESSAGE_SUCCESS_SAME_FILE_PATH;
+			}
+		} catch (IOException e) {
+			return ERROR_CREATING_FILE;
+		}
 	}
 	
 	public String exitProgram() {
