@@ -23,7 +23,7 @@ public class Logic {
 	ArrayList<Task> listOfTasks = new ArrayList<Task>();
 	
 	// date format converter
-	private static SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM yyyy");
+	static SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM yyyy");
 	
 	/*
 	 * Static strings - errors and messages
@@ -74,12 +74,12 @@ public class Logic {
 		}
 	}
 	
-	public void start() {
+	void start() {
 		showWelcomeMessage();
 		readUserInput();
 	}
 	
-	public void showWelcomeMessage() {
+	void showWelcomeMessage() {
 		UIObject.showToUser(MESSAGE_WELCOME);
 	}
 	
@@ -89,7 +89,7 @@ public class Logic {
 	 *  shows the result in UI, writes latest task list to file
 	 * until the program exits
 	 */
-	public void readUserInput() {
+	void readUserInput() {
 		while (true) {
 			try {
 				String userInput = UIObject.promptUser(MESSAGE_PROMPT_COMMAND);
@@ -114,7 +114,7 @@ public class Logic {
 	 * Executes a command based on commandObject
 	 * @return a string to be shown to user
 	 */
-	public String executeCommand(Command commandObject) {
+	String executeCommand(Command commandObject) {
 		if (commandObject == null) {
 			return ERROR_INVALID_COMMAND;
 		}
@@ -143,7 +143,7 @@ public class Logic {
 		return ERROR_NO_COMMAND_HANDLER;
 	}
 	
-	public String addItem(Task userTask, ArrayList<String> argumentList) {
+	String addItem(Task userTask, ArrayList<String> argumentList) {
 		try {
 			int index;
 			if (argumentList == null || argumentList.isEmpty()) {
@@ -169,7 +169,7 @@ public class Logic {
 	 * @param argumentList the index string is read from position 0
 	 * @return status string
 	 */
-	public String deleteItem(ArrayList<String> argumentList) {
+	String deleteItem(ArrayList<String> argumentList) {
 		if (argumentList == null || argumentList.isEmpty()) {
 			return ERROR_INVALID_ARGUMENT;
 		}
@@ -201,7 +201,7 @@ public class Logic {
 	 * @param argumentList the index string is read from position 0
 	 * @return status string
 	 */
-	public String editItem(Task userTask, ArrayList<String> argumentList) {
+	String editItem(Task userTask, ArrayList<String> argumentList) {
 		if (argumentList == null || argumentList.isEmpty()) {
 			return ERROR_INVALID_ARGUMENT;
 		}
@@ -226,14 +226,14 @@ public class Logic {
 		return MESSAGE_SUCCESS_EDIT;
 	}
 	
-	public boolean isValidIndex(int index) {
+	boolean isValidIndex(int index) {
 		return index >= 0 && index < listOfTasks.size();
 	}
 	
 	/**
 	 * @return string to be displayed, in the form of "[taskname] ;[date]"
 	 */
-	public String displayItems() {
+	String displayItems() {
 		if (listOfTasks.isEmpty()) {
 			return MESSAGE_DISPLAY_EMPTY;
 		}
@@ -252,7 +252,7 @@ public class Logic {
 		return stringToDisplay;
 	}
 	
-	public String undoCommand(){
+	String undoCommand(){
 		Command previousCommand = historyObject.getPreviousCommand();
 		if (previousCommand == null) {
 			return ERROR_NO_HISTORY;
@@ -260,11 +260,11 @@ public class Logic {
 		return executeCommand(previousCommand);
 	}
 		
-	public boolean pushToHistory(Command commandObject){
+	boolean pushToHistory(Command commandObject){
 		return historyObject.pushCommand(commandObject);
 	}
 	
-	public String saveFilePath(ArrayList<String> argumentList){
+	String saveFilePath(ArrayList<String> argumentList){
 		if (argumentList == null || argumentList.isEmpty()) {
 			return ERROR_INVALID_ARGUMENT;
 		}
@@ -281,7 +281,7 @@ public class Logic {
 		}
 	}
 	
-	public String exitProgram() {
+	String exitProgram() {
 		System.exit(1);
 		return MESSAGE_SUCCESS_EXIT;
 	}
