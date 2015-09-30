@@ -25,8 +25,7 @@ public class Parser {
 	private static final String COMMAND_EXIT = "exit";
 	private static final String COMMAND_DISPLAY = "display";
 	private static final String COMMAND_SAVEPATH = "savepath";
-	private static final String DATE_ARGUMENTS = "date";
-	private static final String SEPARATOR_ARGUMENTS = ";";
+	private static final String ARGUMENTS_DATE = " date ";
 	
 	private static final String[] months = {"jan", "feb", "mar", "apr", "may", "jun", "jul", "aug",
 		"sep", "oct", "nov", "dec"};
@@ -38,13 +37,13 @@ public class Parser {
 	 * @throws Exception parsing error message
 	 */
 	public Command parseCommand(String command) throws Exception {
-		String[] args = command.split(" ", 2);
+		String[] args = command.split(" ", 2); // extract CommandType from command
 		Command commandObject;
 		if (args[0].equalsIgnoreCase(COMMAND_ADD)) {
 			try {
 				Task taskObj = new Task();
-				if (args[1].contains(SEPARATOR_ARGUMENTS)) {
-					parseArguments(args[1], taskObj);
+				if (args[1].indexOf(ARGUMENTS_DATE) != -1) {
+					extractDate(args[1], taskObj);
 				} else {
 					taskObj.setName(args[1]);
 				}
@@ -55,10 +54,11 @@ public class Parser {
 				throw new Exception(String.format(WARNING_INSUFFICIENT_ARGUMENT, args[0]));
 			}
 		} else if (args[0].equalsIgnoreCase(COMMAND_EDIT)) {
-			if (args.length >= 3) { // LW, this will not have enough arguments since args is split into maximum of 2 parts
-				String[] indexToDelete = {args[1]};
-				commandObject = new Command(Command.Type.EDIT, indexToDelete, new Task(args[2]));
-			} else {
+			try{
+				String[] newArgs = args[1].split(" ");
+				String[] indexToDelete = {newArgs[0]};
+				commandObject = new Command(Command.Type.EDIT, indexToDelete, new Task(newArgs[1]));
+			} catch (ArrayIndexOutOfBoundsException e){
 				throw new Exception(String.format(WARNING_INSUFFICIENT_ARGUMENT, args[0]));
 			}
 		} else if (args[0].equalsIgnoreCase(COMMAND_DELETE)) {
@@ -89,8 +89,8 @@ public class Parser {
 		ArrayList<Task> taskList = new ArrayList<Task>();
 		for (int i = 0; i < fileData.size(); i++) {
 			Task taskObj = new Task();
-			if (fileData.get(i).contains(SEPARATOR_ARGUMENTS)) {
-				parseArguments(fileData.get(i), taskObj);
+			if (fileData.get(i).contains(ARGUMENTS_DATE)) {
+				extractDate(fileData.get(i), taskObj);
 			} else {
 				taskObj.setName(fileData.get(i));
 			}
@@ -101,20 +101,18 @@ public class Parser {
 	
 	/*
 	 * Parses arguments after separator
-	 * pre-condition: String must contain ARGUMENTS_SEPARATOR
+	 * pre-condition: String must contain DATE_ARGUMENTS
 	 */
-	public void parseArguments(String arg, Task taskObj) {
-		String[] newArgs = arg.split(";");
+	public void extractDate(String arg, Task taskObj) {
+		String[] newArgs = arg.split(ARGUMENTS_DATE);
 		taskObj.setName(newArgs[0]);
 		String[] dateArgs = newArgs[1].split(" ");
-		if (dateArgs[0].equalsIgnoreCase(DATE_ARGUMENTS)) {
-			int day = Integer.parseInt(dateArgs[1]);
-			int month = Arrays.binarySearch(months, dateArgs[2]);
-			int year = Integer.parseInt(dateArgs[3]);
-			
-			Calendar date = new GregorianCalendar(year, month, day);
-			taskObj.setDate(date);
-		}
+		int day = Integer.parseInt(dateArgs[0]);
+		int month = Arrays.binarySearch(months, dateArgs[1]);
+		int year = Integer.parseInt(dateArgs[2]);
+
+		Calendar date = new GregorianCalendar(year, month, day);
+		taskObj.setDate(date);
 	}
-	
+
 }

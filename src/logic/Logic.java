@@ -39,7 +39,7 @@ public class Logic {
 	public static final String MESSAGE_DISPLAY_TASKLINE_INDEX = "%d. ";
 	public static final String MESSAGE_DISPLAY_NEWLINE = "\r\n"; // isolated this string for ease of concatenation
 	public static final String MESSAGE_DISPLAY_EMPTY = "No items to display.";
-	public static final String SEPARATOR_DISPLAY_FIELDS = "|";
+	public static final String SEPARATOR_DISPLAY_FIELDS = " | ";
 	public static final String ERROR_WRITING_FILE = "Error: Unable to write file.";
 	public static final String ERROR_CREATING_FILE = "Error: Unable to create file.";
 	public static final String ERROR_FILE_NOT_FOUND = "Error: File not found";
@@ -67,7 +67,7 @@ public class Logic {
 		storageObject = new Storage();
 		historyObject = new History();
 		try {
-			listOfTasks = storageObject.getItemList();
+			listOfTasks = parserObject.parseFileData(storageObject.getItemList());
 		} catch (FileNotFoundException e) {
 			UIObject.showToUser(ERROR_FILE_NOT_FOUND);
 		}
