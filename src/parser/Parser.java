@@ -101,7 +101,7 @@ public class Parser {
 	
 	/*
 	 * Parses arguments after separator
-	 * pre-condition: String must contain DATE_ARGUMENTS
+	 * pre-condition: String must contain DATE_ARGUMENTS, all inputs are valid dates in format dd MMM yyyy
 	 */
 	public void extractDate(String arg, Task taskObj) {
 		String[] newArgs = arg.split(ARGUMENTS_DATE);
@@ -109,8 +109,13 @@ public class Parser {
 		String[] dateArgs = newArgs[1].split(" ");
 		int day = Integer.parseInt(dateArgs[0]);
 		int month = Arrays.asList(months).indexOf(dateArgs[1]);
-		int year = Integer.parseInt(dateArgs[2]);
-
+		// year will be set to current year if not specified by user
+		int year;
+		try {
+			year = Integer.parseInt(dateArgs[2]);
+		} catch (ArrayIndexOutOfBoundsException e) {
+			year = Calendar.getInstance().get(Calendar.YEAR);
+		}
 		Calendar date = new GregorianCalendar(year, month, day);
 		taskObj.setDate(date);
 	}
