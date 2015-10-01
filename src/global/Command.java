@@ -9,7 +9,7 @@ public class Command {
 	private Task task;
 	
 	public enum Type {
-		ADD, EDIT, DELETE, DISPLAY, EXIT, SAVEPATH;
+		ADD, EDIT, DELETE, DISPLAY, EXIT, SAVEPATH, UNDO;
 	}
 	
 	public Command(Type commandType) { 

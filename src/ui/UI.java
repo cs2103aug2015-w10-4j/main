@@ -5,8 +5,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
-import java.beans.PropertyChangeListener;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -101,8 +99,13 @@ public class UI {
 		return userInput;
 	}
 	
-	public boolean showToUser(String toShow) {
-		displayArea.setText(toShow);
+	/**
+	 * Asks the UI to display content to user
+	 * @param stringToShow
+	 * @return true if successful
+	 */
+	public boolean showToUser(String stringToShow) {
+		displayArea.setText(stringToShow);
 		return true;
 	}
 	
