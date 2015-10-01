@@ -43,7 +43,7 @@ public class Task {
 	 * @return   time, format : year month date hour minute (2014 06 04 24 24)
 	 * @SuppressWarnings("deprecation")
 	 */
-	public Date getTime() {
+	public Calendar getTime() {
 		return this.date;
 	}
 

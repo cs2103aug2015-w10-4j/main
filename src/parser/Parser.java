@@ -108,7 +108,7 @@ public class Parser {
 		taskObj.setName(newArgs[0]);
 		String[] dateArgs = newArgs[1].split(" ");
 		int day = Integer.parseInt(dateArgs[0]);
-		int month = Arrays.binarySearch(months, dateArgs[1]);
+		int month = Arrays.asList(months).indexOf(dateArgs[1]);
 		int year = Integer.parseInt(dateArgs[2]);
 
 		Calendar date = new GregorianCalendar(year, month, day);
