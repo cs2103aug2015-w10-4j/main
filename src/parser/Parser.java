@@ -54,11 +54,17 @@ public class Parser {
 				throw new Exception(String.format(WARNING_INSUFFICIENT_ARGUMENT, args[0]));
 			}
 		} else if (args[0].equalsIgnoreCase(COMMAND_EDIT)) {
-			try{
-				String[] newArgs = args[1].split(" ");
+			try {
+				String[] newArgs = args[1].split(" ", 2);
 				String[] indexToDelete = {newArgs[0]};
+				Task taskObj = new Task();
+				if (newArgs[1].indexOf(ARGUMENTS_DATE) != -1) {
+					extractDate(newArgs[1], taskObj);
+				} else {
+					taskObj.setName(newArgs[1]);
+				}
 				commandObject = new Command(Command.Type.EDIT, indexToDelete, new Task(newArgs[1]));
-			} catch (ArrayIndexOutOfBoundsException e){
+			} catch (ArrayIndexOutOfBoundsException e) {
 				throw new Exception(String.format(WARNING_INSUFFICIENT_ARGUMENT, args[0]));
 			}
 		} else if (args[0].equalsIgnoreCase(COMMAND_DELETE)) {

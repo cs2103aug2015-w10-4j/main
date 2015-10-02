@@ -121,21 +121,21 @@ public class Logic {
 		Task userTask = commandObject.getTask();
 		ArrayList<String> argumentList = commandObject.getArguments();
 		switch (commandType) {
-			case ADD:
+			case ADD :
 				return addItem(userTask, argumentList, shouldPushToHistory);
-			case DELETE:
+			case DELETE :
 				historyObject.pushCommand(commandObject);
 				return deleteItem(argumentList, shouldPushToHistory);
-			case EDIT:
+			case EDIT :
 				historyObject.pushCommand(commandObject);
 				return editItem(userTask, argumentList, shouldPushToHistory);
-			case DISPLAY:
+			case DISPLAY :
 				return displayItems();
-			case UNDO:
+			case UNDO :
 				return undoCommand();
-			case SAVEPATH:
+			case SAVEPATH :
 				return saveFilePath(argumentList);
-			case EXIT:
+			case EXIT :
 				return exitProgram();
 			default:
 		}
@@ -281,7 +281,7 @@ public class Logic {
 			boolean locationChanged = storageObject.saveFileToPath(filePath);
 			if (locationChanged) {
 				return MESSAGE_SUCCESS_CHANGE_FILE_PATH;
-			}else{
+			} else {
 				return MESSAGE_SUCCESS_SAME_FILE_PATH;
 			}
 		} catch (IOException e) {
