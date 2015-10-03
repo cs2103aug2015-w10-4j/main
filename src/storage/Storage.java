@@ -7,6 +7,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Scanner;
 
 import global.Task;
@@ -84,5 +86,24 @@ public class Storage {
 		sc.close();
 		return taskList;
 	}
+	
+	/*
+	 * read saved file
+	 */
+	public ArrayList<Task> readFileData(ArrayList<String> fileData) {
+		ArrayList<Task> taskList = new ArrayList<Task>();
+		for (int i = 0; i < fileData.size(); i++) {
+			Task taskObj = new Task();
+			if (fileData.get(i).contains(ARGUMENTS_DATE)) {
+				parser.Parser.extractDate(fileData.get(i), taskObj);
+			} else {
+				taskObj.setName(fileData.get(i));
+			}
+			taskList.add(taskObj);
+		}
+		return taskList;
+	}
+	
+
 
 }

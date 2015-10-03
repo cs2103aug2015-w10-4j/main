@@ -109,7 +109,7 @@ public class Parser {
 	 * Parses arguments after separator
 	 * pre-condition: String must contain DATE_ARGUMENTS, all inputs are valid dates in format dd MMM yyyy
 	 */
-	public void extractDate(String arg, Task taskObj) {
+	public static void extractDate(String arg, Task taskObj) {
 		String[] newArgs = arg.split(ARGUMENTS_DATE);
 		taskObj.setName(newArgs[0]);
 		String[] dateArgs = newArgs[1].split(" ");
