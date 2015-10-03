@@ -11,6 +11,14 @@ import parser.Parser;
 import storage.Storage;
 import ui.UI;
 
+
+/**
+ * This file contains the main program of the command-line calendar, Tasky.
+ * Please read our user guide at README.md if there are any questions.
+ * 
+ * @author cs2103aug2015-w10-4j
+ *
+ */
 public class Logic {
 	
 	/*
@@ -144,6 +152,12 @@ public class Logic {
 		return ERROR_NO_COMMAND_HANDLER;
 	}
 	
+	/**
+	 * Adds an item to the list of tasks in memory
+	 * @param argumentList if empty, last element is used. if not, the index string is read from position 0
+	 * @param shouldPushToHistory
+	 * @return status string
+	 */
 	String addItem(Task userTask, ArrayList<String> argumentList, boolean shouldPushToHistory) {
 		try {
 			int index;
@@ -172,6 +186,7 @@ public class Logic {
 	/**
 	 * Deletes an item from the list of tasks in memory
 	 * @param argumentList the index string is read from position 0
+	 * @param shouldPushToHistory
 	 * @return status string
 	 */
 	String deleteItem(ArrayList<String> argumentList, boolean shouldPushToHistory) {
@@ -230,7 +245,7 @@ public class Logic {
 				if(shouldPushToHistory){
 					//	handle history
 					String[] indexString = {Integer.toString(index + 1)};
-					if (!pushToHistory(new Command(Command.Type.ADD, indexString, taskEdited))) {
+					if (!pushToHistory(new Command(Command.Type.EDIT, indexString, taskEdited))) {
 						return ERROR_CANNOT_WRITE_TO_HISTORY;
 					}
 					return MESSAGE_SUCCESS_EDIT;
@@ -250,7 +265,7 @@ public class Logic {
 	}
 	
 	/**
-	 * @return string to be displayed, in the form of "[taskname] ;[date]"
+	 * @return string to be displayed, in the form of "[taskname] | [date]"
 	 */
 	String displayItems() {
 		if (listOfTasks.isEmpty()) {
@@ -261,9 +276,9 @@ public class Logic {
 			Task curTask = listOfTasks.get(i);
 			stringToDisplay += String.format(MESSAGE_DISPLAY_TASKLINE_INDEX, i + 1);
 			if(curTask != null){
-				stringToDisplay += listOfTasks.get(i).getName();
-				if (curTask. getEndingTime() != null) {
-					stringToDisplay += SEPARATOR_DISPLAY_FIELDS + dateFormat.format(listOfTasks.get(i).getEndingTime().getTime());
+				stringToDisplay += curTask.getName();
+				if (curTask.getEndingTime() != null) {
+					stringToDisplay += SEPARATOR_DISPLAY_FIELDS + dateFormat.format(curTask.getEndingTime().getTime());
 				}
 			}
 			stringToDisplay += MESSAGE_DISPLAY_NEWLINE;
@@ -283,6 +298,11 @@ public class Logic {
 		return historyObject.pushCommand(commandObject);
 	}
 	
+	/**
+	 * Sets the data file path
+	 * @param argumentList the file path string is read from position 0
+	 * @return status string
+	 */
 	String saveFilePath(ArrayList<String> argumentList){
 		if (isEmptyArgumentList(argumentList)) {
 			return ERROR_INVALID_ARGUMENT;

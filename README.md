@@ -38,7 +38,7 @@ This is an example to remove the task that is currently number one in the list. 
 
 This is an example to undo the previous command. If there is no previous command, Tasky will do nothing and give you a notification that you can not undo. All update operations done by Tasky are recorded inside the main memory of Tasky and would be wiped upon program termination. Therefore, you can only undo a command if you issued it in the same session.
 
-Note that as of now, multiple level undo is not supported yet.
+Note that only add, edit and delete commands are supported.
 
 ## Changing save file path
 
