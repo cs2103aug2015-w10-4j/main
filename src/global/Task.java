@@ -9,10 +9,14 @@ public class Task {
 	/*
 	 * Declaration of variables
 	 */
+	private static final String PERIODIC_DAILY = "daily";
+	private static final String PERIODIC_WEEKLY = "weekly";
+	private static final String PERIODIC_MONTHLY = "monthly";
 	String name = null;
 	Calendar startingTime = null;
 	Calendar endingTime = null;
 	String location = null;
+	String periodic = null;
 
 	/*
 	 * Constructor
@@ -22,27 +26,35 @@ public class Task {
 	}
 	
 	public Task(String name, Calendar endingTime) {
-		this(name);
+		this.name = name;
 		this.endingTime = endingTime;
 	}
 	
 	public Task(String name, Calendar endingTime, String location) {
-		this(name);
+		this.name = name;
 		this.endingTime = endingTime;
 		this.location = location;
 	}
 	
 	public Task(String name, Calendar startingTime, Calendar endingTime) {
-		this(name);
+		this.name = name;
 		this.startingTime = startingTime;
 		this.endingTime = endingTime;
 	}
 	
 	public Task(String name, Calendar startingTime, Calendar endingTime, String location) {
-		this(name);
+		this.name = name;
 		this.startingTime = startingTime;
 		this.endingTime = endingTime;
 		this.location = location;
+	}
+	
+	public Task(String name, Calendar startingTime, Calendar endingTime, String location,String periodic) {
+		this.name = name;
+		this.startingTime = startingTime;
+		this.endingTime = endingTime;
+		this.location = location;
+		this.periodic = periodic;
 	}
 	
 	
@@ -74,7 +86,11 @@ public class Task {
 	}
 	
 	public String getLocation(){
-		return location;
+		return this.location;
+	}
+	
+	public String getPeriodic(){
+		return this.periodic;
 	}
 
 
@@ -99,7 +115,16 @@ public class Task {
 		return true;
 	}
 	
-	
+	//return false if periodic type is incorrect
+	public boolean isCorrectPeriodic(){
+		String CurrentPeriodic = getPeriodic();
+		if (! CurrentPeriodic.equals(PERIODIC_DAILY) &&
+				! CurrentPeriodic.equals(PERIODIC_WEEKLY) &&
+				! CurrentPeriodic.equals(PERIODIC_MONTHLY)){
+			return false;
+		}
+		return true;
+	}
 	
 }
 
