@@ -81,15 +81,15 @@ public class Task {
 		return this.endingTime;
 	}
 	
-	public Calendar getStartingTime(){
+	public Calendar getStartingTime() {
 		return this.startingTime;
 	}
 	
-	public String getLocation(){
+	public String getLocation() {
 		return this.location;
 	}
 	
-	public String getPeriodic(){
+	public String getPeriodic() {
 		return this.periodic;
 	}
 
@@ -105,18 +105,18 @@ public class Task {
 		return true;
 	}
 	
-	public boolean setStartingTime(Calendar startingTime){
+	public boolean setStartingTime(Calendar startingTime) {
 		this.startingTime = startingTime;
 		return true;
 	}
 	
-	public boolean setLocation(String location){
+	public boolean setLocation(String location) {
 		this.location = location;
 		return true;
 	}
 	
 	//return false if periodic type is incorrect
-	public boolean isCorrectPeriodic(){
+	public boolean isCorrectPeriodic() {
 		String CurrentPeriodic = getPeriodic();
 		if (! CurrentPeriodic.equals(PERIODIC_DAILY) &&
 				! CurrentPeriodic.equals(PERIODIC_WEEKLY) &&
