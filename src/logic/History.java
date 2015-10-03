@@ -11,6 +11,7 @@ public class History {
 	}
 	
 	public Command getPreviousCommand() {
+		
 		int historySize = commandHistoryList.size();
 		if (historySize > 0) {
 			Command commandObjectToReturn = commandHistoryList.get(historySize - 1);

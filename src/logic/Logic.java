@@ -30,6 +30,10 @@ public class Logic {
 	 */
 	public static final String MESSAGE_WELCOME = "Welcome to Tasky! This is an open source project";
 	public static final String MESSAGE_PROMPT_COMMAND = "command :";
+
+	public static final String MESSAGE_SUCCESS_UNDO_ADD = "Undo : Deleted item restored.";
+	public static final String MESSAGE_SUCCESS_UNDO_DELETE = "Undo : Added item removed.";
+	public static final String MESSAGE_SUCCESS_UNDO_EDIT = "Undo : Reverted edits.";
 	public static final String MESSAGE_SUCCESS_ADD = "Item successfully added.";
 	public static final String MESSAGE_SUCCESS_DELETE = "Item successfully deleted.";
 	public static final String MESSAGE_SUCCESS_EDIT = "Item successfully edited.";
@@ -67,7 +71,7 @@ public class Logic {
 		storageObject = new Storage();
 		historyObject = new History();
 		try {
-			listOfTasks = parserObject.parseFileData(storageObject.getItemList());
+			listOfTasks = storageObject.readFileData(storageObject.getItemList());
 		} catch (FileNotFoundException e) {
 			UIObject.showToUser(ERROR_FILE_NOT_FOUND);
 		}
@@ -124,10 +128,8 @@ public class Logic {
 			case ADD :
 				return addItem(userTask, argumentList, shouldPushToHistory);
 			case DELETE :
-				historyObject.pushCommand(commandObject);
 				return deleteItem(argumentList, shouldPushToHistory);
 			case EDIT :
-				historyObject.pushCommand(commandObject);
 				return editItem(userTask, argumentList, shouldPushToHistory);
 			case DISPLAY :
 				return displayItems();
@@ -151,16 +153,17 @@ public class Logic {
 				index = Integer.parseInt(argumentList.get(0)) - 1;
 			}
 			listOfTasks.add(index, userTask);
-			
+
 			if(shouldPushToHistory){
 				//	handle history
 				String[] indexString = {Integer.toString(index + 1)};
 				if (!pushToHistory(new Command(Command.Type.DELETE, indexString))) {
 					return ERROR_CANNOT_WRITE_TO_HISTORY;
 				}
+				return MESSAGE_SUCCESS_ADD;
+			}else{
+				return MESSAGE_SUCCESS_UNDO_ADD;
 			}
-			
-			return MESSAGE_SUCCESS_ADD;	
 		} catch (NumberFormatException e) {
 			return ERROR_INVALID_ARGUMENT;
 		}
@@ -178,22 +181,27 @@ public class Logic {
 		try {
 			int index = Integer.parseInt(argumentList.get(0)) - 1;
 			if (isValidIndex(index)) {
+				// for history
+				Task taskRemoved = listOfTasks.get(index);
 				
-				//handle history
+				listOfTasks.remove(index);
+				
+				
 				if(shouldPushToHistory){
-					Task taskRemoved = listOfTasks.get(index);
+					//handle history
 					String[] indexString = {Integer.toString(index + 1)};
 					if (!pushToHistory(new Command(Command.Type.ADD, indexString, taskRemoved))) {
 						return ERROR_CANNOT_WRITE_TO_HISTORY;
 					}
+					return MESSAGE_SUCCESS_DELETE;
+				} else {
+					return MESSAGE_SUCCESS_UNDO_DELETE;
 				}
 				
-				listOfTasks.remove(index);
 			} else {
 				return ERROR_INVALID_INDEX;
 			}
 			
-			return MESSAGE_SUCCESS_DELETE;
 		} catch (NumberFormatException e) {
 			return ERROR_INVALID_ARGUMENT;
 		}
@@ -213,25 +221,28 @@ public class Logic {
 		try {
 			int index = Integer.parseInt(argumentList.get(0)) - 1;
 			if (isValidIndex(index)) {
+				// for history
+				Task taskEdited = listOfTasks.get(index);
+
+				listOfTasks.remove(index);
+				listOfTasks.add(index, userTask);
 				
 				if(shouldPushToHistory){
 					//	handle history
-					Task taskEdited = listOfTasks.get(index);
 					String[] indexString = {Integer.toString(index + 1)};
 					if (!pushToHistory(new Command(Command.Type.ADD, indexString, taskEdited))) {
 						return ERROR_CANNOT_WRITE_TO_HISTORY;
 					}
+					return MESSAGE_SUCCESS_EDIT;
+				}else{
+					return MESSAGE_SUCCESS_UNDO_EDIT;
 				}
-				
-				listOfTasks.remove(index);
 			} else {
 				return ERROR_INVALID_INDEX;
 			}
-			listOfTasks.add(index, userTask);
 		} catch (NumberFormatException e) {
 			return ERROR_INVALID_ARGUMENT;
 		}
-		return MESSAGE_SUCCESS_EDIT;
 	}
 	
 	boolean isValidIndex(int index) {
@@ -252,7 +263,7 @@ public class Logic {
 			if(curTask != null){
 				stringToDisplay += listOfTasks.get(i).getName();
 				if (curTask. getEndingTime() != null) {
-					stringToDisplay += SEPARATOR_DISPLAY_FIELDS + dateFormat.format(listOfTasks.get(i). getEndingTime().getTime());
+					stringToDisplay += SEPARATOR_DISPLAY_FIELDS + dateFormat.format(listOfTasks.get(i).getEndingTime().getTime());
 				}
 			}
 			stringToDisplay += MESSAGE_DISPLAY_NEWLINE;
