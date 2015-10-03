@@ -47,7 +47,7 @@ public class Logic {
 	public static final String MESSAGE_SUCCESS_EDIT = "Item successfully edited.";
 	public static final String MESSAGE_SUCCESS_EXIT = "Exiting program...";
 	public static final String MESSAGE_SUCCESS_CHANGE_FILE_PATH = "File path successfully changed.";
-	public static final String MESSAGE_SUCCESS_SAME_FILE_PATH = "File path not changed.";
+	public static final String MESSAGE_SUCCESS_CHANGE_FILE_PATH_BUT_CREATE_FILE = "File path successfully changed. \nNo file was detected, so Tasky has created one for you.";
 	public static final String MESSAGE_DISPLAY_TASKLINE_INDEX = "%d. ";
 	public static final String MESSAGE_DISPLAY_NEWLINE = "\r\n"; // isolated this string for ease of concatenation
 	public static final String MESSAGE_DISPLAY_EMPTY = "No items to display.";
@@ -79,7 +79,7 @@ public class Logic {
 		storageObject = new Storage();
 		historyObject = new History();
 		try {
-			listOfTasks = storageObject.readFileData(storageObject.getItemList());
+			listOfTasks = storageObject.getItemList();
 		} catch (FileNotFoundException e) {
 			UIObject.showToUser(ERROR_FILE_NOT_FOUND);
 		}
@@ -310,10 +310,11 @@ public class Logic {
 		String filePath = argumentList.get(0);
 		try {
 			boolean locationChanged = storageObject.saveFileToPath(filePath);
+			listOfTasks = storageObject.getItemList();
 			if (locationChanged) {
 				return MESSAGE_SUCCESS_CHANGE_FILE_PATH;
 			} else {
-				return MESSAGE_SUCCESS_SAME_FILE_PATH;
+				return MESSAGE_SUCCESS_CHANGE_FILE_PATH_BUT_CREATE_FILE;
 			}
 		} catch (IOException e) {
 			return ERROR_CREATING_FILE;

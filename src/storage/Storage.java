@@ -5,17 +5,19 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.Scanner;
 
 import global.Task;
 
 public class Storage {
 	
-	private static final String ARGUMENTS_SEPERATOR = ";";
+	private static final String ARGUMENTS_SEPARATOR = ";";
 	private static final String ARGUMENTS_DATE = "date ";
 	
 	public static String FILE_PATH = "save.txt";
@@ -38,7 +40,7 @@ public class Storage {
 			if(curTask != null){
 				content += curTask.getName();
 				if (curTask.getEndingTime() != null) {
-					content += ARGUMENTS_SEPERATOR + ARGUMENTS_DATE + sdf.format(task.get(i).getEndingTime().getTime());
+					content += ARGUMENTS_SEPARATOR + ARGUMENTS_DATE + sdf.format(task.get(i).getEndingTime().getTime());
 				}
 			}
 			content += FILE_NEWLINE;
@@ -75,33 +77,37 @@ public class Storage {
 	 * @return ArrayList of tasks read from file
 	 * @throws FileNotFoundException if there is no file in the filePath
 	 */
-	public ArrayList<String> getItemList() throws FileNotFoundException {
+	public ArrayList<Task> getItemList() throws FileNotFoundException {
 		File file = new File(FILE_PATH);
 		Scanner sc = new Scanner(file);
-		ArrayList<String> taskList = new ArrayList<String>();
+		ArrayList<Task> taskList = new ArrayList<Task>();
 	
 		while (sc.hasNextLine()) {
-			taskList.add(sc.nextLine());
+			String nextLine = sc.nextLine();
+			Task taskObj = new Task();
+			if (nextLine.contains(ARGUMENTS_DATE)) {
+				extractDate(nextLine, taskObj);
+			} else {
+				taskObj.setName(nextLine);
+			}
+			taskList.add(taskObj);
 		}
 		sc.close();
 		return taskList;
 	}
 	
-	/*
-	 * read saved file
-	 */
-	public ArrayList<Task> readFileData(ArrayList<String> fileData) {
-		ArrayList<Task> taskList = new ArrayList<Task>();
-		for (int i = 0; i < fileData.size(); i++) {
-			Task taskObj = new Task();
-			if (fileData.get(i).contains(ARGUMENTS_DATE)) {
-				parser.Parser.extractDate(fileData.get(i), taskObj);
-			} else {
-				taskObj.setName(fileData.get(i));
-			}
-			taskList.add(taskObj);
+	public void extractDate(String arg, Task taskObj) { // might want to store the date differently, up to you
+		String[] newArgs = arg.split(ARGUMENTS_DATE);
+		Calendar calendarRead = new GregorianCalendar();
+		try {
+			calendarRead.setTime(sdf.parse(newArgs[1]));
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
-		return taskList;
+		taskObj.setEndingTime(calendarRead);
+		taskObj.setName(arg.split(ARGUMENTS_SEPARATOR)[0]);
+		
 	}
 	
 

@@ -81,7 +81,8 @@ public class Parser {
 		} else if (args[0].equalsIgnoreCase(COMMAND_UNDO)) {
 			commandObject = new Command(Command.Type.UNDO);
 		} else if (args[0].equalsIgnoreCase(COMMAND_SAVEPATH)) {
-			commandObject = new Command(Command.Type.SAVEPATH);
+			String[] newArgs = {args[1]};
+			commandObject = new Command(Command.Type.SAVEPATH, newArgs);
 		} else {
 			commandObject = null;
 		}
@@ -109,7 +110,7 @@ public class Parser {
 	 * Parses arguments after separator
 	 * pre-condition: String must contain DATE_ARGUMENTS, all inputs are valid dates in format dd MMM yyyy
 	 */
-	public static void extractDate(String arg, Task taskObj) {
+	public void extractDate(String arg, Task taskObj) {
 		String[] newArgs = arg.split(ARGUMENTS_DATE);
 		taskObj.setName(newArgs[0]);
 		String[] dateArgs = newArgs[1].split(" ");
