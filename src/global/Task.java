@@ -10,7 +10,9 @@ public class Task {
 	 * Declaration of variables
 	 */
 	String name = null;
-	Calendar date = null;
+	Calendar startingTime = null;
+	Calendar endingTime = null;
+	String location = null;
 
 	/*
 	 * Constructor
@@ -19,10 +21,30 @@ public class Task {
 		this.name = name;
 	}
 	
-	public Task(String name, Calendar date) {
+	public Task(String name, Calendar endingTime) {
 		this(name);
-		this.date = date;
+		this.endingTime = endingTime;
 	}
+	
+	public Task(String name, Calendar endingTime, String location) {
+		this(name);
+		this.endingTime = endingTime;
+		this.location = location;
+	}
+	
+	public Task(String name, Calendar startingTime, Calendar endingTime) {
+		this(name);
+		this.startingTime = startingTime;
+		this.endingTime = endingTime;
+	}
+	
+	public Task(String name, Calendar startingTime, Calendar endingTime, String location) {
+		this(name);
+		this.startingTime = startingTime;
+		this.endingTime = endingTime;
+		this.location = location;
+	}
+	
 	
 	public Task() {
 		
@@ -40,12 +62,21 @@ public class Task {
 	
 	/**
 	 * return time in string format
-	 * @return   time, format : year month date hour minute (2014 06 04 24 24)
+	 * @return   time, format : year month Time hour minute (2014 06 04 24 24)
 	 * @SuppressWarnings("deprecation")
 	 */
-	public Calendar getTime() {
-		return this.date;
+	public Calendar getEndingTime() {
+		return this.endingTime;
 	}
+	
+	public Calendar getStartingTime(){
+		return this.startingTime;
+	}
+	
+	public String getLocation(){
+		return location;
+	}
+
 
 	//change the name of the task
 	public boolean setName(String newName) {
@@ -53,15 +84,23 @@ public class Task {
 		return true;
 	}
 	
-	public boolean setDate(Calendar date) {
-		this.date = date;
+	public boolean setEndingTime(Calendar endingTime) {
+		this.endingTime = endingTime;
 		return true;
 	}
 	
-	public Calendar getDate() {
-		return date;
+	public boolean setStartingTime(Calendar startingTime){
+		this.startingTime = startingTime;
+		return true;
 	}
-
+	
+	public boolean setLocation(String location){
+		this.location = location;
+		return true;
+	}
+	
+	
+	
 }
 
 
