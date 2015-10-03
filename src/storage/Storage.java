@@ -35,8 +35,8 @@ public class Storage {
 			Task curTask = task.get(i);
 			if(curTask != null){
 				content += curTask.getName();
-				if (curTask.getDate() != null) {
-					content += ARGUMENTS_SEPERATOR + ARGUMENTS_DATE + sdf.format(task.get(i).getDate().getTime());
+				if (curTask.getEndingTime() != null) {
+					content += ARGUMENTS_SEPERATOR + ARGUMENTS_DATE + sdf.format(task.get(i).getEndingTime().getTime());
 				}
 			}
 			content += FILE_NEWLINE;

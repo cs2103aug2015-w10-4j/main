@@ -123,7 +123,7 @@ public class Parser {
 			year = Calendar.getInstance().get(Calendar.YEAR);
 		}
 		Calendar date = new GregorianCalendar(year, month, day);
-		taskObj.setDate(date);
+		taskObj.setEndingTime(date);
 	}
 
 }

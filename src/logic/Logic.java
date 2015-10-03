@@ -251,8 +251,8 @@ public class Logic {
 			stringToDisplay += String.format(MESSAGE_DISPLAY_TASKLINE_INDEX, i + 1);
 			if(curTask != null){
 				stringToDisplay += listOfTasks.get(i).getName();
-				if (curTask.getDate() != null) {
-					stringToDisplay += SEPARATOR_DISPLAY_FIELDS + dateFormat.format(listOfTasks.get(i).getDate().getTime());
+				if (curTask. getEndingTime() != null) {
+					stringToDisplay += SEPARATOR_DISPLAY_FIELDS + dateFormat.format(listOfTasks.get(i). getEndingTime().getTime());
 				}
 			}
 			stringToDisplay += MESSAGE_DISPLAY_NEWLINE;
