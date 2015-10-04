@@ -25,12 +25,11 @@ public class ManualFormatStorage implements Storage {
 	// date format converter
 	private static SimpleDateFormat sdf = new SimpleDateFormat("dd MMM yyyy");
 	
+	
 	/**
-	 * Saves the list of tasks in the file
-	 * @param ArrayList<Task> ArrayList that stores the RAW tasks as Strings in text file
-	 * Task data is saved in the following format: "[taskname];[date]" on each line. To be improved
-	 * @return true if file is saved
-	 * @throws IOException 
+	 * {@inheritDoc}
+	 * 
+	 * Task data is saved in the following format: "[task name];[date]" on each line. To be improved
 	 */
 	@Override
 	public boolean writeItemList(ArrayList<Task> task) throws IOException {
@@ -54,12 +53,8 @@ public class ManualFormatStorage implements Storage {
 		return true;
 	}
 
-	/**
-	 * Saves path to text file
-	 *
-	 * @param path path is a String contain the path of file to save
-	 * @return true if location changes
-	 * @throws IOException
+	/* (non-Javadoc)
+	 * @see storage.Storage#saveFileToPath(java.lang.String)
 	 */
 	@Override
 	public boolean saveFileToPath(String path) throws IOException {
@@ -73,10 +68,8 @@ public class ManualFormatStorage implements Storage {
 		return true;
 	}
 
-	/**
-	 * Reads the saved file and returns the ArrayList of tasks
-	 * @return ArrayList of tasks read from file
-	 * @throws FileNotFoundException if there is no file in the filePath
+	/* (non-Javadoc)
+	 * @see storage.Storage#getItemList()
 	 */
 	@Override
 	public ArrayList<Task> getItemList() throws FileNotFoundException {
