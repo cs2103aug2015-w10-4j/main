@@ -1,4 +1,5 @@
 package logic;
+
 import global.Command;
 import global.Task;
 
@@ -9,6 +10,7 @@ import java.util.ArrayList;
 
 import parser.Parser;
 import storage.Storage;
+import storage.ManualFormatStorage;
 import ui.UI;
 
 
@@ -76,7 +78,7 @@ public class Logic {
 	public Logic() {
 		UIObject = new UI();
 		parserObject = new Parser();
-		storageObject = new Storage();
+		storageObject = new ManualFormatStorage();
 		historyObject = new History();
 		try {
 			listOfTasks = storageObject.getItemList();
