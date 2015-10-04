@@ -34,9 +34,9 @@ public class ManualFormatStorage implements Storage {
 	@Override
 	public boolean writeItemList(ArrayList<Task> task) throws IOException {
 		String content = "";
-		for (int i = 0; i <task.size(); i ++) {
+		for (int i = 0; i < task.size(); i++) {
 			Task curTask = task.get(i);
-			if(curTask != null){
+			if (curTask != null) {
 				content += curTask.getName();
 				if (curTask.getEndingTime() != null) {
 					content += ARGUMENTS_SEPARATOR + ARGUMENTS_DATE + sdf.format(task.get(i).getEndingTime().getTime());

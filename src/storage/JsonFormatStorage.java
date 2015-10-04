@@ -16,8 +16,9 @@ import global.Task;
 public class JsonFormatStorage implements Storage {
 	
 	private static final String LINE_SEPARATOR = System.getProperty("line.separator");
+	private static final String DEFAULT_FILE_PATH = "save.txt";
 	
-	private static String filePath = "save.txt";
+	private String currentFilePath = DEFAULT_FILE_PATH;
 	
 	private Gson gson;
 
@@ -31,10 +32,14 @@ public class JsonFormatStorage implements Storage {
 	/**
 	 * Alternative constructor for JsonFormatStorage with option whether to prettify the
 	 * JSON or not.
-	 * @param prettyJson whether to format the json with pretty format or not
+	 * @param usePrettyJson whether to format the JSON with pretty format or not
 	 */
-	public JsonFormatStorage(boolean prettyJson) {
-		gson = new GsonBuilder().setPrettyPrinting().create();
+	public JsonFormatStorage(boolean usePrettyJson) {
+		if (usePrettyJson) {
+			gson = new GsonBuilder().setPrettyPrinting().create();
+		} else {
+			gson = new GsonBuilder().create();
+		}
 	}
 	
 	/**
@@ -46,7 +51,7 @@ public class JsonFormatStorage implements Storage {
 	public boolean writeItemList(ArrayList<Task> tasks) throws IOException {
 		String jsonFormat = convertToJsonFormat(tasks);
 		
-		File outputFile = new File(filePath);
+		File outputFile = new File(currentFilePath);
 		FileWriter outputFileWriter = new FileWriter(outputFile, false);
 		
 		outputFileWriter.write(jsonFormat);
@@ -69,24 +74,24 @@ public class JsonFormatStorage implements Storage {
 	 */
 	@Override
 	public boolean saveFileToPath(String path) throws IOException {
-		boolean filePathChanged = false;
+		boolean isFilePathChanged = false;
 		
 		File newFile = new File(path);
 		if (!newFile.exists()) {
 			//file is not yet created, try to create one
 			newFile.createNewFile();
-			filePath = path;
-			filePathChanged = true;
+			currentFilePath = path;
+			isFilePathChanged = true;
 		} else {
 			//exist already, check whether it is the same file
 			//with the current one
-			if (!filePath.equals(path)) {
-				filePath = path;
-				filePathChanged = true;
+			if (!currentFilePath.equals(path)) {
+				currentFilePath = path;
+				isFilePathChanged = true;
 			}
 		}
 		
-		return filePathChanged;
+		return isFilePathChanged;
 	}
 
 	/**
@@ -95,7 +100,7 @@ public class JsonFormatStorage implements Storage {
 	 */
 	@Override	
 	public ArrayList<Task> getItemList() throws FileNotFoundException, IllegalStateException {
-		File inputFile = new File(filePath);
+		File inputFile = new File(currentFilePath);
 		Scanner inputFileScanner = new Scanner(inputFile);
 		
 		String rawInputData = inputFileScanner.next();
