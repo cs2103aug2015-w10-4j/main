@@ -106,4 +106,17 @@ public class TestLogic {
 		assertEquals("No items to display.", logicObject.executeCommand(commandObject, true));
 	}
 	
+	
+	@Test
+	public void logicSavePath(){
+		Command commandObject;
+		String[] args;
+		
+		// case 1
+		args = new String[1];
+		args[0] = "2";
+		commandObject = new Command(Command.Type.SAVEPATH, args);
+		assertEquals("File path successfully changed.", logicObject.executeCommand(commandObject, true));
+		//saveFilePath(argumentList);
+	}
 }
