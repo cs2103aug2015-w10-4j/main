@@ -3,22 +3,35 @@ package logic;
 import static org.junit.Assert.assertEquals;
 
 import java.io.File;
+import java.io.IOException;
 
 import global.Command;
 import global.Task;
 
 import org.junit.Before;
 import org.junit.Test;
-public class TestLogic {
+
+/**
+ * This class contains test cases of the executeCommand function of Logic
+ */
+public class TestLogicExecute {
 
 	Logic logicObject;
 	File saveFile;
 	
 	@Before
-	public void setupLogic(){
+	public void setup(){
 		logicObject = new Logic();
 		File saveFile = new File("save.txt");
+		File anotherSaveFile = new File("anotherSave.txt");
 		saveFile.delete();
+		anotherSaveFile.delete();
+		try {
+			saveFile.createNewFile();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 		
 		Task task_1 = new Task();
@@ -33,7 +46,7 @@ public class TestLogic {
 	}
 	
 	@Test
-	public void logicAdd(){
+	public void logicExecuteAdd(){
 		Task task;
 		Command commandObject;
 		// case 1
@@ -49,7 +62,7 @@ public class TestLogic {
 	}
 	
 	@Test
-	public void logicDelete(){
+	public void logicExecuteDelete(){
 		Command commandObject;
 		String[] args;
 		
@@ -66,6 +79,7 @@ public class TestLogic {
 		commandObject = new Command(Command.Type.DELETE, args);
 		assertEquals("Error: There is no item at this index.", logicObject.executeCommand(commandObject, true));
 		
+		// case 3
 		args = new String[1];
 		args[0] = "four";
 		commandObject = new Command(Command.Type.DELETE, args);
@@ -73,7 +87,7 @@ public class TestLogic {
 	}
 	
 	@Test
-	public void logicDisplay(){
+	public void logicExecuteDisplay(){
 		Command commandObject;
 		
 		// case 1
@@ -82,8 +96,30 @@ public class TestLogic {
 	}
 	
 	
+	
 	@Test
-	public void logicTests(){
+	public void logicExecuteSavePath(){
+		Command commandObject;
+		String[] args;
+		
+		args = new String[1];
+		args[0] = "save.txt";
+		commandObject = new Command(Command.Type.SAVEPATH, args);
+		assertEquals("File path successfully changed.", logicObject.executeCommand(commandObject, true));
+		
+		args = new String[1];
+		args[0] = "anotherSave.txt";
+		commandObject = new Command(Command.Type.SAVEPATH, args);
+		assertEquals("File path successfully changed. \nNo file was detected, so Tasky has created one for you.", logicObject.executeCommand(commandObject, true));
+		
+		args = new String[1];
+		args[0] = "save.txt";
+		commandObject = new Command(Command.Type.SAVEPATH, args);
+		assertEquals("File path successfully changed.", logicObject.executeCommand(commandObject, true));
+	}
+	
+	@Test
+	public void logicExecute(){
 		Task task;
 		Command commandObject;
 		String[] args;
@@ -104,19 +140,5 @@ public class TestLogic {
 		
 		commandObject = new Command(Command.Type.DISPLAY);
 		assertEquals("No items to display.", logicObject.executeCommand(commandObject, true));
-	}
-	
-	
-	@Test
-	public void logicSavePath(){
-		Command commandObject;
-		String[] args;
-		
-		// case 1
-		args = new String[1];
-		args[0] = "2";
-		commandObject = new Command(Command.Type.SAVEPATH, args);
-		assertEquals("File path successfully changed.", logicObject.executeCommand(commandObject, true));
-		//saveFilePath(argumentList);
 	}
 }
