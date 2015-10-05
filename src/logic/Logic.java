@@ -149,7 +149,7 @@ public class Logic {
 				return saveFilePath(argumentList);
 			case EXIT :
 				return exitProgram();
-			default:
+			default :
 		}
 		return ERROR_NO_COMMAND_HANDLER;
 	}

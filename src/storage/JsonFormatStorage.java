@@ -26,7 +26,7 @@ public class JsonFormatStorage implements Storage {
 	 * Default constructor for JsonFormatStorage. Does not use pretty formatting for JSON.
 	 */
 	public JsonFormatStorage() {
-		gson = new GsonBuilder().create();
+		gson = new GsonBuilder().serializeNulls().create();
 	}
 	
 	/**
@@ -36,9 +36,9 @@ public class JsonFormatStorage implements Storage {
 	 */
 	public JsonFormatStorage(boolean usePrettyJson) {
 		if (usePrettyJson) {
-			gson = new GsonBuilder().setPrettyPrinting().create();
+			gson = new GsonBuilder().serializeNulls().setPrettyPrinting().create();
 		} else {
-			gson = new GsonBuilder().create();
+			gson = new GsonBuilder().serializeNulls().create();
 		}
 	}
 	
