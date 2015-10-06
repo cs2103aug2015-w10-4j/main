@@ -13,8 +13,16 @@ import java.util.GregorianCalendar;
 import java.util.Scanner;
 
 import global.Task;
+import logic.History;
+import parser.Parser;
+import ui.UI;
 
 public class ManualFormatStorage implements Storage {
+	
+	//UI UIObject;
+	//Parser parserObject;
+	Storage storageObject;
+	//History historyObject;
 	
 	private static final String ARGUMENTS_SEPARATOR = ";";
 	private static final String ARGUMENTS_DATE = "date ";
@@ -24,8 +32,7 @@ public class ManualFormatStorage implements Storage {
 	
 	// date format converter
 	private static SimpleDateFormat sdf = new SimpleDateFormat("dd MMM yyyy");
-	
-	
+
 	/**
 	 * {@inheritDoc}
 	 * 
