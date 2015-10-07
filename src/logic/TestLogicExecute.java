@@ -8,6 +8,7 @@ import java.io.IOException;
 import global.Command;
 import global.Task;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -140,5 +141,13 @@ public class TestLogicExecute {
 		
 		commandObject = new Command(Command.Type.DISPLAY);
 		assertEquals("No items to display.", logicObject.executeCommand(commandObject, true, true));
+	}
+	
+	@After
+	public void cleanup(){
+		File saveFile = new File("save.txt");
+		File anotherSaveFile = new File("anotherSave.txt");
+		saveFile.delete();
+		anotherSaveFile.delete();
 	}
 }

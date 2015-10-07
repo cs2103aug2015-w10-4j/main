@@ -6,6 +6,7 @@ import global.Task;
 import java.io.File;
 import java.util.ArrayList;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -50,5 +51,11 @@ public class TestLogicDelete {
 		argumentList.add("1");
 		String message = logicObject.deleteItem(argumentList, true, true);
 		assertEquals("Item successfully deleted.", message);
+	}
+	
+	@After
+	public void cleanup(){
+		File saveFile = new File("save.txt");
+		saveFile.delete();
 	}
 }

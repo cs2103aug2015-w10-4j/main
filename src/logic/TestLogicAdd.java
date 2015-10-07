@@ -6,6 +6,7 @@ import global.Task;
 import java.io.File;
 import java.util.ArrayList;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -38,5 +39,11 @@ public class TestLogicAdd {
 		Task newTask = new Task("-1");
 		String message = logicObject.addItem(newTask, new ArrayList<String>(), true, true);
 		assertEquals("Item successfully added.", message);
+	}
+	
+	@After
+	public void cleanup(){
+		File saveFile = new File("save.txt");
+		saveFile.delete();
 	}
 }
