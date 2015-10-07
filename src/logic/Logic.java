@@ -42,8 +42,11 @@ public class Logic {
 	public static final String MESSAGE_PROMPT_COMMAND = "command :";
 
 	public static final String MESSAGE_SUCCESS_UNDO_ADD = "Undo : Deleted item restored.";
+	public static final String MESSAGE_SUCCESS_REDO_ADD = "Redo : Deleted item restored.";
 	public static final String MESSAGE_SUCCESS_UNDO_DELETE = "Undo : Added item removed.";
+	public static final String MESSAGE_SUCCESS_REDO_DELETE = "Redo : Added item removed.";
 	public static final String MESSAGE_SUCCESS_UNDO_EDIT = "Undo : Reverted edits.";
+	public static final String MESSAGE_SUCCESS_REDO_EDIT = "Redo : Reverted edits.";
 	public static final String MESSAGE_SUCCESS_ADD = "Item successfully added.";
 	public static final String MESSAGE_SUCCESS_DELETE = "Item successfully deleted.";
 	public static final String MESSAGE_SUCCESS_EDIT = "Item successfully edited.";
@@ -107,7 +110,7 @@ public class Logic {
 			try {
 				String userInput = UIObject.promptUser(MESSAGE_PROMPT_COMMAND);
 				Command commandObject = parserObject.parseCommand(userInput);
-				String executionResult = executeCommand(commandObject, true);
+				String executionResult = executeCommand(commandObject, true, true);
 				UIObject.showToUser(executionResult);
 				storageObject.writeItemList(listOfTasks);
 			} catch (InterruptedException e) {
@@ -127,7 +130,7 @@ public class Logic {
 	 * Executes a command based on commandObject
 	 * @return status string to be shown to user
 	 */
-	String executeCommand(Command commandObject, boolean shouldPushToHistory) {
+	String executeCommand(Command commandObject, boolean shouldPushToHistory, boolean isUndoHistory) {
 		if (commandObject == null) {
 			return ERROR_INVALID_COMMAND;
 		}
@@ -136,15 +139,17 @@ public class Logic {
 		ArrayList<String> argumentList = commandObject.getArguments();
 		switch (commandType) {
 			case ADD :
-				return addItem(userTask, argumentList, shouldPushToHistory);
+				return addItem(userTask, argumentList, shouldPushToHistory, isUndoHistory);
 			case DELETE :
-				return deleteItem(argumentList, shouldPushToHistory);
+				return deleteItem(argumentList, shouldPushToHistory, isUndoHistory);
 			case EDIT :
-				return editItem(userTask, argumentList, shouldPushToHistory);
+				return editItem(userTask, argumentList, shouldPushToHistory, isUndoHistory);
 			case DISPLAY :
 				return displayItems();
 			case UNDO :
 				return undoCommand();
+			case REDO :
+				return redoCommand();
 			case SAVEPATH :
 				return saveFilePath(argumentList);
 			case EXIT :
@@ -160,7 +165,7 @@ public class Logic {
 	 * @param shouldPushToHistory
 	 * @return status string
 	 */
-	String addItem(Task userTask, ArrayList<String> argumentList, boolean shouldPushToHistory) {
+	String addItem(Task userTask, ArrayList<String> argumentList, boolean shouldPushToHistory, boolean isUndoHistory) {
 		try {
 			int index;
 			if (isEmptyArgumentList(argumentList)) {
@@ -171,14 +176,22 @@ public class Logic {
 			listOfTasks.add(index, userTask);
 
 			if(shouldPushToHistory){
-				//	handle history
-				String[] indexString = {Integer.toString(index + 1)};
-				if (!pushToHistory(new Command(Command.Type.DELETE, indexString))) {
-					return ERROR_CANNOT_WRITE_TO_HISTORY;
+				if(isUndoHistory){
+					//	handle history
+					String[] indexString = {Integer.toString(index + 1)};
+					if (!pushToHistory(new Command(Command.Type.DELETE, indexString))) {
+						return ERROR_CANNOT_WRITE_TO_HISTORY;
+					}
+					return MESSAGE_SUCCESS_ADD;
+				}else{
+					String[] indexString = {Integer.toString(index + 1)};
+					if (!pushToUndoHistory(new Command(Command.Type.DELETE, indexString))) {
+						return ERROR_CANNOT_WRITE_TO_HISTORY;
+					}
+					return MESSAGE_SUCCESS_UNDO_ADD;
 				}
-				return MESSAGE_SUCCESS_ADD;
-			}else{
-				return MESSAGE_SUCCESS_UNDO_ADD;
+			} else {
+				return MESSAGE_SUCCESS_REDO_ADD;
 			}
 		} catch (NumberFormatException e) {
 			return ERROR_INVALID_ARGUMENT;
@@ -191,7 +204,7 @@ public class Logic {
 	 * @param shouldPushToHistory
 	 * @return status string
 	 */
-	String deleteItem(ArrayList<String> argumentList, boolean shouldPushToHistory) {
+	String deleteItem(ArrayList<String> argumentList, boolean shouldPushToHistory, boolean isUndoHistory) {
 		if (isEmptyArgumentList(argumentList)) {
 			return ERROR_INVALID_ARGUMENT;
 		}
@@ -203,16 +216,24 @@ public class Logic {
 				
 				listOfTasks.remove(index);
 				
-				
 				if(shouldPushToHistory){
-					//handle history
-					String[] indexString = {Integer.toString(index + 1)};
-					if (!pushToHistory(new Command(Command.Type.ADD, indexString, taskRemoved))) {
-						return ERROR_CANNOT_WRITE_TO_HISTORY;
+					if(isUndoHistory){
+						//handle history
+						String[] indexString = {Integer.toString(index + 1)};
+						if (!pushToHistory(new Command(Command.Type.ADD, indexString, taskRemoved))) {
+							return ERROR_CANNOT_WRITE_TO_HISTORY;
+						}
+						return MESSAGE_SUCCESS_DELETE;
+					}else{
+						String[] indexString = {Integer.toString(index + 1)};
+						if (!pushToUndoHistory(new Command(Command.Type.ADD, indexString, taskRemoved))) {
+							return ERROR_CANNOT_WRITE_TO_HISTORY;
+						}
+						return MESSAGE_SUCCESS_UNDO_DELETE;
 					}
-					return MESSAGE_SUCCESS_DELETE;
 				} else {
-					return MESSAGE_SUCCESS_UNDO_DELETE;
+					
+					return MESSAGE_SUCCESS_REDO_DELETE;
 				}
 				
 			} else {
@@ -231,7 +252,7 @@ public class Logic {
 	 * @param argumentList the index string is read from position 0
 	 * @return status string
 	 */
-	String editItem(Task userTask, ArrayList<String> argumentList, boolean shouldPushToHistory) {
+	String editItem(Task userTask, ArrayList<String> argumentList, boolean shouldPushToHistory, boolean isUndoHistory) {
 		if (isEmptyArgumentList(argumentList)) {
 			return ERROR_INVALID_ARGUMENT;
 		}
@@ -245,14 +266,22 @@ public class Logic {
 				listOfTasks.add(index, userTask);
 				
 				if(shouldPushToHistory){
-					//	handle history
-					String[] indexString = {Integer.toString(index + 1)};
-					if (!pushToHistory(new Command(Command.Type.EDIT, indexString, taskEdited))) {
-						return ERROR_CANNOT_WRITE_TO_HISTORY;
+					if(isUndoHistory){
+						//	handle history
+						String[] indexString = {Integer.toString(index + 1)};
+						if (!pushToHistory(new Command(Command.Type.EDIT, indexString, taskEdited))) {
+							return ERROR_CANNOT_WRITE_TO_HISTORY;
+						}
+						return MESSAGE_SUCCESS_EDIT;
+					}else{
+						String[] indexString = {Integer.toString(index + 1)};
+						if (!pushToUndoHistory(new Command(Command.Type.EDIT, indexString, taskEdited))) {
+							return ERROR_CANNOT_WRITE_TO_HISTORY;
+						}
+						return MESSAGE_SUCCESS_UNDO_EDIT;
 					}
-					return MESSAGE_SUCCESS_EDIT;
 				}else{
-					return MESSAGE_SUCCESS_UNDO_EDIT;
+					return MESSAGE_SUCCESS_REDO_EDIT;
 				}
 			} else {
 				return ERROR_INVALID_INDEX;
@@ -289,15 +318,27 @@ public class Logic {
 	}
 	
 	String undoCommand(){
-		Command previousCommand = historyObject.getPreviousCommand();
+		Command previousCommand = historyObject.getPreviousCommand(true);
 		if (previousCommand == null) {
 			return ERROR_NO_HISTORY;
 		}
-		return executeCommand(previousCommand, false);
+		return executeCommand(previousCommand, true, false);
+	}
+	
+	String redoCommand(){
+		Command previousCommand = historyObject.getPreviousCommand(false);
+		if (previousCommand == null) {
+			return ERROR_NO_HISTORY;
+		}
+		return executeCommand(previousCommand, false, false);
 	}
 		
 	boolean pushToHistory(Command commandObject){
-		return historyObject.pushCommand(commandObject);
+		return historyObject.pushCommand(commandObject, true);
+	}
+	
+	boolean pushToUndoHistory(Command commandObject){
+		return historyObject.pushCommand(commandObject, false);
 	}
 	
 	/**

@@ -22,6 +22,7 @@ public class Parser {
 	private static final String COMMAND_EDIT = "edit";
 	private static final String COMMAND_DELETE = "delete";
 	private static final String COMMAND_UNDO = "undo";
+	private static final String COMMAND_REDO = "redo";
 	private static final String COMMAND_EXIT = "exit";
 	private static final String COMMAND_DISPLAY = "display";
 	private static final String COMMAND_SAVEPATH = "savepath";
@@ -80,6 +81,8 @@ public class Parser {
 			commandObject = new Command(Command.Type.DISPLAY);
 		} else if (args[0].equalsIgnoreCase(COMMAND_UNDO)) {
 			commandObject = new Command(Command.Type.UNDO);
+		} else if (args[0].equalsIgnoreCase(COMMAND_REDO)) {
+			commandObject = new Command(Command.Type.REDO);
 		} else if (args[0].equalsIgnoreCase(COMMAND_SAVEPATH)) {
 			String[] newArgs = {args[1]};
 			commandObject = new Command(Command.Type.SAVEPATH, newArgs);

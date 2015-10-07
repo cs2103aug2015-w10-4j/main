@@ -4,18 +4,30 @@ import java.util.ArrayList;
 
 public class History {
 	ArrayList<Command> commandHistoryList  = new ArrayList<Command>();
-	ArrayList<String> commandStringHistoryList = new ArrayList<String>();
+	ArrayList<String> commandStringHistoryList = new ArrayList<String>(); // for future previous command string
+	ArrayList<Command> commandUndoHistoryList = new ArrayList<Command>();
 	
-	boolean pushCommand(Command commandObject) {
+	boolean pushCommand(Command commandObject, boolean isForUndo) {
+		if (isForUndo) {
+			commandHistoryList.add(commandObject);
+			commandUndoHistoryList.clear();
+		} else {
+			commandUndoHistoryList.add(commandObject);
+		}
+		return true;
+	}
+	
+	boolean pushUndoCommand(Command commandObject) {
 		commandHistoryList.add(commandObject);
 		return true;
 	}
 	
-	Command getPreviousCommand() {
-		int historySize = commandHistoryList.size();
+	Command getPreviousCommand(boolean isForUndo) {
+		ArrayList<Command> arrayListToUse = (isForUndo) ? commandHistoryList : commandUndoHistoryList; 
+		int historySize = arrayListToUse.size();
 		if (historySize > 0) {
-			Command commandObjectToReturn = commandHistoryList.get(historySize - 1);
-			commandHistoryList.remove(historySize - 1);
+			Command commandObjectToReturn = arrayListToUse.get(historySize - 1);
+			arrayListToUse.remove(historySize - 1);
 			return commandObjectToReturn;
 		} else {
 			return null;
