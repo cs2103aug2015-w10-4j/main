@@ -21,7 +21,7 @@ public class TestLogicDelete {
 	
 	@Test
 	public void logicDeleteOne(){
-		String message = logicObject.deleteItem(new ArrayList<String>(), true);
+		String message = logicObject.deleteItem(new ArrayList<String>(), true, true);
 		assertEquals("Error: Invalid argument for command", message);
 	}
 	
@@ -29,7 +29,7 @@ public class TestLogicDelete {
 	public void logicDeleteTwo(){
 		ArrayList<String> argumentList = new ArrayList<String>();
 		argumentList.add("1");
-		String message = logicObject.deleteItem(argumentList, true);
+		String message = logicObject.deleteItem(argumentList, true, true);
 		assertEquals("Error: There is no item at this index.", message);
 	}
 	
@@ -37,7 +37,7 @@ public class TestLogicDelete {
 	public void logicDeleteThree(){
 		ArrayList<String> argumentList = new ArrayList<String>();
 		argumentList.add("-3");
-		String message = logicObject.deleteItem(argumentList, true);
+		String message = logicObject.deleteItem(argumentList, true, true);
 		assertEquals("Error: There is no item at this index.", message);
 	}
 	
@@ -48,7 +48,7 @@ public class TestLogicDelete {
 		
 		ArrayList<String> argumentList = new ArrayList<String>();
 		argumentList.add("1");
-		String message = logicObject.deleteItem(argumentList, true);
+		String message = logicObject.deleteItem(argumentList, true, true);
 		assertEquals("Item successfully deleted.", message);
 	}
 }
