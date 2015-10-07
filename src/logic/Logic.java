@@ -26,11 +26,11 @@ public class Logic {
 	/*
 	 * Declaration of object variables
 	 */
-	public UI UIObject;
-	public Parser parserObject;
-	public Storage storageObject;
-	public History historyObject;
-	public ArrayList<Task> listOfTasks = new ArrayList<Task>();
+	UI UIObject;
+	Parser parserObject;
+	Storage storageObject;
+	History historyObject;
+	ArrayList<Task> listOfTasks = new ArrayList<Task>();
 	
 	// date format converter
 	static SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM yyyy");
