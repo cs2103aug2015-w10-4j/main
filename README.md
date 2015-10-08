@@ -8,13 +8,17 @@ This is an open source project for CS2103 module.
 
 ## Installation
 To install Tasky, clone the repository using the following command:
+	
 	git clone git://github.com/cs2103aug2015-w10-4j/main.git
 	
 Then, enter the downloaded "main" folder, and type the following to compile the source code:
+	
 	javac -d bin -sourcepath src -cp gson-2.3.1.jar src/logic/Logic.java
+	
 Note that you only have to do this once for each Tasky update.
 	
 After compiling, execute the following command to launch Tasky!
+
 	java -cp bin logic.Logic
 
 ## Adding a task
