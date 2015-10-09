@@ -31,6 +31,7 @@ public class Parser {
 	
 	private static final String[] months = {"jan", "feb", "mar", "apr", "may", "jun", "jul", "aug",
 		"sep", "oct", "nov", "dec"};
+	private static final String[] days = {"sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"};
 	
 	/**
 	 * Parses the string provided and returns the corresponding object
