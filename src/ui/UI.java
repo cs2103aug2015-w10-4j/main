@@ -1,6 +1,7 @@
 package ui;
 
 import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
@@ -33,12 +34,11 @@ public class UI {
 	/*
 	 * Initialization of GUI variables
 	 */
-	JFrame frame = new JFrame(FRAME_TITLE);
-	JPanel mainPanel = new JPanel();
-	JTextArea displayArea = new JTextArea(DISPLAY_ROW_COUNT, DISPLAY_COLUMN_COUNT);
-	JLabel promptLabel = new JLabel(DEFAULT_PROMPT, PROMPT_LENGTH);
-	JTextField userInputField = new JTextField(USER_INPUT_FIELD_LENGTH);
-	StatusBar statusBar = new StatusBar();
+	private JFrame frame = new JFrame(FRAME_TITLE);
+	private JTextArea displayArea = new JTextArea(DISPLAY_ROW_COUNT, DISPLAY_COLUMN_COUNT);
+	private JLabel promptLabel = new JLabel(DEFAULT_PROMPT, PROMPT_LENGTH);
+	private JTextField userInputField = new JTextField(USER_INPUT_FIELD_LENGTH);
+	private StatusBar statusBar = new StatusBar();
 	
 	/*
 	 * Constructor
@@ -124,6 +124,7 @@ public class UI {
 		
 		userInputField.setEditable(false);
 		displayArea.setEditable(false);
+		displayArea.setPreferredSize(new Dimension(DISPLAY_ROW_COUNT, DISPLAY_COLUMN_COUNT));
 		
 		userInputField.setColumns(USER_INPUT_FIELD_LENGTH);
 		
