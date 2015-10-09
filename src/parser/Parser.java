@@ -28,6 +28,9 @@ public class Parser {
 	private static final String COMMAND_SAVEPATH = "savepath";
 	private static final String ARGUMENTS_DATE = " date ";
 	private static final String ARGUMENTS_DATE_SHORTHAND = " by ";
+	private static final String ARGUMENTS_DAY_THIS = " this ";
+	private static final String ARGUMENTS_DAY_NEXT = " next ";
+	
 	
 	private static final String[] months = {"jan", "feb", "mar", "apr", "may", "jun", "jul", "aug",
 		"sep", "oct", "nov", "dec"};
@@ -110,8 +113,12 @@ public class Parser {
 	}
 	
 	/*
-	 * Extracts 'date' segment of the command if present and updates date field of taskObj.   
+	 * Extracts 'date' segment of the command if present and updates date field of taskObj. Extracts 'day'
+	 * segment of the command if present and updates date field of taskObj - current supported parameters before
+	 * day string are 'this' and 'next' 
 	 * pre-condition: String must contain DATE_ARGUMENTS, date parameters are valid dates in format dd MMM yyyy
+	 * 					OR
+	 * 				  String must contain day arg in lowercase only
 	 * post-condition: returns extracted string if date is present, else return original string if date
 	 * 				   is not present
 	 */
@@ -121,6 +128,17 @@ public class Parser {
 			newArgs = arg.split(ARGUMENTS_DATE);
 		} else if (arg.indexOf(ARGUMENTS_DATE_SHORTHAND) != -1){
 			newArgs = arg.split(ARGUMENTS_DATE_SHORTHAND);
+		} else if (arg.contains(ARGUMENTS_DAY_THIS)) {
+				newArgs = arg.split(ARGUMENTS_DAY_THIS);
+				for (int i = 0; i < newArgs.length - 1; i++) {
+					for (int n = 0; n < days.length; n++) {
+						System.out.println(newArgs[i+1].indexOf(days[n]));
+						if (newArgs[i+1].indexOf(days[n]) == 0) {
+							System.out.println("success");
+							return days[n];
+						}
+					}
+				}
 		} else {
 			// no date parameters found; return original string
 			return arg;
@@ -139,5 +157,4 @@ public class Parser {
 		taskObj.setEndingTime(date);
 		return newArgs[0];
 	}
-
 }
