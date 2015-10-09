@@ -1,6 +1,8 @@
 package ui;
 
-import java.awt.BorderLayout;
+import java.awt.Container;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
@@ -14,36 +16,103 @@ import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
+import javax.swing.SwingConstants;
 
 public class UI {
 	/*
 	 * Declaration of variables
 	 */
-	private final int displayRowCount = 20;
-	private final int displayColumnCount = 40;
-	private final int userInputFieldLength = 30;
-	private final int promptLength = 10;
+	private static final int DISPLAY_ROW_COUNT = 30;
+	private static final int DISPLAY_COLUMN_COUNT = 70;
+	private static final int USER_INPUT_FIELD_LENGTH = 60;
+	private static final int PROMPT_LENGTH = 10;
 	
-	private final String frameTitle = "Tasky";
+	private static final String FRAME_TITLE = "Tasky";
+	private static final String DEFAULT_PROMPT = "command ";
 	
 	/*
 	 * Initialization of GUI variables
 	 */
-	JFrame frame = new JFrame(frameTitle);
-	JPanel mainPanel = new JPanel(new BorderLayout(5, 5));
-	JTextArea displayArea = new JTextArea(displayRowCount, displayColumnCount);
-	JLabel promptLabel = new JLabel("command: ", promptLength);
-	JTextField userInputField = new JTextField(userInputFieldLength);
+	JFrame frame = new JFrame(FRAME_TITLE);
+	JPanel mainPanel = new JPanel();
+	JTextArea displayArea = new JTextArea(DISPLAY_ROW_COUNT, DISPLAY_COLUMN_COUNT);
+	JLabel promptLabel = new JLabel(DEFAULT_PROMPT, PROMPT_LENGTH);
+	JTextField userInputField = new JTextField(USER_INPUT_FIELD_LENGTH);
 	
 	/*
 	 * Constructor
 	 */
 	public UI() {
+		prepareComponents();
+		addComponentsToPane(frame.getContentPane());
+		displayFrame();
+	}
+	
+	private void addComponentsToPane(Container contentPane) {
+		setLayout(contentPane);
+		addDisplayArea(contentPane);
+		addPromptLabel(contentPane);
+		addUserInputField(contentPane);
+	}
+
+	private void addUserInputField(Container contentPane) {
+		GridBagConstraints constraint = new GridBagConstraints();
+		
+		constraint.fill = GridBagConstraints.HORIZONTAL;
+		constraint.gridx = 1;
+		constraint.gridy = 1;
+		constraint.gridheight = 1;
+		constraint.gridwidth = 2;
+		constraint.weightx = 1.0;
+		
+		contentPane.add(userInputField, constraint);
+	}
+
+	private void addPromptLabel(Container contentPane) {
+		GridBagConstraints constraint = new GridBagConstraints();
+		
+		constraint.fill = GridBagConstraints.HORIZONTAL;
+		constraint.gridx = 0;
+		constraint.gridy = 1;
+		constraint.gridheight = 1;
+		constraint.gridwidth = 1;
+		constraint.weightx = 1.0;
+		
+		contentPane.add(promptLabel, constraint);
+	}
+
+	private void addDisplayArea(Container contentPane) {
+		GridBagConstraints constraint = new GridBagConstraints();
+		
+		constraint.fill = GridBagConstraints.BOTH;
+		constraint.gridx = 0;
+		constraint.gridy = 0;
+		constraint.gridheight = 1;
+		constraint.gridwidth = 3;
+		constraint.weightx = 1.0;
+		
+		contentPane.add(displayArea, constraint);
+	}
+
+	private void setLayout(Container contentPane) {
+		contentPane.setLayout(new GridBagLayout());
+	}
+
+	private void displayFrame() {
+		frame.pack();
+		frame.setLocationRelativeTo(null);
+		frame.setVisible(true);
+	}
+
+	private void prepareComponents() {
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		
 		userInputField.setEditable(false);
 		displayArea.setEditable(false);
-		mainPanel.add(displayArea, BorderLayout.PAGE_START);
-		mainPanel.add(promptLabel, BorderLayout.LINE_START);
-		mainPanel.add(userInputField, BorderLayout.CENTER);
+		
+		userInputField.setColumns(USER_INPUT_FIELD_LENGTH);
+		
+		promptLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		
 		userInputField.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -72,13 +141,8 @@ public class UI {
 	        	userInputField.grabFocus();
 	        }
 		});
-		
-		frame.add(mainPanel);
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.pack();
-		frame.setVisible(true);
 	}
-	
+
 	/**
 	 * Prompt message and obtain user input
 	 * @param prompt message to prompt user
