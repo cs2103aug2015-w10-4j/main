@@ -38,6 +38,7 @@ public class UI {
 	JTextArea displayArea = new JTextArea(DISPLAY_ROW_COUNT, DISPLAY_COLUMN_COUNT);
 	JLabel promptLabel = new JLabel(DEFAULT_PROMPT, PROMPT_LENGTH);
 	JTextField userInputField = new JTextField(USER_INPUT_FIELD_LENGTH);
+	StatusBar statusBar = new StatusBar();
 	
 	/*
 	 * Constructor
@@ -53,6 +54,20 @@ public class UI {
 		addDisplayArea(contentPane);
 		addPromptLabel(contentPane);
 		addUserInputField(contentPane);
+		addStatusBar(contentPane);
+	}
+
+	private void addStatusBar(Container contentPane) {
+		GridBagConstraints constraint = new GridBagConstraints();
+		
+		constraint.fill = GridBagConstraints.HORIZONTAL;
+		constraint.gridx = 0;
+		constraint.gridy = 2;
+		constraint.gridheight = 1;
+		constraint.gridwidth = 3;
+		constraint.weightx = 1.0;
+	
+		contentPane.add(statusBar, constraint);
 	}
 
 	private void addUserInputField(Container contentPane) {
@@ -170,6 +185,11 @@ public class UI {
 	 */
 	public boolean showToUser(String stringToShow) {
 		displayArea.setText(stringToShow);
+		return true;
+	}
+	
+	public boolean showStatusToUser(String stringToShow) {
+		statusBar.setText(stringToShow);
 		return true;
 	}
 	
