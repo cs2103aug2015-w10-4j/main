@@ -27,6 +27,7 @@ public class Parser {
 	private static final String COMMAND_DISPLAY = "display";
 	private static final String COMMAND_SAVEPATH = "savepath";
 	private static final String ARGUMENTS_DATE = " date ";
+	private static final String ARGUMENTS_DATE_SHORTHAND = " by ";
 	
 	private static final String[] months = {"jan", "feb", "mar", "apr", "may", "jun", "jul", "aug",
 		"sep", "oct", "nov", "dec"};
@@ -43,13 +44,11 @@ public class Parser {
 		if (args[0].equalsIgnoreCase(COMMAND_ADD)) {
 			try {
 				Task taskObj = new Task();
-				if (args[1].indexOf(ARGUMENTS_DATE) != -1) {
-					extractDate(args[1], taskObj);
-				} else {
-					taskObj.setName(args[1]);
-				}
+				// extracts 'date' segment of the command if present, and returns the remaining 
+				// string back to arg
+				args[1] = extractDate(args[1], taskObj);
+				taskObj.setName(args[1]);
 				commandObject = new Command(Command.Type.ADD, taskObj);
-				
 			}
 			catch (ArrayIndexOutOfBoundsException e) {
 				throw new Exception(String.format(WARNING_INSUFFICIENT_ARGUMENT, args[0]));
@@ -110,12 +109,21 @@ public class Parser {
 	}
 	
 	/*
-	 * Parses arguments after separator
-	 * pre-condition: String must contain DATE_ARGUMENTS, all inputs are valid dates in format dd MMM yyyy
+	 * Extracts 'date' segment of the command if present and updates date field of taskObj.   
+	 * pre-condition: String must contain DATE_ARGUMENTS, date parameters are valid dates in format dd MMM yyyy
+	 * post-condition: returns extracted string if date is present, else return original string if date
+	 * 				   is not present
 	 */
-	public void extractDate(String arg, Task taskObj) {
-		String[] newArgs = arg.split(ARGUMENTS_DATE);
-		taskObj.setName(newArgs[0]);
+	public String extractDate(String arg, Task taskObj) {
+		String[] newArgs;
+		if (arg.indexOf(ARGUMENTS_DATE) != -1) {
+			newArgs = arg.split(ARGUMENTS_DATE);
+		} else if (arg.indexOf(ARGUMENTS_DATE_SHORTHAND) != -1){
+			newArgs = arg.split(ARGUMENTS_DATE_SHORTHAND);
+		} else {
+			// no date parameters found; return original string
+			return arg;
+		}
 		String[] dateArgs = newArgs[1].split(" ");
 		int day = Integer.parseInt(dateArgs[0]);
 		int month = Arrays.asList(months).indexOf(dateArgs[1]);
@@ -128,6 +136,7 @@ public class Parser {
 		}
 		Calendar date = new GregorianCalendar(year, month, day);
 		taskObj.setEndingTime(date);
+		return newArgs[0];
 	}
 
 }
