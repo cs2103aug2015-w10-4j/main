@@ -13,9 +13,6 @@ import java.util.GregorianCalendar;
 import java.util.Scanner;
 
 import global.Task;
-import logic.History;
-import parser.Parser;
-import ui.UI;
 
 public class ManualFormatStorage implements Storage {
 	
