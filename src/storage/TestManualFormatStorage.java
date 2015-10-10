@@ -13,7 +13,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import global.Task;
-import logic.Logic;
 
 public class TestManualFormatStorage {
 	Storage storageObject;
