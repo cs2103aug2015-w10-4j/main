@@ -53,7 +53,7 @@ public class Logic {
 	public static final String MESSAGE_SUCCESS_EXIT = "Exiting program...";
 	public static final String MESSAGE_SUCCESS_CHANGE_FILE_PATH = "File path successfully changed.";
 	public static final String MESSAGE_SUCCESS_CHANGE_FILE_PATH_BUT_CREATE_FILE = "File path successfully changed. \nNo file was detected, so Tasky has created one for you.";
-	public static final String MESSAGE_DISPLAY_TASKLINE_INDEX = "%d. ";
+	public static final String MESSAGE_DISPLAY_TASKLINE_INDEX = "%3d. ";
 	public static final String MESSAGE_DISPLAY_NEWLINE = "\r\n"; // isolated this string for ease of concatenation
 	public static final String MESSAGE_DISPLAY_EMPTY = "No items to display.";
 	public static final String SEPARATOR_DISPLAY_FIELDS = " | ";
@@ -306,8 +306,8 @@ public class Logic {
 		for (int i = 0; i < listOfTasks.size(); i++) {
 			Task curTask = listOfTasks.get(i);
 			stringToDisplay += String.format(MESSAGE_DISPLAY_TASKLINE_INDEX, i + 1);
-			if(curTask != null){
-				stringToDisplay += curTask.getName();
+			if (curTask != null) {
+				stringToDisplay += String.format("%-30s", curTask.getName());
 				if (curTask.getEndingTime() != null) {
 					stringToDisplay += SEPARATOR_DISPLAY_FIELDS + dateFormat.format(curTask.getEndingTime().getTime());
 				}

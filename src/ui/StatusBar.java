@@ -30,7 +30,6 @@ public class StatusBar extends JPanel {
 		statusLabel = new JLabel(DEFAULT_STATUS_BAR_TEXT);
 		statusLabel.setHorizontalAlignment(SwingConstants.LEFT);
 		statusLabel.setFont(new Font(statusLabel.getFont().getName(), Font.PLAIN, 11));
-		statusLabel.revalidate();
 	}
 	
 	public void setText(String text) {
