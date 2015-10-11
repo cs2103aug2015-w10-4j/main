@@ -93,7 +93,7 @@ public class TestLogicExecute {
 		
 		// case 1
 		commandObject = new Command(Command.Type.DISPLAY);
-		assertEquals("1. Item 1\r\n2. Item 2\r\n3. Item 3\r\n", logicObject.executeCommand(commandObject, true, true));
+		assertEquals("Displaying items.", logicObject.executeCommand(commandObject, true, true));
 	}
 	
 	
