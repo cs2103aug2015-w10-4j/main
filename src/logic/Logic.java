@@ -51,6 +51,7 @@ public class Logic {
 	public static final String MESSAGE_SUCCESS_DELETE = "Item successfully deleted.";
 	public static final String MESSAGE_SUCCESS_EDIT = "Item successfully edited.";
 	public static final String MESSAGE_SUCCESS_EXIT = "Exiting program...";
+	public static final String MESSAGE_SUCCESS_DISPLAY = "Displaying items.";
 	public static final String MESSAGE_SUCCESS_CHANGE_FILE_PATH = "File path successfully changed.";
 	public static final String MESSAGE_SUCCESS_CHANGE_FILE_PATH_BUT_CREATE_FILE = "File path successfully changed. \nNo file was detected, so Tasky has created one for you.";
 	public static final String MESSAGE_DISPLAY_TASKLINE_INDEX = "%3d. ";
@@ -111,17 +112,18 @@ public class Logic {
 				String userInput = UIObject.promptUser(MESSAGE_PROMPT_COMMAND);
 				Command commandObject = parserObject.parseCommand(userInput);
 				String executionResult = executeCommand(commandObject, true, true);
-				UIObject.showToUser(executionResult);
+				UIObject.showStatusToUser(executionResult);
+				showUpdatedItems();
 				storageObject.writeItemList(listOfTasks);
 			} catch (InterruptedException e) {
 				// something interrupted the UI's wait for user input
-				UIObject.showToUser(ERROR_UI_INTERRUPTED);
+				UIObject.showStatusToUser(ERROR_UI_INTERRUPTED);
 			} catch (IOException e) {
 				// error writing
-				UIObject.showToUser(ERROR_WRITING_FILE);
+				UIObject.showStatusToUser(ERROR_WRITING_FILE);
 			} catch (Exception e) {
 				// warning from parsing user command
-				UIObject.showToUser(e.getMessage());
+				UIObject.showStatusToUser(e.getMessage());
 			}
 		}
 	}
@@ -295,26 +297,37 @@ public class Logic {
 		return index >= 0 && index < listOfTasks.size();
 	}
 	
-	/**
-	 * @return string to be displayed, in the form of "[taskname] | [date]"
-	 */
-	String displayItems() {
+	String displayItems(){
 		if (listOfTasks.isEmpty()) {
 			return MESSAGE_DISPLAY_EMPTY;
+		}else{
+		   // showUpdatedItems();
+			return MESSAGE_SUCCESS_DISPLAY;
 		}
-		String stringToDisplay = "";
-		for (int i = 0; i < listOfTasks.size(); i++) {
-			Task curTask = listOfTasks.get(i);
-			stringToDisplay += String.format(MESSAGE_DISPLAY_TASKLINE_INDEX, i + 1);
-			if (curTask != null) {
-				stringToDisplay += String.format("%-30s", curTask.getName());
-				if (curTask.getEndingTime() != null) {
-					stringToDisplay += SEPARATOR_DISPLAY_FIELDS + dateFormat.format(curTask.getEndingTime().getTime());
+	}
+	
+	/**
+	 * @return calls the UI to display updated list of items
+	 */
+	boolean showUpdatedItems() {
+		if (listOfTasks.isEmpty()) {
+			UIObject.showToUser(MESSAGE_DISPLAY_EMPTY);
+		}else{
+			String stringToDisplay = "";
+			for (int i = 0; i < listOfTasks.size(); i++) {
+				Task curTask = listOfTasks.get(i);
+				stringToDisplay += String.format(MESSAGE_DISPLAY_TASKLINE_INDEX, i + 1);
+				if (curTask != null) {
+					stringToDisplay += String.format("%-30s", curTask.getName());
+					if (curTask.getEndingTime() != null) {
+						stringToDisplay += SEPARATOR_DISPLAY_FIELDS + dateFormat.format(curTask.getEndingTime().getTime());
+					}
 				}
-			}
-			stringToDisplay += MESSAGE_DISPLAY_NEWLINE;
+				stringToDisplay += MESSAGE_DISPLAY_NEWLINE;
+			}	
+			UIObject.showToUser(stringToDisplay);
 		}
-		return stringToDisplay;
+		return true;
 	}
 	
 	String undoCommand(){
