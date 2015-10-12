@@ -214,9 +214,7 @@ public class Logic {
 			int index = Integer.parseInt(argumentList.get(0)) - 1;
 			if (isValidIndex(index)) {
 				// for history
-				Task taskRemoved = listOfTasks.get(index);
-				
-				listOfTasks.remove(index);
+				Task taskRemoved = listOfTasks.remove(index);
 				
 				if(shouldPushToHistory){
 					if(isUndoHistory){

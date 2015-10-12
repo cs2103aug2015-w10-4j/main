@@ -28,11 +28,6 @@ public class Parser {
 	private static final String COMMAND_EXIT = "exit";
 	private static final String COMMAND_DISPLAY = "display";
 	private static final String COMMAND_SAVEPATH = "savepath";
-//	private static final String ARGUMENTS_DATE = " date ";
-//	private static final String ARGUMENTS_DATE_SHORTHAND = " by ";
-//	private static final String ARGUMENTS_DAY_THIS = " this ";
-//	private static final String ARGUMENTS_DAY_NEXT = " next ";
-//	private static final String ARGUMENTS_DAY_TOMORROW = "tomorrow";
 	private static final String[] ARGUMENTS_DATE = {" date ",  " by ", " this ", " next ", "tomorrow"};
 	
 	private static final String[] MONTHS = {"jan", "feb", "mar", "apr", "may", "jun", "jul", "aug",
@@ -109,7 +104,7 @@ public class Parser {
 	 * post-condition: returns extracted string if date is present, else return original string if date
 	 * 				   is not present
 	 */
-	public String extractDate(String arg, Task taskObj) throws Exception{
+	private String extractDate(String arg, Task taskObj) throws Exception{
 		String[] newArgs = {};
 		Calendar date = new GregorianCalendar();
 		int argument = -1; // 0 = date, 1 = by, 2 = this, 3 = next, 4 = tomorrow
@@ -123,7 +118,7 @@ public class Parser {
 			// no date parameters found; return original string
 			return arg;
 		} else if (argument < 2) {
-			// command contains 'date' or 'by'
+			// command contains ARGUMENTS_DATE[0||1]
 			String[] dateArgs = newArgs[1].split(" ");
 			int day = Integer.parseInt(dateArgs[0]);
 			int month = Arrays.asList(MONTHS).indexOf(dateArgs[1]);
@@ -136,7 +131,7 @@ public class Parser {
 			}
 			date.set(year, month, day);
 		} else if (argument < 4) {
-			// command contains 'this' or 'next'
+			// command contains ARGUMENTS_DATE[2||3]
 			date = new GregorianCalendar();			
 			int setDay = -1, today = 0, offset;
 			SimpleDateFormat dateFormat = new SimpleDateFormat("EEEE");
@@ -160,10 +155,14 @@ public class Parser {
 			}
 			date.set(Calendar.DATE, date.get(Calendar.DATE) + offset);
 		} else {
-			// command contains 'tomorrow'
+			// command contains ARGUMENTS_DATE[4]
 			date.set(Calendar.DATE, date.get(Calendar.DATE) + 1);
 		}
 		taskObj.setEndingTime(date);
 		return newArgs[0];
+	}
+	
+	private String extractPeriodic(String arg, Task taskObj){
+		return null;
 	}
 }
