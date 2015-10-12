@@ -32,7 +32,7 @@ public class Parser {
 	private static final String ARGUMENTS_DATE_SHORTHAND = " by ";
 	private static final String ARGUMENTS_DAY_THIS = " this ";
 	private static final String ARGUMENTS_DAY_NEXT = " next ";
-	
+	private static final String ARGUMENTS_DAY_TOMORROW = "tomorrow";
 	
 	private static final String[] months = {"jan", "feb", "mar", "apr", "may", "jun", "jul", "aug",
 		"sep", "oct", "nov", "dec"};
@@ -101,6 +101,7 @@ public class Parser {
 	 * Extracts 'date' segment of the command if present and updates date field of taskObj. Extracts 'day'
 	 * segment of the command if present and updates date field of taskObj - current supported parameters before
 	 * day string are 'this' and 'next' 
+	 * Special argument: 'tomorrow' will set date to the next day from current date
 	 * pre-condition: String must contain DATE_ARGUMENTS, date parameters are valid dates in format dd MMM yyyy
 	 * 					OR
 	 * 				  String must contain day arg in lowercase only
@@ -115,19 +116,23 @@ public class Parser {
 		} else if (arg.indexOf(ARGUMENTS_DATE_SHORTHAND) != -1){
 			newArgs = arg.split(ARGUMENTS_DATE_SHORTHAND);
 		} else {
-			boolean isThisWeek; 
+			boolean isThisWeek;
+			date = new GregorianCalendar();
 			if (arg.contains(ARGUMENTS_DAY_THIS)) {
 				newArgs = arg.split(ARGUMENTS_DAY_THIS);
 				isThisWeek = true;
 			} else if (arg.contains(ARGUMENTS_DAY_NEXT)) {
 				newArgs = arg.split(ARGUMENTS_DAY_NEXT);
 				isThisWeek = false;
+			} else if (arg.contains(ARGUMENTS_DAY_TOMORROW)) {
+				date.set(Calendar.DATE, date.get(Calendar.DATE) + 1);
+				taskObj.setEndingTime(date);
+				return arg.split(ARGUMENTS_DAY_TOMORROW)[0];
 			} else {
 				// no date parameters found; return original string
 				return arg;
 			}
 			int setDay = -1, today = 0, offset;
-			date = new GregorianCalendar();
 			SimpleDateFormat dateFormat = new SimpleDateFormat("EEEE");
 			for (int i = 0; i < days.length; i++) {
 				if (newArgs[1].indexOf(days[i]) == 0) {
