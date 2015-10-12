@@ -28,15 +28,16 @@ public class Parser {
 	private static final String COMMAND_EXIT = "exit";
 	private static final String COMMAND_DISPLAY = "display";
 	private static final String COMMAND_SAVEPATH = "savepath";
-	private static final String ARGUMENTS_DATE = " date ";
-	private static final String ARGUMENTS_DATE_SHORTHAND = " by ";
-	private static final String ARGUMENTS_DAY_THIS = " this ";
-	private static final String ARGUMENTS_DAY_NEXT = " next ";
-	private static final String ARGUMENTS_DAY_TOMORROW = "tomorrow";
+//	private static final String ARGUMENTS_DATE = " date ";
+//	private static final String ARGUMENTS_DATE_SHORTHAND = " by ";
+//	private static final String ARGUMENTS_DAY_THIS = " this ";
+//	private static final String ARGUMENTS_DAY_NEXT = " next ";
+//	private static final String ARGUMENTS_DAY_TOMORROW = "tomorrow";
+	private static final String[] ARGUMENTS_DATE = {" date ",  " by ", " this ", " next ", "tomorrow"};
 	
-	private static final String[] months = {"jan", "feb", "mar", "apr", "may", "jun", "jul", "aug",
+	private static final String[] MONTHS = {"jan", "feb", "mar", "apr", "may", "jun", "jul", "aug",
 		"sep", "oct", "nov", "dec"};
-	private static final String[] days = {"sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"};
+	private static final String[] DAYS = {"sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"};
 	
 	/**
 	 * Parses the string provided and returns the corresponding object
@@ -64,7 +65,7 @@ public class Parser {
 				String[] newArgs = args[1].split(" ", 2);
 				String[] indexToDelete = {newArgs[0]};
 				Task taskObj = new Task();
-				if (newArgs[1].indexOf(ARGUMENTS_DATE) != -1) {
+				if (newArgs[1].indexOf(ARGUMENTS_DATE[0]) != -1) {
 					extractDate(newArgs[1], taskObj);
 				} else {
 					taskObj.setName(newArgs[1]);
@@ -109,36 +110,41 @@ public class Parser {
 	 * 				   is not present
 	 */
 	public String extractDate(String arg, Task taskObj) throws Exception{
-		String[] newArgs;
-		Calendar date;
-		if (arg.indexOf(ARGUMENTS_DATE) != -1) {
-			newArgs = arg.split(ARGUMENTS_DATE);
-		} else if (arg.indexOf(ARGUMENTS_DATE_SHORTHAND) != -1){
-			newArgs = arg.split(ARGUMENTS_DATE_SHORTHAND);
-		} else {
-			boolean isThisWeek;
-			date = new GregorianCalendar();
-			if (arg.contains(ARGUMENTS_DAY_THIS)) {
-				newArgs = arg.split(ARGUMENTS_DAY_THIS);
-				isThisWeek = true;
-			} else if (arg.contains(ARGUMENTS_DAY_NEXT)) {
-				newArgs = arg.split(ARGUMENTS_DAY_NEXT);
-				isThisWeek = false;
-			} else if (arg.contains(ARGUMENTS_DAY_TOMORROW)) {
-				date.set(Calendar.DATE, date.get(Calendar.DATE) + 1);
-				taskObj.setEndingTime(date);
-				return arg.split(ARGUMENTS_DAY_TOMORROW)[0];
-			} else {
-				// no date parameters found; return original string
-				return arg;
+		String[] newArgs = {};
+		Calendar date = new GregorianCalendar();
+		int argument = -1; // 0 = date, 1 = by, 2 = this, 3 = next, 4 = tomorrow
+		for (int i = 0; i < ARGUMENTS_DATE.length; i++) {
+			if (arg.contains(ARGUMENTS_DATE[i])) {
+				newArgs = arg.split(ARGUMENTS_DATE[i]);
+				argument = i;
 			}
+		}
+		if (argument == -1) {
+			// no date parameters found; return original string
+			return arg;
+		} else if (argument < 2) {
+			// command contains 'date' or 'by'
+			String[] dateArgs = newArgs[1].split(" ");
+			int day = Integer.parseInt(dateArgs[0]);
+			int month = Arrays.asList(MONTHS).indexOf(dateArgs[1]);
+			// year will be set to current year if not specified by user
+			int year;
+			try {
+				year = Integer.parseInt(dateArgs[2]);
+			} catch (ArrayIndexOutOfBoundsException e) {
+				year = Calendar.getInstance().get(Calendar.YEAR);
+			}
+			date.set(year, month, day);
+		} else if (argument < 4) {
+			// command contains 'this' or 'next'
+			date = new GregorianCalendar();			
 			int setDay = -1, today = 0, offset;
 			SimpleDateFormat dateFormat = new SimpleDateFormat("EEEE");
-			for (int i = 0; i < days.length; i++) {
-				if (newArgs[1].indexOf(days[i]) == 0) {
+			for (int i = 0; i < DAYS.length; i++) {
+				if (newArgs[1].indexOf(DAYS[i]) == 0) {
 					setDay = i;
 				}
-				if (dateFormat.format(date.getTime()).equalsIgnoreCase(days[i])) {
+				if (dateFormat.format(date.getTime()).equalsIgnoreCase(DAYS[i])) {
 					today = i;
 				}
 			}
@@ -149,24 +155,14 @@ public class Parser {
 			if (offset <= 0) {
 				offset += 7;
 			}
-			if (!isThisWeek) {
+			if (argument == 3) {
 				offset += 7;
 			}
 			date.set(Calendar.DATE, date.get(Calendar.DATE) + offset);
-			taskObj.setEndingTime(date);
-			return newArgs[0];
+		} else {
+			// command contains 'tomorrow'
+			date.set(Calendar.DATE, date.get(Calendar.DATE) + 1);
 		}
-		String[] dateArgs = newArgs[1].split(" ");
-		int day = Integer.parseInt(dateArgs[0]);
-		int month = Arrays.asList(months).indexOf(dateArgs[1]);
-		// year will be set to current year if not specified by user
-		int year;
-		try {
-			year = Integer.parseInt(dateArgs[2]);
-		} catch (ArrayIndexOutOfBoundsException e) {
-			year = Calendar.getInstance().get(Calendar.YEAR);
-		}
-		date = new GregorianCalendar(year, month, day);
 		taskObj.setEndingTime(date);
 		return newArgs[0];
 	}
