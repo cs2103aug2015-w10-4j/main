@@ -55,6 +55,10 @@ public class Task {
 		this.endingTime = endingTime;
 		this.location = location;
 		this.periodic = periodic;
+		if(isCorrectPeriodic() == false){
+			IllegalArgumentException e = new IllegalArgumentException();
+			throw e;
+		}
 	}
 	
 	
