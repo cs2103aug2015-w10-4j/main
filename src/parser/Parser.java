@@ -3,6 +3,7 @@ package parser;
 import global.Command;
 import global.Task;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -38,11 +39,23 @@ public class Parser {
 	
 	/**
 	 * Parses the string provided and returns the corresponding object
-	 * @param command user input
+	 * @param command user input 
 	 * @return Command object for execution
 	 * @throws Exception parsing error message
 	 */
 	public Command parseCommand(String command) throws Exception {
+		Calendar temp = new GregorianCalendar();
+		 System.out.println("YEAR: " + temp.get(Calendar.YEAR));
+		 System.out.println("MONTH: " + temp.get(Calendar.MONTH));
+		 System.out.println("WEEK_OF_YEAR: " + temp.get(Calendar.WEEK_OF_YEAR));
+		 System.out.println("WEEK_OF_MONTH: " + temp.get(Calendar.WEEK_OF_MONTH));
+		 System.out.println("DATE: " + temp.get(Calendar.DATE));
+		 System.out.println(Calendar.MONDAY);
+		 System.out.println(Calendar.DAY_OF_WEEK);
+		 temp.set(Calendar.DATE, (temp.get(Calendar.DATE) + 7));
+		 System.out.println(temp.getTime());
+
+		 
 		String[] args = command.split(" ", 2); // extract CommandType from command
 		Command commandObject;
 		if (args[0].equalsIgnoreCase(COMMAND_ADD)) {
@@ -124,24 +137,34 @@ public class Parser {
 	 */
 	public String extractDate(String arg, Task taskObj) {
 		String[] newArgs;
+		Calendar date;
 		if (arg.indexOf(ARGUMENTS_DATE) != -1) {
 			newArgs = arg.split(ARGUMENTS_DATE);
 		} else if (arg.indexOf(ARGUMENTS_DATE_SHORTHAND) != -1){
 			newArgs = arg.split(ARGUMENTS_DATE_SHORTHAND);
-		} else if (arg.contains(ARGUMENTS_DAY_THIS)) {
+		} else {
+			int selector = 0; // 1 for this week, 2 for next week
+			if (arg.contains(ARGUMENTS_DAY_THIS)) {
 				newArgs = arg.split(ARGUMENTS_DAY_THIS);
-				for (int i = 0; i < newArgs.length - 1; i++) {
-					for (int n = 0; n < days.length; n++) {
-						System.out.println(newArgs[i+1].indexOf(days[n]));
-						if (newArgs[i+1].indexOf(days[n]) == 0) {
-							System.out.println("success");
-							return days[n];
+				selector = 1;
+			} else if (arg.contains(ARGUMENTS_DAY_NEXT)) {
+				newArgs = arg.split(ARGUMENTS_DAY_NEXT);
+				selector = 2;
+			} else {
+				// no date parameters found; return original string
+				return arg;
+			}
+			for (int i = 0; i < newArgs.length - 1; i++) {
+				for (int n = 0; n < days.length; n++) {
+					if (newArgs[i+1].indexOf(days[n]) == 0) {
+						date = new GregorianCalendar();
+						SimpleDateFormat dateFormat = new SimpleDateFormat("EE");
+						if (dateFormat.format(date.getTime()).equalsIgnoreCase(days[n]) && selector == 2) {
+							date.set(Calendar.DATE, date.get(Calendar.DATE) + 7);
 						}
 					}
 				}
-		} else {
-			// no date parameters found; return original string
-			return arg;
+			}
 		}
 		String[] dateArgs = newArgs[1].split(" ");
 		int day = Integer.parseInt(dateArgs[0]);
@@ -153,7 +176,7 @@ public class Parser {
 		} catch (ArrayIndexOutOfBoundsException e) {
 			year = Calendar.getInstance().get(Calendar.YEAR);
 		}
-		Calendar date = new GregorianCalendar(year, month, day);
+		date = new GregorianCalendar(year, month, day);
 		taskObj.setEndingTime(date);
 		return newArgs[0];
 	}
