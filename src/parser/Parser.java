@@ -4,7 +4,6 @@ import global.Command;
 import global.Task;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -48,8 +47,10 @@ public class Parser {
 		if (args[0].equalsIgnoreCase(COMMAND_ADD)) {
 			try {
 				Task taskObj = new Task();
-				taskObj.setName(extractTaskName(args[1]));
-				taskObj.setEndingTime(extractDate(args[1]));
+				// Using old method of extracting task name temporarily for v0.1
+//				taskObj.setName(extractTaskName(args[1]));
+//				taskObj.setEndingTime(extractDate(args[1]));
+				taskObj.setName(extractDate(args[1], taskObj));
 				args[1] = extractPeriodic(args[1], taskObj);
 				commandObject = new Command(Command.Type.ADD, taskObj);
 			}
@@ -61,9 +62,10 @@ public class Parser {
 				String[] newArgs = args[1].split(" ", 2);
 				String[] indexToDelete = {newArgs[0]};
 				Task taskObj = new Task();
-				//try to parse the date
-				taskObj.setName(extractTaskName(newArgs[1]));
-				taskObj.setEndingTime(extractDate(newArgs[1]));
+				// Using old method of extracting task name temporarily for v0.1
+//				taskObj.setName(extractTaskName(newArgs[1]));
+//				taskObj.setEndingTime(extractDate(args[1]));
+				taskObj.setName(extractDate(newArgs[1], taskObj));
 				commandObject = new Command(Command.Type.EDIT, indexToDelete, taskObj);
 			} catch (ArrayIndexOutOfBoundsException e) {
 				throw new Exception(String.format(WARNING_INSUFFICIENT_ARGUMENT, args[0]));
@@ -112,7 +114,7 @@ public class Parser {
 	 * 				   day is not spelt in full.
 	 * 
 	 */
-	private Calendar extractDate(String arg) throws Exception {
+	private String extractDate(String arg, Task taskObj) throws Exception {
 		String[] newArgs = {};
 		Calendar date = new GregorianCalendar();
 		int argument = -1; // 0 = date, 1 = by, 2 = this, 3 = next, 4 = tomorrow
@@ -169,7 +171,8 @@ public class Parser {
 			// command contains ARGUMENTS_DATE[4]
 			date.set(Calendar.DATE, date.get(Calendar.DATE) + 1);
 		}
-		return date;
+		taskObj.setEndingTime(date);
+		return newArgs[0];
 	}
 	
 	private String extractPeriodic(String arg, Task taskObj){
