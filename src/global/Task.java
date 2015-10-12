@@ -121,10 +121,10 @@ public class Task {
 	
 	//return false if periodic type is incorrect
 	public boolean isCorrectPeriodic() {
-		String CurrentPeriodic = getPeriodic();
-		if (! CurrentPeriodic.equals(PERIODIC_DAILY) &&
-				! CurrentPeriodic.equals(PERIODIC_WEEKLY) &&
-				! CurrentPeriodic.equals(PERIODIC_MONTHLY)){
+		String currentPeriodic = getPeriodic();
+		if (! currentPeriodic.equals(PERIODIC_DAILY) &&
+				! currentPeriodic.equals(PERIODIC_WEEKLY) &&
+				! currentPeriodic.equals(PERIODIC_MONTHLY)){
 			return false;
 		}
 		return true;

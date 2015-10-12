@@ -18,7 +18,8 @@ public class Parser {
 	
 	// warning messages
 	private static final String WARNING_INSUFFICIENT_ARGUMENT = "Warning: '%s': insufficient command arguments";
-	private static final String WARNING_INVALID_DAY = "Invalid day supplied!";
+	private static final String WARNING_INVALID_DAY = "Invalid day specified!";
+	private static final String WARNING_INVALID_MONTH = "Invalid month specified!";
 	
 	private static final String COMMAND_ADD = "add";
 	private static final String COMMAND_EDIT = "edit";
@@ -29,6 +30,7 @@ public class Parser {
 	private static final String COMMAND_DISPLAY = "display";
 	private static final String COMMAND_SAVEPATH = "savepath";
 	private static final String[] ARGUMENTS_DATE = {" date ",  " by ", " this ", " next ", "tomorrow"};
+	private static final String ARGUMENTS_PERIODIC = " every ";
 	
 	private static final String[] MONTHS = {"jan", "feb", "mar", "apr", "may", "jun", "jul", "aug",
 		"sep", "oct", "nov", "dec"};
@@ -46,10 +48,9 @@ public class Parser {
 		if (args[0].equalsIgnoreCase(COMMAND_ADD)) {
 			try {
 				Task taskObj = new Task();
-				// extracts 'date' segment of the command if present, and returns the remaining 
-				// string back to arg
-				args[1] = extractDate(args[1], taskObj);
-				taskObj.setName(args[1]);
+				taskObj.setName(extractTaskName(args[1]));
+				taskObj.setEndingTime(extractDate(args[1]));
+				args[1] = extractPeriodic(args[1], taskObj);
 				commandObject = new Command(Command.Type.ADD, taskObj);
 			}
 			catch (ArrayIndexOutOfBoundsException e) {
@@ -61,7 +62,7 @@ public class Parser {
 				String[] indexToDelete = {newArgs[0]};
 				Task taskObj = new Task();
 				if (newArgs[1].indexOf(ARGUMENTS_DATE[0]) != -1) {
-					extractDate(newArgs[1], taskObj);
+					taskObj.setEndingTime(extractDate(newArgs[1]));
 				} else {
 					taskObj.setName(newArgs[1]);
 				}
@@ -93,18 +94,27 @@ public class Parser {
 		return commandObject;
 	}
 	
+	/* 
+	 * Extracts and returns 'name' segment of the command. 
+	 */
+	private String extractTaskName(String arg) throws Exception {
+		return arg.split("'")[1];
+	}
+	
+	
 	/*
-	 * Extracts 'date' segment of the command if present and updates date field of taskObj. Extracts 'day'
-	 * segment of the command if present and updates date field of taskObj - current supported parameters before
+	 * Extracts 'date' segment of the command if present returns Calendar object. Extracts 'day'
+	 * segment of the command if present and returns Calendar object - current supported parameters before
 	 * day string are 'this' and 'next' 
 	 * Special argument: 'tomorrow' will set date to the next day from current date
 	 * pre-condition: String must contain DATE_ARGUMENTS, date parameters are valid dates in format dd MMM yyyy
 	 * 					OR
 	 * 				  String must contain day arg in lowercase only
-	 * post-condition: returns extracted string if date is present, else return original string if date
-	 * 				   is not present
+	 * post-condition: returns parsed Calendar object if date is present, else return null. Exception if
+	 * 				   day is not spelt in full.
+	 * 
 	 */
-	private String extractDate(String arg, Task taskObj) throws Exception{
+	private Calendar extractDate(String arg) throws Exception {
 		String[] newArgs = {};
 		Calendar date = new GregorianCalendar();
 		int argument = -1; // 0 = date, 1 = by, 2 = this, 3 = next, 4 = tomorrow
@@ -115,13 +125,16 @@ public class Parser {
 			}
 		}
 		if (argument == -1) {
-			// no date parameters found; return original string
-			return arg;
+			// no date parameters found; return null
+			return null;
 		} else if (argument < 2) {
 			// command contains ARGUMENTS_DATE[0||1]
 			String[] dateArgs = newArgs[1].split(" ");
 			int day = Integer.parseInt(dateArgs[0]);
 			int month = Arrays.asList(MONTHS).indexOf(dateArgs[1]);
+			if (month == -1) {
+				throw new Exception(WARNING_INVALID_MONTH);
+			}
 			// year will be set to current year if not specified by user
 			int year;
 			try {
@@ -158,11 +171,18 @@ public class Parser {
 			// command contains ARGUMENTS_DATE[4]
 			date.set(Calendar.DATE, date.get(Calendar.DATE) + 1);
 		}
-		taskObj.setEndingTime(date);
-		return newArgs[0];
+		return date;
 	}
 	
 	private String extractPeriodic(String arg, Task taskObj){
+		if (arg.contains(ARGUMENTS_PERIODIC)){
+			String argPeriodic = arg.split(ARGUMENTS_PERIODIC)[1];
+			for (int i = 0; i < DAYS.length; i++) {
+				if (argPeriodic.indexOf(DAYS[i]) == 0) {
+					return DAYS[i];
+				}
+			}
+		}
 		return null;
 	}
 }
