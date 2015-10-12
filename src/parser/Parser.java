@@ -107,23 +107,6 @@ public class Parser {
 		}
 		return commandObject;
 	}
-
-	/*
-	 * Parses raw data fed from Storage through Logic into Task objects
-	 */
-	public ArrayList<Task> parseFileData(ArrayList<String> fileData) {
-		ArrayList<Task> taskList = new ArrayList<Task>();
-		for (int i = 0; i < fileData.size(); i++) {
-			Task taskObj = new Task();
-			if (fileData.get(i).contains(ARGUMENTS_DATE)) {
-				extractDate(fileData.get(i), taskObj);
-			} else {
-				taskObj.setName(fileData.get(i));
-			}
-			taskList.add(taskObj);
-		}
-		return taskList;
-	}
 	
 	/*
 	 * Extracts 'date' segment of the command if present and updates date field of taskObj. Extracts 'day'
