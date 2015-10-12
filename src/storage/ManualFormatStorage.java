@@ -63,7 +63,22 @@ public class ManualFormatStorage implements Storage {
 	@Override
 	public boolean saveFileToPath(String path) throws IOException {
 		File file = new File(path);
+		String newFolderPath = "";
+		if(path.indexOf("/") != -1){
+			newFolderPath = path.substring(0,path.lastIndexOf("/"));
+		}
+		if(path.indexOf("\\") != -1){
+				newFolderPath = path.substring(0,path.lastIndexOf("\\"));
+			}
+		if(!newFolderPath.equals("")){
+		File Folderpath = new File(newFolderPath);
+		if(!Folderpath.exists()){
+			Folderpath.mkdirs();
+		}
+		}
+		
 		if (!file.exists()) {
+
 			file.createNewFile();
 			FILE_PATH = path;
 			return false;

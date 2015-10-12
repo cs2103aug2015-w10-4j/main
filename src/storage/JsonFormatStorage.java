@@ -77,6 +77,21 @@ public class JsonFormatStorage implements Storage {
 		boolean isFilePathChanged = false;
 		
 		File newFile = new File(path);
+		
+		String newFolderPath = "";
+		if(path.indexOf("/") != -1){
+			newFolderPath = path.substring(0,path.lastIndexOf("/"));
+		}
+		if(path.indexOf("\\") != -1){
+				newFolderPath = path.substring(0,path.lastIndexOf("\\"));
+			}
+		if(!newFolderPath.equals("")){
+		File Folderpath = new File(newFolderPath);
+		if(!Folderpath.exists()){
+			Folderpath.mkdirs();
+		}
+		}	
+		
 		if (!newFile.exists()) {
 			//file is not yet created, try to create one
 			newFile.createNewFile();
