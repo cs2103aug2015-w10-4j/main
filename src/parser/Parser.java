@@ -18,6 +18,7 @@ public class Parser {
 	
 	// warning messages
 	private static final String WARNING_INSUFFICIENT_ARGUMENT = "Warning: '%s': insufficient command arguments";
+	private static final String WARNING_INVALID_DAY = "Invalid day supplied!";
 	
 	private static final String COMMAND_ADD = "add";
 	private static final String COMMAND_EDIT = "edit";
@@ -44,18 +45,6 @@ public class Parser {
 	 * @throws Exception parsing error message
 	 */
 	public Command parseCommand(String command) throws Exception {
-		Calendar temp = new GregorianCalendar();
-		 System.out.println("YEAR: " + temp.get(Calendar.YEAR));
-		 System.out.println("MONTH: " + temp.get(Calendar.MONTH));
-		 System.out.println("WEEK_OF_YEAR: " + temp.get(Calendar.WEEK_OF_YEAR));
-		 System.out.println("WEEK_OF_MONTH: " + temp.get(Calendar.WEEK_OF_MONTH));
-		 System.out.println("DATE: " + temp.get(Calendar.DATE));
-		 System.out.println(Calendar.MONDAY);
-		 System.out.println(Calendar.DAY_OF_WEEK);
-		 temp.set(Calendar.DATE, (temp.get(Calendar.DATE) + 7));
-		 System.out.println(temp.getTime());
-
-		 
 		String[] args = command.split(" ", 2); // extract CommandType from command
 		Command commandObject;
 		if (args[0].equalsIgnoreCase(COMMAND_ADD)) {
@@ -118,7 +107,7 @@ public class Parser {
 	 * post-condition: returns extracted string if date is present, else return original string if date
 	 * 				   is not present
 	 */
-	public String extractDate(String arg, Task taskObj) {
+	public String extractDate(String arg, Task taskObj) throws Exception{
 		String[] newArgs;
 		Calendar date;
 		if (arg.indexOf(ARGUMENTS_DATE) != -1) {
@@ -126,28 +115,41 @@ public class Parser {
 		} else if (arg.indexOf(ARGUMENTS_DATE_SHORTHAND) != -1){
 			newArgs = arg.split(ARGUMENTS_DATE_SHORTHAND);
 		} else {
-			int selector = 0; // 1 for this week, 2 for next week
+			boolean isThisWeek; 
 			if (arg.contains(ARGUMENTS_DAY_THIS)) {
 				newArgs = arg.split(ARGUMENTS_DAY_THIS);
-				selector = 1;
+				isThisWeek = true;
 			} else if (arg.contains(ARGUMENTS_DAY_NEXT)) {
 				newArgs = arg.split(ARGUMENTS_DAY_NEXT);
-				selector = 2;
+				isThisWeek = false;
 			} else {
 				// no date parameters found; return original string
 				return arg;
 			}
-			for (int i = 0; i < newArgs.length - 1; i++) {
-				for (int n = 0; n < days.length; n++) {
-					if (newArgs[i+1].indexOf(days[n]) == 0) {
-						date = new GregorianCalendar();
-						SimpleDateFormat dateFormat = new SimpleDateFormat("EE");
-						if (dateFormat.format(date.getTime()).equalsIgnoreCase(days[n]) && selector == 2) {
-							date.set(Calendar.DATE, date.get(Calendar.DATE) + 7);
-						}
-					}
+			int setDay = -1, today = 0, offset;
+			date = new GregorianCalendar();
+			SimpleDateFormat dateFormat = new SimpleDateFormat("EEEE");
+			for (int i = 0; i < days.length; i++) {
+				if (newArgs[1].indexOf(days[i]) == 0) {
+					setDay = i;
+				}
+				if (dateFormat.format(date.getTime()).equalsIgnoreCase(days[i])) {
+					today = i;
 				}
 			}
+			if (setDay == -1) {
+				throw new Exception(WARNING_INVALID_DAY);
+			}
+			offset = setDay - today;
+			if (offset <= 0) {
+				offset += 7;
+			}
+			if (!isThisWeek) {
+				offset += 7;
+			}
+			date.set(Calendar.DATE, date.get(Calendar.DATE) + offset);
+			taskObj.setEndingTime(date);
+			return newArgs[0];
 		}
 		String[] dateArgs = newArgs[1].split(" ");
 		int day = Integer.parseInt(dateArgs[0]);
