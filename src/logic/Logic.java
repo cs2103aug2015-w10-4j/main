@@ -203,15 +203,15 @@ public class Logic {
 			}
 			listOfTasks.add(index, userTask);
 
-			if(shouldPushToHistory){
-				if(isUndoHistory){
+			if (shouldPushToHistory) {
+				if (isUndoHistory) {
 					//	handle history
 					String[] indexString = {Integer.toString(index + 1)};
 					if (!pushToHistory(new Command(Command.Type.DELETE, indexString))) {
 						return ERROR_CANNOT_WRITE_TO_HISTORY;
 					}
 					return MESSAGE_SUCCESS_ADD;
-				}else{
+				} else {
 					String[] indexString = {Integer.toString(index + 1)};
 					if (!pushToUndoHistory(new Command(Command.Type.DELETE, indexString))) {
 						return ERROR_CANNOT_WRITE_TO_HISTORY;
@@ -342,13 +342,15 @@ public class Logic {
 				Task curTask = listOfTasks.get(i);
 				stringToDisplay += String.format(MESSAGE_DISPLAY_TASKLINE_INDEX, i + 1);
 				if (curTask != null) {
-					stringToDisplay += String.format("%-30s", curTask.getName());
-					if (curTask.getEndingTime() != null) {
-						stringToDisplay += SEPARATOR_DISPLAY_FIELDS + dateFormat.format(curTask.getEndingTime().getTime());
-					}
-					if(curTask.getLocation() != null){
-						stringToDisplay += SEPARATOR_DISPLAY_FIELDS + curTask.getLocation();
-					}
+					stringToDisplay += String.format("%-30s", curTask.getName()) + SEPARATOR_DISPLAY_FIELDS;
+					// leave a blank column for all additional params even if not present for better organisation
+					stringToDisplay += String.format("%-11s", (curTask.getEndingTime() != null ?
+							dateFormat.format(curTask.getEndingTime().getTime()) : ""))
+							+ SEPARATOR_DISPLAY_FIELDS;
+					stringToDisplay += String.format("%-15s", (curTask.getLocation() != null ?
+							curTask.getLocation() : "")) + SEPARATOR_DISPLAY_FIELDS;
+					stringToDisplay += String.format("%-15s", (curTask.getPeriodic() != null ?
+							curTask.getPeriodic() : ""));
 				}
 				stringToDisplay += MESSAGE_DISPLAY_NEWLINE;
 			}	

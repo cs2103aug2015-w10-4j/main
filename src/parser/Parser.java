@@ -7,7 +7,6 @@ import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
-import java.util.logging.Logger;
 
 public class Parser {
 	/**
@@ -15,7 +14,6 @@ public class Parser {
 	 * @param command
 	 * @return commandObject to be executed, or null if invalid
 	 */
-	Logger logger = Logger.getGlobal(); // use logger.<log level>(message) to log a message. default log level is info
 	
 	// warning messages
 	private static final String WARNING_INSUFFICIENT_ARGUMENT = "Warning: '%s': insufficient command arguments";
@@ -53,9 +51,9 @@ public class Parser {
 				// Using old method of extracting task name temporarily for v0.1
 //				taskObj.setName(extractTaskName(args[1]));
 //				taskObj.setEndingTime(extractDate(args[1]));
-				args[1] = extractLocation(args[1], taskObj);
 				taskObj.setName(extractDate(args[1], taskObj));
-				args[1] = extractPeriodic(args[1], taskObj);
+				taskObj.setPeriodic(extractPeriodic(args[1], taskObj));
+				args[1] = extractLocation(args[1], taskObj);
 				commandObject = new Command(Command.Type.ADD, taskObj);
 			}
 			catch (ArrayIndexOutOfBoundsException e) {
@@ -143,7 +141,7 @@ public class Parser {
 			int year;
 			try {
 				year = Integer.parseInt(dateArgs[2]);
-			} catch (ArrayIndexOutOfBoundsException e) {
+			} catch (ArrayIndexOutOfBoundsException|NumberFormatException e) {
 				year = Calendar.getInstance().get(Calendar.YEAR);
 			}
 			date.set(year, month, day);
@@ -178,7 +176,6 @@ public class Parser {
 		taskObj.setEndingTime(date);
 		return newArgs[0];
 	}
-	
 	/*
 	 * Extracts 'loc' segment
 	 * pre-condition: String must contain LOCATION_ARGUMENTS
@@ -213,6 +210,6 @@ public class Parser {
 				}
 			}
 		}
-		return null;
+		return arg;
 	}
 }
