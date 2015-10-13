@@ -21,6 +21,25 @@ import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
 
 public class UI {
+	
+	/*
+	 * Roughly, the UI can be modeled as the following grid :
+	 * 
+	 * +---+---+---+
+	 * | 1 | 2 | 3 |
+	 * +---+---+---+
+	 * | 4 | 5 | 6 |
+	 * +---+---+---+
+	 * | 7 | 8 | 9 |
+	 * +---+---+---+
+	 * 
+	 * where :
+	 *  > displayArea occupies cell 1-3
+	 *  > promptLabel occupies cell 4
+	 *  > userInputField occupies cell 5-6
+	 *  > statusBar occupies cell 7-9
+	 */
+	
 	/*
 	 * Declaration of variables
 	 */
@@ -28,19 +47,41 @@ public class UI {
 	
 	private static final int DISPLAY_ROW_COUNT = 30;
 	private static final int DISPLAY_COLUMN_COUNT = 60;
-	private static final int USER_INPUT_FIELD_LENGTH = 50;
-	private static final int PROMPT_WIDTH = 10;
+	private static final int USER_INPUT_FIELD_CHAR_COUNT = 50;
+	private static final int PROMPT_LABEL_CHAR_COUNT = 10;
+	
+	private static final int DISPLAY_AREA_POS_Y = 0;
+	private static final int DISPLAY_AREA_POS_X = 0;
+	private static final int DISPLAY_AREA_LEN_Y = 1;
+	private static final int DISPLAY_AREA_LEN_X = 3;
+	
+	private static final int PROMPT_LABEL_POS_Y = 1;
+	private static final int PROMPT_LABEL_POS_X = 0;
+	private static final int PROMPT_LABEL_LEN_Y = 1;
+	private static final int PROMPT_LABEL_LEN_X = 1;
+	
+	private static final int USER_INPUT_FIELD_POS_Y = 1;
+	private static final int USER_INPUT_FIELD_POS_X = 1;
+	private static final int USER_INPUT_FIELD_LEN_Y = 1;
+	private static final int USER_INPUT_FIELD_LEN_X = 2;
+	
+	private static final int STATUS_BAR_POS_Y = 2;
+	private static final int STATUS_BAR_POS_X = 0;
+	private static final int STATUS_BAR_LEN_Y = 1;
+	private static final int STATUS_BAR_LEN_X = 3;
 	
 	private static final String FRAME_TITLE = "Tasky";
 	private static final String DEFAULT_PROMPT = "command ";
+	private static final String DISPLAY_AREA_FONT_NAME = "monospaced";
+	private static final int DISPLAY_AREA_FONT_SIZE = 12;
 	
 	/*
 	 * Initialization of GUI variables
 	 */
 	private JFrame frame = new JFrame(FRAME_TITLE);
 	private JTextArea displayArea = new JTextArea();
-	private JLabel promptLabel = new JLabel(DEFAULT_PROMPT, PROMPT_WIDTH);
-	private JTextField userInputField = new JTextField(USER_INPUT_FIELD_LENGTH);
+	private JLabel promptLabel = new JLabel(DEFAULT_PROMPT, PROMPT_LABEL_CHAR_COUNT);
+	private JTextField userInputField = new JTextField(USER_INPUT_FIELD_CHAR_COUNT);
 	private StatusBar statusBar = new StatusBar();
 	
 	/*
@@ -63,10 +104,10 @@ public class UI {
 		GridBagConstraints constraint = new GridBagConstraints();
 		
 		constraint.fill = GridBagConstraints.HORIZONTAL;
-		constraint.gridx = 0;
-		constraint.gridy = 2;
-		constraint.gridheight = 1;
-		constraint.gridwidth = 3;
+		constraint.gridx = STATUS_BAR_POS_X;
+		constraint.gridy = STATUS_BAR_POS_Y;
+		constraint.gridheight = STATUS_BAR_LEN_Y;
+		constraint.gridwidth = STATUS_BAR_LEN_X;
 	
 		contentPane.add(statusBar, constraint);
 	}
@@ -75,10 +116,10 @@ public class UI {
 		GridBagConstraints constraint = new GridBagConstraints();
 		
 		constraint.fill = GridBagConstraints.HORIZONTAL;
-		constraint.gridx = 1;
-		constraint.gridy = 1;
-		constraint.gridheight = 1;
-		constraint.gridwidth = 2;
+		constraint.gridx = USER_INPUT_FIELD_POS_X;
+		constraint.gridy = USER_INPUT_FIELD_POS_Y;
+		constraint.gridheight = USER_INPUT_FIELD_LEN_Y;
+		constraint.gridwidth = USER_INPUT_FIELD_LEN_X;
 		
 		contentPane.add(userInputField, constraint);
 	}
@@ -87,10 +128,10 @@ public class UI {
 		GridBagConstraints constraint = new GridBagConstraints();
 		
 		constraint.fill = GridBagConstraints.HORIZONTAL;
-		constraint.gridx = 0;
-		constraint.gridy = 1;
-		constraint.gridheight = 1;
-		constraint.gridwidth = 1;
+		constraint.gridx = PROMPT_LABEL_POS_X;
+		constraint.gridy = PROMPT_LABEL_POS_Y;
+		constraint.gridheight = PROMPT_LABEL_LEN_Y;
+		constraint.gridwidth = PROMPT_LABEL_LEN_X;
 		
 		contentPane.add(promptLabel, constraint);
 	}
@@ -99,10 +140,10 @@ public class UI {
 		GridBagConstraints constraint = new GridBagConstraints();
 		
 		constraint.fill = GridBagConstraints.BOTH;
-		constraint.gridx = 0;
-		constraint.gridy = 0;
-		constraint.gridheight = 1;
-		constraint.gridwidth = 3;
+		constraint.gridx = DISPLAY_AREA_POS_X;
+		constraint.gridy = DISPLAY_AREA_POS_Y;
+		constraint.gridheight = DISPLAY_AREA_LEN_Y;
+		constraint.gridwidth = DISPLAY_AREA_LEN_X;
 		constraint.weightx = 1.0;
 		constraint.weighty = 1.0;
 		
@@ -110,8 +151,6 @@ public class UI {
 	}
 
 	private void displayFrame() {
-		frame.pack();
-		frame.getContentPane().invalidate();
 		frame.pack();
 		frame.setLocationRelativeTo(null);
 		frame.setVisible(true);
@@ -130,7 +169,7 @@ public class UI {
 
 	private void prepareDisplayArea() {
 		displayArea.setEditable(false);
-		displayArea.setFont(new Font("monospaced", Font.PLAIN, 12));
+		displayArea.setFont(new Font(DISPLAY_AREA_FONT_NAME, Font.PLAIN, DISPLAY_AREA_FONT_SIZE));
 		displayArea.setRows(DISPLAY_ROW_COUNT);
 		displayArea.setColumns(DISPLAY_COLUMN_COUNT);
 		displayArea.setPreferredSize(new Dimension(DISPLAY_ROW_COUNT, DISPLAY_COLUMN_COUNT));
@@ -138,7 +177,7 @@ public class UI {
 
 	private void prepareUserInput() {
 		userInputField.setEditable(false);
-		userInputField.setColumns(USER_INPUT_FIELD_LENGTH);
+		userInputField.setColumns(USER_INPUT_FIELD_CHAR_COUNT);
 		
 		userInputField.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -167,7 +206,7 @@ public class UI {
 		/*
 		 * Focus given to userInputField when window is activated
 		 */
-		frame.addWindowListener(new WindowAdapter(){
+		frame.addWindowListener(new WindowAdapter() {
 	        public void windowActivated(WindowEvent e) {
 	        	userInputField.grabFocus();
 	        }
