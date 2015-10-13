@@ -32,6 +32,7 @@ public class Parser {
 	private static final String COMMAND_SAVEPATH = "savepath";
 	private static final String[] ARGUMENTS_DATE = {" date ",  " by ", " this ", " next ", "tomorrow"};
 	private static final String ARGUMENTS_PERIODIC = " every ";
+	private static final String ARGUMENT_LOC = "loc";
 	
 	private static final String[] MONTHS = {"jan", "feb", "mar", "apr", "may", "jun", "jul", "aug",
 		"sep", "oct", "nov", "dec"};
@@ -52,6 +53,7 @@ public class Parser {
 				// Using old method of extracting task name temporarily for v0.1
 //				taskObj.setName(extractTaskName(args[1]));
 //				taskObj.setEndingTime(extractDate(args[1]));
+				args[1] = extractLocation(args[1], taskObj);
 				taskObj.setName(extractDate(args[1], taskObj));
 				args[1] = extractPeriodic(args[1], taskObj);
 				commandObject = new Command(Command.Type.ADD, taskObj);
@@ -128,7 +130,7 @@ public class Parser {
 		}
 		if (argument == -1) {
 			// no date parameters found; return null
-			return null;
+			return arg;
 		} else if (argument < 2) {
 			// command contains ARGUMENTS_DATE[0||1]
 			String[] dateArgs = newArgs[1].split(" ");
@@ -175,6 +177,31 @@ public class Parser {
 		}
 		taskObj.setEndingTime(date);
 		return newArgs[0];
+	}
+	
+	/*
+	 * Extracts 'loc' segment
+	 * pre-condition: String must contain LOCATION_ARGUMENTS
+	 * post-condition: returns extracted string if LOCATION_ARGUMENTS is present, else return original string if date
+	 * 				   is not present
+	 */
+	private String extractLocation(String arg, Task taskObj) throws Exception{
+		String[] newArgs = {};
+		String returnArg = "";
+		boolean hasLoc = false;
+			if (arg.contains(ARGUMENT_LOC)) {
+				newArgs = arg.split(ARGUMENT_LOC);
+				hasLoc = true;
+			}
+			
+			if (hasLoc){
+				taskObj.setLocation(newArgs[1]);
+				returnArg = newArgs[0];
+			} else {
+				returnArg = arg;
+			}
+
+		return returnArg;
 	}
 	
 	private String extractPeriodic(String arg, Task taskObj){

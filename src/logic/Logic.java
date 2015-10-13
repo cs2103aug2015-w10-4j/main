@@ -346,6 +346,9 @@ public class Logic {
 					if (curTask.getEndingTime() != null) {
 						stringToDisplay += SEPARATOR_DISPLAY_FIELDS + dateFormat.format(curTask.getEndingTime().getTime());
 					}
+					if(curTask.getLocation() != null){
+						stringToDisplay += SEPARATOR_DISPLAY_FIELDS + curTask.getLocation();
+					}
 				}
 				stringToDisplay += MESSAGE_DISPLAY_NEWLINE;
 			}	
