@@ -9,6 +9,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
@@ -43,7 +44,7 @@ public class UI {
 	/*
 	 * Declaration of variables
 	 */
-	Logger logger = Logger.getGlobal(); // use logger.<log level>(message) to log a message. default log level is info
+	private Logger logger = Logger.getLogger(this.getClass().getName());
 	
 	private static final int DISPLAY_ROW_COUNT = 30;
 	private static final int DISPLAY_COLUMN_COUNT = 60;
@@ -108,6 +109,10 @@ public class UI {
 		constraint.gridy = STATUS_BAR_POS_Y;
 		constraint.gridheight = STATUS_BAR_LEN_Y;
 		constraint.gridwidth = STATUS_BAR_LEN_X;
+		
+		logger.log(Level.CONFIG, String.format("%s: fill = %s, gridx = %d, gridy = %d, "
+				+ "gridheight = %d, gridwidth = %d", "STATUS_BAR", "GridBagConstraints.HORIZONTAL",
+				STATUS_BAR_POS_X, STATUS_BAR_POS_Y, STATUS_BAR_LEN_Y, STATUS_BAR_LEN_X));
 	
 		contentPane.add(statusBar, constraint);
 	}
@@ -121,6 +126,11 @@ public class UI {
 		constraint.gridheight = USER_INPUT_FIELD_LEN_Y;
 		constraint.gridwidth = USER_INPUT_FIELD_LEN_X;
 		
+		logger.log(Level.CONFIG, String.format("%s: fill = %s, gridx = %d, gridy = %d, "
+				+ "gridheight = %d, gridwidth = %d", "USER_INPUT_FIELD", "GridBagConstraints.HORIZONTAL",
+				USER_INPUT_FIELD_POS_X, USER_INPUT_FIELD_POS_Y,
+				USER_INPUT_FIELD_LEN_Y, USER_INPUT_FIELD_LEN_X));
+		
 		contentPane.add(userInputField, constraint);
 	}
 
@@ -132,6 +142,10 @@ public class UI {
 		constraint.gridy = PROMPT_LABEL_POS_Y;
 		constraint.gridheight = PROMPT_LABEL_LEN_Y;
 		constraint.gridwidth = PROMPT_LABEL_LEN_X;
+		
+		logger.log(Level.CONFIG, String.format("%s: fill = %s, gridx = %d, gridy = %d, "
+				+ "gridheight = %d, gridwidth = %d", "PROMPT_LABEL", "GridBagConstraints.HORIZONTAL",
+				PROMPT_LABEL_POS_X, PROMPT_LABEL_POS_Y, PROMPT_LABEL_LEN_Y, PROMPT_LABEL_LEN_X));
 		
 		contentPane.add(promptLabel, constraint);
 	}
@@ -146,6 +160,11 @@ public class UI {
 		constraint.gridwidth = DISPLAY_AREA_LEN_X;
 		constraint.weightx = 1.0;
 		constraint.weighty = 1.0;
+		
+		logger.log(Level.CONFIG, String.format("%s: fill = %s, gridx = %d, gridy = %d, "
+				+ "gridheight = %d, gridwidth = %d, weightx = %.2f, weighty = %.2f",
+				"DISPLAY_AREA", "GridBagConstraints.HORIZONTAL",
+				STATUS_BAR_POS_X, STATUS_BAR_POS_Y, STATUS_BAR_LEN_Y, STATUS_BAR_LEN_X, 1.0, 1.0));
 		
 		contentPane.add(displayArea, constraint);
 	}
@@ -220,12 +239,17 @@ public class UI {
 	 * @throws InterruptedException
 	 */
 	public String promptUser(String prompt) throws InterruptedException {
+		logger.log(Level.INFO, "entering promptUser");
+		
 		promptLabel.setText(prompt);
 		userInputField.setEditable(true);
 		userInputField.grabFocus();
 		waitForUserInput();
 		String userInput = userInputField.getText();
 		userInputField.setText("");
+		
+		logger.log(Level.INFO, "returning from promptUser");
+		
 		return userInput;
 	}
 
@@ -243,7 +267,12 @@ public class UI {
 	 * @return true if successful
 	 */
 	public boolean showToUser(String stringToShow) {
+		logger.log(Level.INFO, "enetering showToUser");
+		
 		displayArea.setText(stringToShow);
+		
+		logger.log(Level.INFO, "returning from showToUser");
+		
 		return true;
 	}
 	
@@ -253,7 +282,12 @@ public class UI {
 	 * @return true if successful
 	 */
 	public boolean showStatusToUser(String stringToShow) {
+		logger.log(Level.INFO,  "entering showStatusToUser");
+		
 		statusBar.setText(stringToShow);
+		
+		logger.log(Level.INFO,  "returning from showStatusToUser");
+		
 		return true;
 	}
 	

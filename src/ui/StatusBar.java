@@ -2,6 +2,8 @@ package ui;
 
 import java.awt.FlowLayout;
 import java.awt.Font;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -10,6 +12,8 @@ import javax.swing.border.BevelBorder;
 
 @SuppressWarnings("serial")
 public class StatusBar extends JPanel {
+	
+	private Logger logger = Logger.getLogger(this.getClass().getName());
 	
 	private static final String DEFAULT_STATUS_BAR_TEXT = "Tasky is ready.";
 	private JLabel statusLabel;
@@ -33,7 +37,11 @@ public class StatusBar extends JPanel {
 	}
 	
 	public void setText(String text) {
+		logger.log(Level.INFO, "entering setText");
+		
 		statusLabel.setText(text);
+		
+		logger.log(Level.INFO,  "returning from setText");
 	}
 	
 }
