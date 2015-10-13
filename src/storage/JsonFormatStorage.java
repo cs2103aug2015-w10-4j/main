@@ -120,9 +120,12 @@ public class JsonFormatStorage implements Storage {
 		File inputFile = new File(currentFilePath);
 		Scanner inputFileScanner = new Scanner(inputFile);
 		
-		String rawInputData = inputFileScanner.nextLine();
+		StringBuilder rawInputData = new StringBuilder();
+		while (inputFileScanner.hasNextLine()) {
+			rawInputData.append(inputFileScanner.nextLine());
+		}
 		
-		Task[] processedInputData = gson.fromJson(rawInputData, Task[].class);
+		Task[] processedInputData = gson.fromJson(rawInputData.toString(), Task[].class);
 		ArrayList<Task> result = new ArrayList<>(Arrays.asList(processedInputData));
 		
 		inputFileScanner.close();
