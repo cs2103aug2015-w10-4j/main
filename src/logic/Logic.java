@@ -17,6 +17,7 @@ import java.util.logging.SimpleFormatter;
 import parser.Parser;
 import storage.Storage;
 import storage.ManualFormatStorage;
+import storage.JsonFormatStorage;
 import ui.UI;
 
 
@@ -90,7 +91,7 @@ public class Logic {
 	public Logic() {
 		UIObject = new UI();
 		parserObject = new Parser();
-		storageObject = new ManualFormatStorage();
+		storageObject = new JsonFormatStorage();
 		historyObject = new History();
 		try {
 			FileHandler logHandler = new FileHandler("tasky.log");
