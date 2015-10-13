@@ -9,6 +9,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -23,6 +24,8 @@ public class UI {
 	/*
 	 * Declaration of variables
 	 */
+	Logger logger = Logger.getGlobal(); // use logger.<log level>(message) to log a message. default log level is info
+	
 	private static final int DISPLAY_ROW_COUNT = 30;
 	private static final int DISPLAY_COLUMN_COUNT = 60;
 	private static final int USER_INPUT_FIELD_LENGTH = 50;

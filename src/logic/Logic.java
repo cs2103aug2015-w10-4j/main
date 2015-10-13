@@ -7,6 +7,12 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.logging.Handler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.logging.LogManager;
+import java.util.logging.FileHandler;
+import java.util.logging.SimpleFormatter;
 
 import parser.Parser;
 import storage.Storage;
@@ -26,6 +32,7 @@ public class Logic {
 	/*
 	 * Declaration of object variables
 	 */
+	Logger logger = Logger.getGlobal();
 	UI UIObject;
 	Parser parserObject;
 	Storage storageObject;
@@ -38,36 +45,37 @@ public class Logic {
 	/*
 	 * Static strings - errors and messages
 	 */
-	public static final String MESSAGE_WELCOME = "Welcome to Tasky! This is an open source project";
-	public static final String MESSAGE_PROMPT_COMMAND = "command :";
+	private static final String MESSAGE_WELCOME = "Welcome to Tasky! This is an open source project";
+	private static final String MESSAGE_PROMPT_COMMAND = "command :";
 
-	public static final String MESSAGE_SUCCESS_UNDO_ADD = "Undo : Deleted item restored.";
-	public static final String MESSAGE_SUCCESS_REDO_ADD = "Redo : Deleted item restored.";
-	public static final String MESSAGE_SUCCESS_UNDO_DELETE = "Undo : Added item removed.";
-	public static final String MESSAGE_SUCCESS_REDO_DELETE = "Redo : Added item removed.";
-	public static final String MESSAGE_SUCCESS_UNDO_EDIT = "Undo : Reverted edits.";
-	public static final String MESSAGE_SUCCESS_REDO_EDIT = "Redo : Reverted edits.";
-	public static final String MESSAGE_SUCCESS_ADD = "Item successfully added.";
-	public static final String MESSAGE_SUCCESS_DELETE = "Item successfully deleted.";
-	public static final String MESSAGE_SUCCESS_EDIT = "Item successfully edited.";
-	public static final String MESSAGE_SUCCESS_EXIT = "Exiting program...";
-	public static final String MESSAGE_SUCCESS_DISPLAY = "Displaying items.";
-	public static final String MESSAGE_SUCCESS_CHANGE_FILE_PATH = "File path successfully changed.";
-	public static final String MESSAGE_SUCCESS_CHANGE_FILE_PATH_BUT_CREATE_FILE = "File path successfully changed. \nNo file was detected, so Tasky has created one for you.";
-	public static final String MESSAGE_DISPLAY_TASKLINE_INDEX = "%3d. ";
-	public static final String MESSAGE_DISPLAY_NEWLINE = "\r\n"; // isolated this string for ease of concatenation
-	public static final String MESSAGE_DISPLAY_EMPTY = "No items to display.";
-	public static final String SEPARATOR_DISPLAY_FIELDS = " | ";
-	public static final String ERROR_WRITING_FILE = "Error: Unable to write file.";
-	public static final String ERROR_CREATING_FILE = "Error: Unable to create file.";
-	public static final String ERROR_FILE_NOT_FOUND = "Error: File not found";
-	public static final String ERROR_INVALID_ARGUMENT = "Error: Invalid argument for command";
-	public static final String ERROR_INVALID_COMMAND = "Error: Invalid command.";
-	public static final String ERROR_NO_COMMAND_HANDLER = "Error: Handler for this command type has not been defined.";
-	public static final String ERROR_INVALID_INDEX = "Error: There is no item at this index.";
-	public static final String ERROR_UI_INTERRUPTED = "Error: UI prompt has been interrupted";
-	public static final String ERROR_NO_HISTORY = "Error: No history found";
-	public static final String ERROR_CANNOT_WRITE_TO_HISTORY = "Error: Unable to store command in history";
+	private static final String MESSAGE_SUCCESS_UNDO_ADD = "Undo : Deleted item restored.";
+	private static final String MESSAGE_SUCCESS_REDO_ADD = "Redo : Deleted item restored.";
+	private static final String MESSAGE_SUCCESS_UNDO_DELETE = "Undo : Added item removed.";
+	private static final String MESSAGE_SUCCESS_REDO_DELETE = "Redo : Added item removed.";
+	private static final String MESSAGE_SUCCESS_UNDO_EDIT = "Undo : Reverted edits.";
+	private static final String MESSAGE_SUCCESS_REDO_EDIT = "Redo : Reverted edits.";
+	private static final String MESSAGE_SUCCESS_ADD = "Item successfully added.";
+	private static final String MESSAGE_SUCCESS_DELETE = "Item successfully deleted.";
+	private static final String MESSAGE_SUCCESS_EDIT = "Item successfully edited.";
+	private static final String MESSAGE_SUCCESS_EXIT = "Exiting program...";
+	private static final String MESSAGE_SUCCESS_DISPLAY = "Displaying items.";
+	private static final String MESSAGE_SUCCESS_CHANGE_FILE_PATH = "File path successfully changed.";
+	private static final String MESSAGE_SUCCESS_CHANGE_FILE_PATH_BUT_CREATE_FILE = "File path successfully changed. \nNo file was detected, so Tasky has created one for you.";
+	private static final String MESSAGE_DISPLAY_TASKLINE_INDEX = "%3d. ";
+	private static final String MESSAGE_DISPLAY_NEWLINE = "\r\n"; // isolated this string for ease of concatenation
+	private static final String MESSAGE_DISPLAY_EMPTY = "No items to display.";
+	private static final String SEPARATOR_DISPLAY_FIELDS = " | ";
+	private static final String ERROR_WRITING_FILE = "Error: Unable to write file.";
+	private static final String ERROR_CREATING_FILE = "Error: Unable to create file.";
+	private static final String ERROR_FILE_NOT_FOUND = "Error: Data file not found.";
+	private static final String ERROR_LOG_FILE_INITIALIZE = "Error: Cannot initialize log file.";
+	private static final String ERROR_INVALID_ARGUMENT = "Error: Invalid argument for command.";
+	private static final String ERROR_INVALID_COMMAND = "Error: Invalid command.";
+	private static final String ERROR_NO_COMMAND_HANDLER = "Error: Handler for this command type has not been defined.";
+	private static final String ERROR_INVALID_INDEX = "Error: There is no item at this index.";
+	private static final String ERROR_UI_INTERRUPTED = "Error: UI prompt has been interrupted.";
+	private static final String ERROR_NO_HISTORY = "Error: No history found.";
+	private static final String ERROR_CANNOT_WRITE_TO_HISTORY = "Error: Unable to store command in history.";
 	/*
 	 * Main program
 	 */
@@ -85,9 +93,19 @@ public class Logic {
 		storageObject = new ManualFormatStorage();
 		historyObject = new History();
 		try {
+			FileHandler logHandler = new FileHandler("tasky.log");
+			LogManager.getLogManager().reset(); // removes printout to console aka root handler
+			logHandler.setFormatter(new SimpleFormatter()); // set output to a human-readable log format
+			logger.addHandler(logHandler);
+			logger.setLevel(Level.INFO); // setting of log level
+			
 			listOfTasks = storageObject.getItemList();
 		} catch (FileNotFoundException e) {
 			UIObject.showToUser(ERROR_FILE_NOT_FOUND);
+		} catch (SecurityException e) {
+			UIObject.showToUser(ERROR_LOG_FILE_INITIALIZE);
+		} catch (IOException e) {
+			UIObject.showToUser(ERROR_LOG_FILE_INITIALIZE);
 		}
 	}
 	
@@ -141,20 +159,28 @@ public class Logic {
 		ArrayList<String> argumentList = commandObject.getArguments();
 		switch (commandType) {
 			case ADD :
+				logger.info("ADD command detected");
 				return addItem(userTask, argumentList, shouldPushToHistory, isUndoHistory);
 			case DELETE :
+				logger.info("DELETE command detected");
 				return deleteItem(argumentList, shouldPushToHistory, isUndoHistory);
 			case EDIT :
+				logger.info("EDIT command detected");
 				return editItem(userTask, argumentList, shouldPushToHistory, isUndoHistory);
 			case DISPLAY :
+				logger.info("DISPLAY command detected");
 				return displayItems();
 			case UNDO :
+				logger.info("UNDO command detected");
 				return undoCommand();
 			case REDO :
+				logger.info("REDO command detected");
 				return redoCommand();
 			case SAVEPATH :
+				logger.info("SAVEPATH command detected");
 				return saveFilePath(argumentList);
 			case EXIT :
+				logger.info("EXIT command detected");
 				return exitProgram();
 			default :
 		}

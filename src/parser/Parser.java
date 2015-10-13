@@ -7,6 +7,7 @@ import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.logging.Logger;
 
 public class Parser {
 	/**
@@ -14,6 +15,7 @@ public class Parser {
 	 * @param command
 	 * @return commandObject to be executed, or null if invalid
 	 */
+	Logger logger = Logger.getGlobal(); // use logger.<log level>(message) to log a message. default log level is info
 	
 	// warning messages
 	private static final String WARNING_INSUFFICIENT_ARGUMENT = "Warning: '%s': insufficient command arguments";

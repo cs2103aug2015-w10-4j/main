@@ -1,8 +1,11 @@
 package logic;
 import global.Command;
+
 import java.util.ArrayList;
+import java.util.logging.Logger;
 
 public class History {
+	Logger logger = Logger.getGlobal();
 	ArrayList<Command> commandHistoryList  = new ArrayList<Command>();
 	ArrayList<String> commandStringHistoryList = new ArrayList<String>(); // for future previous command string
 	ArrayList<Command> commandUndoHistoryList = new ArrayList<Command>();
