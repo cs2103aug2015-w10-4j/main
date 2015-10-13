@@ -210,6 +210,6 @@ public class Parser {
 				}
 			}
 		}
-		return arg;
+		return null;
 	}
 }
