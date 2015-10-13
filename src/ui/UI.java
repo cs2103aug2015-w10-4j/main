@@ -44,7 +44,7 @@ public class UI {
 	/*
 	 * Declaration of variables
 	 */
-	private Logger logger = Logger.getLogger(this.getClass().getName());
+	private Logger logger = Logger.getGlobal();
 	
 	private static final int DISPLAY_ROW_COUNT = 30;
 	private static final int DISPLAY_COLUMN_COUNT = 60;
@@ -239,7 +239,7 @@ public class UI {
 	 * @throws InterruptedException
 	 */
 	public String promptUser(String prompt) throws InterruptedException {
-		logger.log(Level.INFO, "entering promptUser");
+		logger.info("Entering promptUser(prompt = " + prompt + ")");
 		
 		promptLabel.setText(prompt);
 		userInputField.setEditable(true);
@@ -248,7 +248,7 @@ public class UI {
 		String userInput = userInputField.getText();
 		userInputField.setText("");
 		
-		logger.log(Level.INFO, "returning from promptUser");
+		logger.info("Returning from promptUser");
 		
 		return userInput;
 	}
@@ -267,11 +267,11 @@ public class UI {
 	 * @return true if successful
 	 */
 	public boolean showToUser(String stringToShow) {
-		logger.log(Level.INFO, "enetering showToUser");
+		logger.log(Level.INFO, "Entering showToUser(), stringToShow length = " + stringToShow.length());
 		
 		displayArea.setText(stringToShow);
 		
-		logger.log(Level.INFO, "returning from showToUser");
+		logger.log(Level.INFO, "Returning from showToUser");
 		
 		return true;
 	}
@@ -282,11 +282,11 @@ public class UI {
 	 * @return true if successful
 	 */
 	public boolean showStatusToUser(String stringToShow) {
-		logger.log(Level.INFO,  "entering showStatusToUser");
+		logger.log(Level.INFO,  "Entering showStatusToUser(stringToShow=" + stringToShow + ")");
 		
 		statusBar.setText(stringToShow);
 		
-		logger.log(Level.INFO,  "returning from showStatusToUser");
+		logger.log(Level.INFO,  "Returning from showStatusToUser");
 		
 		return true;
 	}

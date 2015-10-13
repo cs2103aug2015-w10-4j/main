@@ -13,7 +13,7 @@ import javax.swing.border.BevelBorder;
 @SuppressWarnings("serial")
 public class StatusBar extends JPanel {
 	
-	private Logger logger = Logger.getLogger(this.getClass().getName());
+	private Logger logger = Logger.getGlobal();
 	
 	private static final String DEFAULT_STATUS_BAR_TEXT = "Tasky is ready.";
 	private JLabel statusLabel;
@@ -37,11 +37,11 @@ public class StatusBar extends JPanel {
 	}
 	
 	public void setText(String text) {
-		logger.log(Level.INFO, "entering setText");
+		logger.info("Entering setText(text=" + text + ")");
 		
 		statusLabel.setText(text);
 		
-		logger.log(Level.INFO,  "returning from setText");
+		logger.info("Returning from setText");
 	}
 	
 }
