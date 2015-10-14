@@ -7,6 +7,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -76,6 +77,7 @@ public class Logic {
 	private static final String ERROR_UI_INTERRUPTED = "Error: UI prompt has been interrupted.";
 	private static final String ERROR_NO_HISTORY = "Error: No history found.";
 	private static final String ERROR_CANNOT_WRITE_TO_HISTORY = "Error: Unable to store command in history.";
+	private static final String ERROR_TIMING_CLASH = "Error: There are clashing timings between tasks.";
 	/*
 	 * Main program
 	 */
@@ -201,6 +203,9 @@ public class Logic {
 			} else {
 				index = Integer.parseInt(argumentList.get(0)) - 1;
 			}
+			if(hasClashes(userTask)){
+				return ERROR_TIMING_CLASH;
+			}
 			listOfTasks.add(index, userTask);
 
 			if (shouldPushToHistory) {
@@ -287,7 +292,9 @@ public class Logic {
 			if (isValidIndex(index)) {
 				// for history
 				Task taskEdited = listOfTasks.get(index);
-
+				if(hasClashes(userTask)){
+					return ERROR_TIMING_CLASH;
+				}
 				listOfTasks.remove(index);
 				listOfTasks.add(index, userTask);
 				
@@ -411,6 +418,36 @@ public class Logic {
 			return true;
 		}
 		return false;
+	}
+	
+	boolean hasClashes(Task task){
+		if(task.getStartingTime() != null && task.getEndingTime() != null){
+			for(int i = 0; i < listOfTasks.size(); i++){
+				Task curTaskToCheck = listOfTasks.get(i);
+				if(task.getStartingTime() != null && task.getEndingTime() != null && isClashing(task, curTaskToCheck)){
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+	
+	boolean isClashing(Task taskOne, Task taskTwo){
+		Calendar taskOneStart = taskOne.getStartingTime();
+		Calendar taskOneEnd = taskOne.getEndingTime();
+		Calendar taskTwoStart = taskOne.getStartingTime();
+		Calendar taskTwoEnd = taskOne.getEndingTime();
+		assert(!(taskOneStart == null));
+		assert(!(taskOneEnd == null));
+		assert(!(taskTwoStart == null));
+		assert(!(taskTwoEnd == null));
+		
+		if( (taskOneStart.before(taskTwoStart) && taskOneEnd.before(taskTwoStart))
+				|| (taskTwoStart.before(taskOneStart) && taskTwoEnd.before(taskOneStart))) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 	
 	String exitProgram() {
