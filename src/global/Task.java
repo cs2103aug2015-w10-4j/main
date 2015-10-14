@@ -135,6 +135,11 @@ public class Task {
 		return true;
 	}
 	
+	public boolean setPeriodic(String periodic) {
+		this.periodic = periodic;
+		return true;
+	}
+	
 	//return false if periodic type is incorrect
 	public boolean isCorrectPeriodic() {
 		String currentPeriodic = getPeriodic();
