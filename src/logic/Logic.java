@@ -266,9 +266,12 @@ public class Logic {
 		try {
 			logger.fine("Attempting to determine index.");
 			String []arr = argumentList.get(0).split(" ");
+			int previousInt = 9999;
 			for(int i = 0; i < arr.length; i++) {
 				int index = Integer.parseInt(arr[i]) - 1;	
-			
+			if(index > previousInt) {
+				index --;
+			}
 			if (isValidIndex(index)) {
 				// for history
 				Task taskRemoved = listOfTasks.remove(index);
@@ -307,6 +310,7 @@ public class Logic {
 				result += ERROR_INVALID_INDEX;
 			}
 			
+			previousInt = index;
 		}
 		} catch (NumberFormatException e) {
 			return ERROR_INVALID_ARGUMENT;
