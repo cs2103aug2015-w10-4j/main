@@ -61,7 +61,7 @@ public class Logic {
 	private static final String MESSAGE_SUCCESS_EXIT = "Exiting program...";
 	private static final String MESSAGE_SUCCESS_DISPLAY = "Displaying items.";
 	private static final String MESSAGE_SUCCESS_CHANGE_FILE_PATH = "File path successfully changed.";
-	private static final String MESSAGE_SUCCESS_CHANGE_FILE_PATH_BUT_CREATE_FILE = "File path successfully changed. \nNo file was detected, so Tasky has created one for you.";
+	private static final String MESSAGE_SUCCESS_NO_CHANGE_FILE_PATH = "File path not changed. Entered file path is the same as current one used.";
 	private static final String MESSAGE_DISPLAY_TASKLINE_INDEX = "%3d. ";
 	private static final String MESSAGE_DISPLAY_NEWLINE = "\r\n"; // isolated this string for ease of concatenation
 	private static final String MESSAGE_DISPLAY_EMPTY = "No items to display.";
@@ -406,7 +406,7 @@ public class Logic {
 			if (locationChanged) {
 				return MESSAGE_SUCCESS_CHANGE_FILE_PATH;
 			} else {
-				return MESSAGE_SUCCESS_CHANGE_FILE_PATH_BUT_CREATE_FILE;
+				return MESSAGE_SUCCESS_NO_CHANGE_FILE_PATH;
 			}
 		} catch (IOException e) {
 			return ERROR_CREATING_FILE;

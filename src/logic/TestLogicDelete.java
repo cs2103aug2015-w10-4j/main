@@ -23,7 +23,7 @@ public class TestLogicDelete {
 	@Test
 	public void logicDeleteOne(){
 		String message = logicObject.deleteItem(new ArrayList<String>(), true, true);
-		assertEquals("Error: Invalid argument for command", message);
+		assertEquals("Error: Invalid argument for command.", message);
 	}
 	
 	@Test
