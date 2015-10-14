@@ -15,18 +15,18 @@ import java.util.Scanner;
 import global.Task;
 
 public class ManualFormatStorage implements Storage {
-	
+
 	//UI UIObject;
 	//Parser parserObject;
 	Storage storageObject;
 	//History historyObject;
-	
+
 	private static final String ARGUMENTS_SEPARATOR = ";";
 	private static final String ARGUMENTS_DATE = "date ";
-	
+
 	public static String FILE_PATH = "save.txt";
 	public static String FILE_NEWLINE = "\r\n";
-	
+
 	// date format converter
 	private static SimpleDateFormat sdf = new SimpleDateFormat("dd MMM yyyy");
 
@@ -48,7 +48,7 @@ public class ManualFormatStorage implements Storage {
 			}
 			content += FILE_NEWLINE;
 		}
-	
+
 		File file = new File(FILE_PATH);
 		FileWriter fw = new FileWriter(file.getAbsoluteFile());
 		BufferedWriter bw = new BufferedWriter(fw);
@@ -64,21 +64,20 @@ public class ManualFormatStorage implements Storage {
 	public boolean saveFileToPath(String path) throws IOException {
 		File file = new File(path);
 		String newFolderPath = "";
-		if(path.indexOf("/") != -1){
+		if (path.indexOf("/") != -1) {
 			newFolderPath = path.substring(0,path.lastIndexOf("/"));
 		}
-		if(path.indexOf("\\") != -1){
-				newFolderPath = path.substring(0,path.lastIndexOf("\\"));
+		if (path.indexOf("\\") != -1) {
+			newFolderPath = path.substring(0,path.lastIndexOf("\\"));
+		}
+		if (!newFolderPath.equals("")) {
+			File Folderpath = new File(newFolderPath);
+			if (!Folderpath.exists()) {
+				Folderpath.mkdirs();
 			}
-		if(!newFolderPath.equals("")){
-		File Folderpath = new File(newFolderPath);
-		if(!Folderpath.exists()){
-			Folderpath.mkdirs();
 		}
-		}
-		
-		if (!file.exists()) {
 
+		if (!file.exists()) {
 			file.createNewFile();
 			FILE_PATH = path;
 			return false;
@@ -95,7 +94,7 @@ public class ManualFormatStorage implements Storage {
 		File file = new File(FILE_PATH);
 		Scanner sc = new Scanner(file);
 		ArrayList<Task> taskList = new ArrayList<Task>();
-	
+
 		while (sc.hasNextLine()) {
 			String nextLine = sc.nextLine();
 			Task taskObj = new Task();
@@ -109,7 +108,7 @@ public class ManualFormatStorage implements Storage {
 		sc.close();
 		return taskList;
 	}
-	
+
 	public void extractDate(String arg, Task taskObj) { // might want to store the date differently, up to you
 		String[] newArgs = arg.split(ARGUMENTS_DATE);
 		Calendar calendarRead = new GregorianCalendar();
@@ -121,9 +120,9 @@ public class ManualFormatStorage implements Storage {
 		}
 		taskObj.setEndingTime(calendarRead);
 		taskObj.setName(arg.split(ARGUMENTS_SEPARATOR)[0]);
-		
+
 	}
-	
+
 
 
 }
