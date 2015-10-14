@@ -104,11 +104,9 @@ public class Logic {
 			listOfTasks = storageObject.getItemList();
 		} catch (FileNotFoundException e) {
 			UIObject.showToUser(ERROR_FILE_NOT_FOUND);
-		} catch (SecurityException e) {
+		} catch (SecurityException|IOException e) {
 			UIObject.showToUser(ERROR_LOG_FILE_INITIALIZE);
-		} catch (IOException e) {
-			UIObject.showToUser(ERROR_LOG_FILE_INITIALIZE);
-		}
+		} 
 	}
 	
 	void start() {
@@ -156,9 +154,11 @@ public class Logic {
 		if (commandObject == null) {
 			return ERROR_INVALID_COMMAND;
 		}
+		
 		Command.Type commandType = commandObject.getCommandType();
 		Task userTask = commandObject.getTask();
 		ArrayList<String> argumentList = commandObject.getArguments();
+		
 		switch (commandType) {
 			case ADD :
 				logger.info("ADD command detected");
@@ -185,8 +185,8 @@ public class Logic {
 				logger.info("EXIT command detected");
 				return exitProgram();
 			default :
-				logger.warning("Command type cannot be identified!");
 		}
+		logger.warning("Command type cannot be identified!");
 		return ERROR_NO_COMMAND_HANDLER;
 	}
 	
@@ -198,8 +198,8 @@ public class Logic {
 	 */
 	String addItem(Task userTask, ArrayList<String> argumentList, boolean shouldPushToHistory, boolean isUndoHistory) {
 		try {
-			int index;
 			logger.fine("Attempting to determine index.");
+			int index;
 			if (isEmptyArgumentList(argumentList)) {
 				index = listOfTasks.size();
 				logger.finer("No specified index. Defaulting to the end of list.");
@@ -207,23 +207,35 @@ public class Logic {
 				index = Integer.parseInt(argumentList.get(0)) - 1;
 				logger.finer("Index " + index + " specified.");
 			}
+			
+			logger.fine("Checking for clashes.");
 			if(hasClashes(userTask)){
 				logger.finer("Clash in timing detected, exiting method.");
 				return ERROR_TIMING_CLASH;
 			}
-			listOfTasks.add(index, userTask);
-			logger.fine("Task added to list.");
 			
+			logger.fine("Adding task to list.");
+			listOfTasks.add(index, userTask);
+			
+			
+			logger.fine("Checking if command should be pushed to history.");
 			if (shouldPushToHistory) {
-				logger.fine("Pushing command to history.");
+				logger.finer("Pushing command to history.");
+				
+				logger.finer("Checking if command is called by undo.");
 				if (isUndoHistory) {
-					//	handle history
+					logger.finer("Command is NOT called by undo.");
+					
+					logger.finer("Attempting to reverse command and push it to history.");
 					String[] indexString = {Integer.toString(index + 1)};
 					if (!pushToHistory(new Command(Command.Type.DELETE, indexString))) {
 						return ERROR_CANNOT_WRITE_TO_HISTORY;
 					}
 					return MESSAGE_SUCCESS_ADD;
 				} else {
+					logger.finer("Command is called by undo.");
+					
+					logger.finer("Attempting to reverse command and push it to undoHistory.");
 					String[] indexString = {Integer.toString(index + 1)};
 					if (!pushToUndoHistory(new Command(Command.Type.DELETE, indexString))) {
 						return ERROR_CANNOT_WRITE_TO_HISTORY;
@@ -259,6 +271,9 @@ public class Logic {
 				if(shouldPushToHistory){
 					logger.fine("Pushing command to history.");
 					if(isUndoHistory){
+						logger.finer("Command is NOT called by undo.");
+						
+						logger.finer("Attempting to reverse command and push it to history.");
 						//handle history
 						String[] indexString = {Integer.toString(index + 1)};
 						if (!pushToHistory(new Command(Command.Type.ADD, indexString, taskRemoved))) {
@@ -266,6 +281,9 @@ public class Logic {
 						}
 						return MESSAGE_SUCCESS_DELETE;
 					}else{
+						logger.finer("Command is called by undo.");
+						
+						logger.finer("Attempting to reverse command and push it to undoHistory.");
 						String[] indexString = {Integer.toString(index + 1)};
 						if (!pushToUndoHistory(new Command(Command.Type.ADD, indexString, taskRemoved))) {
 							return ERROR_CANNOT_WRITE_TO_HISTORY;
@@ -273,7 +291,6 @@ public class Logic {
 						return MESSAGE_SUCCESS_UNDO_DELETE;
 					}
 				} else {
-					
 					return MESSAGE_SUCCESS_REDO_DELETE;
 				}
 				
@@ -315,13 +332,18 @@ public class Logic {
 				if(shouldPushToHistory){
 					logger.fine("Pushing command to history.");
 					if(isUndoHistory){
-						//	handle history
+						logger.finer("Command is NOT called by undo.");
+						
+						logger.finer("Attempting to reverse command and push it to history.");
 						String[] indexString = {Integer.toString(index + 1)};
 						if (!pushToHistory(new Command(Command.Type.EDIT, indexString, taskEdited))) {
 							return ERROR_CANNOT_WRITE_TO_HISTORY;
 						}
 						return MESSAGE_SUCCESS_EDIT;
 					}else{
+						logger.finer("Command is called by undo.");
+						
+						logger.finer("Attempting to reverse command and push it to undoHistory.");
 						String[] indexString = {Integer.toString(index + 1)};
 						if (!pushToUndoHistory(new Command(Command.Type.EDIT, indexString, taskEdited))) {
 							return ERROR_CANNOT_WRITE_TO_HISTORY;
@@ -362,18 +384,29 @@ public class Logic {
 			String stringToDisplay = "";
 			for (int i = 0; i < listOfTasks.size(); i++) {
 				Task curTask = listOfTasks.get(i);
+				assert(curTask != null);
+				
+				// Index
 				stringToDisplay += String.format(MESSAGE_DISPLAY_TASKLINE_INDEX, i + 1);
-				if (curTask != null) {
-					stringToDisplay += String.format("%-30.30s", curTask.getName()) + SEPARATOR_DISPLAY_FIELDS;
-					// leave a blank column for all additional params even if not present for better organisation
-					stringToDisplay += String.format("%-11s", (curTask.getEndingTime() != null ?
-							dateFormat.format(curTask.getEndingTime().getTime()) : ""))
-							+ SEPARATOR_DISPLAY_FIELDS;
-					stringToDisplay += String.format("%-15s", (curTask.getLocation() != null ?
-							curTask.getLocation() : "")) + SEPARATOR_DISPLAY_FIELDS;
-					stringToDisplay += String.format("%-15s", (curTask.getPeriodic() != null ?
-							curTask.getPeriodic() : ""));
-				}
+				
+				// Name
+				stringToDisplay += String.format("%-30.30s", curTask.getName());
+				stringToDisplay += SEPARATOR_DISPLAY_FIELDS;
+				
+				// Date
+				stringToDisplay += String.format("%-11s", (curTask.getEndingTime() != null ?
+						dateFormat.format(curTask.getEndingTime().getTime()) : ""));
+				stringToDisplay += SEPARATOR_DISPLAY_FIELDS;
+				
+				// Location
+				stringToDisplay += String.format("%-15s", (curTask.getLocation() != null ?
+						curTask.getLocation() : ""));
+				stringToDisplay += SEPARATOR_DISPLAY_FIELDS;
+				
+				// Periodic
+				stringToDisplay += String.format("%-15s", (curTask.getPeriodic() != null ?
+						curTask.getPeriodic() : ""));
+				
 				stringToDisplay += MESSAGE_DISPLAY_NEWLINE;
 			}
 			UIObject.showToUser(stringToDisplay);
@@ -439,7 +472,10 @@ public class Logic {
 		if(task.getStartingTime() != null && task.getEndingTime() != null){
 			for(int i = 0; i < listOfTasks.size(); i++){
 				Task curTaskToCheck = listOfTasks.get(i);
-				if(task.getStartingTime() != null && task.getEndingTime() != null && isClashing(task, curTaskToCheck)){
+				
+				if (task.getStartingTime() != null
+						&& task.getEndingTime() != null 
+						&& isClashing(task, curTaskToCheck)){
 					return true;
 				}
 			}
@@ -457,7 +493,7 @@ public class Logic {
 		assert(!(taskTwoStart == null));
 		assert(!(taskTwoEnd == null));
 		
-		if( (taskOneStart.before(taskTwoStart) && taskOneEnd.before(taskTwoStart))
+		if((taskOneStart.before(taskTwoStart) && taskOneEnd.before(taskTwoStart))
 				|| (taskTwoStart.before(taskOneStart) && taskTwoEnd.before(taskOneStart))) {
 			return true;
 		} else {
