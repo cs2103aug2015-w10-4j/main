@@ -96,6 +96,22 @@ public class Task {
 	public String getPeriodic() {
 		return this.periodic;
 	}
+	
+	public boolean hasStartingTime(){
+		if (this.startingTime == null) {
+			return false;
+		} else {
+			return true;
+		}
+	}
+	
+	public boolean hasEndingTime(){
+		if (this.endingTime == null) {
+			return false;
+		} else {
+			return true;
+		}
+	}
 
 
 	//change the name of the task
@@ -119,11 +135,6 @@ public class Task {
 		return true;
 	}
 	
-	public boolean setPeriodic(String periodic) {
-		this.periodic = periodic;
-		return true;
-	}
-	
 	//return false if periodic type is incorrect
 	public boolean isCorrectPeriodic() {
 		String currentPeriodic = getPeriodic();
@@ -136,5 +147,3 @@ public class Task {
 	}
 	
 }
-
-
