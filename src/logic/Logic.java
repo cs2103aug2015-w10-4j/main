@@ -63,7 +63,7 @@ public class Logic {
 	private static final String MESSAGE_SUCCESS_CHANGE_FILE_PATH = "File path successfully changed.";
 	private static final String MESSAGE_SUCCESS_NO_CHANGE_FILE_PATH = "File path not changed. Entered file path is the same as current one used.";
 	private static final String MESSAGE_DISPLAY_TASKLINE_INDEX = "%3d. ";
-	private static final String MESSAGE_DISPLAY_NEWLINE = "\r\n"; // isolated this string for ease of concatenation
+	private static final String MESSAGE_DISPLAY_NEWLINE = "\r\n";
 	private static final String MESSAGE_DISPLAY_EMPTY = "No items to display.";
 	private static final String SEPARATOR_DISPLAY_FIELDS = " | ";
 	private static final String ERROR_WRITING_FILE = "Error: Unable to write file.";
@@ -185,6 +185,7 @@ public class Logic {
 				logger.info("EXIT command detected");
 				return exitProgram();
 			default :
+				logger.warning("Command type cannot be identified!");
 		}
 		return ERROR_NO_COMMAND_HANDLER;
 	}
@@ -198,17 +199,23 @@ public class Logic {
 	String addItem(Task userTask, ArrayList<String> argumentList, boolean shouldPushToHistory, boolean isUndoHistory) {
 		try {
 			int index;
+			logger.fine("Attempting to determine index.");
 			if (isEmptyArgumentList(argumentList)) {
 				index = listOfTasks.size();
+				logger.finer("No specified index. Defaulting to the end of list.");
 			} else {
 				index = Integer.parseInt(argumentList.get(0)) - 1;
+				logger.finer("Index " + index + " specified.");
 			}
 			if(hasClashes(userTask)){
+				logger.finer("Clash in timing detected, exiting method.");
 				return ERROR_TIMING_CLASH;
 			}
 			listOfTasks.add(index, userTask);
-
+			logger.fine("Task added to list.");
+			
 			if (shouldPushToHistory) {
+				logger.fine("Pushing command to history.");
 				if (isUndoHistory) {
 					//	handle history
 					String[] indexString = {Integer.toString(index + 1)};
@@ -242,12 +249,15 @@ public class Logic {
 			return ERROR_INVALID_ARGUMENT;
 		}
 		try {
+			logger.fine("Attempting to determine index.");
 			int index = Integer.parseInt(argumentList.get(0)) - 1;
 			if (isValidIndex(index)) {
 				// for history
 				Task taskRemoved = listOfTasks.remove(index);
+				logger.fine("Task removed from list.");
 				
 				if(shouldPushToHistory){
+					logger.fine("Pushing command to history.");
 					if(isUndoHistory){
 						//handle history
 						String[] indexString = {Integer.toString(index + 1)};
@@ -288,6 +298,7 @@ public class Logic {
 			return ERROR_INVALID_ARGUMENT;
 		}
 		try {
+			logger.fine("Attempting to determine index.");
 			int index = Integer.parseInt(argumentList.get(0)) - 1;
 			if (isValidIndex(index)) {
 				// for history
@@ -296,9 +307,13 @@ public class Logic {
 					return ERROR_TIMING_CLASH;
 				}
 				listOfTasks.remove(index);
+				logger.fine("Old task removed from list.");
 				listOfTasks.add(index, userTask);
+				logger.fine("New task added to list.");
+				
 				
 				if(shouldPushToHistory){
+					logger.fine("Pushing command to history.");
 					if(isUndoHistory){
 						//	handle history
 						String[] indexString = {Integer.toString(index + 1)};
