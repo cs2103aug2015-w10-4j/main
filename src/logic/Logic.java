@@ -349,7 +349,7 @@ public class Logic {
 				Task curTask = listOfTasks.get(i);
 				stringToDisplay += String.format(MESSAGE_DISPLAY_TASKLINE_INDEX, i + 1);
 				if (curTask != null) {
-					stringToDisplay += String.format("%-30s", curTask.getName()) + SEPARATOR_DISPLAY_FIELDS;
+					stringToDisplay += String.format("%-30.30s", curTask.getName()) + SEPARATOR_DISPLAY_FIELDS;
 					// leave a blank column for all additional params even if not present for better organisation
 					stringToDisplay += String.format("%-11s", (curTask.getEndingTime() != null ?
 							dateFormat.format(curTask.getEndingTime().getTime()) : ""))
@@ -360,7 +360,7 @@ public class Logic {
 							curTask.getPeriodic() : ""));
 				}
 				stringToDisplay += MESSAGE_DISPLAY_NEWLINE;
-			}	
+			}
 			UIObject.showToUser(stringToDisplay);
 		}
 		return true;

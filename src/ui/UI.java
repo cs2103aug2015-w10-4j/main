@@ -165,7 +165,7 @@ public class UI {
 				+ "gridheight = %d, gridwidth = %d, weightx = %.2f, weighty = %.2f",
 				"DISPLAY_AREA", "GridBagConstraints.HORIZONTAL",
 				STATUS_BAR_POS_X, STATUS_BAR_POS_Y, STATUS_BAR_LEN_Y, STATUS_BAR_LEN_X, 1.0, 1.0));
-		
+		displayArea.setFont(new Font("Lucida Console", Font.PLAIN, 12));
 		contentPane.add(displayArea, constraint);
 	}
 
