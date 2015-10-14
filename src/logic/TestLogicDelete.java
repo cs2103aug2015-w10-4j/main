@@ -19,7 +19,7 @@ public class TestLogicDelete {
 		File saveFile = new File("save.txt");
 		saveFile.delete();
 	}
-	
+	/*
 	@Test
 	public void logicDeleteOne(){
 		String message = logicObject.deleteItem(new ArrayList<String>(), true, true);
@@ -58,4 +58,5 @@ public class TestLogicDelete {
 		File saveFile = new File("save.txt");
 		saveFile.delete();
 	}
+	*/
 }

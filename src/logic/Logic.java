@@ -165,7 +165,17 @@ public class Logic {
 				return addItem(userTask, argumentList, shouldPushToHistory, isUndoHistory);
 			case DELETE :
 				logger.info("DELETE command detected");
+		/*		if (isEmptyArgumentList(argumentList)) {
+					return ERROR_INVALID_ARGUMENT;
+				}
+				String deleteMSG = "";
+				for(int i =0; i< argumentList.size(); i++) {
+					System.out.println("argu"+argumentList.get(i));
+					deleteMSG += deleteItem(Integer.parseInt(argumentList.get(i)) - 1, shouldPushToHistory, isUndoHistory) + " ";
+				}
+				*/
 				return deleteItem(argumentList, shouldPushToHistory, isUndoHistory);
+
 			case EDIT :
 				logger.info("EDIT command detected");
 				return editItem(userTask, argumentList, shouldPushToHistory, isUndoHistory);
@@ -257,12 +267,21 @@ public class Logic {
 	 * @return status string
 	 */
 	String deleteItem(ArrayList<String> argumentList, boolean shouldPushToHistory, boolean isUndoHistory) {
+		String result = "";
+		System.out.println("hello ::"+argumentList.get(0));
 		if (isEmptyArgumentList(argumentList)) {
 			return ERROR_INVALID_ARGUMENT;
 		}
+	
 		try {
 			logger.fine("Attempting to determine index.");
-			int index = Integer.parseInt(argumentList.get(0)) - 1;
+			String []arr = argumentList.get(0).split(" ");
+		//	int index = Integer.parseInt(arr[0]) - 1;
+			for(int i = 0; i < arr.length; i++) {
+				int index = Integer.parseInt(arr[i]) - 1;	
+			System.out.println("index is "+index);
+			//int index = Integer.parseInt(argumentList.get(0)) - 1;
+			
 			if (isValidIndex(index)) {
 				// for history
 				Task taskRemoved = listOfTasks.remove(index);
@@ -277,30 +296,37 @@ public class Logic {
 						//handle history
 						String[] indexString = {Integer.toString(index + 1)};
 						if (!pushToHistory(new Command(Command.Type.ADD, indexString, taskRemoved))) {
-							return ERROR_CANNOT_WRITE_TO_HISTORY;
+						//	return ERROR_CANNOT_WRITE_TO_HISTORY;
+							result = ERROR_CANNOT_WRITE_TO_HISTORY;
 						}
-						return MESSAGE_SUCCESS_DELETE;
+						//return MESSAGE_SUCCESS_DELETE;
+						result +=  (index +1) + "th " +MESSAGE_SUCCESS_DELETE +" ";
 					}else{
 						logger.finer("Command is called by undo.");
 						
 						logger.finer("Attempting to reverse command and push it to undoHistory.");
 						String[] indexString = {Integer.toString(index + 1)};
 						if (!pushToUndoHistory(new Command(Command.Type.ADD, indexString, taskRemoved))) {
-							return ERROR_CANNOT_WRITE_TO_HISTORY;
+							//return ERROR_CANNOT_WRITE_TO_HISTORY;
+							result = ERROR_CANNOT_WRITE_TO_HISTORY;
 						}
-						return MESSAGE_SUCCESS_UNDO_DELETE;
+						result = ERROR_CANNOT_WRITE_TO_HISTORY;
 					}
 				} else {
-					return MESSAGE_SUCCESS_REDO_DELETE;
+					//return MESSAGE_SUCCESS_REDO_DELETE;
+					result += (index + 1) + "th " + MESSAGE_SUCCESS_REDO_DELETE +" ";
 				}
 				
 			} else {
-				return ERROR_INVALID_INDEX;
+				//return ERROR_INVALID_INDEX;
+				result += ERROR_INVALID_INDEX;
 			}
 			
+		}
 		} catch (NumberFormatException e) {
 			return ERROR_INVALID_ARGUMENT;
 		}
+		return result;
 		
 	}
 	
