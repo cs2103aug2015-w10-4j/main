@@ -165,15 +165,6 @@ public class Logic {
 				return addItem(userTask, argumentList, shouldPushToHistory, isUndoHistory);
 			case DELETE :
 				logger.info("DELETE command detected");
-		/*		if (isEmptyArgumentList(argumentList)) {
-					return ERROR_INVALID_ARGUMENT;
-				}
-				String deleteMSG = "";
-				for(int i =0; i< argumentList.size(); i++) {
-					System.out.println("argu"+argumentList.get(i));
-					deleteMSG += deleteItem(Integer.parseInt(argumentList.get(i)) - 1, shouldPushToHistory, isUndoHistory) + " ";
-				}
-				*/
 				return deleteItem(argumentList, shouldPushToHistory, isUndoHistory);
 
 			case EDIT :
@@ -268,7 +259,6 @@ public class Logic {
 	 */
 	String deleteItem(ArrayList<String> argumentList, boolean shouldPushToHistory, boolean isUndoHistory) {
 		String result = "";
-		System.out.println("hello ::"+argumentList.get(0));
 		if (isEmptyArgumentList(argumentList)) {
 			return ERROR_INVALID_ARGUMENT;
 		}
@@ -276,11 +266,8 @@ public class Logic {
 		try {
 			logger.fine("Attempting to determine index.");
 			String []arr = argumentList.get(0).split(" ");
-		//	int index = Integer.parseInt(arr[0]) - 1;
 			for(int i = 0; i < arr.length; i++) {
 				int index = Integer.parseInt(arr[i]) - 1;	
-			System.out.println("index is "+index);
-			//int index = Integer.parseInt(argumentList.get(0)) - 1;
 			
 			if (isValidIndex(index)) {
 				// for history
@@ -296,10 +283,8 @@ public class Logic {
 						//handle history
 						String[] indexString = {Integer.toString(index + 1)};
 						if (!pushToHistory(new Command(Command.Type.ADD, indexString, taskRemoved))) {
-						//	return ERROR_CANNOT_WRITE_TO_HISTORY;
 							result = ERROR_CANNOT_WRITE_TO_HISTORY;
 						}
-						//return MESSAGE_SUCCESS_DELETE;
 						result +=  (index +1) + "th " +MESSAGE_SUCCESS_DELETE +" ";
 					}else{
 						logger.finer("Command is called by undo.");
