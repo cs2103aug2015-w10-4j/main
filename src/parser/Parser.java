@@ -28,9 +28,11 @@ public class Parser {
 	private static final String COMMAND_EXIT = "exit";
 	private static final String COMMAND_DISPLAY = "display";
 	private static final String COMMAND_SAVEPATH = "savepath";
-	private static final String[] ARGUMENTS_DATE = {" date ",  " by ", " this ", " next ", "tomorrow"};
+	private static final String[] ARGUMENTS_END_DATE = {"date", "by"};
+	private static final String[] ARGUMENTS_SPECIAL_END_DATE = {"this", "next", "tomorrow", "today"};
 	private static final String ARGUMENTS_PERIODIC = " every ";
 	private static final String ARGUMENT_LOC = "loc";
+	private static final String DEFAULT_DAY = "friday";
 	
 	private static final String[] MONTHS = {"jan", "feb", "mar", "apr", "may", "jun", "jul", "aug",
 		"sep", "oct", "nov", "dec"};
@@ -119,24 +121,19 @@ public class Parser {
 	private String extractDate(String arg, Task taskObj) throws Exception {
 		String[] newArgs = {};
 		Calendar date = new GregorianCalendar();
-		int argument = -1; // 0 = date, 1 = by, 2 = this, 3 = next, 4 = tomorrow
-		for (int i = 0; i < ARGUMENTS_DATE.length; i++) {
-			if (arg.contains(ARGUMENTS_DATE[i])) {
-				newArgs = arg.split(ARGUMENTS_DATE[i]);
-				argument = i;
-			}
-		}
-		if (argument == -1) {
-			// no date parameters found; return null
-			return arg;
-		} else if (argument < 2) {
-			// command contains ARGUMENTS_DATE[0||1]
+		if (hasKeyword(arg, ARGUMENTS_END_DATE)) {
+			String keywordToSplitAt = getKeyword(arg, ARGUMENTS_END_DATE);
+			newArgs = arg.split(keywordToSplitAt);
+			
 			String[] dateArgs = newArgs[1].split(" ");
+			
 			int day = Integer.parseInt(dateArgs[0]);
+			
 			int month = Arrays.asList(MONTHS).indexOf(dateArgs[1]);
 			if (month == -1) {
 				throw new Exception(WARNING_INVALID_MONTH);
 			}
+			
 			// year will be set to current year if not specified by user
 			int year;
 			try {
@@ -144,37 +141,64 @@ public class Parser {
 			} catch (ArrayIndexOutOfBoundsException|NumberFormatException e) {
 				year = Calendar.getInstance().get(Calendar.YEAR);
 			}
+			
 			date.set(year, month, day);
-		} else if (argument < 4) {
-			// command contains ARGUMENTS_DATE[2||3]
+			taskObj.setEndingTime(date);
+			return newArgs[0];
+		} else if (hasKeyword(arg, ARGUMENTS_SPECIAL_END_DATE)) {
+			String keywordToSplitAt = getKeyword(arg, ARGUMENTS_SPECIAL_END_DATE);
+			newArgs = arg.split(keywordToSplitAt);
+			
 			date = new GregorianCalendar();			
-			int setDay = -1, today = 0, offset;
-			SimpleDateFormat dateFormat = new SimpleDateFormat("EEEE");
-			for (int i = 0; i < DAYS.length; i++) {
-				if (newArgs[1].indexOf(DAYS[i]) == 0) {
-					setDay = i;
-				}
-				if (dateFormat.format(date.getTime()).equalsIgnoreCase(DAYS[i])) {
-					today = i;
-				}
+			int setDate, today, todayDate, offset;
+			
+			
+			today = date.get(Calendar.DAY_OF_WEEK);
+			todayDate = date.get(Calendar.DATE);
+			
+			switch(keywordToSplitAt) {
+				case "tomorrow":
+					setDate = todayDate + 1;
+					break;
+				case "today":
+					setDate = todayDate;
+					break;
+				case "this":
+					if(!hasKeyword(newArgs[1], DAYS)) {
+						throw new Exception(WARNING_INVALID_DAY);
+					}
+					offset = dayOfTheWeek(getKeyword(newArgs[1], DAYS)) - today;
+					if (offset < 0) {
+						offset += DAYS.length;
+					}
+					setDate = todayDate + offset;
+					break;
+				case "next":
+					if(!hasKeyword(newArgs[1], DAYS)) {
+						throw new Exception(WARNING_INVALID_DAY);
+					}
+					offset = dayOfTheWeek(getKeyword(newArgs[1], DAYS)) - today;
+					if (offset < 0) {
+						offset += DAYS.length;
+					}
+					setDate = todayDate + offset + DAYS.length;
+					break;
+				default:
+					offset = dayOfTheWeek(DEFAULT_DAY) - today;
+					if (offset < 0) {
+						offset += DAYS.length;
+					}
+					setDate = todayDate + offset;
 			}
-			if (setDay == -1) {
-				throw new Exception(WARNING_INVALID_DAY);
-			}
-			offset = setDay - today;
-			if (offset <= 0) {
-				offset += 7;
-			}
-			if (argument == 3) {
-				offset += 7;
-			}
-			date.set(Calendar.DATE, date.get(Calendar.DATE) + offset);
+			
+			date.set(Calendar.DATE, setDate);
+			taskObj.setEndingTime(date);
+			return newArgs[0];
 		} else {
-			// command contains ARGUMENTS_DATE[4]
-			date.set(Calendar.DATE, date.get(Calendar.DATE) + 1);
+			return arg;
 		}
-		taskObj.setEndingTime(date);
-		return newArgs[0];
+		
+		
 	}
 	/*
 	 * Extracts 'loc' segment
@@ -211,5 +235,27 @@ public class Parser {
 			}
 		}
 		return null;
+	}
+	
+	private boolean hasKeyword(String str, String[] keywords){
+		for(int i = 0; i < keywords.length; i++){
+			if(str.contains(keywords[i])) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	private String getKeyword(String str, String[] keywords){
+		for(int i = 0; i < keywords.length; i++){
+			if(str.contains(keywords[i])) {
+				return keywords[i];
+			}
+		}
+		return null; // should never happen
+	}
+	
+	private int dayOfTheWeek(String dayString){
+		return Arrays.asList(DAYS).indexOf(dayString) + 1;
 	}
 }
