@@ -32,8 +32,8 @@ public class Parser {
 	private static final String ARGUMENT_TO = "end";
 	
 	private static final String[] ARGUMENT_EVENT = {"start", "end"};
-	private static final String[] ARGUMENTS_END_DATE = {"date", "by"};
-	private static final String[] ARGUMENTS_SPECIAL_END_DATE = {"this", "next", "tomorrow", "today"};
+	private static final String[] ARGUMENTS_END_DATE = {" date ", " by "};
+	private static final String[] ARGUMENTS_SPECIAL_END_DATE = {" this ", " next ", " tomorrow", " today"};
 	private static final String ARGUMENTS_PERIODIC = " every ";
 	private static final String ARGUMENT_LOC = "loc";
 	private static final String DEFAULT_DAY = "friday";
