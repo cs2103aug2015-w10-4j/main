@@ -47,14 +47,18 @@ public class Parser {
 	public Command parseCommand(String command) throws Exception {
 		String[] args = command.split(" ", 2); // extract CommandType from command
 		Command commandObject;
+		for(int i=0;i<args.length;i++){
+			System.out.println("argssss "+args[i]);
+		}
 		if (args[0].equalsIgnoreCase(COMMAND_ADD)) {
 			try {
 				Task taskObj = new Task();
 				// Using old method of extracting task name temporarily for v0.1
 //				taskObj.setName(extractTaskName(args[1]));
 //				taskObj.setEndingTime(extractDate(args[1]));
+				System.out.println("hello"+extractDate(args[1], taskObj));
 				taskObj.setName(extractDate(args[1], taskObj));
-				taskObj.setPeriodic(extractPeriodic(args[1], taskObj));
+			//	taskObj.setPeriodic(extractPeriodic(args[1], taskObj));
 				args[1] = extractLocation(args[1], taskObj);
 				commandObject = new Command(Command.Type.ADD, taskObj);
 			}
@@ -121,6 +125,7 @@ public class Parser {
 	private String extractDate(String arg, Task taskObj) throws Exception {
 		String[] newArgs = {};
 		Calendar date = new GregorianCalendar();
+		Calendar date1 = new GregorianCalendar();
 		if (hasKeyword(arg, ARGUMENTS_END_DATE)) {
 			String keywordToSplitAt = getKeyword(arg, ARGUMENTS_END_DATE);
 			newArgs = arg.split(keywordToSplitAt);
@@ -149,8 +154,9 @@ public class Parser {
 			String keywordToSplitAt = getKeyword(arg, ARGUMENTS_SPECIAL_END_DATE);
 			newArgs = arg.split(keywordToSplitAt);
 			
-			date = new GregorianCalendar();			
-			int setDate, today, todayDate, offset;
+			date = new GregorianCalendar();		
+			date1 =  new GregorianCalendar();	
+			int setDate,setstartDate = 0, today, todayDate, offset, startOffset;
 			
 			
 			today = date.get(Calendar.DAY_OF_WEEK);
@@ -174,6 +180,31 @@ public class Parser {
 					setDate = todayDate + offset;
 					break;
 				case "next":
+					for(int i=0;i<newArgs.length;i++){
+						System.out.println(newArgs.length);
+						System.out.println("new args"+i+" " +newArgs[i]);
+					}
+					if(newArgs.length !=2) {// has a endingTime
+						System.out.println("hello");
+					if(!hasKeyword(newArgs[1], DAYS) || !hasKeyword(newArgs[2], DAYS) ) {
+							throw new Exception(WARNING_INVALID_DAY);
+						}	
+						startOffset = dayOfTheWeek(getKeyword(newArgs[2], DAYS)) - today;
+						if (startOffset < 0) {
+							startOffset += DAYS.length;
+						}
+						setDate = todayDate + startOffset + DAYS.length;
+						System.out.println("start"+setstartDate);
+						
+						offset = dayOfTheWeek(getKeyword(newArgs[1], DAYS)) - today;
+						if (offset < 0) {
+							offset += DAYS.length;
+						}
+						setstartDate = todayDate + offset + DAYS.length;
+						System.out.println("end"+setDate);
+						
+					//	break;
+					} else {
 					if(!hasKeyword(newArgs[1], DAYS)) {
 						throw new Exception(WARNING_INVALID_DAY);
 					}
@@ -182,6 +213,8 @@ public class Parser {
 						offset += DAYS.length;
 					}
 					setDate = todayDate + offset + DAYS.length;
+				//	break;
+					}
 					break;
 				default:
 					offset = dayOfTheWeek(DEFAULT_DAY) - today;
@@ -192,7 +225,17 @@ public class Parser {
 			}
 			
 			date.set(Calendar.DATE, setDate);
-			taskObj.setEndingTime(date);
+		    date1.set(Calendar.DATE, setstartDate);
+		    if(date.before(date1)){
+		    	taskObj.setEndingTime(date1);
+				taskObj.setStartingTime(date);
+		    }else{
+		    	taskObj.setEndingTime(date);
+				taskObj.setStartingTime(date1);
+		    }
+		//	System.out.println("test "+newArgs[0]);
+			SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM yyyy");
+			System.out.println(dateFormat.format(taskObj.getStartingTime().getTime())+" "+dateFormat.format(taskObj.getEndingTime().getTime()));
 			return newArgs[0];
 		} else {
 			return arg;
