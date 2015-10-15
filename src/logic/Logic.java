@@ -5,6 +5,7 @@ import global.Task;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -65,8 +66,6 @@ public class Logic {
 	private static final String MESSAGE_SUCCESS_DISPLAY = "Displaying items.";
 	private static final String MESSAGE_SUCCESS_CHANGE_FILE_PATH = "File path successfully changed.";
 	private static final String MESSAGE_SUCCESS_NO_CHANGE_FILE_PATH = "File path not changed. Entered file path is the same as current one used.";
-	private static final String MESSAGE_DISPLAY_TASKLINE_INDEX = "%3d. ";
-	private static final String MESSAGE_DISPLAY_NEWLINE = "\r\n";
 	private static final String MESSAGE_DISPLAY_EMPTY = "No items to display.";
 	private static final String SEPARATOR_DISPLAY_FIELDS = " | ";
 	private static final String ERROR_WRITING_FILE = "Error: Unable to write file.";
@@ -395,6 +394,8 @@ public class Logic {
 	 * @return calls the UI to display updated list of items
 	 */
 	boolean showUpdatedItems() {
+		return UIObject.showTasks(listOfTasks);
+		/*
 		if (listOfTasks.isEmpty()) {
 			UIObject.showToUser(MESSAGE_DISPLAY_EMPTY);
 		}else{
@@ -411,6 +412,10 @@ public class Logic {
 				stringToDisplay += SEPARATOR_DISPLAY_FIELDS;
 				
 				// Date
+				stringToDisplay += String.format("%-11s", (curTask.getStartingTime() != null ?
+						dateFormat.format(curTask.getStartingTime().getTime()) : ""));
+				stringToDisplay += SEPARATOR_DISPLAY_FIELDS;
+				
 				stringToDisplay += String.format("%-11s", (curTask.getEndingTime() != null ?
 						dateFormat.format(curTask.getEndingTime().getTime()) : ""));
 				stringToDisplay += SEPARATOR_DISPLAY_FIELDS;
@@ -429,6 +434,7 @@ public class Logic {
 			UIObject.showToUser(stringToDisplay);
 		}
 		return true;
+		*/
 	}
 	
 	String undoCommand(){

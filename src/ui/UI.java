@@ -9,6 +9,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -20,6 +21,9 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
+
+import global.Task;
+import ui.formatter.TaskListFormatter;
 
 public class UI {
 	
@@ -73,7 +77,7 @@ public class UI {
 	
 	private static final String FRAME_TITLE = "Tasky";
 	private static final String DEFAULT_PROMPT = "command ";
-	private static final String DISPLAY_AREA_FONT_NAME = "monospaced";
+	private static final String DISPLAY_AREA_FONT_NAME = "Lucida Console";
 	private static final int DISPLAY_AREA_FONT_SIZE = 12;
 	
 	/*
@@ -84,6 +88,8 @@ public class UI {
 	private JLabel promptLabel = new JLabel(DEFAULT_PROMPT, PROMPT_LABEL_CHAR_COUNT);
 	private JTextField userInputField = new JTextField(USER_INPUT_FIELD_CHAR_COUNT);
 	private StatusBar statusBar = new StatusBar();
+	
+	private TaskListFormatter taskListFormatter = TaskListFormatter.getInstance();
 	
 	/*
 	 * Constructor
@@ -165,7 +171,7 @@ public class UI {
 				+ "gridheight = %d, gridwidth = %d, weightx = %.2f, weighty = %.2f",
 				"DISPLAY_AREA", "GridBagConstraints.HORIZONTAL",
 				STATUS_BAR_POS_X, STATUS_BAR_POS_Y, STATUS_BAR_LEN_Y, STATUS_BAR_LEN_X, 1.0, 1.0));
-		displayArea.setFont(new Font("Lucida Console", Font.PLAIN, 12));
+		
 		contentPane.add(displayArea, constraint);
 	}
 
@@ -267,12 +273,18 @@ public class UI {
 	 * @return true if successful
 	 */
 	public boolean showToUser(String stringToShow) {
-		logger.log(Level.INFO, "Entering showToUser(), stringToShow length = " + stringToShow.length());
-		
 		displayArea.setText(stringToShow);
-		
-		logger.log(Level.INFO, "Returning from showToUser");
-		
+		return true;
+	}
+	
+	/**
+	 * Asks the UI to display the list of tasks
+	 * @param tasks
+	 * @return true if successful
+	 */
+	public boolean showTasks(List<Task> taskList) {
+		String textFormatTaskList = taskListFormatter.formatTaskList(taskList);
+		showToUser(textFormatTaskList);
 		return true;
 	}
 	
@@ -282,11 +294,11 @@ public class UI {
 	 * @return true if successful
 	 */
 	public boolean showStatusToUser(String stringToShow) {
-		logger.log(Level.INFO,  "Entering showStatusToUser(stringToShow=" + stringToShow + ")");
+		logger.info("Entering showStatusToUser(stringToShow=" + stringToShow + ")");
 		
 		statusBar.setText(stringToShow);
 		
-		logger.log(Level.INFO,  "Returning from showStatusToUser");
+		logger.info("Returning from showStatusToUser");
 		
 		return true;
 	}

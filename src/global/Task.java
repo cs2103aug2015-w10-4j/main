@@ -12,11 +12,12 @@ public class Task {
 	private static final String PERIODIC_DAILY = "daily";
 	private static final String PERIODIC_WEEKLY = "weekly";
 	private static final String PERIODIC_MONTHLY = "monthly";
-	String name = null;
-	Calendar startingTime = null;
-	Calendar endingTime = null;
-	String location = null;
-	String periodic = null;
+	
+	private String name = null;
+	private Calendar startingTime = null;
+	private Calendar endingTime = null;
+	private String location = null;
+	private String periodic = null;
 
 	/*
 	 * Constructor
@@ -143,12 +144,9 @@ public class Task {
 	//return false if periodic type is incorrect
 	public boolean isCorrectPeriodic() {
 		String currentPeriodic = getPeriodic();
-		if (! currentPeriodic.equals(PERIODIC_DAILY) &&
-				! currentPeriodic.equals(PERIODIC_WEEKLY) &&
-				! currentPeriodic.equals(PERIODIC_MONTHLY)){
-			return false;
-		}
-		return true;
+		return currentPeriodic.equals(PERIODIC_DAILY) ||
+			   currentPeriodic.equals(PERIODIC_WEEKLY) ||
+			   currentPeriodic.equals(PERIODIC_MONTHLY);
 	}
 	
 }
