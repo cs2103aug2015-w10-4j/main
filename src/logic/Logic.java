@@ -182,8 +182,8 @@ public class Logic {
 			case REDO :
 				logger.info("REDO command detected");
 				return redoCommand();
-			case SAVEPATH :
-				logger.info("SAVEPATH command detected");
+			case SAVETO :
+				logger.info("SAVETO command detected");
 				return saveFilePath(argumentList);
 			case EXIT :
 				logger.info("EXIT command detected");

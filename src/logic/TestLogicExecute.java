@@ -105,17 +105,17 @@ public class TestLogicExecute {
 		
 		args = new String[1];
 		args[0] = "save.txt";
-		commandObject = new Command(Command.Type.SAVEPATH, args);
+		commandObject = new Command(Command.Type.SAVETO, args);
 		assertEquals("File path not changed. Entered file path is the same as current one used.", logicObject.executeCommand(commandObject, true, true));
 		
 		args = new String[1];
 		args[0] = "anotherSave.txt";
-		commandObject = new Command(Command.Type.SAVEPATH, args);
+		commandObject = new Command(Command.Type.SAVETO, args);
 		assertEquals("File path successfully changed.", logicObject.executeCommand(commandObject, true, true));
 		
 		args = new String[1];
 		args[0] = "save.txt";
-		commandObject = new Command(Command.Type.SAVEPATH, args);
+		commandObject = new Command(Command.Type.SAVETO, args);
 		assertEquals("File path successfully changed.", logicObject.executeCommand(commandObject, true, true));
 	}
 	

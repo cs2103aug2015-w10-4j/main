@@ -27,7 +27,7 @@ public class Parser {
 	private static final String COMMAND_REDO = "redo";
 	private static final String COMMAND_EXIT = "exit";
 	private static final String COMMAND_DISPLAY = "display";
-	private static final String COMMAND_SAVEPATH = "savepath";
+	private static final String COMMAND_SAVETO = "saveto";
 	private static final String[] ARGUMENTS_END_DATE = {"date", "by"};
 	private static final String[] ARGUMENTS_SPECIAL_END_DATE = {"this", "next", "tomorrow", "today"};
 	private static final String ARGUMENTS_PERIODIC = " every ";
@@ -89,9 +89,9 @@ public class Parser {
 			commandObject = new Command(Command.Type.UNDO);
 		} else if (args[0].equalsIgnoreCase(COMMAND_REDO)) {
 			commandObject = new Command(Command.Type.REDO);
-		} else if (args[0].equalsIgnoreCase(COMMAND_SAVEPATH)) {
+		} else if (args[0].equalsIgnoreCase(COMMAND_SAVETO)) {
 			String[] newArgs = {args[1]};
-			commandObject = new Command(Command.Type.SAVEPATH, newArgs);
+			commandObject = new Command(Command.Type.SAVETO, newArgs);
 		} else {
 			commandObject = null;
 		}
