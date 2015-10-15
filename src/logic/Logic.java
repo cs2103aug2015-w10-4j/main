@@ -7,8 +7,10 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -266,7 +268,11 @@ public class Logic {
 	
 		try {
 			logger.fine("Attempting to determine index.");
+			
+			argumentList = removeDuplicates(argumentList);
 			Collections.sort(argumentList);
+			
+			
 			for(int i = argumentList.size() - 1; i >= 0; i--) {
 				int index = Integer.parseInt(argumentList.get(i)) - 1;
 				if (isValidIndex(index)) {
@@ -510,6 +516,18 @@ public class Logic {
 		} else {
 			return false;
 		}
+	}
+	
+	// Create an array with all unique elements
+	public ArrayList<String> removeDuplicates(ArrayList<String> A) {
+
+		// add elements to al, including duplicates
+		HashSet<String> hs = new HashSet<>();
+		hs.addAll(A);
+		A.clear();
+		A.addAll(hs);
+		
+	 return A;
 	}
 	
 	String exitProgram() {
