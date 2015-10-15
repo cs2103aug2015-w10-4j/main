@@ -96,7 +96,7 @@ public class Parser {
 			commandObject = new Command(Command.Type.REDO);
 		} else if (args[0].equalsIgnoreCase(COMMAND_SAVEPATH)) {
 			String[] newArgs = {args[1]};
-			commandObject = new Command(Command.Type.SAVEPATH, newArgs);
+			commandObject = new Command(Command.Type.SAVETO, newArgs);
 		} else {
 			commandObject = null;
 		}
