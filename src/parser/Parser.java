@@ -207,13 +207,12 @@ public class Parser {
 
             //	SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM yyyy");
             //	System.out.println(dateFormat.format(taskObj.getStartingTime().getTime())+" "+dateFormat.format(taskObj.getEndingTime().getTime()));
-
+            
             return arg;
 
 			} else {
 				throw new Exception(WARNING_INVALID_DAY);
 			}
-
 		} else if (hasKeyword(arg, ARGUMENTS_END_DATE_SPECIAL)) {
 			String keywordToSplitAt = getKeyword(arg, ARGUMENTS_END_DATE_SPECIAL);
 			newArgs = arg.split(keywordToSplitAt);
