@@ -76,7 +76,7 @@ public class Parser {
 			}
 		} else if (args[0].equalsIgnoreCase(COMMAND_DELETE)) {
 			if (args.length >= 2) { // this is to be edited when the parser becomes more complete
-				String[] indexToDelete = {args[1]};
+				String[] indexToDelete = args[1].split(" ");
 				commandObject = new Command(Command.Type.DELETE, indexToDelete);
 			} else {
 				throw new Exception(String.format(WARNING_INSUFFICIENT_ARGUMENT, args[0]));
