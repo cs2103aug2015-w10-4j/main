@@ -33,7 +33,7 @@ public class Parser {
 	
 	private static final String[] ARGUMENT_EVENT = {"start", "end"};
 	private static final String[] ARGUMENTS_END_DATE = {" date ", " by "};
-	private static final String[] ARGUMENTS_SPECIAL_END_DATE = {" this ", " next ", " tomorrow", " today"};
+	private static final String[] ARGUMENTS_END_DATE_SPECIAL = {" this ", " next ", " tomorrow", " today"};
 	private static final String ARGUMENTS_PERIODIC = " every ";
 	private static final String ARGUMENT_LOC = "loc";
 	private static final String DEFAULT_DAY = "friday";
@@ -202,20 +202,20 @@ public class Parser {
 				taskObj.setStartingTime(date);
 		    }else {
 		    	taskObj.setEndingTime(date);
-				taskObj.setStartingTime(date1);
+		    	taskObj.setStartingTime(date1);
 		    }
 
-		//	SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM yyyy");
-		//	System.out.println(dateFormat.format(taskObj.getStartingTime().getTime())+" "+dateFormat.format(taskObj.getEndingTime().getTime()));
+            //	SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM yyyy");
+            //	System.out.println(dateFormat.format(taskObj.getStartingTime().getTime())+" "+dateFormat.format(taskObj.getEndingTime().getTime()));
 
             return arg;
-			
-		} else {
-			throw new Exception(WARNING_INVALID_DAY);
-		}
-			
-		} else if (hasKeyword(arg, ARGUMENTS_SPECIAL_END_DATE)) {
-			String keywordToSplitAt = getKeyword(arg, ARGUMENTS_SPECIAL_END_DATE);
+
+			} else {
+				throw new Exception(WARNING_INVALID_DAY);
+			}
+
+		} else if (hasKeyword(arg, ARGUMENTS_END_DATE_SPECIAL)) {
+			String keywordToSplitAt = getKeyword(arg, ARGUMENTS_END_DATE_SPECIAL);
 			newArgs = arg.split(keywordToSplitAt);
 			
 			date = new GregorianCalendar();			
@@ -224,42 +224,36 @@ public class Parser {
 			
 			today = date.get(Calendar.DAY_OF_WEEK);
 			todayDate = date.get(Calendar.DATE);
-			
-			switch(keywordToSplitAt) {
-				case "tomorrow":
-					setDate = todayDate + 1;
-					break;
-				case "today":
-					setDate = todayDate;
-					break;
-				case "this":
-					if(!hasKeyword(newArgs[1], DAYS)) {
-						throw new Exception(WARNING_INVALID_DAY);
-					}
-					offset = dayOfTheWeek(getKeyword(newArgs[1], DAYS)) - today;
-					if (offset < 0) {
-						offset += DAYS.length;
-					}
-					setDate = todayDate + offset;
-					break;
-				case "next":
-					if(!hasKeyword(newArgs[1], DAYS)) {
-						throw new Exception(WARNING_INVALID_DAY);
-					}
-					offset = dayOfTheWeek(getKeyword(newArgs[1], DAYS)) - today;
-					if (offset < 0) {
-						offset += DAYS.length;
-					}
-					setDate = todayDate + offset + DAYS.length;
-					break;
-				default:
-					offset = dayOfTheWeek(DEFAULT_DAY) - today;
-					if (offset < 0) {
-						offset += DAYS.length;
-					}
-					setDate = todayDate + offset;
+
+			if (keywordToSplitAt.equalsIgnoreCase(ARGUMENTS_END_DATE_SPECIAL[0])) {
+				if(!hasKeyword(newArgs[1], DAYS)) {
+					throw new Exception(WARNING_INVALID_DAY);
+				}
+				offset = dayOfTheWeek(getKeyword(newArgs[1], DAYS)) - today;
+				if (offset < 0) {
+					offset += DAYS.length;
+				}
+				setDate = todayDate + offset;
+			} else if (keywordToSplitAt.equalsIgnoreCase(ARGUMENTS_END_DATE_SPECIAL[1])) {
+				if(!hasKeyword(newArgs[1], DAYS)) {
+					throw new Exception(WARNING_INVALID_DAY);
+				}
+				offset = dayOfTheWeek(getKeyword(newArgs[1], DAYS)) - today;
+				if (offset < 0) {
+					offset += DAYS.length;
+				}
+				setDate = todayDate + offset + DAYS.length;
+			} else if (keywordToSplitAt.equalsIgnoreCase(ARGUMENTS_END_DATE_SPECIAL[2])) {
+				setDate = todayDate + 1;
+			} else if (keywordToSplitAt.equalsIgnoreCase(ARGUMENTS_END_DATE_SPECIAL[3])) {
+				setDate = todayDate;
+			} else {
+				offset = dayOfTheWeek(DEFAULT_DAY) - today;
+				if (offset < 0) {
+					offset += DAYS.length;
+				}
+				setDate = todayDate + offset;
 			}
-			
 			date.set(Calendar.DATE, setDate);
 			taskObj.setEndingTime(date);
 			return newArgs[0];
