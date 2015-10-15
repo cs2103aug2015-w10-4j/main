@@ -4,9 +4,10 @@ public class StringFormatter {
 	
 	private static final String NULL_STRING_SUBSTITUTE = "-";
 	
-	/* to align left a string S with a particular width W,
+	/* 
+	 * To align left a string S with a particular width W,
 	 * one can use : String.format("%-Ws", S); (format = "%-Ws", args = S)
-	 * Since W can be a variable, and we cannot specify W directly,
+	 * Since W is a variable and we cannot specify W directly,
 	 * we create another string as a format of this String.format, using
 	 * another String.format
 	 */

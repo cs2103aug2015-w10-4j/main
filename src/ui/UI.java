@@ -40,9 +40,9 @@ public class UI {
 	 * 
 	 * where :
 	 *  > displayArea occupies cell 1-3
-	 *  > promptLabel occupies cell 4
-	 *  > userInputField occupies cell 5-6
-	 *  > statusBar occupies cell 7-9
+	 *  > statusBar occupies cell 4-6
+	 *  > promptLabel occupies cell 7
+	 *  > userInputField occupies cell 8-9
 	 */
 	
 	/*
@@ -60,17 +60,17 @@ public class UI {
 	private static final int DISPLAY_AREA_LEN_Y = 1;
 	private static final int DISPLAY_AREA_LEN_X = 3;
 	
-	private static final int PROMPT_LABEL_POS_Y = 1;
+	private static final int PROMPT_LABEL_POS_Y = 2;
 	private static final int PROMPT_LABEL_POS_X = 0;
 	private static final int PROMPT_LABEL_LEN_Y = 1;
 	private static final int PROMPT_LABEL_LEN_X = 1;
 	
-	private static final int USER_INPUT_FIELD_POS_Y = 1;
+	private static final int USER_INPUT_FIELD_POS_Y = 2;
 	private static final int USER_INPUT_FIELD_POS_X = 1;
 	private static final int USER_INPUT_FIELD_LEN_Y = 1;
 	private static final int USER_INPUT_FIELD_LEN_X = 2;
 	
-	private static final int STATUS_BAR_POS_Y = 2;
+	private static final int STATUS_BAR_POS_Y = 1;
 	private static final int STATUS_BAR_POS_X = 0;
 	private static final int STATUS_BAR_LEN_Y = 1;
 	private static final int STATUS_BAR_LEN_X = 3;
