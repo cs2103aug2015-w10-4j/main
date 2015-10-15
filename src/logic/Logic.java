@@ -395,46 +395,6 @@ public class Logic {
 	 */
 	boolean showUpdatedItems() {
 		return UIObject.showTasks(listOfTasks);
-		/*
-		if (listOfTasks.isEmpty()) {
-			UIObject.showToUser(MESSAGE_DISPLAY_EMPTY);
-		}else{
-			String stringToDisplay = "";
-			for (int i = 0; i < listOfTasks.size(); i++) {
-				Task curTask = listOfTasks.get(i);
-				assert(curTask != null);
-				
-				// Index
-				stringToDisplay += String.format(MESSAGE_DISPLAY_TASKLINE_INDEX, i + 1);
-				
-				// Name
-				stringToDisplay += String.format("%-30.30s", curTask.getName());
-				stringToDisplay += SEPARATOR_DISPLAY_FIELDS;
-				
-				// Date
-				stringToDisplay += String.format("%-11s", (curTask.getStartingTime() != null ?
-						dateFormat.format(curTask.getStartingTime().getTime()) : ""));
-				stringToDisplay += SEPARATOR_DISPLAY_FIELDS;
-				
-				stringToDisplay += String.format("%-11s", (curTask.getEndingTime() != null ?
-						dateFormat.format(curTask.getEndingTime().getTime()) : ""));
-				stringToDisplay += SEPARATOR_DISPLAY_FIELDS;
-				
-				// Location
-				stringToDisplay += String.format("%-15s", (curTask.getLocation() != null ?
-						curTask.getLocation() : ""));
-				stringToDisplay += SEPARATOR_DISPLAY_FIELDS;
-				
-				// Periodic
-				stringToDisplay += String.format("%-15s", (curTask.getPeriodic() != null ?
-						curTask.getPeriodic() : ""));
-				
-				stringToDisplay += MESSAGE_DISPLAY_NEWLINE;
-			}
-			UIObject.showToUser(stringToDisplay);
-		}
-		return true;
-		*/
 	}
 	
 	String undoCommand(){

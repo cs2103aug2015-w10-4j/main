@@ -38,9 +38,6 @@ public class StringFormatter {
 			str = NULL_STRING_SUBSTITUTE;
 		}
 		
-		if (width < str.length()) {
-			System.out.println(width + " " + str);
-		}
 		assert width >= str.length() : "Width must be larger than or equal to str";
 		
 		String result = null;
