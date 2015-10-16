@@ -455,9 +455,8 @@ public class Logic {
 		if(task.getStartingTime() != null && task.getEndingTime() != null){
 			for(int i = 0; i < listOfTasks.size(); i++){
 				Task curTaskToCheck = listOfTasks.get(i);
-				
-				if (task.getStartingTime() != null
-						&& task.getEndingTime() != null 
+				if (curTaskToCheck.getStartingTime() != null
+						&& curTaskToCheck.getEndingTime() != null 
 						&& isClashing(task, curTaskToCheck)){
 					return true;
 				}
@@ -469,8 +468,8 @@ public class Logic {
 	boolean isClashing(Task taskOne, Task taskTwo){
 		Calendar taskOneStart = taskOne.getStartingTime();
 		Calendar taskOneEnd = taskOne.getEndingTime();
-		Calendar taskTwoStart = taskOne.getStartingTime();
-		Calendar taskTwoEnd = taskOne.getEndingTime();
+		Calendar taskTwoStart = taskTwo.getStartingTime();
+		Calendar taskTwoEnd = taskTwo.getEndingTime();
 		assert(!(taskOneStart == null));
 		assert(!(taskOneEnd == null));
 		assert(!(taskTwoStart == null));
@@ -478,9 +477,9 @@ public class Logic {
 		
 		if((taskOneStart.before(taskTwoStart) && taskOneEnd.before(taskTwoStart))
 				|| (taskTwoStart.before(taskOneStart) && taskTwoEnd.before(taskOneStart))) {
-			return true;
-		} else {
 			return false;
+		} else {
+			return true;
 		}
 	}
 	
