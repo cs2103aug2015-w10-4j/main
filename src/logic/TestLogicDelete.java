@@ -19,6 +19,65 @@ public class TestLogicDelete {
 		File saveFile = new File("save.txt");
 		saveFile.delete();
 	}
+	
+	@Test
+	public void logicDeleteMultipleOne(){
+		logicObject.listOfTasks = new ArrayList<Task>();
+		logicObject.listOfTasks.add(new Task("some item 1"));
+        logicObject.listOfTasks.add(new Task("some item 2"));	
+		logicObject.listOfTasks.add(new Task("some item 3"));
+		
+		ArrayList<String> argumentList = new ArrayList<String>();		
+
+		argumentList.add("1");
+		argumentList.add("3");
+		argumentList.add("2");
+		
+		String message = logicObject.deleteItem(argumentList, true, true);
+		assertEquals("3th Item successfully deleted. 2th Item successfully deleted. 1th Item successfully deleted. ", message);
+	}
+	
+	@Test
+	public void logicDeleteMultipleTwo(){
+		logicObject.listOfTasks = new ArrayList<Task>();
+		logicObject.listOfTasks.add(new Task("some item 1"));
+        logicObject.listOfTasks.add(new Task("some item 2"));	
+		logicObject.listOfTasks.add(new Task("some item 3"));
+		logicObject.listOfTasks.add(new Task("some item 4"));
+        logicObject.listOfTasks.add(new Task("some item 5"));	
+		logicObject.listOfTasks.add(new Task("some item 6"));
+		
+		ArrayList<String> argumentList = new ArrayList<String>();
+		
+		argumentList.add("1");
+		argumentList.add("3");
+		argumentList.add("2");
+		argumentList.add("1");
+		argumentList.add("3");
+		argumentList.add("2");
+		
+		String message = logicObject.deleteItem(argumentList, true, true);
+		assertEquals("3th Item successfully deleted. 2th Item successfully deleted. 1th Item successfully deleted. ", message);
+	}
+	
+	@Test
+	public void logicDeleteMultipleThree(){
+		logicObject.listOfTasks = new ArrayList<Task>();
+		logicObject.listOfTasks.add(new Task("some item 1"));
+    
+		
+		ArrayList<String> argumentList = new ArrayList<String>();
+		
+
+		argumentList.add("3");
+
+		
+		String message = logicObject.deleteItem(argumentList, true, true);
+		assertEquals("Error: There is no item at this index.", message);
+	}
+	
+	
+	
 	/*
 	@Test
 	public void logicDeleteOne(){
