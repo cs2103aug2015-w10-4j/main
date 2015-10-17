@@ -131,11 +131,11 @@ public class Parser {
 		Calendar date = new GregorianCalendar();
 		Calendar date1 = new GregorianCalendar();
 		if (hasKeyword(arg, ARGUMENTS_END_DATE)) {
-			return endDate(newArgs,arg, date, taskObj, ARGUMENT_ENDING);
+			return oneDateInput(newArgs,arg, date, taskObj, ARGUMENT_ENDING);
 		} else if (hasKeyword(arg, ARGUMENT_EVENT)) {
-		    return eventDate(newArgs, arg, date, date1, taskObj);
+		    return eventDatesInput(newArgs, arg, date, date1, taskObj);
 		} else if (hasKeyword(arg, ARGUMENTS_END_DATE_SPECIAL)) {
-			return specialDate(newArgs,arg, date, taskObj, ARGUMENT_ENDING);
+			return specialDateInput(newArgs,arg, date, taskObj, ARGUMENT_ENDING);
 		} else {
 			return arg;
 		}
@@ -144,7 +144,7 @@ public class Parser {
 	}
 	
 	//construct task when there is just one date in the input 
-	public String endDate(String[] newArgs,String arg, Calendar date, Task taskObj, String timeArg) throws Exception {
+	public String oneDateInput(String[] newArgs,String arg, Calendar date, Task taskObj, String timeArg) throws Exception {
 		String keywordToSplitAt = getKeyword(arg, ARGUMENTS_END_DATE);
 		newArgs = arg.split(keywordToSplitAt);
 		
@@ -178,7 +178,7 @@ public class Parser {
 	}
 	
 	//construct task when there are both starting time and endingtime
-	public String eventDate(String[] newArgs,String arg, Calendar date, Calendar date1, Task taskObj) throws Exception {
+	public String eventDatesInput(String[] newArgs,String arg, Calendar date, Calendar date1, Task taskObj) throws Exception {
 		String originalArg = arg;
 	
 		String name = extractTaskNameWithoutCommand(arg);
@@ -191,8 +191,8 @@ public class Parser {
         
 		if(hasKeyword(tempArgs[1], ARGUMENTS_END_DATE_SPECIAL)) {	
 
-					specialDate(newArgs, name + tempArgs[1], date, taskObj,ARGUMENT_STARTING);
-					specialDate(newArgs, name + newArgs[1], date, taskObj,ARGUMENT_ENDING);
+					specialDateInput(newArgs, name + tempArgs[1], date, taskObj,ARGUMENT_STARTING);
+					specialDateInput(newArgs, name + newArgs[1], date, taskObj,ARGUMENT_ENDING);
 					return name;
 		} else {
 			
@@ -258,7 +258,7 @@ public class Parser {
 	}
 	
 	//construct task when there is a special date argument
-	public String specialDate(String[] newArgs,String arg, Calendar date, Task taskObj, String timeArg) throws Exception {
+	public String specialDateInput(String[] newArgs,String arg, Calendar date, Task taskObj, String timeArg) throws Exception {
 		String keywordToSplitAt = getKeyword(arg, ARGUMENTS_END_DATE_SPECIAL);
 		newArgs = arg.split(keywordToSplitAt);
 		
