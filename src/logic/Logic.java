@@ -53,21 +53,22 @@ public class Logic {
 	private static final String MESSAGE_WELCOME = "Welcome to Tasky! This is an open source project";
 	private static final String MESSAGE_PROMPT_COMMAND = "command :";
 
-	private static final String MESSAGE_SUCCESS_UNDO_ADD = "Undo : Deleted item restored.";
-	private static final String MESSAGE_SUCCESS_REDO_ADD = "Redo : Deleted item restored.";
-	private static final String MESSAGE_SUCCESS_UNDO_DELETE = "Undo : Added item removed.";
-	private static final String MESSAGE_SUCCESS_REDO_DELETE = "Redo : Added item removed.";
+	private static final String MESSAGE_SUCCESS_UNDO_ADD = "Undo : Deleted item(s) restored.";
+	private static final String MESSAGE_SUCCESS_REDO_ADD = "Redo : Deleted item(s) restored.";
+	private static final String MESSAGE_SUCCESS_UNDO_DELETE = "Undo : Added item(s) removed.";
+	private static final String MESSAGE_SUCCESS_REDO_DELETE = "Redo : Added item(s) removed.";
 	private static final String MESSAGE_SUCCESS_UNDO_EDIT = "Undo : Reverted edits.";
 	private static final String MESSAGE_SUCCESS_REDO_EDIT = "Redo : Reverted edits.";
-	private static final String MESSAGE_SUCCESS_ADD = "Item successfully added.";
-	private static final String MESSAGE_SUCCESS_DELETE = "Item successfully deleted.";
-	private static final String MESSAGE_SUCCESS_EDIT = "Item successfully edited.";
+	private static final String MESSAGE_SUCCESS_ADD = "Item(s) successfully added.";
+	private static final String MESSAGE_SUCCESS_DELETE = "Item(s) %s successfully deleted.";
+	private static final String MESSAGE_SUCCESS_EDIT = "Item(s) %s successfully edited.";
 	private static final String MESSAGE_SUCCESS_EXIT = "Exiting program...";
 	private static final String MESSAGE_SUCCESS_DISPLAY = "Displaying items.";
 	private static final String MESSAGE_SUCCESS_CHANGE_FILE_PATH = "File path successfully changed.";
 	private static final String MESSAGE_SUCCESS_NO_CHANGE_FILE_PATH = "File path not changed. Entered file path is the same as current one used.";
 	private static final String MESSAGE_DISPLAY_EMPTY = "No items to display.";
 	private static final String SEPARATOR_DISPLAY_FIELDS = " | ";
+	private static final String SEPARATOR_ITEM_LIST = ", ";
 	private static final String ERROR_WRITING_FILE = "Error: Unable to write file.";
 	private static final String ERROR_CREATING_FILE = "Error: Unable to create file.";
 	private static final String ERROR_FILE_NOT_FOUND = "Error: Data file not found.";
@@ -101,7 +102,7 @@ public class Logic {
 			LogManager.getLogManager().reset(); // removes printout to console aka root handler
 			logHandler.setFormatter(new SimpleFormatter()); // set output to a human-readable log format
 			logger.addHandler(logHandler);
-			logger.setLevel(Level.INFO); // setting of log level
+			logger.setLevel(Level.FINER); // setting of log level
 			
 			listOfTasks = storageObject.getItemList();
 		} catch (FileNotFoundException e) {
@@ -131,6 +132,7 @@ public class Logic {
 			try {
 				String userInput = UIObject.promptUser(MESSAGE_PROMPT_COMMAND);
 				Command commandObject = parserObject.parseCommand(userInput);
+
 				String executionResult = executeCommand(commandObject, true, true);
 				UIObject.showStatusToUser(executionResult);
 				showUpdatedItems();
@@ -158,7 +160,7 @@ public class Logic {
 		}
 		
 		Command.Type commandType = commandObject.getCommandType();
-		Task userTask = commandObject.getTask();
+		Task userTask = commandObject.getTask(0);
 		ArrayList<String> argumentList = commandObject.getArguments();
 		
 		switch (commandType) {
@@ -260,7 +262,8 @@ public class Logic {
 	 * @return status string
 	 */
 	String deleteItem(ArrayList<String> argumentList, boolean shouldPushToHistory, boolean isUndoHistory) {
-		String result = "";
+		ArrayList<Integer> parsedIntArgumentList = new ArrayList<Integer>();
+		String[] argumentListForReverse = new String[argumentList.size()];
 		if (isEmptyArgumentList(argumentList)) {
 			return ERROR_INVALID_ARGUMENT;
 		}
@@ -272,51 +275,47 @@ public class Logic {
 			Collections.sort(argumentList);
 			
 			
+			ArrayList<Task> tasksRemoved = new ArrayList<Task>();
 			for(int i = argumentList.size() - 1; i >= 0; i--) {
 				int index = Integer.parseInt(argumentList.get(i)) - 1;
-				if (isValidIndex(index)) {
-					// for history
-					Task taskRemoved = listOfTasks.remove(index);
+				if (isValidIndex(index)) { 
+					parsedIntArgumentList.add(index);
+					argumentListForReverse[i] = argumentList.get(i);
+					tasksRemoved.add(listOfTasks.remove(index));
 					logger.fine("Task removed from list.");
-				
-					if(shouldPushToHistory){
-						logger.fine("Pushing command to history.");
-						if(isUndoHistory){
-							logger.finer("Command is NOT called by undo.");
-						
-							logger.finer("Attempting to reverse command and push it to history.");
-							//	handle history
-							String[] indexString = {Integer.toString(index + 1)};
-							if (!pushToHistory(new Command(Command.Type.ADD, indexString, taskRemoved))) {
-								result = ERROR_CANNOT_WRITE_TO_HISTORY;
-							}
-							result +=  (index +1) + "th " +MESSAGE_SUCCESS_DELETE +" ";
-						}else{
-							logger.finer("Command is called by undo.");
-						
-							logger.finer("Attempting to reverse command and push it to undoHistory.");
-							String[] indexString = {Integer.toString(index + 1)};
-							if (!pushToUndoHistory(new Command(Command.Type.ADD, indexString, taskRemoved))) {
-								//return ERROR_CANNOT_WRITE_TO_HISTORY;
-								result = ERROR_CANNOT_WRITE_TO_HISTORY;
-							}
-							result = ERROR_CANNOT_WRITE_TO_HISTORY;
-						}
-					} else {
-						//return MESSAGE_SUCCESS_REDO_DELETE;
-						result += (index + 1) + "th " + MESSAGE_SUCCESS_REDO_DELETE +" ";
-					}
-				
 				} else {
-					//return ERROR_INVALID_INDEX;
-					result += ERROR_INVALID_INDEX;
+					return ERROR_INVALID_INDEX;
 				}
+				
+			}
 			
+			// for history
+			if(shouldPushToHistory){
+				logger.fine("Pushing command to history.");
+				if(isUndoHistory){
+					logger.finer("Command is NOT called by undo.");
+						
+					logger.finer("Attempting to reverse command and push it to history.");
+					//	handle history
+					if (!pushToHistory(new Command(Command.Type.ADD, argumentListForReverse, tasksRemoved))) {
+						return ERROR_CANNOT_WRITE_TO_HISTORY;
+					}
+				}else{
+					logger.finer("Command is called by undo.");
+				
+					logger.finer("Attempting to reverse command and push it to undoHistory.");
+					if (!pushToUndoHistory(new Command(Command.Type.ADD, argumentListForReverse, tasksRemoved))) {
+						return ERROR_CANNOT_WRITE_TO_HISTORY;
+					}
+				}
+			} else {
+				//return MESSAGE_SUCCESS_REDO_DELETE;
+				return multipleItemFormatting(MESSAGE_SUCCESS_REDO_DELETE, parsedIntArgumentList);
 			}
 		} catch (NumberFormatException e) {
 			return ERROR_INVALID_ARGUMENT;
 		}
-		return result;
+		return multipleItemFormatting(MESSAGE_SUCCESS_DELETE, parsedIntArgumentList);
 		
 	}
 	
@@ -484,7 +483,7 @@ public class Logic {
 	}
 	
 	// Create an array with all unique elements
-	public ArrayList<String> removeDuplicates(ArrayList<String> A) {
+	private ArrayList<String> removeDuplicates(ArrayList<String> A) {
 
 		// add elements to al, including duplicates
 		HashSet<String> hs = new HashSet<>();
@@ -492,7 +491,18 @@ public class Logic {
 		A.clear();
 		A.addAll(hs);
 		
-	 return A;
+		return A;
+	}
+	private String multipleItemFormatting(String string, ArrayList<Integer> numberList){
+		Collections.sort(numberList);
+		String combinedNumberStrings = "";
+		for(int i = 0; i < numberList.size(); i++){
+			combinedNumberStrings += numberList.get(i);
+			if(i != numberList.size() - 1){
+				 combinedNumberStrings += SEPARATOR_ITEM_LIST;
+			}
+		}
+		return String.format(string, combinedNumberStrings);
 	}
 	
 	String exitProgram() {

@@ -6,7 +6,7 @@ public class Command {
 
 	private Type commandType;
 	private ArrayList<String> argumentList;
-	private Task task;
+	private ArrayList<Task> tasks;
 	
 	public enum Type {
 		ADD, EDIT, DELETE, DISPLAY, EXIT, SAVETO, UNDO, REDO;
@@ -14,25 +14,31 @@ public class Command {
 	
 	public Command(Type commandType) { 
 		setCommandType(commandType);
-		this.task = null;
+		this.tasks = null;
 		this.argumentList = null;
 	}
 	
 	public Command(Type commandType, Task task) { 
 		setCommandType(commandType);
-		setTask(task);
+		addTask(task);
 		this.argumentList = null;
 	}
 	
 	public Command(Type commandType, String[] args) { 
 		setCommandType(commandType);
 		setArguments(args);
-		this.task = null;
+		this.tasks = null;
 	}
 	
 	public Command(Type commandType, String[] args, Task task) { 
 		setCommandType(commandType);
-		setTask(task);
+		addTask(task);
+		setArguments(args);
+	}
+	
+	public Command(Type commandType, String[] args, ArrayList<Task> tasks) { 
+		setCommandType(commandType);
+		addTasks(tasks);
 		setArguments(args);
 	}
 	
@@ -41,8 +47,17 @@ public class Command {
 		return commandType;
 	}
 	
-	public Task getTask() {
-		return task;
+	public ArrayList<Task> getTasks() {
+		return tasks;
+	}
+	
+	public Task getTask(int index) {
+		if(tasks != null && tasks.size() > index) {
+			return tasks.get(index);
+		} else {
+			return null;
+		}
+		
 	}
 	
 	public ArrayList<String> getArguments() {
@@ -54,8 +69,17 @@ public class Command {
 		this.commandType = commandType;
 	}
 	
-	public void setTask(Task task) {
-		this.task = task;
+	public void addTask(Task task) {
+		if (this.tasks == null) {
+			this.tasks = new ArrayList<Task>();
+		}
+		this.tasks.add(task);
+	}
+	
+	public void addTasks(ArrayList<Task> tasks) {
+		for(int i = 0; i < tasks.size(); i++){
+			addTask(tasks.get(i));
+		}
 	}
 	
 	public void setArguments(String[] args) {
