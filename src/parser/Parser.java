@@ -38,6 +38,8 @@ public class Parser {
 	private static final String ARGUMENTS_PERIODIC = " every ";
 	private static final String ARGUMENT_LOC = "loc";
 	private static final String DEFAULT_DAY = "friday";
+	private static final String ARGUMENT_STARTING = "starting time";
+	private static final String ARGUMENT_ENDING = "ending time";
 	
 	private static final String[] MONTHS = {"jan", "feb", "mar", "apr", "may", "jun", "jul", "aug",
 		"sep", "oct", "nov", "dec"};
@@ -107,6 +109,10 @@ public class Parser {
 		return arg.split("'")[1];
 	}
 	
+	private String extractTaskNameWithoutCommand(String arg){
+		return arg.split(" ")[0];
+	}
+	
 	
 	/*
 	 * Extracts 'date' segment of the command if present returns Calendar object. Extracts 'day'
@@ -125,12 +131,11 @@ public class Parser {
 		Calendar date = new GregorianCalendar();
 		Calendar date1 = new GregorianCalendar();
 		if (hasKeyword(arg, ARGUMENTS_END_DATE)) {
-			return endDate(newArgs,arg, date, taskObj);
+			return endDate(newArgs,arg, date, taskObj, ARGUMENT_ENDING);
 		} else if (hasKeyword(arg, ARGUMENT_EVENT)) {
-			return eventDate(newArgs, arg, date, date1, taskObj);
-		
+		    return eventDate(newArgs, arg, date, date1, taskObj);
 		} else if (hasKeyword(arg, ARGUMENTS_END_DATE_SPECIAL)) {
-			return specialDate(newArgs,arg, date, taskObj);
+			return specialDate(newArgs,arg, date, taskObj, ARGUMENT_ENDING);
 		} else {
 			return arg;
 		}
@@ -138,8 +143,8 @@ public class Parser {
 		
 	}
 	
-	//construct task when there is just an  normal end date in the input 
-	public String endDate(String[] newArgs,String arg, Calendar date, Task taskObj) throws Exception {
+	//construct task when there is just one date in the input 
+	public String endDate(String[] newArgs,String arg, Calendar date, Task taskObj, String timeArg) throws Exception {
 		String keywordToSplitAt = getKeyword(arg, ARGUMENTS_END_DATE);
 		newArgs = arg.split(keywordToSplitAt);
 		
@@ -161,19 +166,35 @@ public class Parser {
 		}
 		
 		date.set(year, month, day);
+		if (timeArg.equals(ARGUMENT_ENDING)) {
 		taskObj.setEndingTime(date);
+        } else if (timeArg.equals(ARGUMENT_STARTING)) {
+        taskObj.setStartingTime(date);	
+        }
+        else {
+        	// return an exception
+        }
 		return newArgs[0];
 	}
 	
 	//construct task when there are both starting time and endingtime
 	public String eventDate(String[] newArgs,String arg, Calendar date, Calendar date1, Task taskObj) throws Exception {
+		String originalArg = arg;
+	
+		String name = extractTaskNameWithoutCommand(arg);
+		taskObj.setName(name);
 		newArgs = arg.split(ARGUMENT_TO);			
 		if(newArgs[0].indexOf(ARGUMENT_FROM) != -1) {// if there is a "start" in the input
 
 		String[] tempArgs = newArgs[0].split(ARGUMENT_FROM);
 		arg = tempArgs[0];
-		System.out.println("arg "+tempArgs[1]);
-	
+        
+		if(hasKeyword(tempArgs[1], ARGUMENTS_END_DATE_SPECIAL)) {	
+
+					specialDate(newArgs, name + tempArgs[1], date, taskObj,ARGUMENT_STARTING);
+					specialDate(newArgs, name + newArgs[1], date, taskObj,ARGUMENT_ENDING);
+					return name;
+		} else {
 			
 		
         String [] fromArgs =tempArgs[1].split(" ");
@@ -229,7 +250,7 @@ public class Parser {
         //	System.out.println(dateFormat.format(taskObj.getStartingTime().getTime())+" "+dateFormat.format(taskObj.getEndingTime().getTime()));
         
         return arg;
-		
+		}
 		} else {
 			throw new Exception(WARNING_INVALID_DAY);
 		}
@@ -237,8 +258,7 @@ public class Parser {
 	}
 	
 	//construct task when there is a special date argument
-	public String specialDate(String[] newArgs,String arg, Calendar date, Task taskObj) throws Exception {
-		System.out.println("arg is "+ arg);
+	public String specialDate(String[] newArgs,String arg, Calendar date, Task taskObj, String timeArg) throws Exception {
 		String keywordToSplitAt = getKeyword(arg, ARGUMENTS_END_DATE_SPECIAL);
 		newArgs = arg.split(keywordToSplitAt);
 		
@@ -279,9 +299,18 @@ public class Parser {
 			setDate = todayDate + offset;
 		}
 		date.set(Calendar.DATE, setDate);
-		taskObj.setEndingTime(date);
+		if (timeArg.equals(ARGUMENT_ENDING)) {
+			taskObj.setEndingTime(date);
+	        } else if (timeArg.equals(ARGUMENT_STARTING)) {
+	        taskObj.setStartingTime(date);	
+	        }
+	        else {
+	        	// return an exception
+	        }
 		return newArgs[0];
 	}
+	
+	
 	
 	/*
 	 * Extracts 'loc' segment
