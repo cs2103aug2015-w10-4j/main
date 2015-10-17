@@ -79,7 +79,8 @@ public class Logic {
 	private static final String ERROR_UI_INTERRUPTED = "Error: UI prompt has been interrupted.";
 	private static final String ERROR_NO_HISTORY = "Error: No history found.";
 	private static final String ERROR_CANNOT_WRITE_TO_HISTORY = "Error: Unable to store command in history.";
-	private static final String ERROR_TIMING_CLASH = "Error: There are clashing timings between tasks.";
+	
+	private static final String WARNING_TIMING_CLASH = "Warning: There are clashing timings between tasks.";
 
 	/*
 	 * Main program
@@ -219,11 +220,12 @@ public class Logic {
 																			// status
 			String[] argumentListForReverse = new String[userTasks.size()]; // for
 																			// undo
+			boolean hasClashes = false;
 
 			logger.fine("Checking for clashes.");
 			if (haveClashes(userTasks)) {
-				logger.finer("Clash in timing detected, exiting method.");
-				return ERROR_TIMING_CLASH;
+				logger.finer("Clash in timing detected.");
+				hasClashes = true;
 			}
 
 			if (isEmptyArgumentList(argumentList)) {
@@ -262,8 +264,12 @@ public class Logic {
 							argumentListForReverse))) {
 						return ERROR_CANNOT_WRITE_TO_HISTORY;
 					}
-					return multipleItemFormatting(MESSAGE_SUCCESS_ADD,
-							parsedIntList);
+					if (hasClashes) {
+						return WARNING_TIMING_CLASH;
+					} else {
+						return multipleItemFormatting(MESSAGE_SUCCESS_ADD,
+								parsedIntList);
+					}
 				} else {
 					logger.finer("Command is called by undo.");
 
@@ -310,9 +316,9 @@ public class Logic {
 				if (isValidIndex(index)) {
 					parsedIntArgumentList.add(index); // for status
 					argumentListForReverse[i] = argumentList.get(i); // for undo
-					
+
 					// add to start of list to maintain order
-					tasksRemoved.add(0, listOfTasks.remove(index)); 
+					tasksRemoved.add(0, listOfTasks.remove(index));
 					logger.fine("Task removed from list.");
 				} else {
 					while (tasksRemoved.size() != 0) {
@@ -376,11 +382,12 @@ public class Logic {
 		try {
 			logger.fine("Attempting to determine index.");
 			int index = Integer.parseInt(argumentList.get(0)) - 1;
+			boolean hasClashes = false;
 			if (isValidIndex(index)) {
 				// for history
 				Task taskEdited = listOfTasks.get(index);
 				if (hasClashes(userTask)) {
-					return ERROR_TIMING_CLASH;
+					hasClashes = true;
 				}
 				listOfTasks.remove(index);
 				logger.fine("Old task removed from list.");
@@ -400,9 +407,12 @@ public class Logic {
 								indexString, taskEdited))) {
 							return ERROR_CANNOT_WRITE_TO_HISTORY;
 						}
-
-						return multipleItemFormatting(MESSAGE_SUCCESS_EDIT,
-								parsedIndex);
+						if (hasClashes) {
+							return WARNING_TIMING_CLASH;
+						} else {
+							return multipleItemFormatting(MESSAGE_SUCCESS_EDIT,
+									parsedIndex);
+						}
 					} else {
 						logger.finer("Command is called by undo.");
 
@@ -566,9 +576,9 @@ public class Logic {
 		}
 		return String.format(string, combinedNumberStrings);
 	}
-	
-	public static Logic getInstance(){
-		if(logicInstance == null){
+
+	public static Logic getInstance() {
+		if (logicInstance == null) {
 			logicInstance = new Logic();
 		}
 		return logicInstance;
