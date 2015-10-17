@@ -2,12 +2,15 @@ package ui.formatter;
 
 import java.lang.reflect.Field;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
 import global.Task;
 
 public class FormatterHelper {
+	
+	private static final String EMPTY_STRING_SUBSTITUTE = "-";
 	
 	public static final String[] FIELD_NAMES = new String[] { "UNUSED",
 															  "name",
@@ -25,25 +28,29 @@ public class FormatterHelper {
 																	  "Period" };
 	
 	private static final int COLUMN_COUNT = 6;
-
+	
 	//additional space at the beginning and the end
 	private static final int ADDITIONAL_SPACE = 2;
 	
 	private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd MMM yyyy");
 
-	public static ColumnInfo[] getColumnInfo(List<Task> taskList) {
+	public static ColumnInfo[] getColumnInfo(List<Task> taskList, int lineCharLimit) {
 		int[] columnLengths = new int[COLUMN_COUNT];
 		
 		for (int i = 0; i < columnLengths.length; i++) {
 			//coulumn length should be at least as long as the column name length
-			int columnLength = TABLE_COLUMN_NAMES[i].length();
+			int columnLength = TABLE_COLUMN_NAMES[i].length() + ADDITIONAL_SPACE;
 			
 			for (int j = 0; j < taskList.size(); j++) {
 				Task task = taskList.get(j);
 				
 				if (i == 0) { //the first column is the number
 					String numberAsString = String.valueOf(i + 1);
-					columnLength = Math.max(columnLength, numberAsString.length());
+					int currentRowColumnLength = numberAsString.length();
+					if (currentRowColumnLength > lineCharLimit) {
+						currentRowColumnLength = lineCharLimit;
+					}
+					columnLength = Math.max(columnLength, currentRowColumnLength);
 				} else {
 					Field currentField = null;
 					
@@ -55,18 +62,20 @@ public class FormatterHelper {
 						String stringRepresentation = getStringRepresentation(objectInField);
 						
 						if (stringRepresentation != null) {
-							columnLength = Math.max(columnLength, stringRepresentation.length());
+							int currentRowColumnLength = stringRepresentation.length();
+							if (currentRowColumnLength > lineCharLimit) {
+								currentRowColumnLength = lineCharLimit;
+							}
+							columnLength = Math.max(columnLength, currentRowColumnLength);
 						}
 					} catch (SecurityException | NoSuchFieldException | IllegalAccessException e) {
-						System.out.println("Attempting to get " + FIELD_NAMES[i]);
 						assert currentField != null;
-						System.out.println("Getting " + currentField.getName());
 						assert false; //should not happen
 					}
 				}
 			}
 			
-			columnLengths[i] = columnLength + ADDITIONAL_SPACE;
+			columnLengths[i] = columnLength;
 		}
 		
 		ColumnInfo[] columnInfo = new ColumnInfo[COLUMN_COUNT];
@@ -92,5 +101,32 @@ public class FormatterHelper {
 		return null;
 	}
 
+	public static String[] splitString(String string, int lineCharLimit) {
+		assert lineCharLimit > 1 : "Does not work if charLimit = 1";
+		if (string == null) {
+			return new String[] {EMPTY_STRING_SUBSTITUTE};
+		}
+		
+		List<String> resultList = new ArrayList<String>();
+
+		int currentPosition = 0;
+		while (currentPosition < string.length()) {
+			if (currentPosition + lineCharLimit >= string.length()) { //we can fit all
+				resultList.add(string.substring(currentPosition, string.length()));
+				currentPosition = string.length();
+			} else {
+				int nextStartingPosition = currentPosition + lineCharLimit;
+				
+				String toAdd = string.substring(currentPosition, nextStartingPosition);
+				resultList.add(toAdd);
+				
+				currentPosition = nextStartingPosition;
+			}
+		}
+		
+		String[] resultArray = resultList.toArray(new String[] {});
+		
+		return resultArray;
+	}
 	
 }

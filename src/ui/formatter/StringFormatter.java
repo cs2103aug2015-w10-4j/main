@@ -2,8 +2,6 @@ package ui.formatter;
 
 public class StringFormatter {
 	
-	private static final String NULL_STRING_SUBSTITUTE = "-";
-	
 	/* 
 	 * To align left a string S with a particular width W,
 	 * one can use : String.format("%-Ws", S); (format = "%-Ws", args = S)
@@ -34,10 +32,7 @@ public class StringFormatter {
 	};
 	
 	public static String formatString(String str, Alignment alignment, int width) {
-		if (str == null) {
-			str = NULL_STRING_SUBSTITUTE;
-		}
-		
+		assert str != null;
 		assert width >= str.length() : "Width must be larger than or equal to str";
 		
 		String result = null;

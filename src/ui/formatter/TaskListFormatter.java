@@ -8,12 +8,15 @@ import global.Task;
 public class TaskListFormatter {
 
 	private static TaskListFormatter instance = null;
+
+	private static final String NULL_STRING_SUBSTITUTE = "";
+	
 	private static final String MESSAGE_DISPLAY_NEWLINE = System.getProperty("line.separator");
 	private static final String MESSAGE_DISPLAY_EMPTY = "No items to display.";
 	
-	private char INTERSECTION_CHAR = '+';
-	private char HORIZONTAL_CHAR = '-';
-	private char VERTICAL_CHAR = '|';
+	private static final char INTERSECTION_CHAR = '+';
+	private static final char HORIZONTAL_CHAR = '-';
+	private static final char VERTICAL_CHAR = '|';
 	
 	public static TaskListFormatter getInstance() {
 		if (instance == null) {
@@ -22,49 +25,34 @@ public class TaskListFormatter {
 		return instance;
 	}
 	
-	public String formatTaskList(List<Task> taskList) {
+	public String formatTaskList(List<Task> taskList, int lineCharLimit) {
 		if (taskList.size() == 0) {
 			return MESSAGE_DISPLAY_EMPTY;
 		}
-		ColumnInfo[] columnInfo = FormatterHelper.getColumnInfo(taskList);
+		ColumnInfo[] columnInfo = FormatterHelper.getColumnInfo(taskList, lineCharLimit);
 		
-		String result = "";
-		result += getRowSeparator(columnInfo);
-		result += getHeader(columnInfo);
+		StringBuilder result = new StringBuilder();
+		result.append(getRowSeparator(columnInfo));
+		result.append(getHeader(columnInfo));
 		for (int i = 0; i < taskList.size(); i++) {
 			Task task = taskList.get(i);
 			
-			result += getRowSeparator(columnInfo);
-			result += getRowData(columnInfo, task, i);
+			result.append(getRowSeparator(columnInfo));
+			result.append(getTaskData(columnInfo, task, i, lineCharLimit));
 		}
-		result += getFooter(columnInfo);
-		
-		return result;
-	}
-
-	private String getFooter(ColumnInfo[] columnInfo) {
-		StringBuilder result = new StringBuilder();
-		
-		result.append(INTERSECTION_CHAR);
-		for (int i = 0; i < columnInfo.length; i++) {
-			for (int j = 0; j < columnInfo[i].getColumnWidth(); j++) {
-				result.append(HORIZONTAL_CHAR);
-			}
-			result.append(INTERSECTION_CHAR);
-		}
-		result.append(MESSAGE_DISPLAY_NEWLINE);
+		result.append(getRowSeparator(columnInfo));
 		
 		return result.toString();
 	}
 
-	private String getRowData(ColumnInfo[] columnInfo, Task task, int taskId) {
+	private String getTaskData(ColumnInfo[] columnInfo, Task task, int taskId, int lineCharLimit) {
 		StringBuilder result = new StringBuilder();
 		
-		result.append(VERTICAL_CHAR);
+		String[][] columnData = new String[columnInfo.length][];
+		
 		for (int i = 0; i < columnInfo.length; i++) {
+			String stringRepresentation = null;
 			try {
-				String stringRepresentation = null;
-				
 				if (i == 0) {
 					stringRepresentation = String.valueOf(taskId + 1);
 				} else {
@@ -74,19 +62,36 @@ public class TaskListFormatter {
 					Object objectInField = currentField.get(task);
 					stringRepresentation = FormatterHelper.getStringRepresentation(objectInField);
 				}
-				
-				result.append(StringFormatter.formatString(stringRepresentation,
-														   StringFormatter.Alignment.ALIGN_LEFT,
-														   columnInfo[i].getColumnWidth()));
-				result.append(VERTICAL_CHAR);
-			
 			} catch (NoSuchFieldException | SecurityException e) {
 				assert false;
 			} catch (IllegalArgumentException | IllegalAccessException e) {
 				assert false;
 			}
+			columnData[i] = FormatterHelper.splitString(stringRepresentation, lineCharLimit);
 		}
-		result.append(MESSAGE_DISPLAY_NEWLINE);
+		
+		int rowCountForCurrentTask = 0;
+		for (int i = 0; i < columnData.length; i++) {
+			rowCountForCurrentTask = Math.max(rowCountForCurrentTask, columnData[i].length);
+		}
+		
+		for (int row = 1; row <= rowCountForCurrentTask; row++) {
+			result.append(VERTICAL_CHAR);
+			for (int i = 0; i < columnData.length; i++) {
+				if (columnData[i].length >= row) {
+					result.append(StringFormatter.formatString(columnData[i][row - 1],
+															   StringFormatter.Alignment.ALIGN_LEFT,
+															   columnInfo[i].getColumnWidth()));
+					result.append(VERTICAL_CHAR);
+				} else {
+					result.append(StringFormatter.formatString(NULL_STRING_SUBSTITUTE,
+															   StringFormatter.Alignment.ALIGN_LEFT,
+															   columnInfo[i].getColumnWidth()));
+					result.append(VERTICAL_CHAR);
+				}
+			}
+			result.append(MESSAGE_DISPLAY_NEWLINE);
+		}
 		
 		return result.toString();
 	}

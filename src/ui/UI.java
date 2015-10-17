@@ -80,6 +80,8 @@ public class UI {
 	private static final String DISPLAY_AREA_FONT_NAME = "Lucida Console";
 	private static final int DISPLAY_AREA_FONT_SIZE = 12;
 	
+	private static final int MAXIMUM_COLUMN_WIDTH = 30;
+	
 	/*
 	 * Initialization of GUI variables
 	 */
@@ -283,7 +285,7 @@ public class UI {
 	 * @return true if successful
 	 */
 	public boolean showTasks(List<Task> taskList) {
-		String textFormatTaskList = taskListFormatter.formatTaskList(taskList);
+		String textFormatTaskList = taskListFormatter.formatTaskList(taskList, MAXIMUM_COLUMN_WIDTH);
 		showToUser(textFormatTaskList);
 		return true;
 	}
