@@ -102,7 +102,6 @@ public class Parser {
 		} else if (commandWord.equalsIgnoreCase(COMMAND_EXIT)) {
 			commandObject = new Command(Command.Type.EXIT);
 		} else if (commandWord.equalsIgnoreCase(COMMAND_DISPLAY)) {
-			System.out.println("?");
 			commandObject = new Command(Command.Type.DISPLAY);
 		} else if (commandWord.equalsIgnoreCase(COMMAND_UNDO)) {
 			commandObject = new Command(Command.Type.UNDO);
