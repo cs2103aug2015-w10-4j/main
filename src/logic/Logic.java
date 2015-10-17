@@ -5,7 +5,6 @@ import global.Task;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -494,12 +493,12 @@ public class Logic {
 		
 		return A;
 	}
-	private String multipleItemFormatting(String string, ArrayList<Integer> numberList){
-		Collections.sort(numberList);
+	private String multipleItemFormatting(String string, ArrayList<Integer> parsedIntList){
+		Collections.sort(parsedIntList);
 		String combinedNumberStrings = "";
-		for(int i = 0; i < numberList.size(); i++){
-			combinedNumberStrings += numberList.get(i);
-			if(i != numberList.size() - 1){
+		for(int i = 0; i < parsedIntList.size(); i++){
+			combinedNumberStrings += (parsedIntList.get(i)+1);
+			if(i != parsedIntList.size() - 1){
 				 combinedNumberStrings += SEPARATOR_ITEM_LIST;
 			}
 		}
