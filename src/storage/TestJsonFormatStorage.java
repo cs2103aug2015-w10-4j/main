@@ -1,5 +1,7 @@
 package storage;
 
+// enable saveFile.delete() at line 89 for testing 
+// comment saveFile.delete(); at line 79 after done testing
 import static org.junit.Assert.assertEquals;
 
 import java.io.BufferedWriter;
@@ -33,7 +35,7 @@ public class TestJsonFormatStorage {
 				result.add(newTask);
 			}
 	
-			File saveFile = new File("save.txt");
+			File saveFile = new File("save1.txt");
 	/*		BufferedWriter buffWriter = new BufferedWriter(new FileWriter(saveFile));
 			buffWriter.write(TEST_ITEMS);
 			buffWriter.close();
