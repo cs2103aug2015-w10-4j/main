@@ -18,6 +18,52 @@ public class TestLogicDelete {
 		logicObject = new Logic();
 		File saveFile = new File("save.txt");
 		saveFile.delete();
+	}	
+	
+	@Test
+	public void logicDeleteOne(){
+		logicObject.listOfTasks = new ArrayList<Task>();
+		logicObject.listOfTasks.add(new Task("item 1"));
+		logicObject.listOfTasks.add(new Task("item 2"));
+		logicObject.listOfTasks.add(new Task("item 3"));
+    
+		
+		ArrayList<String> argumentList = new ArrayList<String>();
+		String message;
+		
+		argumentList.add("six");
+		message = logicObject.deleteItem(argumentList, true, true);
+		assertEquals("Error: Invalid argument for command.", message);
+		
+		argumentList.clear();
+		argumentList.add("item 12");
+		message = logicObject.deleteItem(argumentList, true, true);
+		assertEquals("Error: Invalid argument for command.", message);
+		
+		argumentList.clear();
+		argumentList.add("4");
+		message = logicObject.deleteItem(argumentList, true, true);
+		assertEquals("Error: There is no item at this index.", message);
+		
+		argumentList.clear();
+		argumentList.add("-1");
+		message = logicObject.deleteItem(argumentList, true, true);
+		assertEquals("Error: There is no item at this index.", message);
+		
+		argumentList.clear();
+		argumentList.add("0");
+		message = logicObject.deleteItem(argumentList, true, true);
+		assertEquals("Error: There is no item at this index.", message);
+		
+		argumentList.clear();
+		argumentList.add("55");
+		message = logicObject.deleteItem(argumentList, true, true);
+		assertEquals("Error: There is no item at this index.", message);
+		
+		argumentList.clear();
+		argumentList.add("2");
+		message = logicObject.deleteItem(argumentList, true, true);
+		assertEquals("Item(s) 2 successfully deleted.", message);
 	}
 	
 	@Test
@@ -64,52 +110,25 @@ public class TestLogicDelete {
 	public void logicDeleteMultipleThree(){
 		logicObject.listOfTasks = new ArrayList<Task>();
 		logicObject.listOfTasks.add(new Task("some item 1"));
-    
+        logicObject.listOfTasks.add(new Task("some item 2"));	
+		logicObject.listOfTasks.add(new Task("some item 3"));
+		logicObject.listOfTasks.add(new Task("some item 4"));
+        logicObject.listOfTasks.add(new Task("some item 5"));	
+		logicObject.listOfTasks.add(new Task("some item 6"));
 		
 		ArrayList<String> argumentList = new ArrayList<String>();
+		String message;
 		
-
-		argumentList.add("3");
-
+		argumentList.add("6");
+		argumentList.add("22");
+		argumentList.add("2");
+		argumentList.add("4");
+		argumentList.add("6");
+		argumentList.add("6");
 		
-		String message = logicObject.deleteItem(argumentList, true, true);
+		message = logicObject.deleteItem(argumentList, true, true);
 		assertEquals("Error: There is no item at this index.", message);
-	}
-	
-	
-	
-	/*
-	@Test
-	public void logicDeleteOne(){
-		String message = logicObject.deleteItem(new ArrayList<String>(), true, true);
-		assertEquals("Error: Invalid argument for command.", message);
-	}
-	
-	@Test
-	public void logicDeleteTwo(){
-		ArrayList<String> argumentList = new ArrayList<String>();
-		argumentList.add("1");
-		String message = logicObject.deleteItem(argumentList, true, true);
-		assertEquals("Error: There is no item at this index.", message);
-	}
-	
-	@Test
-	public void logicDeleteThree(){
-		ArrayList<String> argumentList = new ArrayList<String>();
-		argumentList.add("-3");
-		String message = logicObject.deleteItem(argumentList, true, true);
-		assertEquals("Error: There is no item at this index.", message);
-	}
-	
-	@Test
-	public void logicDeleteFour(){
-		logicObject.listOfTasks = new ArrayList<Task>();
-		logicObject.listOfTasks.add(new Task("some item"));
-		
-		ArrayList<String> argumentList = new ArrayList<String>();
-		argumentList.add("1");
-		String message = logicObject.deleteItem(argumentList, true, true);
-		assertEquals("Item successfully deleted.", message);
+		assertEquals(logicObject.listOfTasks.size(), 6);
 	}
 	
 	@After
@@ -117,5 +136,5 @@ public class TestLogicDelete {
 		File saveFile = new File("save.txt");
 		saveFile.delete();
 	}
-	*/
+	
 }

@@ -221,6 +221,7 @@ public class Logic {
 				logger.fine("Adding tasks to list.");
 				for(int i = 0; i < userTasks.size(); i++){
 					int index = Integer.parseInt(argumentList.get(i)) - 1;
+					assert(isValidIndex(index));
 					listOfTasks.add(index, userTasks.get(i));
 					
 					parsedIntList.add(index);
@@ -293,7 +294,7 @@ public class Logic {
 					tasksRemoved.add(0, listOfTasks.remove(index)); // add to start of list to maintain order
 					logger.fine("Task removed from list.");
 				} else {
-					for(int k = 0; tasksRemoved.size() != 0; k++){
+					while (tasksRemoved.size() != 0) {
 						listOfTasks.add(parsedIntArgumentList.get(i), tasksRemoved.remove(0));
 					}
 					
