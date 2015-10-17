@@ -25,7 +25,7 @@ public class TestLogicAdd {
 		ArrayList<Task> newTasks = new ArrayList<Task>();
 		newTasks.add(new Task("item 1"));
 		String message = logicObject.addItem(newTasks, new ArrayList<String>(), true, true);
-		assertEquals("Item successfully added.", message);
+		assertEquals("Item(s) 1 successfully added.", message);
 	}
 	
 	@Test
@@ -33,7 +33,7 @@ public class TestLogicAdd {
 		ArrayList<Task> newTasks = new ArrayList<Task>();
 		newTasks.add(new Task("\n\n\n %s %d"));
 		String message = logicObject.addItem(newTasks, new ArrayList<String>(), true, true);
-		assertEquals("Item successfully added.", message);
+		assertEquals("Item(s) 1 successfully added.", message);
 	}
 	
 	@Test
@@ -41,7 +41,7 @@ public class TestLogicAdd {
 		ArrayList<Task> newTasks = new ArrayList<Task>();
 		newTasks.add(new Task("-1"));
 		String message = logicObject.addItem(newTasks, new ArrayList<String>(), true, true);
-		assertEquals("Item successfully added.", message);
+		assertEquals("Item(s) 1 successfully added.", message);
 	}
 	
 	@After

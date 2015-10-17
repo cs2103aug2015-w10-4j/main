@@ -54,12 +54,12 @@ public class TestLogicExecute {
 		task = new Task();
 		task.setName("Submit assignment");
 		commandObject = new Command(Command.Type.ADD, task);
-		assertEquals("Item successfully added.", logicObject.executeCommand(commandObject, true, true));
+		assertEquals("Item(s) 4 successfully added.", logicObject.executeCommand(commandObject, true, true));
 		
 		// case 2
 		task.setName("%% Random item %%");
 		commandObject = new Command(Command.Type.ADD, task);
-		assertEquals("Item successfully added.", logicObject.executeCommand(commandObject, true, true));
+		assertEquals("Item(s) 5 successfully added.", logicObject.executeCommand(commandObject, true, true));
 	}
 	
 	@Test
@@ -71,7 +71,7 @@ public class TestLogicExecute {
 		args = new String[1];
 		args[0] = "2";
 		commandObject = new Command(Command.Type.DELETE, args);
-		assertEquals("Item successfully deleted.", logicObject.executeCommand(commandObject, true, true));
+		assertEquals("Item(s) 2 successfully deleted.", logicObject.executeCommand(commandObject, true, true));
 		
 		// case 2
 		// left item 1 & 3
@@ -128,15 +128,15 @@ public class TestLogicExecute {
 		task = new Task();
 		task.setName("Submit assignment");
 		commandObject = new Command(Command.Type.ADD, task);
-		assertEquals("Item successfully added.", logicObject.executeCommand(commandObject, true, true));
+		assertEquals("Item(s) 4 successfully added.", logicObject.executeCommand(commandObject, true, true));
 		
 		args = new String[1];
 		args[0] = "1";
 		commandObject = new Command(Command.Type.DELETE, args);
-		assertEquals("Item successfully deleted.", logicObject.executeCommand(commandObject, true, true));
-		assertEquals("Item successfully deleted.", logicObject.executeCommand(commandObject, true, true));
-		assertEquals("Item successfully deleted.", logicObject.executeCommand(commandObject, true, true));
-		assertEquals("Item successfully deleted.", logicObject.executeCommand(commandObject, true, true));
+		assertEquals("Item(s) 1 successfully deleted.", logicObject.executeCommand(commandObject, true, true));
+		assertEquals("Item(s) 1 successfully deleted.", logicObject.executeCommand(commandObject, true, true));
+		assertEquals("Item(s) 1 successfully deleted.", logicObject.executeCommand(commandObject, true, true));
+		assertEquals("Item(s) 1 successfully deleted.", logicObject.executeCommand(commandObject, true, true));
 		
 		
 		commandObject = new Command(Command.Type.DISPLAY);

@@ -34,7 +34,7 @@ public class TestLogicDelete {
 		argumentList.add("2");
 		
 		String message = logicObject.deleteItem(argumentList, true, true);
-		assertEquals("3th Item successfully deleted. 2th Item successfully deleted. 1th Item successfully deleted. ", message);
+		assertEquals("Item(s) 1, 2, 3 successfully deleted.", message);
 	}
 	
 	@Test
@@ -57,7 +57,7 @@ public class TestLogicDelete {
 		argumentList.add("2");
 		
 		String message = logicObject.deleteItem(argumentList, true, true);
-		assertEquals("3th Item successfully deleted. 2th Item successfully deleted. 1th Item successfully deleted. ", message);
+		assertEquals("Item(s) 1, 2, 3 successfully deleted.", message);
 	}
 	
 	@Test
