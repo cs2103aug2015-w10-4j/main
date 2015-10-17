@@ -9,6 +9,8 @@ import java.util.Arrays;
 import java.util.Scanner;
 import java.util.logging.Logger;
 
+import parser.Parser;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -16,6 +18,7 @@ import global.Task;
 
 public class JsonFormatStorage implements Storage {
 	Logger logger = Logger.getGlobal(); // use logger.<log level>(message) to log a message. default log level is info
+	private static JsonFormatStorage storageInstance = null;
 	
 	private static final String LINE_SEPARATOR = System.getProperty("line.separator");
 	private static final String DEFAULT_FILE_PATH = "save.txt";
@@ -135,6 +138,13 @@ public class JsonFormatStorage implements Storage {
 		
 		inputFileScanner.close();
 		return result;
+	}
+	
+	public static Storage getInstance(){
+		if(storageInstance == null){
+			storageInstance = new JsonFormatStorage(true);
+		}
+		return storageInstance;
 	}
 
 }

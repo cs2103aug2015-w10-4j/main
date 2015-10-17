@@ -14,6 +14,7 @@ public class Parser {
 	 * @param command
 	 * @return commandObject to be executed, or null if invalid
 	 */
+	private static Parser parserInstance = null;
 	
 	// warning messages
 	private static final String WARNING_INSUFFICIENT_ARGUMENT = "Warning: '%s': insufficient command arguments";
@@ -319,5 +320,12 @@ public class Parser {
 	
 	private int dayOfTheWeek(String dayString){
 		return Arrays.asList(DAYS).indexOf(dayString) + 1;
+	}
+	
+	public static Parser getInstance(){
+		if(parserInstance == null){
+			parserInstance = new Parser();
+		}
+		return parserInstance;
 	}
 }

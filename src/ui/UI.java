@@ -22,6 +22,7 @@ import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
 
+import parser.Parser;
 import global.Task;
 import ui.formatter.TaskListFormatter;
 
@@ -49,6 +50,7 @@ public class UI {
 	 * Declaration of variables
 	 */
 	private Logger logger = Logger.getGlobal();
+	private static UI uiInstance = null;
 	
 	private static final int DISPLAY_ROW_COUNT = 30;
 	private static final int DISPLAY_COLUMN_COUNT = 60;
@@ -305,4 +307,10 @@ public class UI {
 		return true;
 	}
 	
+	public static UI getInstance(){
+		if(uiInstance == null){
+			uiInstance = new UI();
+		}
+		return uiInstance;
+	}
 }
