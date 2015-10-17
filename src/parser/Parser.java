@@ -58,51 +58,59 @@ public class Parser {
 	 *             parsing error message
 	 */
 	public Command parseCommand(String command) throws Exception {
-		String[] args = command.split(" ", 2); // extract CommandType from
-												// command
+		String[] commandSplit = command.split(" ", 2);
+		
+		String commandWord, arguments = null;
+		commandWord = commandSplit[0];
+		if(commandSplit.length >= 2){
+			arguments = commandSplit[1];
+		}
+		
 		Command commandObject;
-		if (args[0].equalsIgnoreCase(COMMAND_ADD)) {
+		if (commandWord.equalsIgnoreCase(COMMAND_ADD)) {
 			try {
 				Task taskObj = new Task();
-				taskObj.setName(extractDate(args[1], taskObj));
-				args[1] = extractLocation(args[1], taskObj);
+				extractTaskInformation(taskObj, arguments);
 				commandObject = new Command(Command.Type.ADD, taskObj);
 			} catch (ArrayIndexOutOfBoundsException e) {
 				throw new Exception(String.format(
-						WARNING_INSUFFICIENT_ARGUMENT, args[0]));
+						WARNING_INSUFFICIENT_ARGUMENT, commandWord));
 			}
-		} else if (args[0].equalsIgnoreCase(COMMAND_EDIT)) {
+		} else if (commandWord.equalsIgnoreCase(COMMAND_EDIT)) {
 			try {
-				String[] newArgs = args[1].split(" ", 2);
-				String[] indexToDelete = { newArgs[0] };
+				String[] argumentSplit = arguments.split(" ", 2);
+				String[] indexToDelete = { argumentSplit[0] };
+				String taskInformation = argumentSplit[1];
+				
 				Task taskObj = new Task();
-				taskObj.setName(extractDate(newArgs[1], taskObj));
+				extractTaskInformation(taskObj, taskInformation);
 				commandObject = new Command(Command.Type.EDIT, indexToDelete,
 						taskObj);
 			} catch (ArrayIndexOutOfBoundsException e) {
 				throw new Exception(String.format(
-						WARNING_INSUFFICIENT_ARGUMENT, args[0]));
+						WARNING_INSUFFICIENT_ARGUMENT, commandWord));
 			}
-		} else if (args[0].equalsIgnoreCase(COMMAND_DELETE)) {
-			if (args.length >= 2) {
-				String[] indexToDelete = args[1].split(" ");
+		} else if (commandWord.equalsIgnoreCase(COMMAND_DELETE)) {
+			if (commandSplit.length >= 2) {
+				String[] indexToDelete = arguments.split(" ");
 
 				commandObject = new Command(Command.Type.DELETE, indexToDelete);
 			} else {
 				throw new Exception(String.format(
-						WARNING_INSUFFICIENT_ARGUMENT, args[0]));
+						WARNING_INSUFFICIENT_ARGUMENT, commandWord));
 			}
-		} else if (args[0].equalsIgnoreCase(COMMAND_EXIT)) {
+		} else if (commandWord.equalsIgnoreCase(COMMAND_EXIT)) {
 			commandObject = new Command(Command.Type.EXIT);
-		} else if (args[0].equalsIgnoreCase(COMMAND_DISPLAY)) {
+		} else if (commandWord.equalsIgnoreCase(COMMAND_DISPLAY)) {
+			System.out.println("?");
 			commandObject = new Command(Command.Type.DISPLAY);
-		} else if (args[0].equalsIgnoreCase(COMMAND_UNDO)) {
+		} else if (commandWord.equalsIgnoreCase(COMMAND_UNDO)) {
 			commandObject = new Command(Command.Type.UNDO);
-		} else if (args[0].equalsIgnoreCase(COMMAND_REDO)) {
+		} else if (commandWord.equalsIgnoreCase(COMMAND_REDO)) {
 			commandObject = new Command(Command.Type.REDO);
-		} else if (args[0].equalsIgnoreCase(COMMAND_SAVETO)) {
-			String[] newArgs = { args[1] };
-			commandObject = new Command(Command.Type.SAVETO, newArgs);
+		} else if (commandWord.equalsIgnoreCase(COMMAND_SAVETO)) {
+			String[] argumentArray = { arguments };
+			commandObject = new Command(Command.Type.SAVETO, argumentArray);
 		} else {
 			commandObject = null;
 		}
@@ -131,28 +139,27 @@ public class Parser {
 	 * object if date is present, else return null. Exception if day is not
 	 * spelt in full.
 	 */
-	private String extractDate(String arg, Task taskObj) throws Exception {
-		String[] newArgs = {};
+	private String extractDate(String arguments, Task taskObj) throws Exception {
 		Calendar dateOne = new GregorianCalendar();
 		Calendar dateTwo = new GregorianCalendar();
-		if (hasKeyword(arg, ARGUMENTS_END_DATE)) {
-			return oneDateInput(newArgs, arg, dateOne, taskObj, ARGUMENT_ENDING);
-		} else if (hasKeyword(arg, ARGUMENT_EVENT)) {
-			return eventDatesInput(newArgs, arg, dateOne, dateTwo, taskObj);
-		} else if (hasKeyword(arg, ARGUMENTS_END_DATE_SPECIAL)) {
-			return specialDateInput(newArgs, arg, dateOne, taskObj,
+		if (hasKeyword(arguments, ARGUMENTS_END_DATE)) {
+			return extractOneDateInput(arguments, dateOne, taskObj, ARGUMENT_ENDING);
+		} else if (hasKeyword(arguments, ARGUMENT_EVENT)) {
+			return extractEventDatesInput(arguments, dateOne, dateTwo, taskObj);
+		} else if (hasKeyword(arguments, ARGUMENTS_END_DATE_SPECIAL)) {
+			return extractSpecialDateInput(arguments, dateOne, taskObj,
 					ARGUMENT_ENDING);
 		} else {
-			return arg;
+			return arguments;
 		}
 
 	}
 
 	// construct task when there is just one date in the input
-	public String oneDateInput(String[] newArgs, String arg, Calendar date,
+	public String extractOneDateInput(String arg, Calendar date,
 			Task taskObj, String timeArg) throws Exception {
 		String keywordToSplitAt = getKeyword(arg, ARGUMENTS_END_DATE);
-		newArgs = arg.split(keywordToSplitAt);
+		String[] newArgs = arg.split(keywordToSplitAt);
 
 		String[] dateArgs = newArgs[1].split(" ");
 
@@ -181,13 +188,19 @@ public class Parser {
 		}
 		return newArgs[0];
 	}
+	
+	private boolean extractTaskInformation(Task taskObject, String arguments) throws Exception{
+		taskObject.setName(extractDate(arguments, taskObject));
+		arguments = extractLocation(arguments, taskObject);
+		return true;
+	}
 
 	// construct task when there are both starting time and endingtime
-	public String eventDatesInput(String[] newArgs, String arg, Calendar dateOne,
+	public String extractEventDatesInput(String arg, Calendar dateOne,
 			Calendar dateTwo, Task taskObj) throws Exception {
 		String name = extractTaskNameWithoutCommand(arg);
 		taskObj.setName(name);
-		newArgs = arg.split(ARGUMENT_TO);
+		String[] newArgs = arg.split(ARGUMENT_TO);
 		if (newArgs[0].indexOf(ARGUMENT_FROM) != -1) {// if there is a "start"
 														// in the input
 
@@ -195,9 +208,9 @@ public class Parser {
 			arg = tempArgs[0];
 
 			if (hasKeyword(tempArgs[1], ARGUMENTS_END_DATE_SPECIAL)) {
-				specialDateInput(newArgs, name + tempArgs[1], dateOne, taskObj,
+				extractSpecialDateInput(name + tempArgs[1], dateOne, taskObj,
 						ARGUMENT_STARTING);
-				specialDateInput(newArgs, name + newArgs[1], dateOne, taskObj,
+				extractOneDateInput(name + newArgs[1], dateOne, taskObj,
 						ARGUMENT_ENDING);
 				return name;
 			} else {
@@ -254,10 +267,10 @@ public class Parser {
 	}
 
 	// construct task when there is a special date argument
-	public String specialDateInput(String[] newArgs, String arg, Calendar date,
+	public String extractSpecialDateInput(String arg, Calendar date,
 			Task taskObj, String timeArg) throws Exception {
 		String keywordToSplitAt = getKeyword(arg, ARGUMENTS_END_DATE_SPECIAL);
-		newArgs = arg.split(keywordToSplitAt);
+		String[] newArgs = arg.split(keywordToSplitAt);
 
 		date = new GregorianCalendar();
 		int setDate, today, todayDate, offset;
@@ -315,15 +328,11 @@ public class Parser {
 	 * present
 	 */
 	private String extractLocation(String arg, Task taskObj) throws Exception {
-		String[] newArgs = {};
+		String[] newArgs;
 		String returnArg = "";
-		boolean hasLoc = false;
+		
 		if (arg.contains(ARGUMENT_LOC)) {
 			newArgs = arg.split(ARGUMENT_LOC);
-			hasLoc = true;
-		}
-
-		if (hasLoc) {
 			taskObj.setLocation(newArgs[1]);
 			returnArg = newArgs[0];
 		} else {
