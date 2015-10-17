@@ -60,7 +60,7 @@ public class Parser {
 	public Command parseCommand(String command) throws Exception {
 		String[] commandSplit = command.split(" ", 2);
 		
-		String commandWord, arguments = null;
+		String commandWord, arguments = "";
 		commandWord = commandSplit[0];
 		if(commandSplit.length >= 2){
 			arguments = commandSplit[1];
