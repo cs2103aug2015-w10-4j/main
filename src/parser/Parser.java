@@ -43,9 +43,6 @@ public class Parser {
 		"sep", "oct", "nov", "dec"};
 	private static final String[] DAYS = {"sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"};
 	
-	private Parser(){
-		// to make constructor private
-	}
 	/**
 	 * Parses the string provided and returns the corresponding object
 	 * @param command user input 
@@ -58,11 +55,7 @@ public class Parser {
 		if (args[0].equalsIgnoreCase(COMMAND_ADD)) {
 			try {
 				Task taskObj = new Task();
-				// Using old method of extracting task name temporarily for v0.1
-//				taskObj.setName(extractTaskName(args[1]));
-//				taskObj.setEndingTime(extractDate(args[1]));
 				taskObj.setName(extractDate(args[1], taskObj));
-			//	taskObj.setPeriodic(extractPeriodic(args[1], taskObj));
 				args[1] = extractLocation(args[1], taskObj);
 				commandObject = new Command(Command.Type.ADD, taskObj);
 			}
@@ -132,140 +125,164 @@ public class Parser {
 		Calendar date = new GregorianCalendar();
 		Calendar date1 = new GregorianCalendar();
 		if (hasKeyword(arg, ARGUMENTS_END_DATE)) {
-			String keywordToSplitAt = getKeyword(arg, ARGUMENTS_END_DATE);
-			newArgs = arg.split(keywordToSplitAt);
-			
-			String[] dateArgs = newArgs[1].split(" ");
-			
-			int day = Integer.parseInt(dateArgs[0]);
-			
-			int month = Arrays.asList(MONTHS).indexOf(dateArgs[1]);
-			if (month == -1) {
-				throw new Exception(WARNING_INVALID_MONTH);
-			}
-			
-			// year will be set to current year if not specified by user
-			int year;
-			try {
-				year = Integer.parseInt(dateArgs[2]);
-			} catch (ArrayIndexOutOfBoundsException|NumberFormatException e) {
-				year = Calendar.getInstance().get(Calendar.YEAR);
-			}
-			
-			date.set(year, month, day);
-			taskObj.setEndingTime(date);
-			return newArgs[0];
+			return endDate(newArgs,arg, date, taskObj);
 		} else if (hasKeyword(arg, ARGUMENT_EVENT)) {
-			newArgs = arg.split(ARGUMENT_TO);			
-			if(newArgs[0].indexOf(ARGUMENT_FROM) != -1) {// if there is a "from" in the input
-
-			String[] tempArgs = newArgs[0].split(ARGUMENT_FROM);
-			arg = tempArgs[0];
-            String [] fromArgs =tempArgs[1].split(" ");
-
-            int day = Integer.parseInt(fromArgs[1]);		
-			int month = Arrays.asList(MONTHS).indexOf(fromArgs[2]);
-			if (month == -1) {
-				throw new Exception(WARNING_INVALID_MONTH);
-			}
-			
-			// year will be set to current year if not specified by user
-			int year;
-			try {
-				year = Integer.parseInt(fromArgs[3]);
-			} catch (ArrayIndexOutOfBoundsException|NumberFormatException e) {
-				year = Calendar.getInstance().get(Calendar.YEAR);
-			}
-			
-
-            date1.set(year, month, day);
-            taskObj.setStartingTime(date1);
-            
-
-            String[] dateArgs = newArgs[1].split(" ");
-			day = Integer.parseInt(dateArgs[1]);
-			
-			month = Arrays.asList(MONTHS).indexOf(dateArgs[2]);
-			if (month == -1) {
-				throw new Exception(WARNING_INVALID_MONTH);
-			}
-			
-			// year will be set to current year if not specified by user
-
-			try {
-				year = Integer.parseInt(dateArgs[3]);
-			} catch (ArrayIndexOutOfBoundsException|NumberFormatException e) {
-				year = Calendar.getInstance().get(Calendar.YEAR);
-			}
-			
-
-            date.set(year, month, day);
-            taskObj.setEndingTime(date);
-            if(date.before(date1)){
-		    	taskObj.setEndingTime(date1);
-				taskObj.setStartingTime(date);
-		    }else {
-		    	taskObj.setEndingTime(date);
-		    	taskObj.setStartingTime(date1);
-		    }
-
-            //	SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM yyyy");
-            //	System.out.println(dateFormat.format(taskObj.getStartingTime().getTime())+" "+dateFormat.format(taskObj.getEndingTime().getTime()));
-            
-            return arg;
-
-			} else {
-				throw new Exception(WARNING_INVALID_DAY);
-			}
+			return eventDate(newArgs, arg, date, date1, taskObj);
+		
 		} else if (hasKeyword(arg, ARGUMENTS_END_DATE_SPECIAL)) {
-			String keywordToSplitAt = getKeyword(arg, ARGUMENTS_END_DATE_SPECIAL);
-			newArgs = arg.split(keywordToSplitAt);
-			
-			date = new GregorianCalendar();			
-			int setDate, today, todayDate, offset;
-			
-			
-			today = date.get(Calendar.DAY_OF_WEEK);
-			todayDate = date.get(Calendar.DATE);
-
-			if (keywordToSplitAt.equalsIgnoreCase(ARGUMENTS_END_DATE_SPECIAL[0])) {
-				if(!hasKeyword(newArgs[1], DAYS)) {
-					throw new Exception(WARNING_INVALID_DAY);
-				}
-				offset = dayOfTheWeek(getKeyword(newArgs[1], DAYS)) - today;
-				if (offset < 0) {
-					offset += DAYS.length;
-				}
-				setDate = todayDate + offset;
-			} else if (keywordToSplitAt.equalsIgnoreCase(ARGUMENTS_END_DATE_SPECIAL[1])) {
-				if(!hasKeyword(newArgs[1], DAYS)) {
-					throw new Exception(WARNING_INVALID_DAY);
-				}
-				offset = dayOfTheWeek(getKeyword(newArgs[1], DAYS)) - today;
-				if (offset < 0) {
-					offset += DAYS.length;
-				}
-				setDate = todayDate + offset + DAYS.length;
-			} else if (keywordToSplitAt.equalsIgnoreCase(ARGUMENTS_END_DATE_SPECIAL[2])) {
-				setDate = todayDate + 1;
-			} else if (keywordToSplitAt.equalsIgnoreCase(ARGUMENTS_END_DATE_SPECIAL[3])) {
-				setDate = todayDate;
-			} else {
-				offset = dayOfTheWeek(DEFAULT_DAY) - today;
-				if (offset < 0) {
-					offset += DAYS.length;
-				}
-				setDate = todayDate + offset;
-			}
-			date.set(Calendar.DATE, setDate);
-			taskObj.setEndingTime(date);
-			return newArgs[0];
+			return specialDate(newArgs,arg, date, taskObj);
 		} else {
 			return arg;
 		}
 		
 		
 	}
+	
+	//construct task when there is just an  normal end date in the input 
+	public String endDate(String[] newArgs,String arg, Calendar date, Task taskObj) throws Exception {
+		String keywordToSplitAt = getKeyword(arg, ARGUMENTS_END_DATE);
+		newArgs = arg.split(keywordToSplitAt);
+		
+		String[] dateArgs = newArgs[1].split(" ");
+		
+		int day = Integer.parseInt(dateArgs[0]);
+		
+		int month = Arrays.asList(MONTHS).indexOf(dateArgs[1]);
+		if (month == -1) {
+			throw new Exception(WARNING_INVALID_MONTH);
+		}
+		
+		// year will be set to current year if not specified by user
+		int year;
+		try {
+			year = Integer.parseInt(dateArgs[2]);
+		} catch (ArrayIndexOutOfBoundsException|NumberFormatException e) {
+			year = Calendar.getInstance().get(Calendar.YEAR);
+		}
+		
+		date.set(year, month, day);
+		taskObj.setEndingTime(date);
+		return newArgs[0];
+	}
+	
+	//construct task when there are both starting time and endingtime
+	public String eventDate(String[] newArgs,String arg, Calendar date, Calendar date1, Task taskObj) throws Exception {
+		newArgs = arg.split(ARGUMENT_TO);			
+		if(newArgs[0].indexOf(ARGUMENT_FROM) != -1) {// if there is a "start" in the input
+
+		String[] tempArgs = newArgs[0].split(ARGUMENT_FROM);
+		arg = tempArgs[0];
+		System.out.println("arg "+tempArgs[1]);
+	
+			
+		
+        String [] fromArgs =tempArgs[1].split(" ");
+        System.out.println(fromArgs.length+" "+fromArgs[0]);
+
+        int day = Integer.parseInt(fromArgs[1]);		
+		int month = Arrays.asList(MONTHS).indexOf(fromArgs[2]);
+		if (month == -1) {
+			throw new Exception(WARNING_INVALID_MONTH);
+		}
+		
+		// year will be set to current year if not specified by user
+		int year;
+		try {
+			year = Integer.parseInt(fromArgs[3]);
+		} catch (ArrayIndexOutOfBoundsException|NumberFormatException e) {
+			year = Calendar.getInstance().get(Calendar.YEAR);
+		}
+		
+
+        date1.set(year, month, day);
+        taskObj.setStartingTime(date1);
+        
+
+        String[] dateArgs = newArgs[1].split(" ");
+		day = Integer.parseInt(dateArgs[1]);
+		
+		month = Arrays.asList(MONTHS).indexOf(dateArgs[2]);
+		if (month == -1) {
+			throw new Exception(WARNING_INVALID_MONTH);
+		}
+		
+		// year will be set to current year if not specified by user
+
+		try {
+			year = Integer.parseInt(dateArgs[3]);
+		} catch (ArrayIndexOutOfBoundsException|NumberFormatException e) {
+			year = Calendar.getInstance().get(Calendar.YEAR);
+		}
+		
+
+        date.set(year, month, day);
+        taskObj.setEndingTime(date);
+        if(date.before(date1)){
+	    	taskObj.setEndingTime(date1);
+			taskObj.setStartingTime(date);
+	    }else {
+	    	taskObj.setEndingTime(date);
+	    	taskObj.setStartingTime(date1);
+	    }
+
+        //	SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM yyyy");
+        //	System.out.println(dateFormat.format(taskObj.getStartingTime().getTime())+" "+dateFormat.format(taskObj.getEndingTime().getTime()));
+        
+        return arg;
+		
+		} else {
+			throw new Exception(WARNING_INVALID_DAY);
+		}
+	
+	}
+	
+	//construct task when there is a special date argument
+	public String specialDate(String[] newArgs,String arg, Calendar date, Task taskObj) throws Exception {
+		System.out.println("arg is "+ arg);
+		String keywordToSplitAt = getKeyword(arg, ARGUMENTS_END_DATE_SPECIAL);
+		newArgs = arg.split(keywordToSplitAt);
+		
+		date = new GregorianCalendar();			
+		int setDate, today, todayDate, offset;
+		
+		
+		today = date.get(Calendar.DAY_OF_WEEK);
+		todayDate = date.get(Calendar.DATE);
+
+		if (keywordToSplitAt.equalsIgnoreCase(ARGUMENTS_END_DATE_SPECIAL[0])) {
+			if(!hasKeyword(newArgs[1], DAYS)) {
+				throw new Exception(WARNING_INVALID_DAY);
+			}
+			offset = dayOfTheWeek(getKeyword(newArgs[1], DAYS)) - today;
+			if (offset < 0) {
+				offset += DAYS.length;
+			}
+			setDate = todayDate + offset;
+		} else if (keywordToSplitAt.equalsIgnoreCase(ARGUMENTS_END_DATE_SPECIAL[1])) {
+			if(!hasKeyword(newArgs[1], DAYS)) {
+				throw new Exception(WARNING_INVALID_DAY);
+			}
+			offset = dayOfTheWeek(getKeyword(newArgs[1], DAYS)) - today;
+			if (offset < 0) {
+				offset += DAYS.length;
+			}
+			setDate = todayDate + offset + DAYS.length;
+		} else if (keywordToSplitAt.equalsIgnoreCase(ARGUMENTS_END_DATE_SPECIAL[2])) {
+			setDate = todayDate + 1;
+		} else if (keywordToSplitAt.equalsIgnoreCase(ARGUMENTS_END_DATE_SPECIAL[3])) {
+			setDate = todayDate;
+		} else {
+			offset = dayOfTheWeek(DEFAULT_DAY) - today;
+			if (offset < 0) {
+				offset += DAYS.length;
+			}
+			setDate = todayDate + offset;
+		}
+		date.set(Calendar.DATE, setDate);
+		taskObj.setEndingTime(date);
+		return newArgs[0];
+	}
+	
 	/*
 	 * Extracts 'loc' segment
 	 * pre-condition: String must contain LOCATION_ARGUMENTS
