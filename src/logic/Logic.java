@@ -37,7 +37,7 @@ public class Logic {
 	 */
 	Logger logger = Logger.getGlobal();
 	private static Logic logicInstance = null;
-	private UI UIObject;
+	UI UIObject;
 	Parser parserObject;
 	Storage storageObject;
 	History historyObject;
@@ -306,8 +306,8 @@ public class Logic {
 	 * 
 	 * @param argumentList
 	 *            all elements in this array should be integer strings elements
-	 *            the array will first have its duplicates removed, then
-	 *            sorted in an increasing order
+	 *            the array will first have its duplicates removed, then sorted
+	 *            in an increasing order
 	 * @param shouldPushToHistory
 	 * @param isUndoHistory
 	 * 
