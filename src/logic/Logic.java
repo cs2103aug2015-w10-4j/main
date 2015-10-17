@@ -37,7 +37,7 @@ public class Logic {
 	 */
 	Logger logger = Logger.getGlobal();
 	private static Logic logicInstance = null;
-	UI UIObject;
+	private UI UIObject;
 	Parser parserObject;
 	Storage storageObject;
 	History historyObject;
@@ -79,7 +79,7 @@ public class Logic {
 	private static final String ERROR_UI_INTERRUPTED = "Error: UI prompt has been interrupted.";
 	private static final String ERROR_NO_HISTORY = "Error: No history found.";
 	private static final String ERROR_CANNOT_WRITE_TO_HISTORY = "Error: Unable to store command in history.";
-	
+
 	private static final String WARNING_TIMING_CLASH = "Warning: There are clashing timings between tasks.";
 
 	/*
@@ -158,6 +158,13 @@ public class Logic {
 	/**
 	 * Executes a command based on commandObject
 	 * 
+	 * @param commandObject
+	 * @param shouldPushToHistory
+	 *            false if command is called from redo
+	 * @param isUndoHistory
+	 *            true if command is called from undo false if command is called
+	 *            by user directly
+	 * 
 	 * @return status string to be shown to user
 	 */
 	String executeCommand(Command commandObject, boolean shouldPushToHistory,
@@ -206,10 +213,16 @@ public class Logic {
 	/**
 	 * Adds an item to the list of tasks in memory
 	 * 
+	 * @param userTasks
+	 *            an arraylist of tasks to be added
 	 * @param argumentList
-	 *            if empty, last element is used. if not, the index string is
-	 *            read from position 0
+	 *            if empty, tasks will be added to the back of the list in the
+	 *            order given in userTasks else should contain the same number
+	 *            of elements as userTasks, to determine the positions the tasks
+	 *            are to be inserted at
 	 * @param shouldPushToHistory
+	 * @param isUndoHistory
+	 * 
 	 * @return status string
 	 */
 	String addItem(ArrayList<Task> userTasks, ArrayList<String> argumentList,
@@ -292,8 +305,12 @@ public class Logic {
 	 * Deletes an item from the list of tasks in memory
 	 * 
 	 * @param argumentList
-	 *            the index string is read from position 0
+	 *            all elements in this array should be integer strings elements
+	 *            the array will first have its duplicates removed, then
+	 *            sorted in an increasing order
 	 * @param shouldPushToHistory
+	 * @param isUndoHistory
+	 * 
 	 * @return status string
 	 */
 	String deleteItem(ArrayList<String> argumentList,
@@ -367,10 +384,15 @@ public class Logic {
 	/**
 	 * Replaces an item from the list of tasks in memory with the new userTask
 	 * 
-	 * @param userTask
-	 *            the new task to be replaced with
+	 * @param userTasks
+	 *            this should be of size 1 which contains the new task to
+	 *            replaced with. all other tasks will be ignored
 	 * @param argumentList
-	 *            the index string is read from position 0
+	 *            a number string, which contains the index position of the task
+	 *            to edit
+	 * @param shouldPushToHistory
+	 * @param isUndoHistory
+	 * 
 	 * @return status string
 	 */
 	String editItem(ArrayList<Task> userTasks, ArrayList<String> argumentList,
@@ -583,7 +605,8 @@ public class Logic {
 		}
 		return logicInstance;
 	}
-	public static void destroyAnyInstance(){
+
+	public static void destroyAnyInstance() {
 		logicInstance = null;
 	}
 
