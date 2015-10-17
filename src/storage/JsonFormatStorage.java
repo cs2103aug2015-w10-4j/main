@@ -30,7 +30,7 @@ public class JsonFormatStorage implements Storage {
 	/**
 	 * Default constructor for JsonFormatStorage. Does not use pretty formatting for JSON.
 	 */
-	public JsonFormatStorage() {
+	private JsonFormatStorage() {
 		gson = new GsonBuilder().serializeNulls().create();
 	}
 	

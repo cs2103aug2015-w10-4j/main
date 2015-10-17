@@ -15,9 +15,9 @@ public class TestLogicEdit {
 	
 	@Before
 	public void setup(){
-		logicObject = new Logic();
 		File saveFile = new File("save.txt");
 		saveFile.delete();
+		logicObject = Logic.getInstance();
 		
 		logicObject.listOfTasks.add(new Task("Item 1"));
 		logicObject.listOfTasks.add(new Task("Item 2"));
@@ -110,6 +110,7 @@ public class TestLogicEdit {
 	
 	@After
 	public void cleanup(){
+		Logic.destroyAnyInstance();
 		File saveFile = new File("save.txt");
 		saveFile.delete();
 	}

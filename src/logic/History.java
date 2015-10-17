@@ -13,6 +13,10 @@ public class History {
 	ArrayList<String> commandStringHistoryList = new ArrayList<String>(); // for future previous command string
 	ArrayList<Command> commandUndoHistoryList = new ArrayList<Command>();
 	
+	private History() {
+		// to make constructor private
+	}
+	
 	boolean pushCommand(Command commandObject, boolean isForUndo) {
 		if (isForUndo) {
 			commandHistoryList.add(commandObject);

@@ -22,10 +22,10 @@ public class TestLogicExecute {
 	
 	@Before
 	public void setup(){
-		logicObject = new Logic();
 		File saveFile = new File("save.txt");
 		File anotherSaveFile = new File("anotherSave.txt");
 		saveFile.delete();
+		logicObject = Logic.getInstance();
 		anotherSaveFile.delete();
 		try {
 			saveFile.createNewFile();
@@ -145,6 +145,8 @@ public class TestLogicExecute {
 	
 	@After
 	public void cleanup(){
+		Logic.destroyAnyInstance();
+		logicObject = null;
 		File saveFile = new File("save.txt");
 		File anotherSaveFile = new File("anotherSave.txt");
 		saveFile.delete();

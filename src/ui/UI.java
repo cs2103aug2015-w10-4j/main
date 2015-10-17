@@ -98,7 +98,7 @@ public class UI {
 	/*
 	 * Constructor
 	 */
-	public UI() {
+	private UI() {
 		prepareComponents();
 		addComponentsToPane(frame.getContentPane());
 		displayFrame();

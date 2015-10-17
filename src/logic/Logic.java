@@ -93,7 +93,7 @@ public class Logic {
 	/*
 	 * Constructor to initialize object variables
 	 */
-	public Logic() {
+	private Logic() {
 		UIObject = UI.getInstance();
 		parserObject = Parser.getInstance();
 		storageObject = JsonFormatStorage.getInstance();
@@ -582,6 +582,9 @@ public class Logic {
 			logicInstance = new Logic();
 		}
 		return logicInstance;
+	}
+	public static void destroyAnyInstance(){
+		logicInstance = null;
 	}
 
 	String exitProgram() {

@@ -43,6 +43,9 @@ public class Parser {
 		"sep", "oct", "nov", "dec"};
 	private static final String[] DAYS = {"sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"};
 	
+	private Parser(){
+		// to make constructor private
+	}
 	/**
 	 * Parses the string provided and returns the corresponding object
 	 * @param command user input 
