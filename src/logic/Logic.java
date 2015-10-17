@@ -58,7 +58,7 @@ public class Logic {
 	private static final String MESSAGE_SUCCESS_REDO_DELETE = "Redo : Added item(s) removed.";
 	private static final String MESSAGE_SUCCESS_UNDO_EDIT = "Undo : Reverted edits.";
 	private static final String MESSAGE_SUCCESS_REDO_EDIT = "Redo : Reverted edits.";
-	private static final String MESSAGE_SUCCESS_ADD = "Item(s) successfully added.";
+	private static final String MESSAGE_SUCCESS_ADD = "Item(s) %s successfully added.";
 	private static final String MESSAGE_SUCCESS_DELETE = "Item(s) %s successfully deleted.";
 	private static final String MESSAGE_SUCCESS_EDIT = "Item(s) %s successfully edited.";
 	private static final String MESSAGE_SUCCESS_EXIT = "Exiting program...";
@@ -144,7 +144,7 @@ public class Logic {
 				UIObject.showStatusToUser(ERROR_WRITING_FILE);
 			} catch (Exception e) {
 				// warning from parsing user command
-				e.printStackTrace();
+				//e.printStackTrace();
 				UIObject.showStatusToUser(e.getMessage());
 			}
 		}
@@ -160,20 +160,19 @@ public class Logic {
 		}
 		
 		Command.Type commandType = commandObject.getCommandType();
-		Task userTask = commandObject.getTask(0);
+		ArrayList<Task> userTasks = commandObject.getTasks();
 		ArrayList<String> argumentList = commandObject.getArguments();
 		
 		switch (commandType) {
 			case ADD :
 				logger.info("ADD command detected");
-				return addItem(userTask, argumentList, shouldPushToHistory, isUndoHistory);
+				return addItem(userTasks, argumentList, shouldPushToHistory, isUndoHistory);
 			case DELETE :
 				logger.info("DELETE command detected");
 				return deleteItem(argumentList, shouldPushToHistory, isUndoHistory);
-
 			case EDIT :
 				logger.info("EDIT command detected");
-				return editItem(userTask, argumentList, shouldPushToHistory, isUndoHistory);
+				return editItem(userTasks, argumentList, shouldPushToHistory, isUndoHistory);
 			case DISPLAY :
 				logger.info("DISPLAY command detected");
 				return displayItems();
@@ -201,27 +200,40 @@ public class Logic {
 	 * @param shouldPushToHistory
 	 * @return status string
 	 */
-	String addItem(Task userTask, ArrayList<String> argumentList, boolean shouldPushToHistory, boolean isUndoHistory) {
+	String addItem(ArrayList<Task> userTasks, ArrayList<String> argumentList, boolean shouldPushToHistory, boolean isUndoHistory) {
 		try {
 			logger.fine("Attempting to determine index.");
-			int index;
+			ArrayList<Integer> parsedIntList = new ArrayList<Integer>(); // for status
+			String[] argumentListForReverse = new String[userTasks.size()]; // for undo
+			
 			if (isEmptyArgumentList(argumentList)) {
-				index = listOfTasks.size();
-				logger.finer("No specified index. Defaulting to the end of list.");
+				for(int i = 0; i < userTasks.size(); i++){
+					int index = i+listOfTasks.size();
+					listOfTasks.add(index, userTasks.get(i));
+					
+					parsedIntList.add(index);
+					argumentListForReverse[i] = Integer.toString(index + 1);
+				}
+				logger.finer("No specified index. Defaulting all items to the end of list.");
+			} else if (argumentList.size() != userTasks.size()) {
+				return ERROR_INVALID_ARGUMENT;
 			} else {
-				index = Integer.parseInt(argumentList.get(0)) - 1;
-				logger.finer("Index " + index + " specified.");
+				logger.fine("Adding tasks to list.");
+				for(int i = 0; i < userTasks.size(); i++){
+					int index = Integer.parseInt(argumentList.get(i)) - 1;
+					listOfTasks.add(index, userTasks.get(i));
+					
+					parsedIntList.add(index);
+					argumentListForReverse[i] = argumentList.get(i);
+					logger.finer("Index " + (index + 1) + " specified.");
+				}
 			}
 			
 			logger.fine("Checking for clashes.");
-			if(hasClashes(userTask)){
+			if(haveClashes(userTasks)){
 				logger.finer("Clash in timing detected, exiting method.");
 				return ERROR_TIMING_CLASH;
 			}
-			
-			logger.fine("Adding task to list.");
-			listOfTasks.add(index, userTask);
-			
 			
 			logger.fine("Checking if command should be pushed to history.");
 			if (shouldPushToHistory) {
@@ -232,17 +244,15 @@ public class Logic {
 					logger.finer("Command is NOT called by undo.");
 					
 					logger.finer("Attempting to reverse command and push it to history.");
-					String[] indexString = {Integer.toString(index + 1)};
-					if (!pushToHistory(new Command(Command.Type.DELETE, indexString))) {
+					if (!pushToHistory(new Command(Command.Type.DELETE, argumentListForReverse))) {
 						return ERROR_CANNOT_WRITE_TO_HISTORY;
 					}
-					return MESSAGE_SUCCESS_ADD;
+					return multipleItemFormatting(MESSAGE_SUCCESS_ADD, parsedIntList);
 				} else {
 					logger.finer("Command is called by undo.");
 					
 					logger.finer("Attempting to reverse command and push it to undoHistory.");
-					String[] indexString = {Integer.toString(index + 1)};
-					if (!pushToUndoHistory(new Command(Command.Type.DELETE, indexString))) {
+					if (!pushToUndoHistory(new Command(Command.Type.DELETE, argumentListForReverse))) {
 						return ERROR_CANNOT_WRITE_TO_HISTORY;
 					}
 					return MESSAGE_SUCCESS_UNDO_ADD;
@@ -263,27 +273,30 @@ public class Logic {
 	 */
 	String deleteItem(ArrayList<String> argumentList, boolean shouldPushToHistory, boolean isUndoHistory) {
 		ArrayList<Integer> parsedIntArgumentList = new ArrayList<Integer>();
-		String[] argumentListForReverse = new String[argumentList.size()];
+		String[] argumentListForReverse;
 		if (isEmptyArgumentList(argumentList)) {
 			return ERROR_INVALID_ARGUMENT;
 		}
 	
 		try {
-			logger.fine("Attempting to determine index.");
-			
+			logger.fine("Cleaning up arguments.");
 			argumentList = removeDuplicates(argumentList);
 			Collections.sort(argumentList);
-			
+			argumentListForReverse = new String[argumentList.size()];
 			
 			ArrayList<Task> tasksRemoved = new ArrayList<Task>();
 			for(int i = argumentList.size() - 1; i >= 0; i--) {
 				int index = Integer.parseInt(argumentList.get(i)) - 1;
 				if (isValidIndex(index)) { 
-					parsedIntArgumentList.add(index);
-					argumentListForReverse[i] = argumentList.get(i);
-					tasksRemoved.add(listOfTasks.remove(index));
+					parsedIntArgumentList.add(index); // for status
+					argumentListForReverse[i] = argumentList.get(i); // for undo
+					tasksRemoved.add(0, listOfTasks.remove(index)); // add to start of list to maintain order
 					logger.fine("Task removed from list.");
 				} else {
+					for(int k = 0; tasksRemoved.size() != 0; k++){
+						listOfTasks.add(parsedIntArgumentList.get(i), tasksRemoved.remove(0));
+					}
+					
 					return ERROR_INVALID_INDEX;
 				}
 				
@@ -300,6 +313,7 @@ public class Logic {
 					if (!pushToHistory(new Command(Command.Type.ADD, argumentListForReverse, tasksRemoved))) {
 						return ERROR_CANNOT_WRITE_TO_HISTORY;
 					}
+					return multipleItemFormatting(MESSAGE_SUCCESS_DELETE, parsedIntArgumentList);
 				}else{
 					logger.finer("Command is called by undo.");
 				
@@ -307,15 +321,14 @@ public class Logic {
 					if (!pushToUndoHistory(new Command(Command.Type.ADD, argumentListForReverse, tasksRemoved))) {
 						return ERROR_CANNOT_WRITE_TO_HISTORY;
 					}
+					return MESSAGE_SUCCESS_UNDO_DELETE;
 				}
 			} else {
-				//return MESSAGE_SUCCESS_REDO_DELETE;
-				return multipleItemFormatting(MESSAGE_SUCCESS_REDO_DELETE, parsedIntArgumentList);
+				return MESSAGE_SUCCESS_REDO_DELETE;
 			}
 		} catch (NumberFormatException e) {
 			return ERROR_INVALID_ARGUMENT;
 		}
-		return multipleItemFormatting(MESSAGE_SUCCESS_DELETE, parsedIntArgumentList);
 		
 	}
 	
@@ -325,10 +338,11 @@ public class Logic {
 	 * @param argumentList the index string is read from position 0
 	 * @return status string
 	 */
-	String editItem(Task userTask, ArrayList<String> argumentList, boolean shouldPushToHistory, boolean isUndoHistory) {
+	String editItem(ArrayList<Task> userTasks, ArrayList<String> argumentList, boolean shouldPushToHistory, boolean isUndoHistory) {
 		if (isEmptyArgumentList(argumentList)) {
 			return ERROR_INVALID_ARGUMENT;
 		}
+		Task userTask = userTasks.get(0); // should only have 1 item
 		try {
 			logger.fine("Attempting to determine index.");
 			int index = Integer.parseInt(argumentList.get(0)) - 1;
@@ -350,11 +364,14 @@ public class Logic {
 						logger.finer("Command is NOT called by undo.");
 						
 						logger.finer("Attempting to reverse command and push it to history.");
+						ArrayList<Integer> parsedIndex = new ArrayList<Integer>();
+						parsedIndex.add(index);
 						String[] indexString = {Integer.toString(index + 1)};
 						if (!pushToHistory(new Command(Command.Type.EDIT, indexString, taskEdited))) {
 							return ERROR_CANNOT_WRITE_TO_HISTORY;
 						}
-						return MESSAGE_SUCCESS_EDIT;
+						
+						return multipleItemFormatting(MESSAGE_SUCCESS_EDIT, parsedIndex);
 					}else{
 						logger.finer("Command is called by undo.");
 						
@@ -450,6 +467,15 @@ public class Logic {
 		return false;
 	}
 	
+	boolean haveClashes(ArrayList<Task> tasks){
+		for(int i = 0; i < tasks.size(); i++){
+			if (hasClashes(tasks.get(i))){
+				return true;
+			}
+		}
+		return false;
+	}
+	
 	boolean hasClashes(Task task){
 		if(task.getStartingTime() != null && task.getEndingTime() != null){
 			for(int i = 0; i < listOfTasks.size(); i++){
@@ -484,13 +510,11 @@ public class Logic {
 	
 	// Create an array with all unique elements
 	private ArrayList<String> removeDuplicates(ArrayList<String> A) {
-
 		// add elements to al, including duplicates
 		HashSet<String> hs = new HashSet<>();
 		hs.addAll(A);
 		A.clear();
 		A.addAll(hs);
-		
 		return A;
 	}
 	private String multipleItemFormatting(String string, ArrayList<Integer> parsedIntList){
