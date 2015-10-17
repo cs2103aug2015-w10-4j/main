@@ -206,9 +206,15 @@ public class Logic {
 			ArrayList<Integer> parsedIntList = new ArrayList<Integer>(); // for status
 			String[] argumentListForReverse = new String[userTasks.size()]; // for undo
 			
+			logger.fine("Checking for clashes.");
+			if(haveClashes(userTasks)){
+				logger.finer("Clash in timing detected, exiting method.");
+				return ERROR_TIMING_CLASH;
+			}
+			
 			if (isEmptyArgumentList(argumentList)) {
 				for(int i = 0; i < userTasks.size(); i++){
-					int index = i+listOfTasks.size();
+					int index = i + listOfTasks.size();
 					listOfTasks.add(index, userTasks.get(i));
 					
 					parsedIntList.add(index);
@@ -221,7 +227,6 @@ public class Logic {
 				logger.fine("Adding tasks to list.");
 				for(int i = 0; i < userTasks.size(); i++){
 					int index = Integer.parseInt(argumentList.get(i)) - 1;
-					assert(isValidIndex(index));
 					listOfTasks.add(index, userTasks.get(i));
 					
 					parsedIntList.add(index);
@@ -230,11 +235,6 @@ public class Logic {
 				}
 			}
 			
-			logger.fine("Checking for clashes.");
-			if(haveClashes(userTasks)){
-				logger.finer("Clash in timing detected, exiting method.");
-				return ERROR_TIMING_CLASH;
-			}
 			
 			logger.fine("Checking if command should be pushed to history.");
 			if (shouldPushToHistory) {
@@ -470,7 +470,7 @@ public class Logic {
 	
 	boolean haveClashes(ArrayList<Task> tasks){
 		for(int i = 0; i < tasks.size(); i++){
-			if (hasClashes(tasks.get(i))){
+			if (hasClashes(tasks.get(i))) {
 				return true;
 			}
 		}
