@@ -35,13 +35,11 @@ public class Parser {
 
 	private static final String[] ARGUMENT_EVENT = { "start", "end" };
 	private static final String[] ARGUMENTS_END_DATE = { " date ", " by " };
-	private static final String[] ARGUMENTS_END_DATE_SPECIAL = { " this ",
+	private static final String[] ARGUMENTS_DATE_SPECIAL = { " this ",
 			" next ", " tomorrow", " today" };
 	private static final String ARGUMENTS_PERIODIC = " every ";
 	private static final String ARGUMENT_LOC = "loc";
 	private static final String DEFAULT_DAY = "friday";
-	private static final String ARGUMENT_STARTING = "starting time";
-	private static final String ARGUMENT_ENDING = "ending time";
 
 	private static final String[] MONTHS = { "jan", "feb", "mar", "apr", "may",
 			"jun", "jul", "aug", "sep", "oct", "nov", "dec" };
@@ -59,13 +57,13 @@ public class Parser {
 	 */
 	public Command parseCommand(String command) throws Exception {
 		String[] commandSplit = command.split(" ", 2);
-		
+
 		String commandWord, arguments = "";
 		commandWord = commandSplit[0];
-		if(commandSplit.length >= 2){
+		if (commandSplit.length >= 2) {
 			arguments = commandSplit[1];
 		}
-		
+
 		Command commandObject;
 		if (commandWord.equalsIgnoreCase(COMMAND_ADD)) {
 			try {
@@ -81,7 +79,7 @@ public class Parser {
 				String[] argumentSplit = arguments.split(" ", 2);
 				String[] indexToDelete = { argumentSplit[0] };
 				String taskInformation = argumentSplit[1];
-				
+
 				Task taskObj = new Task();
 				extractTaskInformation(taskObj, taskInformation);
 				commandObject = new Command(Command.Type.EDIT, indexToDelete,
@@ -126,9 +124,21 @@ public class Parser {
 	private String extractTaskNameWithoutCommand(String arg) {
 		return arg.split(" ")[0];
 	}
+	
+	
+	private boolean extractTaskInformation(Task taskObject, String arguments)
+			throws Exception {
+		String taskName = extractTaskNameWithoutCommand(arguments);
+		taskObject.setName(taskName);
+		String dateExtracted = extractDate(arguments, taskObject);
+		String locationExtracted = extractLocation(dateExtracted, taskObject); // for
+																				// extension
 
-	/*
-	 * Extracts 'date' segment of the command if present returns Calendar
+		return true;
+	}
+
+	/**
+	 * Extracts 'date' segment of the command if present & returns Calendar
 	 * object. Extracts 'day' segment of the command if present and returns
 	 * Calendar object - current supported parameters before day string are
 	 * 'this' and 'next' Special argument: 'tomorrow' will set date to the next
@@ -139,15 +149,10 @@ public class Parser {
 	 * spelt in full.
 	 */
 	private String extractDate(String arguments, Task taskObj) throws Exception {
-		Calendar dateOne = new GregorianCalendar();
-		Calendar dateTwo = new GregorianCalendar();
 		if (hasKeyword(arguments, ARGUMENTS_END_DATE)) {
-			return extractOneDateInput(arguments, dateOne, taskObj, ARGUMENT_ENDING);
+			return extractOneDate(arguments, taskObj);
 		} else if (hasKeyword(arguments, ARGUMENT_EVENT)) {
-			return extractEventDatesInput(arguments, dateOne, dateTwo, taskObj);
-		} else if (hasKeyword(arguments, ARGUMENTS_END_DATE_SPECIAL)) {
-			return extractSpecialDateInput(arguments, dateOne, taskObj,
-					ARGUMENT_ENDING);
+			return extractTwoDates(arguments, taskObj);
 		} else {
 			return arguments;
 		}
@@ -155,18 +160,66 @@ public class Parser {
 	}
 
 	// construct task when there is just one date in the input
-	public String extractOneDateInput(String arg, Calendar date,
-			Task taskObj, String timeArg) throws Exception {
+	private String extractOneDate(String arg, Task taskObj) throws Exception {
+		Calendar date;
 		String keywordToSplitAt = getKeyword(arg, ARGUMENTS_END_DATE);
 		String[] newArgs = arg.split(keywordToSplitAt);
+		if (hasKeyword(arg, ARGUMENTS_DATE_SPECIAL)) {
+			date = parseSpecialDate(newArgs[1]);
+		} else {
+			date = parseDate(newArgs[1]);
+		}
 
-		String[] dateArgs = newArgs[1].split(" ");
+		taskObj.setEndingTime(date);
+
+		return newArgs[0];
+	}
+
+	// construct task when there are both starting time and endingtime
+	public String extractTwoDates(String commandArguments, Task taskObj)
+			throws Exception {
+		Calendar dateOne, dateTwo;
+		String taskName = extractTaskNameWithoutCommand(commandArguments);
+		taskObj.setName(taskName);
+		assert (commandArguments.contains(ARGUMENT_FROM) && commandArguments
+				.contains(ARGUMENT_TO));
+		String[] endSplit = commandArguments.split(ARGUMENT_TO);
+		String[] startSplit = endSplit[0].split(ARGUMENT_FROM);
+		String remainingCommandString = startSplit[0];
+
+		if (hasKeyword(startSplit[1], ARGUMENTS_DATE_SPECIAL)) {
+			dateOne = parseSpecialDate(startSplit[1]);
+		} else {
+			dateOne = parseDate(startSplit[1]);
+		}
+
+		if (hasKeyword(endSplit[1], ARGUMENTS_DATE_SPECIAL)) {
+			dateTwo = parseSpecialDate(endSplit[1]);
+		} else {
+			dateTwo = parseDate(endSplit[1]);
+		}
+
+		if (dateOne.before(dateTwo)) {
+			taskObj.setEndingTime(dateTwo);
+			taskObj.setStartingTime(dateOne);
+		} else {
+			taskObj.setEndingTime(dateOne);
+			taskObj.setStartingTime(dateTwo);
+		}
+
+		return remainingCommandString;
+
+	}
+
+	private Calendar parseDate(String dateString) throws Exception {
+		dateString = dateString.trim();
+		String[] dateArgs = dateString.split(" ");
 
 		int day = Integer.parseInt(dateArgs[0]);
 
 		int month = Arrays.asList(MONTHS).indexOf(dateArgs[1]);
 		if (month == -1) {
-			throw new Exception(WARNING_INVALID_MONTH);
+			month = Calendar.getInstance().get(Calendar.MONTH);
 		}
 
 		// year will be set to current year if not specified by user
@@ -176,99 +229,14 @@ public class Parser {
 		} catch (ArrayIndexOutOfBoundsException | NumberFormatException e) {
 			year = Calendar.getInstance().get(Calendar.YEAR);
 		}
-
+		Calendar date = new GregorianCalendar();
 		date.set(year, month, day);
-		if (timeArg.equals(ARGUMENT_ENDING)) {
-			taskObj.setEndingTime(date);
-		} else if (timeArg.equals(ARGUMENT_STARTING)) {
-			taskObj.setStartingTime(date);
-		} else {
-			// return an exception
-		}
-		return newArgs[0];
-	}
-	
-	private boolean extractTaskInformation(Task taskObject, String arguments) throws Exception{
-		taskObject.setName(extractDate(arguments, taskObject));
-		arguments = extractLocation(arguments, taskObject);
-		return true;
+		return date;
 	}
 
-	// construct task when there are both starting time and endingtime
-	public String extractEventDatesInput(String arg, Calendar dateOne,
-			Calendar dateTwo, Task taskObj) throws Exception {
-		String name = extractTaskNameWithoutCommand(arg);
-		taskObj.setName(name);
-		String[] newArgs = arg.split(ARGUMENT_TO);
-		if (newArgs[0].indexOf(ARGUMENT_FROM) != -1) {// if there is a "start"
-														// in the input
-
-			String[] tempArgs = newArgs[0].split(ARGUMENT_FROM);
-			arg = tempArgs[0];
-
-			if (hasKeyword(tempArgs[1], ARGUMENTS_END_DATE_SPECIAL)) {
-				extractSpecialDateInput(name + tempArgs[1], dateOne, taskObj,
-						ARGUMENT_STARTING);
-				extractOneDateInput(name + newArgs[1], dateOne, taskObj,
-						ARGUMENT_ENDING);
-				return name;
-			} else {
-				String[] fromArgs = tempArgs[1].split(" ");
-
-				int day = Integer.parseInt(fromArgs[1]);
-				int month = Arrays.asList(MONTHS).indexOf(fromArgs[2]);
-				if (month == -1) {
-					throw new Exception(WARNING_INVALID_MONTH);
-				}
-
-				// year will be set to current year if not specified by user
-				int year;
-				try {
-					year = Integer.parseInt(fromArgs[3]);
-				} catch (ArrayIndexOutOfBoundsException | NumberFormatException e) {
-					year = Calendar.getInstance().get(Calendar.YEAR);
-				}
-
-				dateTwo.set(year, month, day);
-				taskObj.setStartingTime(dateTwo);
-
-				String[] dateArgs = newArgs[1].split(" ");
-				day = Integer.parseInt(dateArgs[1]);
-
-				month = Arrays.asList(MONTHS).indexOf(dateArgs[2]);
-				if (month == -1) {
-					throw new Exception(WARNING_INVALID_MONTH);
-				}
-
-				// year will be set to current year if not specified by user
-
-				try {
-					year = Integer.parseInt(dateArgs[3]);
-				} catch (ArrayIndexOutOfBoundsException | NumberFormatException e) {
-					year = Calendar.getInstance().get(Calendar.YEAR);
-				}
-
-				dateOne.set(year, month, day);
-				if (dateOne.before(dateTwo)) {
-					taskObj.setEndingTime(dateTwo);
-					taskObj.setStartingTime(dateOne);
-				} else {
-					taskObj.setEndingTime(dateOne);
-					taskObj.setStartingTime(dateTwo);
-				}
-
-				return arg;
-			}
-		} else {
-			throw new Exception(WARNING_INVALID_DAY);
-		}
-
-	}
-
-	// construct task when there is a special date argument
-	public String extractSpecialDateInput(String arg, Calendar date,
-			Task taskObj, String timeArg) throws Exception {
-		String keywordToSplitAt = getKeyword(arg, ARGUMENTS_END_DATE_SPECIAL);
+	private Calendar parseSpecialDate(String arg) throws Exception {
+		Calendar date = new GregorianCalendar();
+		String keywordToSplitAt = getKeyword(arg, ARGUMENTS_DATE_SPECIAL);
 		String[] newArgs = arg.split(keywordToSplitAt);
 
 		date = new GregorianCalendar();
@@ -277,7 +245,7 @@ public class Parser {
 		today = date.get(Calendar.DAY_OF_WEEK);
 		todayDate = date.get(Calendar.DATE);
 
-		if (keywordToSplitAt.equalsIgnoreCase(ARGUMENTS_END_DATE_SPECIAL[0])) {
+		if (keywordToSplitAt.equalsIgnoreCase(ARGUMENTS_DATE_SPECIAL[0])) {
 			if (!hasKeyword(newArgs[1], DAYS)) {
 				throw new Exception(WARNING_INVALID_DAY);
 			}
@@ -286,8 +254,7 @@ public class Parser {
 				offset += DAYS.length;
 			}
 			setDate = todayDate + offset;
-		} else if (keywordToSplitAt
-				.equalsIgnoreCase(ARGUMENTS_END_DATE_SPECIAL[1])) {
+		} else if (keywordToSplitAt.equalsIgnoreCase(ARGUMENTS_DATE_SPECIAL[1])) {
 			if (!hasKeyword(newArgs[1], DAYS)) {
 				throw new Exception(WARNING_INVALID_DAY);
 			}
@@ -296,11 +263,9 @@ public class Parser {
 				offset += DAYS.length;
 			}
 			setDate = todayDate + offset + DAYS.length;
-		} else if (keywordToSplitAt
-				.equalsIgnoreCase(ARGUMENTS_END_DATE_SPECIAL[2])) {
+		} else if (keywordToSplitAt.equalsIgnoreCase(ARGUMENTS_DATE_SPECIAL[2])) {
 			setDate = todayDate + 1;
-		} else if (keywordToSplitAt
-				.equalsIgnoreCase(ARGUMENTS_END_DATE_SPECIAL[3])) {
+		} else if (keywordToSplitAt.equalsIgnoreCase(ARGUMENTS_DATE_SPECIAL[3])) {
 			setDate = todayDate;
 		} else {
 			offset = dayOfTheWeek(DEFAULT_DAY) - today;
@@ -310,14 +275,8 @@ public class Parser {
 			setDate = todayDate + offset;
 		}
 		date.set(Calendar.DATE, setDate);
-		if (timeArg.equals(ARGUMENT_ENDING)) {
-			taskObj.setEndingTime(date);
-		} else if (timeArg.equals(ARGUMENT_STARTING)) {
-			taskObj.setStartingTime(date);
-		} else {
-			// return an exception
-		}
-		return newArgs[0];
+
+		return date;
 	}
 
 	/*
@@ -329,7 +288,7 @@ public class Parser {
 	private String extractLocation(String arg, Task taskObj) throws Exception {
 		String[] newArgs;
 		String returnArg = "";
-		
+
 		if (arg.contains(ARGUMENT_LOC)) {
 			newArgs = arg.split(ARGUMENT_LOC);
 			taskObj.setLocation(newArgs[1]);
