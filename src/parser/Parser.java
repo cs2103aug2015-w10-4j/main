@@ -13,10 +13,11 @@ import java.util.logging.Logger;
 
 /**
  * To allow parser to parse a new field for task,
- * 1. Define a list of keywords to identify field
- * 2. Define a new get<newfield>Field which adds a KeywordMarker to the list
+ * 1. Add to enum FieldType
+ * 2. Define an array of keywords to identify field
+ * 3. Define a new get<newfield>Field which adds a KeywordMarker to the list
  * and execute it in getArrayOfKeywordIndexes
- * 3. Define a new extract<newfield> method to handle parsing of arguments
+ * 4. Define a new extract<newfield> method to handle parsing of arguments
  * and execute it in extractTaskInformation
  * Use getArgumentForField to retrieve the array of argument words
  *
@@ -54,9 +55,9 @@ public class Parser {
 
 	private enum FieldType {
 		START_EVENT, END_EVENT, DEADLINE, LOCATION, THREECHARMONTH, FULLDAY, PERIODIC
-	}// SPECIAL,
+	}
 
-	private static final String[] LOCATION = { "loc" };
+	private static final String[] LOCATION = { "loc" , "at" };
 	private static final String[] DEADLINE = { "by" };
 	private static final String[] START_EVENT = { "start" };
 	private static final String[] END_EVENT = { "end" };
@@ -118,7 +119,8 @@ public class Parser {
 			commandObject.setArguments(argumentArray);
 			break;
 		default:
-			throw new Exception("parseCommand: no command word identified.");
+			//oops
+			//throw new Exception("parseCommand: no command word identified.");
 		}
 		return commandObject;
 	}
@@ -165,7 +167,7 @@ public class Parser {
 			} else if (isCommandKeyword(firstWord, COMMAND_EXIT)) {
 				return Command.Type.EXIT;
 			} else {
-				return null;// default to add
+				return null;// default to add?
 			}
 		}
 	}
@@ -179,6 +181,8 @@ public class Parser {
 		}
 		return false;
 	}
+	
+	
 
 	private boolean extractTaskInformation(String commandString, Task taskObject)
 			throws Exception {
@@ -189,7 +193,19 @@ public class Parser {
 		logger.fine("extractedTaskInformation: extracting data from string");
 		extractName(commandString, keywordMarkers, taskObject);
 		extractDate(commandString, keywordMarkers, taskObject);
+		extractLocation(commandString, keywordMarkers, taskObject);
 		return true;
+	}
+	
+	private boolean extractLocation(String commandString, ArrayList<KeywordMarker> keywordMarkers, Task taskObject) throws Exception{
+		String[] locationArguments = getArgumentsForField(commandString, keywordMarkers, FieldType.LOCATION);
+		if(locationArguments.length == 1){
+			logger.finer("extractLocation: argument length is 1.");
+			taskObject.setLocation(locationArguments[0]);
+			return true;
+		} else {
+			throw new Exception("extractLocation: invalid number of arguments");
+		}
 	}
 
 	private boolean extractDate(String commandString,
@@ -198,7 +214,7 @@ public class Parser {
 		logger.fine("extractDate: getting date arguments");
 		String[] deadlineArguments = getArgumentsForField(commandString,
 				keywordMarkers, FieldType.DEADLINE);
-		if(deadlineArguments!=null){
+		if (deadlineArguments != null) {
 			for(int i = 0; i < deadlineArguments.length; i++){
 				logger.finer("extractDate: deadlineArguments[" + i + "] contains " +  deadlineArguments[i]);
 			}
@@ -322,6 +338,7 @@ public class Parser {
 	private ArrayList<KeywordMarker> getArrayOfKeywordIndexes(
 			String commandString) throws Exception {
 		ArrayList<KeywordMarker> keywordMarkerList = new ArrayList<KeywordMarker>();
+		
 		getLocationField(keywordMarkerList, commandString);
 		getDateField(keywordMarkerList, commandString);
 
@@ -333,6 +350,7 @@ public class Parser {
 		KeywordMarker markerForLocation = getKeywordMarker(commandString,
 				LOCATION);
 		if (markerForLocation != null) {
+			markerForLocation.setFieldType(FieldType.LOCATION);
 			curMarkerList.add(markerForLocation);
 			return true;
 		}
