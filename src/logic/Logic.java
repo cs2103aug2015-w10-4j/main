@@ -66,7 +66,6 @@ public class Logic {
 	private static final String MESSAGE_SUCCESS_CHANGE_FILE_PATH = "File path successfully changed.";
 	private static final String MESSAGE_SUCCESS_NO_CHANGE_FILE_PATH = "File path not changed. Entered file path is the same as current one used.";
 	private static final String MESSAGE_DISPLAY_EMPTY = "No items to display.";
-	private static final String SEPARATOR_DISPLAY_FIELDS = " | ";
 	private static final String SEPARATOR_ITEM_LIST = ", ";
 	private static final String ERROR_WRITING_FILE = "Error: Unable to write file.";
 	private static final String ERROR_CREATING_FILE = "Error: Unable to create file.";
@@ -135,7 +134,6 @@ public class Logic {
 			try {
 				String userInput = UIObject.promptUser(MESSAGE_PROMPT_COMMAND);
 				Command commandObject = parserObject.parseCommand(userInput);
-
 				String executionResult = executeCommand(commandObject, true,
 						true);
 				UIObject.showStatusToUser(executionResult);

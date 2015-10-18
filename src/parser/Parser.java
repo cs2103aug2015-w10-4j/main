@@ -4,6 +4,7 @@ import global.Command;
 import global.Task;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -22,22 +23,54 @@ public class Parser {
 	private static final String WARNING_INVALID_DAY = "Invalid day specified!";
 	private static final String WARNING_INVALID_MONTH = "Invalid month specified!";
 
-	private static final String COMMAND_ADD = "add";
-	private static final String COMMAND_EDIT = "edit";
-	private static final String COMMAND_DELETE = "delete";
-	private static final String COMMAND_UNDO = "undo";
-	private static final String COMMAND_REDO = "redo";
-	private static final String COMMAND_EXIT = "exit";
-	private static final String COMMAND_DISPLAY = "display";
-	private static final String COMMAND_SAVETO = "saveto";
+	private static final String[] COMMAND_ADD = { "add" };
+	private static final String[] COMMAND_EDIT = { "edit" };
+	private static final String[] COMMAND_DELETE = { "delete" };
+	private static final String[] COMMAND_UNDO = { "undo" };
+	private static final String[] COMMAND_REDO = { "redo" };
+	private static final String[] COMMAND_EXIT = { "exit" };
+	private static final String[] COMMAND_DISPLAY = { "display" };
+	private static final String[] COMMAND_SAVETO = { "saveto" };
+
+	private static class WordList {
+		String name;
+		ArrayList<String> listOfWords = new ArrayList<String>();
+
+		WordList(String listName, String[] wordList) {
+			name = listName;
+			for (int i = 0; i < wordList.length; i++) {
+				listOfWords.add(wordList[i]);
+			}
+		}
+
+		private String getName() {
+			return this.name;
+		}
+
+		private String returnIfContainsString(String partOfCommandString) {
+			for (int i = 0; i < listOfWords.size(); i++) {
+				String curWord = listOfWords.get(i);
+				if (partOfCommandString.contains(curWord)) {
+					return curWord;
+				}
+			}
+			return null;
+		}
+	};
+
+	private ArrayList<WordList> keywordDate;
+	private ArrayList<WordList> keywordPeriodic;
+	private ArrayList<WordList> keywordMonth;
+	private ArrayList<WordList> keywordDay;
+	private ArrayList<WordList> keywordCommand;
 	private static final String ARGUMENT_FROM = "start";
 	private static final String ARGUMENT_TO = "end";
 
-	private static final String[] ARGUMENT_EVENT = { "start", "end" };
-	private static final String[] ARGUMENTS_END_DATE = { " date ", " by " };
-	private static final String[] ARGUMENTS_DATE_SPECIAL = { " this ",
-			" next ", " tomorrow", " today" };
-	private static final String ARGUMENTS_PERIODIC = " every ";
+	private static final String[] DATE_EVENT = { "start", "end" };
+	private static final String[] DATE_END = { "date", "by" };
+	private static final String[] DATE_SPECIAL = { "this",
+			"next", "tomorrow", "today" };
+	private static final String ARGUMENTS_PERIODIC = "every";
 	private static final String ARGUMENT_LOC = "loc";
 	private static final String DEFAULT_DAY = "friday";
 
@@ -45,6 +78,42 @@ public class Parser {
 			"jun", "jul", "aug", "sep", "oct", "nov", "dec" };
 	private static final String[] DAYS = { "sunday", "monday", "tuesday",
 			"wednesday", "thursday", "friday", "saturday" };
+
+	private Parser() {
+		keywordCommand = new ArrayList<WordList>();
+		WordList add = new WordList("add", COMMAND_ADD);
+		WordList edit = new WordList("edit", COMMAND_EDIT);
+		WordList delete = new WordList("delete", COMMAND_DELETE);
+		WordList undo = new WordList("undo", COMMAND_UNDO);
+		WordList redo = new WordList("redo", COMMAND_REDO);
+		WordList display = new WordList("display", COMMAND_DISPLAY);
+		WordList saveto = new WordList("saveto", COMMAND_SAVETO);
+		WordList exit = new WordList("exit", COMMAND_EXIT);
+		keywordCommand.add(add);
+		keywordCommand.add(edit);
+		keywordCommand.add(delete);
+		keywordCommand.add(undo);
+		keywordCommand.add(redo);
+		keywordCommand.add(display);
+		keywordCommand.add(saveto);
+		keywordCommand.add(exit);
+		
+		keywordDate = new ArrayList<WordList>();
+		WordList event = new WordList("event", DATE_EVENT);
+		WordList end = new WordList("end", DATE_END);
+		WordList special = new WordList("special", DATE_SPECIAL);
+		keywordDate.add(event);
+		keywordDate.add(end);
+		keywordDate.add(special);
+
+		keywordMonth = new ArrayList<WordList>();
+		WordList threeCharMonth = new WordList("threeCharMonth", MONTHS);
+		keywordMonth.add(threeCharMonth);
+
+		keywordDay = new ArrayList<WordList>();
+		WordList fullDay = new WordList("fullDay", DAYS);
+		keywordDay.add(fullDay);
+	}
 
 	/**
 	 * Parses the string provided and returns the corresponding object
@@ -65,7 +134,7 @@ public class Parser {
 		}
 
 		Command commandObject;
-		if (commandWord.equalsIgnoreCase(COMMAND_ADD)) {
+		if (hasKeyword(commandWord, keywordCommand, "add")) {
 			try {
 				Task taskObj = new Task();
 				extractTaskInformation(taskObj, arguments);
@@ -74,7 +143,7 @@ public class Parser {
 				throw new Exception(String.format(
 						WARNING_INSUFFICIENT_ARGUMENT, commandWord));
 			}
-		} else if (commandWord.equalsIgnoreCase(COMMAND_EDIT)) {
+		} else if (hasKeyword(commandWord, keywordCommand, "edit")) {
 			try {
 				String[] argumentSplit = arguments.split(" ", 2);
 				String[] indexToDelete = { argumentSplit[0] };
@@ -88,7 +157,7 @@ public class Parser {
 				throw new Exception(String.format(
 						WARNING_INSUFFICIENT_ARGUMENT, commandWord));
 			}
-		} else if (commandWord.equalsIgnoreCase(COMMAND_DELETE)) {
+		} else if (hasKeyword(commandWord, keywordCommand, "delete")) {
 			if (commandSplit.length >= 2) {
 				String[] indexToDelete = arguments.split(" ");
 
@@ -97,15 +166,15 @@ public class Parser {
 				throw new Exception(String.format(
 						WARNING_INSUFFICIENT_ARGUMENT, commandWord));
 			}
-		} else if (commandWord.equalsIgnoreCase(COMMAND_EXIT)) {
+		} else if (hasKeyword(commandWord, keywordCommand, "exit")) {
 			commandObject = new Command(Command.Type.EXIT);
-		} else if (commandWord.equalsIgnoreCase(COMMAND_DISPLAY)) {
+		} else if (hasKeyword(commandWord, keywordCommand, "display")) {
 			commandObject = new Command(Command.Type.DISPLAY);
-		} else if (commandWord.equalsIgnoreCase(COMMAND_UNDO)) {
+		} else if (hasKeyword(commandWord, keywordCommand, "undo")) {
 			commandObject = new Command(Command.Type.UNDO);
-		} else if (commandWord.equalsIgnoreCase(COMMAND_REDO)) {
+		} else if (hasKeyword(commandWord, keywordCommand, "redo")) {
 			commandObject = new Command(Command.Type.REDO);
-		} else if (commandWord.equalsIgnoreCase(COMMAND_SAVETO)) {
+		} else if (hasKeyword(commandWord, keywordCommand, "saveto")) {
 			String[] argumentArray = { arguments };
 			commandObject = new Command(Command.Type.SAVETO, argumentArray);
 		} else {
@@ -124,15 +193,15 @@ public class Parser {
 	private String extractTaskNameWithoutCommand(String arg) {
 		return arg.split(" ")[0];
 	}
-	
-	
+
 	private boolean extractTaskInformation(Task taskObject, String arguments)
 			throws Exception {
-		String taskName = extractTaskNameWithoutCommand(arguments);
-		taskObject.setName(taskName);
+		//String taskName = extractTaskNameWithoutCommand(arguments);
+		
 		String dateExtracted = extractDate(arguments, taskObject);
 		String locationExtracted = extractLocation(dateExtracted, taskObject); // for
 																				// extension
+		taskObject.setName(locationExtracted);
 
 		return true;
 	}
@@ -149,9 +218,9 @@ public class Parser {
 	 * spelt in full.
 	 */
 	private String extractDate(String arguments, Task taskObj) throws Exception {
-		if (hasKeyword(arguments, ARGUMENTS_END_DATE)) {
+		if (hasKeyword(arguments, keywordDate, "end")) {
 			return extractOneDate(arguments, taskObj);
-		} else if (hasKeyword(arguments, ARGUMENT_EVENT)) {
+		} else if (hasKeyword(arguments, keywordDate, "event")) {
 			return extractTwoDates(arguments, taskObj);
 		} else {
 			return arguments;
@@ -159,12 +228,24 @@ public class Parser {
 
 	}
 
+	private boolean hasDate(String argumentString) {
+		for (int i = 0; i < keywordDate.size(); i++) {
+			WordList curWordList = keywordDate.get(i);
+			String wordFound = curWordList
+					.returnIfContainsString(argumentString);
+			if (wordFound != null) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	// construct task when there is just one date in the input
 	private String extractOneDate(String arg, Task taskObj) throws Exception {
 		Calendar date;
-		String keywordToSplitAt = getKeyword(arg, ARGUMENTS_END_DATE);
+		String keywordToSplitAt = getKeyword(arg, keywordDate, "end");
 		String[] newArgs = arg.split(keywordToSplitAt);
-		if (hasKeyword(arg, ARGUMENTS_DATE_SPECIAL)) {
+		if (hasKeyword(arg, keywordDate, "special")) {
 			date = parseSpecialDate(newArgs[1]);
 		} else {
 			date = parseDate(newArgs[1]);
@@ -187,13 +268,13 @@ public class Parser {
 		String[] startSplit = endSplit[0].split(ARGUMENT_FROM);
 		String remainingCommandString = startSplit[0];
 
-		if (hasKeyword(startSplit[1], ARGUMENTS_DATE_SPECIAL)) {
+		if (hasKeyword(startSplit[1], keywordDate, "special")) {
 			dateOne = parseSpecialDate(startSplit[1]);
 		} else {
 			dateOne = parseDate(startSplit[1]);
 		}
 
-		if (hasKeyword(endSplit[1], ARGUMENTS_DATE_SPECIAL)) {
+		if (hasKeyword(endSplit[1], keywordDate, "special")) {
 			dateTwo = parseSpecialDate(endSplit[1]);
 		} else {
 			dateTwo = parseDate(endSplit[1]);
@@ -236,7 +317,7 @@ public class Parser {
 
 	private Calendar parseSpecialDate(String arg) throws Exception {
 		Calendar date = new GregorianCalendar();
-		String keywordToSplitAt = getKeyword(arg, ARGUMENTS_DATE_SPECIAL);
+		String keywordToSplitAt = getKeyword(arg, keywordDate, "special");
 		String[] newArgs = arg.split(keywordToSplitAt);
 
 		date = new GregorianCalendar();
@@ -245,27 +326,27 @@ public class Parser {
 		today = date.get(Calendar.DAY_OF_WEEK);
 		todayDate = date.get(Calendar.DATE);
 
-		if (keywordToSplitAt.equalsIgnoreCase(ARGUMENTS_DATE_SPECIAL[0])) {
-			if (!hasKeyword(newArgs[1], DAYS)) {
+		if (keywordToSplitAt.equalsIgnoreCase(DATE_SPECIAL[0])) {
+			if (!hasKeyword(newArgs[1], keywordDay)) {
 				throw new Exception(WARNING_INVALID_DAY);
 			}
-			offset = dayOfTheWeek(getKeyword(newArgs[1], DAYS)) - today;
+			offset = dayOfTheWeek(getKeyword(newArgs[1], keywordDay)) - today;
 			if (offset < 0) {
 				offset += DAYS.length;
 			}
 			setDate = todayDate + offset;
-		} else if (keywordToSplitAt.equalsIgnoreCase(ARGUMENTS_DATE_SPECIAL[1])) {
-			if (!hasKeyword(newArgs[1], DAYS)) {
+		} else if (keywordToSplitAt.equalsIgnoreCase(DATE_SPECIAL[1])) {
+			if (!hasKeyword(newArgs[1], keywordDay)) {
 				throw new Exception(WARNING_INVALID_DAY);
 			}
-			offset = dayOfTheWeek(getKeyword(newArgs[1], DAYS)) - today;
+			offset = dayOfTheWeek(getKeyword(newArgs[1], keywordDay)) - today;
 			if (offset < 0) {
 				offset += DAYS.length;
 			}
 			setDate = todayDate + offset + DAYS.length;
-		} else if (keywordToSplitAt.equalsIgnoreCase(ARGUMENTS_DATE_SPECIAL[2])) {
+		} else if (keywordToSplitAt.equalsIgnoreCase(DATE_SPECIAL[2])) {
 			setDate = todayDate + 1;
-		} else if (keywordToSplitAt.equalsIgnoreCase(ARGUMENTS_DATE_SPECIAL[3])) {
+		} else if (keywordToSplitAt.equalsIgnoreCase(DATE_SPECIAL[3])) {
 			setDate = todayDate;
 		} else {
 			offset = dayOfTheWeek(DEFAULT_DAY) - today;
@@ -312,22 +393,47 @@ public class Parser {
 		return null;
 	}
 
-	private boolean hasKeyword(String str, String[] keywords) {
-		for (int i = 0; i < keywords.length; i++) {
-			if (str.contains(keywords[i])) {
+	private boolean hasKeyword(String str, ArrayList<WordList> keywordType) {
+		for (int i = 0; i < keywordType.size(); i++) {
+			WordList curWordList = keywordType.get(i);
+			if (curWordList.returnIfContainsString(str) != null) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	private boolean hasKeyword(String str, ArrayList<WordList> keywordType,
+			String keywordList) {
+		for (int i = 0; i < keywordType.size(); i++) {
+			WordList curWordList = keywordType.get(i);
+			if (curWordList.getName().equals(keywordList)
+					&& curWordList.returnIfContainsString(str) != null) {
 				return true;
 			}
 		}
 		return false;
 	}
 
-	private String getKeyword(String str, String[] keywords) {
-		for (int i = 0; i < keywords.length; i++) {
-			if (str.contains(keywords[i])) {
-				return keywords[i];
+	private String getKeyword(String str, ArrayList<WordList> keywordType,
+			String keywordList) {
+		for (int i = 0; i < keywordType.size(); i++) {
+			WordList curWordList = keywordType.get(i);
+			if (curWordList.getName().equals(keywordList)) {
+				return curWordList.returnIfContainsString(str);
 			}
 		}
-		return null; // should never happen
+		return null;
+	}
+	private String getKeyword(String str, ArrayList<WordList> keywordType) {
+		for (int i = 0; i < keywordType.size(); i++) {
+			WordList curWordList = keywordType.get(i);
+			String wordFound = curWordList.returnIfContainsString(str);
+			if (wordFound != null) {
+				return wordFound;
+			}
+		}
+		return null;
 	}
 
 	private int dayOfTheWeek(String dayString) {
