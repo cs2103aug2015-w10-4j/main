@@ -48,10 +48,11 @@ public class Parser {
 	private static final String[] COMMAND_DISPLAY = { "display" };
 	private static final String[] COMMAND_SAVETO = { "saveto" };
 
-	private static final String[] DATE_SPECIAL = { "next", "tomorrow", "today",
-			"this" };
+	private static final String[] DATE_SPECIAL = { "this", "next", "today", "tomorrow"
+			 };
 	private static final String[] MONTHS = { "jan", "feb", "mar", "apr", "may",
 			"jun", "jul", "aug", "sep", "oct", "nov", "dec" };
+	private static final String[] DAYS = { "sunday" , "monday" , "tuesday" , "wednesday" , "thursday" ,"friday", "saturday" };
 
 	private enum FieldType {
 		START_EVENT, END_EVENT, DEADLINE, LOCATION, THREECHARMONTH, FULLDAY, PERIODIC
@@ -59,8 +60,8 @@ public class Parser {
 
 	private static final String[] LOCATION = { "loc" , "at" };
 	private static final String[] DEADLINE = { "by" };
-	private static final String[] START_EVENT = { "start" };
-	private static final String[] END_EVENT = { "end" };
+	private static final String[] START_EVENT = { "start", "from" };
+	private static final String[] END_EVENT = { "end" , "to" };
 
 	private class KeywordMarker implements Comparable<KeywordMarker> {
 		private int index;
@@ -95,6 +96,7 @@ public class Parser {
 	}
 
 	public Command parseCommand(String commandString) throws Exception {
+		commandString = commandString.trim();
 		Command.Type commandType = identifyType(commandString);
 		commandString = clearFirstWord(commandString);
 		Command commandObject = new Command(commandType);
@@ -167,7 +169,7 @@ public class Parser {
 			} else if (isCommandKeyword(firstWord, COMMAND_EXIT)) {
 				return Command.Type.EXIT;
 			} else {
-				return null;// default to add?
+				throw new Exception("Invalid command specified!");
 			}
 		}
 	}
@@ -199,17 +201,20 @@ public class Parser {
 	
 	private boolean extractLocation(String commandString, ArrayList<KeywordMarker> keywordMarkers, Task taskObject) throws Exception{
 		String[] locationArguments = getArgumentsForField(commandString, keywordMarkers, FieldType.LOCATION);
-		if(locationArguments.length == 1){
-			logger.finer("extractLocation: argument length is 1.");
-			taskObject.setLocation(locationArguments[0]);
-			return true;
-		} else {
-			throw new Exception("extractLocation: invalid number of arguments");
+		if(locationArguments!= null){
+			if(locationArguments.length == 1){
+				logger.finer("extractLocation: argument length is 1.");
+				taskObject.setLocation(locationArguments[0]);
+				return true;
+			} else {
+				throw new Exception("extractLocation: invalid number of arguments");
+			}
 		}
+		return false;
 	}
 
 	private boolean extractDate(String commandString,
-			ArrayList<KeywordMarker> keywordMarkers, Task taskObject) {
+			ArrayList<KeywordMarker> keywordMarkers, Task taskObject) throws Exception {
 		// check deadline/start_event & end_event
 		logger.fine("extractDate: getting date arguments");
 		String[] deadlineArguments = getArgumentsForField(commandString,
@@ -224,7 +229,7 @@ public class Parser {
 		String[] endEventArguments = getArgumentsForField(commandString,
 				keywordMarkers, FieldType.END_EVENT);
 		
-		if(startEventArguments!=null){
+		if(startEventArguments != null){
 			for(int i = 0; i < startEventArguments.length; i++){
 				logger.finer("extractDate: startEventArguments[" + i + "] contains " +  startEventArguments[i]);
 			}
@@ -233,6 +238,7 @@ public class Parser {
 		if (deadlineArguments != null) {
 			Calendar argumentDate = parseDate(deadlineArguments);
 			taskObject.setEndingTime(argumentDate);
+			logger.fine("extractDate: deadline set");
 			return true;
 		} else if (startEventArguments != null && startEventArguments != null) {
 			Calendar argumentStartDate = parseDate(startEventArguments);
@@ -251,17 +257,89 @@ public class Parser {
 		}
 	}
 
-	private Calendar parseDate(String[] dateArguments) {
+	private Calendar parseDate(String[] dateArguments) throws Exception {
 		logger.fine("parseDate: parsing date");
 		int date, month, year;
-		date = Integer.parseInt(dateArguments[0]);
-		month = Arrays.asList(MONTHS).indexOf(dateArguments[1]);
-		year = Integer.parseInt(dateArguments[2]);
+		if (!hasKeyword(dateArguments, DATE_SPECIAL)) {
+			date = Integer.parseInt(dateArguments[0]);
+			month = Arrays.asList(MONTHS).indexOf(dateArguments[1]);
+			if(dateArguments.length == 3){
+				year = Integer.parseInt(dateArguments[2]);
+			}else{
+				year = Calendar.getInstance().get(Calendar.YEAR);
+			}
 
-		Calendar helperDate = new GregorianCalendar();
-		helperDate.set(year, month, date);
+			Calendar helperDate = new GregorianCalendar();
+			helperDate.set(year, month, date);
 
-		return helperDate;
+			return helperDate;
+		} else if(dateArguments.length == 2){ // this/next <day>
+			logger.finer("parseDate: dateArguments[0] contains " + dateArguments[0]);
+			logger.finer("parseDate: dateArguments[1] contains " + dateArguments[1]);
+			String firstWord = dateArguments[0];
+			String secondWord = dateArguments[1];
+			
+			if(hasKeyword(secondWord, DAYS)){
+				int dayIndex = Arrays.asList(DAYS).indexOf(secondWord) + 1;
+				assert(firstWord.equalsIgnoreCase(DATE_SPECIAL[0])
+						|| firstWord.equalsIgnoreCase(DATE_SPECIAL[1]));
+				if(firstWord.equalsIgnoreCase(DATE_SPECIAL[0])){//this
+					date = getNearestDate(dayIndex);
+				} else {//next
+					date = getNearestDate(dayIndex) + DAYS.length;
+				} 
+				logger.finer("parseDate: this/next day determined to be " + date);
+			} else {
+				throw new Exception("parseDate: Invalid day specified!");
+			}
+			
+			month = Calendar.getInstance().get(Calendar.MONTH);
+			year = Calendar.getInstance().get(Calendar.YEAR);
+			
+			Calendar helperDate = new GregorianCalendar();
+			helperDate.set(year, month, date);
+			return helperDate;
+		} else if (dateArguments.length == 1){ // today/tomorrow
+			if(dateArguments[0].equalsIgnoreCase(DATE_SPECIAL[2])){
+				return new GregorianCalendar();
+			} else {
+				Calendar helperDate = new GregorianCalendar();
+				helperDate.add(Calendar.DATE, 1);
+				return helperDate;
+			}
+		} else {
+			throw new Exception("parseDate: Invalid arguments for date");
+		}
+	}
+	
+	private int getNearestDate(int givenDayIndex){
+		Calendar dateHelper = Calendar.getInstance();
+		int curDayIndex = dateHelper.get(Calendar.DAY_OF_WEEK);
+		logger.fine("getNearestDate: given day is " + givenDayIndex);
+		logger.fine("getNearestDate: today is " + curDayIndex);
+		int todayDate = dateHelper.get(Calendar.DATE);
+		
+		int difference = (givenDayIndex - curDayIndex) % DAYS.length;
+		logger.fine("getNearestDate: difference is " + difference);
+		int newDate = todayDate + difference;
+		return newDate;
+	}
+	
+	private boolean hasKeyword(String word, String[] keywords){
+		for(int i = 0; i < keywords.length; i++){
+			if(word.equalsIgnoreCase(keywords[i])){
+				return true;
+			}
+		}
+		return false;
+	}
+	private boolean hasKeyword(String[] words, String[] keywords){
+		for(int i = 0; i < words.length; i++){
+			if(hasKeyword(words[i], keywords)){
+				return true;
+			}
+		}
+		return false;
 	}
 
 	private String[] getArgumentsForField(String commandString,
