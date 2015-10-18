@@ -318,63 +318,70 @@ public class Logic {
 		if (isEmptyArgumentList(argumentList)) {
 			return ERROR_INVALID_ARGUMENT;
 		}
-
+		
 		try {
 			logger.fine("Cleaning up arguments.");
+			
 			argumentList = removeDuplicates(argumentList);
-			Collections.sort(argumentList);
-			argumentListForReverse = new String[argumentList.size()];
-
-			ArrayList<Task> tasksRemoved = new ArrayList<Task>();
-			for (int i = argumentList.size() - 1; i >= 0; i--) {
-				int index = Integer.parseInt(argumentList.get(i)) - 1;
-				if (isValidIndex(index)) {
-					parsedIntArgumentList.add(index); // for status
-					argumentListForReverse[i] = argumentList.get(i); // for undo
-
-					// add to start of list to maintain order
-					tasksRemoved.add(0, listOfTasks.remove(index));
-					logger.fine("Task removed from list.");
-				} else {
-					while (tasksRemoved.size() != 0) {
-						listOfTasks.add(parsedIntArgumentList.get(i),
-								tasksRemoved.remove(0));
-					}
-
-					return ERROR_INVALID_INDEX;
-				}
-
+			
+			for (String str : argumentList) {
+				int index = Integer.parseInt(str) - 1;
+				parsedIntArgumentList.add(index);
 			}
-
-			// for history
-			if (shouldPushToHistory) {
-				logger.fine("Pushing command to history.");
-				if (isUndoHistory) {
-					logger.finer("Command is NOT called by undo.");
-
-					logger.finer("Attempting to reverse command and push it to history.");
-					// handle history
-					if (!pushToHistory(new Command(Command.Type.ADD,
-							argumentListForReverse, tasksRemoved))) {
-						return ERROR_CANNOT_WRITE_TO_HISTORY;
-					}
-					return multipleItemFormatting(MESSAGE_SUCCESS_DELETE,
-							parsedIntArgumentList);
-				} else {
-					logger.finer("Command is called by undo.");
-
-					logger.finer("Attempting to reverse command and push it to undoHistory.");
-					if (!pushToUndoHistory(new Command(Command.Type.ADD,
-							argumentListForReverse, tasksRemoved))) {
-						return ERROR_CANNOT_WRITE_TO_HISTORY;
-					}
-					return MESSAGE_SUCCESS_UNDO_DELETE;
-				}
-			} else {
-				return MESSAGE_SUCCESS_REDO_DELETE;
-			}
+			
+			Collections.sort(parsedIntArgumentList);
 		} catch (NumberFormatException e) {
 			return ERROR_INVALID_ARGUMENT;
+		}
+
+		argumentListForReverse = new String[argumentList.size()];
+
+		ArrayList<Task> tasksRemoved = new ArrayList<Task>();
+		for (int i = parsedIntArgumentList.size() - 1; i >= 0; i--) {
+			int index = parsedIntArgumentList.get(i);
+			if (isValidIndex(index)) {
+				argumentListForReverse[i] = argumentList.get(i); // for undo
+
+				// add to start of list to maintain order
+				tasksRemoved.add(0, listOfTasks.remove(index));
+				logger.fine("Task removed from list.");
+			} else {
+				while (tasksRemoved.size() != 0) {
+					listOfTasks.add(parsedIntArgumentList.get(i),
+							tasksRemoved.remove(0));
+				}
+
+				return ERROR_INVALID_INDEX;
+			}
+
+		}
+
+		// for history
+		if (shouldPushToHistory) {
+			logger.fine("Pushing command to history.");
+			if (isUndoHistory) {
+				logger.finer("Command is NOT called by undo.");
+
+				logger.finer("Attempting to reverse command and push it to history.");
+				// handle history
+				if (!pushToHistory(new Command(Command.Type.ADD,
+						argumentListForReverse, tasksRemoved))) {
+					return ERROR_CANNOT_WRITE_TO_HISTORY;
+				}
+				return multipleItemFormatting(MESSAGE_SUCCESS_DELETE,
+						parsedIntArgumentList);
+			} else {
+				logger.finer("Command is called by undo.");
+
+				logger.finer("Attempting to reverse command and push it to undoHistory.");
+				if (!pushToUndoHistory(new Command(Command.Type.ADD,
+						argumentListForReverse, tasksRemoved))) {
+					return ERROR_CANNOT_WRITE_TO_HISTORY;
+				}
+				return MESSAGE_SUCCESS_UNDO_DELETE;
+			}
+		} else {
+			return MESSAGE_SUCCESS_REDO_DELETE;
 		}
 
 	}
@@ -576,7 +583,6 @@ public class Logic {
 
 	// Create an array with all unique elements
 	private ArrayList<String> removeDuplicates(ArrayList<String> A) {
-		// add elements to al, including duplicates
 		HashSet<String> hs = new HashSet<>();
 		hs.addAll(A);
 		A.clear();
