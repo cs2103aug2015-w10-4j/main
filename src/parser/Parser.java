@@ -3,12 +3,33 @@ package parser;
 import global.Command;
 import global.Task;
 
-import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.GregorianCalendar;
+import java.util.logging.Logger;
 
+/**
+ * To allow parser to parse a new field for task,
+ * 1. Add to enum FieldType
+ * 2. Define an array of keywords to identify field
+ * 3. Define a new get<newfield>Field which adds a KeywordMarker to the list
+ * and execute it in getArrayOfKeywordIndexes
+ * 4. Define a new extract<newfield> method to handle parsing of arguments
+ * and execute it in extractTaskInformation
+ * Use getArgumentForField to retrieve the array of argument words
+ *
+ */
 public class Parser {
+	private static final String ERROR_MISSING_START_TIME = "Error: An end time has been entered without start time!";
+	private static final String ERROR_MISSING_END_TIME = "Error: A start time has been entered without end time!";
+	private static final String ERROR_INVALID_DAY_SPECIFIED = "Error: Invalid day specified!";
+	private static final String ERROR_INVALID_NUMBER_OF_ARGUMENTS = "Error: Invalid number of arguments";
+	private static final String ERROR_INVALID_COMMAND_SPECIFIED = "Error: Invalid command specified!";
+	private static final String ERROR_EMPTY_COMMAND_STRING = "Error: Command string is empty";
+	private static final String ERROR_EMPTY_TASK_NAME = "Error: Task name is empty";
+
 	/**
 	 * Parses the command string based on keyword
 	 * 
@@ -16,322 +37,463 @@ public class Parser {
 	 * @return commandObject to be executed, or null if invalid
 	 */
 	private static Parser parserInstance = null;
+	
+	Logger logger = Logger.getGlobal();
 
 	// warning messages
-	private static final String WARNING_INSUFFICIENT_ARGUMENT = "Warning: '%s': insufficient command arguments";
-	private static final String WARNING_INVALID_DAY = "Invalid day specified!";
-	private static final String WARNING_INVALID_MONTH = "Invalid month specified!";
 
-	private static final String COMMAND_ADD = "add";
-	private static final String COMMAND_EDIT = "edit";
-	private static final String COMMAND_DELETE = "delete";
-	private static final String COMMAND_UNDO = "undo";
-	private static final String COMMAND_REDO = "redo";
-	private static final String COMMAND_EXIT = "exit";
-	private static final String COMMAND_DISPLAY = "display";
-	private static final String COMMAND_SAVETO = "saveto";
-	private static final String ARGUMENT_FROM = "start";
-	private static final String ARGUMENT_TO = "end";
+	private static final String[] COMMAND_ADD = { "add" };
+	private static final String[] COMMAND_EDIT = { "edit", "change" };
+	private static final String[] COMMAND_DELETE = { "delete", "del" };
+	private static final String[] COMMAND_UNDO = { "undo" };
+	private static final String[] COMMAND_REDO = { "redo" };
+	private static final String[] COMMAND_EXIT = { "exit" };
+	private static final String[] COMMAND_DISPLAY = { "display" };
+	private static final String[] COMMAND_SAVETO = { "saveto" };
 
-	private static final String[] ARGUMENT_EVENT = { "start", "end" };
-	private static final String[] ARGUMENTS_END_DATE = { " date ", " by " };
-	private static final String[] ARGUMENTS_DATE_SPECIAL = { " this ",
-			" next ", " tomorrow", " today" };
-	private static final String ARGUMENTS_PERIODIC = " every ";
-	private static final String ARGUMENT_LOC = "loc";
-	private static final String DEFAULT_DAY = "friday";
-
+	private static final String[] DATE_SPECIAL = { "this", "next", "today", "tomorrow"
+			 };
 	private static final String[] MONTHS = { "jan", "feb", "mar", "apr", "may",
 			"jun", "jul", "aug", "sep", "oct", "nov", "dec" };
-	private static final String[] DAYS = { "sunday", "monday", "tuesday",
-			"wednesday", "thursday", "friday", "saturday" };
+	private static final String[] DAYS = { "sunday" , "monday" , "tuesday" , "wednesday" , "thursday" ,"friday", "saturday" };
 
-	/**
-	 * Parses the string provided and returns the corresponding object
-	 * 
-	 * @param command
-	 *            user input
-	 * @return Command object for execution
-	 * @throws Exception
-	 *             parsing error message
-	 */
-	public Command parseCommand(String command) throws Exception {
-		String[] commandSplit = command.split(" ", 2);
+	private enum FieldType {
+		START_EVENT, END_EVENT, DEADLINE, LOCATION, THREECHARMONTH, FULLDAY, PERIODIC
+	}
 
-		String commandWord, arguments = "";
-		commandWord = commandSplit[0];
-		if (commandSplit.length >= 2) {
-			arguments = commandSplit[1];
+	private static final String[] LOCATION = { "loc" , "at" };
+	private static final String[] DEADLINE = { "by" };
+	private static final String[] START_EVENT = { "start", "from" };
+	private static final String[] END_EVENT = { "end" , "to" };
+
+	private class KeywordMarker implements Comparable<KeywordMarker> {
+		private int index;
+		private FieldType typeOfField;
+
+		private int getIndex() {
+			return index;
 		}
 
-		Command commandObject;
-		if (commandWord.equalsIgnoreCase(COMMAND_ADD)) {
-			try {
-				Task taskObj = new Task();
-				extractTaskInformation(taskObj, arguments);
-				commandObject = new Command(Command.Type.ADD, taskObj);
-			} catch (ArrayIndexOutOfBoundsException e) {
-				throw new Exception(String.format(
-						WARNING_INSUFFICIENT_ARGUMENT, commandWord));
-			}
-		} else if (commandWord.equalsIgnoreCase(COMMAND_EDIT)) {
-			try {
-				String[] argumentSplit = arguments.split(" ", 2);
-				String[] indexToDelete = { argumentSplit[0] };
-				String taskInformation = argumentSplit[1];
+		private void setIndex(int i) {
+			index = i;
+		}
 
-				Task taskObj = new Task();
-				extractTaskInformation(taskObj, taskInformation);
-				commandObject = new Command(Command.Type.EDIT, indexToDelete,
-						taskObj);
-			} catch (ArrayIndexOutOfBoundsException e) {
-				throw new Exception(String.format(
-						WARNING_INSUFFICIENT_ARGUMENT, commandWord));
-			}
-		} else if (commandWord.equalsIgnoreCase(COMMAND_DELETE)) {
-			if (commandSplit.length >= 2) {
-				String[] indexToDelete = arguments.split(" ");
+		private FieldType getFieldType() {
+			return typeOfField;
+		}
 
-				commandObject = new Command(Command.Type.DELETE, indexToDelete);
+		private void setFieldType(FieldType fieldType) {
+			typeOfField = fieldType;
+		}
+
+		@Override
+		public int compareTo(KeywordMarker o) {
+			if (this.index < o.getIndex()) {
+				return -1;
+			} else if (this.index > o.getIndex()) {
+				return 1;
 			} else {
-				throw new Exception(String.format(
-						WARNING_INSUFFICIENT_ARGUMENT, commandWord));
+				return 0;
 			}
-		} else if (commandWord.equalsIgnoreCase(COMMAND_EXIT)) {
-			commandObject = new Command(Command.Type.EXIT);
-		} else if (commandWord.equalsIgnoreCase(COMMAND_DISPLAY)) {
-			commandObject = new Command(Command.Type.DISPLAY);
-		} else if (commandWord.equalsIgnoreCase(COMMAND_UNDO)) {
-			commandObject = new Command(Command.Type.UNDO);
-		} else if (commandWord.equalsIgnoreCase(COMMAND_REDO)) {
-			commandObject = new Command(Command.Type.REDO);
-		} else if (commandWord.equalsIgnoreCase(COMMAND_SAVETO)) {
-			String[] argumentArray = { arguments };
-			commandObject = new Command(Command.Type.SAVETO, argumentArray);
-		} else {
-			commandObject = null;
+		}
+	}
+
+	public Command parseCommand(String commandString) throws Exception {
+		commandString = commandString.trim();
+		Command.Type commandType = identifyType(commandString);
+		commandString = clearFirstWord(commandString);
+		Command commandObject = new Command(commandType);
+		Task taskObject = new Task();
+		String[] argumentArray;
+		
+		switch (commandType) {
+		case ADD:
+			extractTaskInformation(commandString, taskObject);
+			commandObject.addTask(taskObject);
+			break;
+		case EDIT:
+			argumentArray = getEditIndex(commandString);
+			commandObject.setArguments(argumentArray);
+			commandString = clearFirstWord(commandString);
+			
+			extractTaskInformation(commandString, taskObject);
+			commandObject.addTask(taskObject);
+			break;
+		case DELETE:
+			argumentArray = getDeleteIndexes(commandString);
+			commandObject.setArguments(argumentArray);
+			break;
+		default:
+			
 		}
 		return commandObject;
 	}
-
-	/*
-	 * Extracts and returns 'name' segment of the command.
-	 */
-	private String extractTaskName(String arg) throws Exception {
-		return arg.split("'")[1];
+	
+	private String[] getEditIndex(String commandString){
+		String indexString = commandString.split(" ", 2)[0];
+		return new String[]{ indexString };
+	}
+	
+	private String[] getDeleteIndexes(String commandString){
+		String[] indexArray = commandString.split(" ");
+		return indexArray;
 	}
 
-	private String extractTaskNameWithoutCommand(String arg) {
-		return arg.split(" ")[0];
+	private String clearFirstWord(String commandString) {
+		String[] splitCommand = commandString.split(" ", 2);
+		assert (splitCommand.length >= 1);
+		if (splitCommand.length == 1) {
+			return "";
+		} else {
+			return splitCommand[1];
+		}
+	}
+
+	private Command.Type identifyType(String commandString) throws Exception {
+		if (commandString.length() == 0) {
+			logger.info("identifyType: Command string is empty!");
+			throw new Exception(ERROR_EMPTY_COMMAND_STRING);
+		} else {
+			String firstWord = commandString.split(" ", 2)[0];
+			if (isCommandKeyword(firstWord, COMMAND_ADD)) {
+				return Command.Type.ADD;
+			} else if (isCommandKeyword(firstWord, COMMAND_EDIT)) {
+				return Command.Type.EDIT;
+			} else if (isCommandKeyword(firstWord, COMMAND_DELETE)) {
+				return Command.Type.DELETE;
+			} else if (isCommandKeyword(firstWord, COMMAND_UNDO)) {
+				return Command.Type.UNDO;
+			} else if (isCommandKeyword(firstWord, COMMAND_REDO)) {
+				return Command.Type.REDO;
+			} else if (isCommandKeyword(firstWord, COMMAND_SAVETO)) {
+				return Command.Type.SAVETO;
+			} else if (isCommandKeyword(firstWord, COMMAND_DISPLAY)) {
+				return Command.Type.DISPLAY;
+			} else if (isCommandKeyword(firstWord, COMMAND_EXIT)) {
+				return Command.Type.EXIT;
+			} else {
+				logger.info("identifyType: invalid command");
+				throw new Exception(ERROR_INVALID_COMMAND_SPECIFIED);
+			}
+		}
+	}
+
+	private boolean isCommandKeyword(String firstWordInCommandString,
+			String[] keywords) {
+		for (int i = 0; i < keywords.length; i++) {
+			if (firstWordInCommandString.equalsIgnoreCase(keywords[i])) {
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	
-	private boolean extractTaskInformation(Task taskObject, String arguments)
+
+	private boolean extractTaskInformation(String commandString, Task taskObject)
 			throws Exception {
-		String taskName = extractTaskNameWithoutCommand(arguments);
-		taskObject.setName(taskName);
-		String dateExtracted = extractDate(arguments, taskObject);
-		String locationExtracted = extractLocation(dateExtracted, taskObject); // for
-																				// extension
-
+		logger.fine("extractTaskInformation: getting keyword markers");
+		ArrayList<KeywordMarker> keywordMarkers = getArrayOfKeywordIndexes(commandString);
+		Collections.sort(keywordMarkers);
+		
+		logger.fine("extractedTaskInformation: extracting data from string");
+		extractName(commandString, keywordMarkers, taskObject);
+		extractDate(commandString, keywordMarkers, taskObject);
+		extractLocation(commandString, keywordMarkers, taskObject);
 		return true;
 	}
-
-	/**
-	 * Extracts 'date' segment of the command if present & returns Calendar
-	 * object. Extracts 'day' segment of the command if present and returns
-	 * Calendar object - current supported parameters before day string are
-	 * 'this' and 'next' Special argument: 'tomorrow' will set date to the next
-	 * day from current date pre-condition: String must contain DATE_ARGUMENTS,
-	 * date parameters are valid dates in format dd MMM yyyy OR String must
-	 * contain day arg in lowercase only post-condition: returns parsed Calendar
-	 * object if date is present, else return null. Exception if day is not
-	 * spelt in full.
-	 */
-	private String extractDate(String arguments, Task taskObj) throws Exception {
-		if (hasKeyword(arguments, ARGUMENTS_END_DATE)) {
-			return extractOneDate(arguments, taskObj);
-		} else if (hasKeyword(arguments, ARGUMENT_EVENT)) {
-			return extractTwoDates(arguments, taskObj);
-		} else {
-			return arguments;
+	
+	private boolean extractLocation(String commandString, ArrayList<KeywordMarker> keywordMarkers, Task taskObject) throws Exception{
+		String[] locationArguments = getArgumentsForField(commandString, keywordMarkers, FieldType.LOCATION);
+		if(locationArguments!= null){
+			if(locationArguments.length == 1){
+				logger.finer("extractLocation: argument length is 1.");
+				taskObject.setLocation(locationArguments[0]);
+				return true;
+			} else {
+				logger.info("extractLocation: invalid number of arguments");
+				throw new Exception(ERROR_INVALID_NUMBER_OF_ARGUMENTS);
+			}
 		}
-
+		return false;
 	}
 
-	// construct task when there is just one date in the input
-	private String extractOneDate(String arg, Task taskObj) throws Exception {
-		Calendar date;
-		String keywordToSplitAt = getKeyword(arg, ARGUMENTS_END_DATE);
-		String[] newArgs = arg.split(keywordToSplitAt);
-		if (hasKeyword(arg, ARGUMENTS_DATE_SPECIAL)) {
-			date = parseSpecialDate(newArgs[1]);
-		} else {
-			date = parseDate(newArgs[1]);
+	private boolean extractDate(String commandString,
+			ArrayList<KeywordMarker> keywordMarkers, Task taskObject) throws Exception {
+		// check deadline/start_event & end_event
+		logger.fine("extractDate: getting date arguments");
+		String[] deadlineArguments = getArgumentsForField(commandString,
+				keywordMarkers, FieldType.DEADLINE);
+		if (deadlineArguments != null) {
+			for(int i = 0; i < deadlineArguments.length; i++){
+				logger.finer("extractDate: deadlineArguments[" + i + "] contains " +  deadlineArguments[i]);
+			}
 		}
+		String[] startEventArguments = getArgumentsForField(commandString,
+				keywordMarkers, FieldType.START_EVENT);
+		String[] endEventArguments = getArgumentsForField(commandString,
+				keywordMarkers, FieldType.END_EVENT);
+		
+		if(startEventArguments != null){
+			for(int i = 0; i < startEventArguments.length; i++){
+				logger.finer("extractDate: startEventArguments[" + i + "] contains " +  startEventArguments[i]);
+			}
+		}
+		logger.fine("extractDate: got date arguments. attempting to parse dates");
+		if (deadlineArguments != null) {
+			Calendar argumentDate = parseDate(deadlineArguments);
+			taskObject.setEndingTime(argumentDate);
+			logger.fine("extractDate: deadline set");
+			return true;
+		} else if (startEventArguments != null && startEventArguments != null) {
+			Calendar argumentStartDate = parseDate(startEventArguments);
+			Calendar argumentEndDate = parseDate(endEventArguments);
 
-		taskObj.setEndingTime(date);
-
-		return newArgs[0];
+			if (argumentStartDate.before(argumentEndDate)) {
+				taskObject.setStartingTime(argumentStartDate);
+				taskObject.setEndingTime(argumentEndDate);
+			} else {
+				taskObject.setStartingTime(argumentEndDate);
+				taskObject.setEndingTime(argumentStartDate);
+			}
+			return true;
+		} else {
+			return false;
+		}
 	}
 
-	// construct task when there are both starting time and endingtime
-	public String extractTwoDates(String commandArguments, Task taskObj)
-			throws Exception {
-		Calendar dateOne, dateTwo;
-		String taskName = extractTaskNameWithoutCommand(commandArguments);
-		taskObj.setName(taskName);
-		assert (commandArguments.contains(ARGUMENT_FROM) && commandArguments
-				.contains(ARGUMENT_TO));
-		String[] endSplit = commandArguments.split(ARGUMENT_TO);
-		String[] startSplit = endSplit[0].split(ARGUMENT_FROM);
-		String remainingCommandString = startSplit[0];
+	private Calendar parseDate(String[] dateArguments) throws Exception {
+		logger.fine("parseDate: parsing date");
+		int date, month, year;
+		if (!hasKeyword(dateArguments, DATE_SPECIAL)) {
+			date = Integer.parseInt(dateArguments[0]);
+			month = Arrays.asList(MONTHS).indexOf(dateArguments[1]);
+			if(dateArguments.length == 3){
+				year = Integer.parseInt(dateArguments[2]);
+			}else{
+				year = Calendar.getInstance().get(Calendar.YEAR);
+			}
 
-		if (hasKeyword(startSplit[1], ARGUMENTS_DATE_SPECIAL)) {
-			dateOne = parseSpecialDate(startSplit[1]);
-		} else {
-			dateOne = parseDate(startSplit[1]);
-		}
+			Calendar helperDate = new GregorianCalendar();
+			helperDate.set(year, month, date);
 
-		if (hasKeyword(endSplit[1], ARGUMENTS_DATE_SPECIAL)) {
-			dateTwo = parseSpecialDate(endSplit[1]);
-		} else {
-			dateTwo = parseDate(endSplit[1]);
-		}
-
-		if (dateOne.before(dateTwo)) {
-			taskObj.setEndingTime(dateTwo);
-			taskObj.setStartingTime(dateOne);
-		} else {
-			taskObj.setEndingTime(dateOne);
-			taskObj.setStartingTime(dateTwo);
-		}
-
-		return remainingCommandString;
-
-	}
-
-	private Calendar parseDate(String dateString) throws Exception {
-		dateString = dateString.trim();
-		String[] dateArgs = dateString.split(" ");
-
-		int day = Integer.parseInt(dateArgs[0]);
-
-		int month = Arrays.asList(MONTHS).indexOf(dateArgs[1]);
-		if (month == -1) {
+			return helperDate;
+		} else if(dateArguments.length == 2){ // this/next <day>
+			logger.finer("parseDate: dateArguments[0] contains " + dateArguments[0]);
+			logger.finer("parseDate: dateArguments[1] contains " + dateArguments[1]);
+			String firstWord = dateArguments[0];
+			String secondWord = dateArguments[1];
+			
+			if(hasKeyword(secondWord, DAYS)){
+				int dayIndex = Arrays.asList(DAYS).indexOf(secondWord) + 1;
+				assert(firstWord.equalsIgnoreCase(DATE_SPECIAL[0])
+						|| firstWord.equalsIgnoreCase(DATE_SPECIAL[1]));
+				if(firstWord.equalsIgnoreCase(DATE_SPECIAL[0])){//this
+					date = getNearestDate(dayIndex);
+				} else {//next
+					date = getNearestDate(dayIndex) + DAYS.length;
+				} 
+				logger.finer("parseDate: this/next day determined to be " + date);
+			} else {
+				logger.info("parseDate: invaid day");
+				throw new Exception(ERROR_INVALID_DAY_SPECIFIED);
+			}
+			
 			month = Calendar.getInstance().get(Calendar.MONTH);
-		}
-
-		// year will be set to current year if not specified by user
-		int year;
-		try {
-			year = Integer.parseInt(dateArgs[2]);
-		} catch (ArrayIndexOutOfBoundsException | NumberFormatException e) {
 			year = Calendar.getInstance().get(Calendar.YEAR);
-		}
-		Calendar date = new GregorianCalendar();
-		date.set(year, month, day);
-		return date;
-	}
-
-	private Calendar parseSpecialDate(String arg) throws Exception {
-		Calendar date = new GregorianCalendar();
-		String keywordToSplitAt = getKeyword(arg, ARGUMENTS_DATE_SPECIAL);
-		String[] newArgs = arg.split(keywordToSplitAt);
-
-		date = new GregorianCalendar();
-		int setDate, today, todayDate, offset;
-
-		today = date.get(Calendar.DAY_OF_WEEK);
-		todayDate = date.get(Calendar.DATE);
-
-		if (keywordToSplitAt.equalsIgnoreCase(ARGUMENTS_DATE_SPECIAL[0])) {
-			if (!hasKeyword(newArgs[1], DAYS)) {
-				throw new Exception(WARNING_INVALID_DAY);
+			
+			Calendar helperDate = new GregorianCalendar();
+			helperDate.set(year, month, date);
+			return helperDate;
+		} else if (dateArguments.length == 1){ // today/tomorrow
+			if(dateArguments[0].equalsIgnoreCase(DATE_SPECIAL[2])){
+				return new GregorianCalendar();
+			} else {
+				Calendar helperDate = new GregorianCalendar();
+				helperDate.add(Calendar.DATE, 1);
+				return helperDate;
 			}
-			offset = dayOfTheWeek(getKeyword(newArgs[1], DAYS)) - today;
-			if (offset < 0) {
-				offset += DAYS.length;
-			}
-			setDate = todayDate + offset;
-		} else if (keywordToSplitAt.equalsIgnoreCase(ARGUMENTS_DATE_SPECIAL[1])) {
-			if (!hasKeyword(newArgs[1], DAYS)) {
-				throw new Exception(WARNING_INVALID_DAY);
-			}
-			offset = dayOfTheWeek(getKeyword(newArgs[1], DAYS)) - today;
-			if (offset < 0) {
-				offset += DAYS.length;
-			}
-			setDate = todayDate + offset + DAYS.length;
-		} else if (keywordToSplitAt.equalsIgnoreCase(ARGUMENTS_DATE_SPECIAL[2])) {
-			setDate = todayDate + 1;
-		} else if (keywordToSplitAt.equalsIgnoreCase(ARGUMENTS_DATE_SPECIAL[3])) {
-			setDate = todayDate;
 		} else {
-			offset = dayOfTheWeek(DEFAULT_DAY) - today;
-			if (offset < 0) {
-				offset += DAYS.length;
-			}
-			setDate = todayDate + offset;
+			logger.info("parseDate: unknown date arguments");
+			throw new Exception("Error: Invalid arguments for date");
 		}
-		date.set(Calendar.DATE, setDate);
-
-		return date;
 	}
-
-	/*
-	 * Extracts 'loc' segment pre-condition: String must contain
-	 * LOCATION_ARGUMENTS post-condition: returns extracted string if
-	 * LOCATION_ARGUMENTS is present, else return original string if date is not
-	 * present
-	 */
-	private String extractLocation(String arg, Task taskObj) throws Exception {
-		String[] newArgs;
-		String returnArg = "";
-
-		if (arg.contains(ARGUMENT_LOC)) {
-			newArgs = arg.split(ARGUMENT_LOC);
-			taskObj.setLocation(newArgs[1]);
-			returnArg = newArgs[0];
-		} else {
-			returnArg = arg;
-		}
-
-		return returnArg;
+	
+	private int getNearestDate(int givenDayIndex){
+		Calendar dateHelper = Calendar.getInstance();
+		int curDayIndex = dateHelper.get(Calendar.DAY_OF_WEEK);
+		logger.fine("getNearestDate: given day is " + givenDayIndex);
+		logger.fine("getNearestDate: today is " + curDayIndex);
+		int todayDate = dateHelper.get(Calendar.DATE);
+		
+		int difference = (givenDayIndex - curDayIndex) % DAYS.length;
+		logger.fine("getNearestDate: difference is " + difference);
+		int newDate = todayDate + difference;
+		return newDate;
 	}
-
-	private String extractPeriodic(String arg, Task taskObj) {
-		if (arg.contains(ARGUMENTS_PERIODIC)) {
-			String argPeriodic = arg.split(ARGUMENTS_PERIODIC)[1];
-			for (int i = 0; i < DAYS.length; i++) {
-				if (argPeriodic.indexOf(DAYS[i]) == 0) {
-					return DAYS[i];
-				}
+	
+	private boolean hasKeyword(String word, String[] keywords){
+		for(int i = 0; i < keywords.length; i++){
+			if(word.equalsIgnoreCase(keywords[i])){
+				return true;
 			}
 		}
-		return null;
+		return false;
 	}
-
-	private boolean hasKeyword(String str, String[] keywords) {
-		for (int i = 0; i < keywords.length; i++) {
-			if (str.contains(keywords[i])) {
+	private boolean hasKeyword(String[] words, String[] keywords){
+		for(int i = 0; i < words.length; i++){
+			if(hasKeyword(words[i], keywords)){
 				return true;
 			}
 		}
 		return false;
 	}
 
-	private String getKeyword(String str, String[] keywords) {
-		for (int i = 0; i < keywords.length; i++) {
-			if (str.contains(keywords[i])) {
-				return keywords[i];
+	private String[] getArgumentsForField(String commandString,
+			ArrayList<KeywordMarker> keywordMarkers, FieldType typeOfField) {
+		for (int i = 0; i < keywordMarkers.size(); i++) {
+			KeywordMarker curKeywordMarker = keywordMarkers.get(i);
+			if (curKeywordMarker.getFieldType() == typeOfField) {
+				int indexSearch;
+				if (i < keywordMarkers.size() - 1) {
+					// get index of the next field argument
+					indexSearch = keywordMarkers.get(i + 1).getIndex() - 1;
+					logger.finer("getArgumentsForField: search starting from " + indexSearch);
+					while (commandString.charAt(indexSearch) == ' ') {
+						indexSearch--;
+					}
+					while (commandString.charAt(indexSearch) != ' ') {
+						indexSearch--;
+					}
+					while (commandString.charAt(indexSearch) == ' ') {
+						indexSearch--;
+					}
+					indexSearch++;
+				} else {
+					// until the end of the string
+					indexSearch = commandString.length();
+				}
+				
+				int curIndex = curKeywordMarker.getIndex();
+				logger.finer("getArgumentsForField: curIndex is " + curIndex);
+				logger.finer("getArgumentsForField: indexSearch is " + indexSearch);
+				String argumentString = commandString.substring(curIndex,
+						indexSearch);
+				String[] argumentWords = argumentString.split("[ ]+");
+				return argumentWords;
 			}
 		}
-		return null; // should never happen
+		return null;
 	}
 
-	private int dayOfTheWeek(String dayString) {
-		return Arrays.asList(DAYS).indexOf(dayString) + 1;
+	private boolean extractName(String commandString,
+			ArrayList<KeywordMarker> keywordMarkers, Task taskObject)
+			throws Exception {
+		logger.fine("extractName: extracting name");
+		String taskName;
+		if (commandString.length() == 0) {
+			logger.info("extractName: no task information");
+			throw new Exception(ERROR_EMPTY_TASK_NAME);
+		} else if (keywordMarkers.size() > 0) {
+			logger.finer("extractName: markersize > 0");
+			int searchIndex = keywordMarkers.get(0).getIndex() - 1;
+			
+			logger.finer("extractName: searchIndex starts from " + searchIndex);
+			while (searchIndex >= 0 && commandString.charAt(searchIndex) == ' ') {
+				searchIndex--;
+			}
+			
+			logger.finer("extractName: reached next command word at " + searchIndex);
+			while (searchIndex >= 0 && commandString.charAt(searchIndex) != ' ') {
+				searchIndex--;
+			}
+			
+			logger.finer("extractName: past next command word at " + searchIndex);
+			assert(searchIndex >= 0);
+			taskName = commandString.substring(0, searchIndex);
+		} else {
+			taskName = commandString;
+		}
+		taskObject.setName(taskName);
+		return true;
+	}
+
+	private ArrayList<KeywordMarker> getArrayOfKeywordIndexes(
+			String commandString) throws Exception {
+		ArrayList<KeywordMarker> keywordMarkerList = new ArrayList<KeywordMarker>();
+		
+		getLocationField(keywordMarkerList, commandString);
+		getDateField(keywordMarkerList, commandString);
+
+		return keywordMarkerList;
+	}
+
+	private boolean getLocationField(ArrayList<KeywordMarker> curMarkerList,
+			String commandString) {
+		KeywordMarker markerForLocation = getKeywordMarker(commandString,
+				LOCATION);
+		if (markerForLocation != null) {
+			markerForLocation.setFieldType(FieldType.LOCATION);
+			curMarkerList.add(markerForLocation);
+			return true;
+		}
+		return false;
+	}
+
+	private boolean getDateField(ArrayList<KeywordMarker> curMarkerList,
+			String commandString) throws Exception {
+		KeywordMarker markerForDeadline = getKeywordMarker(commandString,
+				DEADLINE);
+		if (markerForDeadline != null) {
+			markerForDeadline.setFieldType(FieldType.DEADLINE);
+			curMarkerList.add(markerForDeadline);
+			return true;
+		}
+
+		KeywordMarker markerForStartEvent = getKeywordMarker(commandString,
+				START_EVENT);
+		KeywordMarker markerForEndEvent = getKeywordMarker(commandString,
+				END_EVENT);
+		if (markerForStartEvent != null && markerForEndEvent != null) {
+			markerForStartEvent.setFieldType(FieldType.START_EVENT);
+			markerForEndEvent.setFieldType(FieldType.END_EVENT);
+			curMarkerList.add(markerForStartEvent);
+			curMarkerList.add(markerForEndEvent);
+			return true;
+		} else if (markerForStartEvent != null) {
+			logger.info("getDateField: start time without end time detected");
+			throw new Exception(
+					ERROR_MISSING_END_TIME);
+		} else if (markerForEndEvent != null) {
+			logger.info("getDateField: end time without start time detected");
+			throw new Exception(
+					ERROR_MISSING_START_TIME);
+		} else {
+			return false;
+		}
+	}
+
+	private KeywordMarker getKeywordMarker(String commandString,
+			String[] listOfKeywords) {
+		for (int i = 0; i < listOfKeywords.length; i++) {
+			String curKeyword = " " + listOfKeywords[i] + " "; // maybe use
+																// string format
+			int keywordIndex = commandString.indexOf(curKeyword);
+			if (commandString.indexOf(curKeyword) != -1) {
+				int indexOfArgument = keywordIndex + curKeyword.length();
+				int lengthOfCommandString = commandString.length();
+				logger.finer("getKeywordMarker: Attempting to check " + curKeyword);
+				logger.finer("getKeywordMarker: found at " + keywordIndex + " and argument is at " + indexOfArgument);
+				while (lengthOfCommandString > indexOfArgument
+						&& commandString.charAt(indexOfArgument) == ' ') {
+					indexOfArgument++;
+				}
+				KeywordMarker newMarker = new KeywordMarker();
+				newMarker.setIndex(indexOfArgument);
+				return newMarker;
+			}
+		}
+		return null;
 	}
 
 	public static Parser getInstance() {
