@@ -25,8 +25,8 @@ public class Parser {
 	private static final String WARNING_INVALID_MONTH = "Invalid month specified!";
 
 	private static final String[] COMMAND_ADD = { "add" };
-	private static final String[] COMMAND_EDIT = { "edit" };
-	private static final String[] COMMAND_DELETE = { "delete" };
+	private static final String[] COMMAND_EDIT = { "edit", "change" };
+	private static final String[] COMMAND_DELETE = { "delete", "del" };
 	private static final String[] COMMAND_UNDO = { "undo" };
 	private static final String[] COMMAND_REDO = { "redo" };
 	private static final String[] COMMAND_EXIT = { "exit" };
@@ -49,20 +49,35 @@ public class Parser {
 			return this.name;
 		}
 
+		private boolean containsKeyword(String partOfCommandString,
+				String keyword) {
+			while (partOfCommandString.contains(keyword)) {
+				int index = partOfCommandString.indexOf(keyword);
+				if ((!(index - 1 < 0) && partOfCommandString.charAt(index - 1) == ' ')
+						&& (index + keyword.length() >= partOfCommandString
+								.length() || partOfCommandString.charAt(index
+								+ keyword.length()) == ' ')) {
+					return true;
+				}
+				partOfCommandString = partOfCommandString.split(keyword, 2)[1];
+			}
+			return false;
+		}
+
 		private String returnIfContainsString(String partOfCommandString) {
 			for (int i = 0; i < listOfWords.size(); i++) {
 				String curWord = listOfWords.get(i);
-				if (partOfCommandString.contains(curWord)) {
+				if (containsKeyword(partOfCommandString, curWord)) {
 					return curWord;
 				}
 			}
 			return null;
 		}
-		
+
 		private boolean containsAllStrings(String partOfCommandString) {
 			for (int i = 0; i < listOfWords.size(); i++) {
 				String curWord = listOfWords.get(i);
-				if (!partOfCommandString.contains(curWord)) {
+				if (!containsKeyword(partOfCommandString, curWord)) {
 					return false;
 				}
 			}
@@ -75,28 +90,28 @@ public class Parser {
 	private ArrayList<WordList> keywordMonth;
 	private ArrayList<WordList> keywordDay;
 	private ArrayList<WordList> keywordCommand;
-	
+	private ArrayList<WordList> keywordLocation;
+
 	private static final String ARGUMENT_FROM = "start";
 	private static final String ARGUMENT_TO = "end";
 
 	private static final String[] DATE_EVENT = { "start", "end" };
 	private static final String[] DATE_END = { "date", "by" };
-	private static final String[] DATE_SPECIAL = { "this",
-			"next", "tomorrow", "today" };
-	private static final String ARGUMENTS_PERIODIC = "every";
-	private static final String ARGUMENT_LOC = "loc";
+	private static final String[] DATE_SPECIAL = { "this", "next", "tomorrow",
+			"today" };
+	private static final String[] PERIODIC_GENERAL = { "every" };
+	private static final String[] LOCATION = { "loc", "at" };
 	private static final String DEFAULT_DAY = "friday";
 
 	private static final String[] MONTHS = { "jan", "feb", "mar", "apr", "may",
 			"jun", "jul", "aug", "sep", "oct", "nov", "dec" };
 	private static final String[] DAYS = { "sunday", "monday", "tuesday",
 			"wednesday", "thursday", "friday", "saturday" };
+
 	private enum keywordType {
-		ADD, EDIT, DELETE, DISPLAY, UNDO, REDO, SAVETO, EXIT,
-		EVENT, END, SPECIAL,
-		LOC,
-		THREECHARMONTH, FULLDAY
+		ADD, EDIT, DELETE, DISPLAY, UNDO, REDO, SAVETO, EXIT, EVENT, END, SPECIAL, LOCATION, THREECHARMONTH, FULLDAY, PERIODIC
 	}
+
 	private Parser() {
 		keywordCommand = new ArrayList<WordList>();
 		WordList add = new WordList(keywordType.ADD, COMMAND_ADD);
@@ -115,7 +130,7 @@ public class Parser {
 		keywordCommand.add(display);
 		keywordCommand.add(saveto);
 		keywordCommand.add(exit);
-		
+
 		keywordDate = new ArrayList<WordList>();
 		WordList event = new WordList(keywordType.EVENT, DATE_EVENT);
 		WordList end = new WordList(keywordType.END, DATE_END);
@@ -125,12 +140,22 @@ public class Parser {
 		keywordDate.add(special);
 
 		keywordMonth = new ArrayList<WordList>();
-		WordList threeCharMonth = new WordList(keywordType.THREECHARMONTH, MONTHS);
+		WordList threeCharMonth = new WordList(keywordType.THREECHARMONTH,
+				MONTHS);
 		keywordMonth.add(threeCharMonth);
 
 		keywordDay = new ArrayList<WordList>();
 		WordList fullDay = new WordList(keywordType.FULLDAY, DAYS);
 		keywordDay.add(fullDay);
+
+		keywordPeriodic = new ArrayList<WordList>();
+		WordList generalPeriodic = new WordList(keywordType.PERIODIC,
+				PERIODIC_GENERAL);
+		keywordPeriodic.add(generalPeriodic);
+
+		keywordLocation = new ArrayList<WordList>();
+		WordList location = new WordList(keywordType.LOCATION, LOCATION);
+		keywordPeriodic.add(location);
 	}
 
 	/**
@@ -202,7 +227,7 @@ public class Parser {
 	}
 
 	private boolean extractTaskInformation(Task taskObject, String arguments)
-			throws Exception {		
+			throws Exception {
 		String dateExtracted = extractDate(arguments, taskObject);
 		String locationExtracted = extractLocation(dateExtracted, taskObject); // for
 																				// extension
@@ -249,7 +274,7 @@ public class Parser {
 	private String extractOneDate(String arg, Task taskObj) throws Exception {
 		Calendar date;
 		String keywordToSplitAt = getKeyword(arg, keywordDate, keywordType.END);
-		String[] newArgs = arg.split(keywordToSplitAt);
+		String[] newArgs = splitAt(arg, keywordToSplitAt);
 		if (hasKeyword(arg, keywordDate, keywordType.SPECIAL)) {
 			date = parseSpecialDate(newArgs[1]);
 		} else {
@@ -264,13 +289,14 @@ public class Parser {
 	// construct task when there are both starting time and endingtime
 	public String extractTwoDates(String commandArguments, Task taskObj)
 			throws Exception {
+		System.out.println("Extracting 2 dates...");
 		Calendar dateOne, dateTwo;
 		assert (commandArguments.contains(ARGUMENT_FROM) && commandArguments
 				.contains(ARGUMENT_TO));
-		String[] endSplit = commandArguments.split(ARGUMENT_TO);
-		String[] startSplit = endSplit[0].split(ARGUMENT_FROM);
+		String[] endSplit = splitAt(commandArguments, ARGUMENT_TO);
+		String[] startSplit = splitAt(endSplit[0], ARGUMENT_FROM);
 		String remainingCommandString = startSplit[0];
-
+		System.out.println("After parsing: " + remainingCommandString);
 		if (hasKeyword(startSplit[1], keywordDate, keywordType.SPECIAL)) {
 			dateOne = parseSpecialDate(startSplit[1]);
 		} else {
@@ -298,11 +324,11 @@ public class Parser {
 	private Calendar parseDate(String dateString) throws Exception {
 		dateString = dateString.trim();
 		String[] dateArgs = dateString.split(" ");
-		
+
 		int day;
 		try {
 			day = Integer.parseInt(dateArgs[0]);
-		} catch(NumberFormatException e) {
+		} catch (NumberFormatException e) {
 			throw new Exception(WARNING_INVALID_DATE);
 		}
 
@@ -325,8 +351,9 @@ public class Parser {
 
 	private Calendar parseSpecialDate(String arg) throws Exception {
 		Calendar date = new GregorianCalendar();
-		String keywordToSplitAt = getKeyword(arg, keywordDate, keywordType.SPECIAL);
-		String[] newArgs = arg.split(keywordToSplitAt);
+		String keywordToSplitAt = getKeyword(arg, keywordDate,
+				keywordType.SPECIAL);
+		String[] newArgs = splitAt(arg, keywordToSplitAt);
 
 		date = new GregorianCalendar();
 		int setDate, today, todayDate, offset;
@@ -374,24 +401,31 @@ public class Parser {
 	 * LOCATION_ARGUMENTS is present, else return original string if date is not
 	 * present
 	 */
-	private String extractLocation(String arg, Task taskObj) throws Exception {
+	private String extractLocation(String partOfCommandString, Task taskObj)
+			throws Exception {
 		String[] newArgs;
 		String returnArg = "";
 
-		if (arg.contains(ARGUMENT_LOC)) {
-			newArgs = arg.split(ARGUMENT_LOC);
+		if (hasKeyword(partOfCommandString, keywordLocation,
+				keywordType.LOCATION)) {
+			String keywordToSplitAt = getKeyword(partOfCommandString,
+					keywordLocation, keywordType.LOCATION);
+			newArgs = splitAt(partOfCommandString, keywordToSplitAt);
 			taskObj.setLocation(newArgs[1]);
 			returnArg = newArgs[0];
 		} else {
-			returnArg = arg;
+			returnArg = partOfCommandString;
 		}
 
 		return returnArg;
 	}
 
-	private String extractPeriodic(String arg, Task taskObj) {
-		if (arg.contains(ARGUMENTS_PERIODIC)) {
-			String argPeriodic = arg.split(ARGUMENTS_PERIODIC)[1];
+	private String extractPeriodic(String partOfCommandString, Task taskObj) {
+		if (hasKeyword(partOfCommandString, keywordPeriodic,
+				keywordType.PERIODIC)) {
+			String keywordToSplitAt = getKeyword(partOfCommandString,
+					keywordPeriodic, keywordType.PERIODIC);
+			String argPeriodic = splitAt(partOfCommandString, keywordToSplitAt)[1];
 			for (int i = 0; i < DAYS.length; i++) {
 				if (argPeriodic.indexOf(DAYS[i]) == 0) {
 					return DAYS[i];
@@ -410,8 +444,7 @@ public class Parser {
 		}
 		return false;
 	}
-	
-	
+
 	private boolean hasKeyword(String str, ArrayList<WordList> keywordType,
 			keywordType keywordList) {
 		for (int i = 0; i < keywordType.size(); i++) {
@@ -423,7 +456,7 @@ public class Parser {
 		}
 		return false;
 	}
-	
+
 	private boolean hasAllKeywords(String str, ArrayList<WordList> keywordType,
 			keywordType keywordList) {
 		for (int i = 0; i < keywordType.size(); i++) {
@@ -446,6 +479,7 @@ public class Parser {
 		}
 		return null;
 	}
+
 	private String getKeyword(String str, ArrayList<WordList> keywordType) {
 		for (int i = 0; i < keywordType.size(); i++) {
 			WordList curWordList = keywordType.get(i);
@@ -453,6 +487,45 @@ public class Parser {
 			if (wordFound != null) {
 				return wordFound;
 			}
+		}
+		return null;
+	}
+
+	private String[] splitAt(String partOfCommandString, String keywordToSplitAt) {
+		String tempString = partOfCommandString;
+		int noOfCutOffChars = 0;
+		while (tempString.contains(keywordToSplitAt)) {
+			int index = tempString.indexOf(keywordToSplitAt);
+			int endIndexOfKeyword = index + keywordToSplitAt.length();
+
+			boolean startConditionOne = index - 1 < 0;
+			boolean startConditionTwo = !startConditionOne
+					&& tempString.charAt(index - 1) == ' ';
+			boolean endConditionOne = endIndexOfKeyword >= tempString.length();
+			boolean endConditionTwo = !endConditionOne
+					&& tempString.charAt(index + keywordToSplitAt.length()) == ' ';
+
+			if ((startConditionTwo) && (endConditionOne || endConditionTwo)) {
+
+				int startEndIndex, endStartIndex;
+				startEndIndex = index + noOfCutOffChars - 1;
+
+				if (endConditionOne) {
+					endStartIndex = index + keywordToSplitAt.length()
+							+ noOfCutOffChars;
+				} else {
+					endStartIndex = index + keywordToSplitAt.length()
+							+ noOfCutOffChars + 1;
+				}
+
+				return new String[] {
+						partOfCommandString.substring(0, startEndIndex),
+						partOfCommandString.substring(endStartIndex) };
+			}
+			String[] helperString = tempString.split(keywordToSplitAt, 2);
+			tempString = helperString[1];
+			noOfCutOffChars += helperString[0].length()
+					+ keywordToSplitAt.length();
 		}
 		return null;
 	}
