@@ -33,17 +33,18 @@ public class Parser {
 	private static final String[] COMMAND_SAVETO = { "saveto" };
 
 	private static class WordList {
-		String name;
-		ArrayList<String> listOfWords = new ArrayList<String>();
+		keywordType name;
+		ArrayList<String> listOfWords;
 
-		WordList(String listName, String[] wordList) {
+		WordList(keywordType listName, String[] wordList) {
 			name = listName;
+			listOfWords = new ArrayList<String>();
 			for (int i = 0; i < wordList.length; i++) {
 				listOfWords.add(wordList[i]);
 			}
 		}
 
-		private String getName() {
+		private keywordType getName() {
 			return this.name;
 		}
 
@@ -63,6 +64,7 @@ public class Parser {
 	private ArrayList<WordList> keywordMonth;
 	private ArrayList<WordList> keywordDay;
 	private ArrayList<WordList> keywordCommand;
+	
 	private static final String ARGUMENT_FROM = "start";
 	private static final String ARGUMENT_TO = "end";
 
@@ -78,17 +80,22 @@ public class Parser {
 			"jun", "jul", "aug", "sep", "oct", "nov", "dec" };
 	private static final String[] DAYS = { "sunday", "monday", "tuesday",
 			"wednesday", "thursday", "friday", "saturday" };
-
+	private enum keywordType {
+		ADD, EDIT, DELETE, DISPLAY, UNDO, REDO, SAVETO, EXIT,
+		EVENT, END, SPECIAL,
+		LOC,
+		THREECHARMONTH, FULLDAY
+	}
 	private Parser() {
 		keywordCommand = new ArrayList<WordList>();
-		WordList add = new WordList("add", COMMAND_ADD);
-		WordList edit = new WordList("edit", COMMAND_EDIT);
-		WordList delete = new WordList("delete", COMMAND_DELETE);
-		WordList undo = new WordList("undo", COMMAND_UNDO);
-		WordList redo = new WordList("redo", COMMAND_REDO);
-		WordList display = new WordList("display", COMMAND_DISPLAY);
-		WordList saveto = new WordList("saveto", COMMAND_SAVETO);
-		WordList exit = new WordList("exit", COMMAND_EXIT);
+		WordList add = new WordList(keywordType.ADD, COMMAND_ADD);
+		WordList edit = new WordList(keywordType.EDIT, COMMAND_EDIT);
+		WordList delete = new WordList(keywordType.DELETE, COMMAND_DELETE);
+		WordList undo = new WordList(keywordType.UNDO, COMMAND_UNDO);
+		WordList redo = new WordList(keywordType.REDO, COMMAND_REDO);
+		WordList display = new WordList(keywordType.DISPLAY, COMMAND_DISPLAY);
+		WordList saveto = new WordList(keywordType.SAVETO, COMMAND_SAVETO);
+		WordList exit = new WordList(keywordType.EXIT, COMMAND_EXIT);
 		keywordCommand.add(add);
 		keywordCommand.add(edit);
 		keywordCommand.add(delete);
@@ -99,19 +106,19 @@ public class Parser {
 		keywordCommand.add(exit);
 		
 		keywordDate = new ArrayList<WordList>();
-		WordList event = new WordList("event", DATE_EVENT);
-		WordList end = new WordList("end", DATE_END);
-		WordList special = new WordList("special", DATE_SPECIAL);
+		WordList event = new WordList(keywordType.EVENT, DATE_EVENT);
+		WordList end = new WordList(keywordType.END, DATE_END);
+		WordList special = new WordList(keywordType.SPECIAL, DATE_SPECIAL);
 		keywordDate.add(event);
 		keywordDate.add(end);
 		keywordDate.add(special);
 
 		keywordMonth = new ArrayList<WordList>();
-		WordList threeCharMonth = new WordList("threeCharMonth", MONTHS);
+		WordList threeCharMonth = new WordList(keywordType.THREECHARMONTH, MONTHS);
 		keywordMonth.add(threeCharMonth);
 
 		keywordDay = new ArrayList<WordList>();
-		WordList fullDay = new WordList("fullDay", DAYS);
+		WordList fullDay = new WordList(keywordType.FULLDAY, DAYS);
 		keywordDay.add(fullDay);
 	}
 
@@ -134,7 +141,7 @@ public class Parser {
 		}
 
 		Command commandObject;
-		if (hasKeyword(commandWord, keywordCommand, "add")) {
+		if (hasKeyword(commandWord, keywordCommand, keywordType.ADD)) {
 			try {
 				Task taskObj = new Task();
 				extractTaskInformation(taskObj, arguments);
@@ -143,7 +150,7 @@ public class Parser {
 				throw new Exception(String.format(
 						WARNING_INSUFFICIENT_ARGUMENT, commandWord));
 			}
-		} else if (hasKeyword(commandWord, keywordCommand, "edit")) {
+		} else if (hasKeyword(commandWord, keywordCommand, keywordType.EDIT)) {
 			try {
 				String[] argumentSplit = arguments.split(" ", 2);
 				String[] indexToDelete = { argumentSplit[0] };
@@ -157,7 +164,7 @@ public class Parser {
 				throw new Exception(String.format(
 						WARNING_INSUFFICIENT_ARGUMENT, commandWord));
 			}
-		} else if (hasKeyword(commandWord, keywordCommand, "delete")) {
+		} else if (hasKeyword(commandWord, keywordCommand, keywordType.DELETE)) {
 			if (commandSplit.length >= 2) {
 				String[] indexToDelete = arguments.split(" ");
 
@@ -166,15 +173,15 @@ public class Parser {
 				throw new Exception(String.format(
 						WARNING_INSUFFICIENT_ARGUMENT, commandWord));
 			}
-		} else if (hasKeyword(commandWord, keywordCommand, "exit")) {
+		} else if (hasKeyword(commandWord, keywordCommand, keywordType.EXIT)) {
 			commandObject = new Command(Command.Type.EXIT);
-		} else if (hasKeyword(commandWord, keywordCommand, "display")) {
+		} else if (hasKeyword(commandWord, keywordCommand, keywordType.DISPLAY)) {
 			commandObject = new Command(Command.Type.DISPLAY);
-		} else if (hasKeyword(commandWord, keywordCommand, "undo")) {
+		} else if (hasKeyword(commandWord, keywordCommand, keywordType.UNDO)) {
 			commandObject = new Command(Command.Type.UNDO);
-		} else if (hasKeyword(commandWord, keywordCommand, "redo")) {
+		} else if (hasKeyword(commandWord, keywordCommand, keywordType.REDO)) {
 			commandObject = new Command(Command.Type.REDO);
-		} else if (hasKeyword(commandWord, keywordCommand, "saveto")) {
+		} else if (hasKeyword(commandWord, keywordCommand, keywordType.SAVETO)) {
 			String[] argumentArray = { arguments };
 			commandObject = new Command(Command.Type.SAVETO, argumentArray);
 		} else {
@@ -218,9 +225,9 @@ public class Parser {
 	 * spelt in full.
 	 */
 	private String extractDate(String arguments, Task taskObj) throws Exception {
-		if (hasKeyword(arguments, keywordDate, "end")) {
+		if (hasKeyword(arguments, keywordDate, keywordType.END)) {
 			return extractOneDate(arguments, taskObj);
-		} else if (hasKeyword(arguments, keywordDate, "event")) {
+		} else if (hasKeyword(arguments, keywordDate, keywordType.EVENT)) {
 			return extractTwoDates(arguments, taskObj);
 		} else {
 			return arguments;
@@ -243,9 +250,9 @@ public class Parser {
 	// construct task when there is just one date in the input
 	private String extractOneDate(String arg, Task taskObj) throws Exception {
 		Calendar date;
-		String keywordToSplitAt = getKeyword(arg, keywordDate, "end");
+		String keywordToSplitAt = getKeyword(arg, keywordDate, keywordType.END);
 		String[] newArgs = arg.split(keywordToSplitAt);
-		if (hasKeyword(arg, keywordDate, "special")) {
+		if (hasKeyword(arg, keywordDate, keywordType.SPECIAL)) {
 			date = parseSpecialDate(newArgs[1]);
 		} else {
 			date = parseDate(newArgs[1]);
@@ -260,21 +267,19 @@ public class Parser {
 	public String extractTwoDates(String commandArguments, Task taskObj)
 			throws Exception {
 		Calendar dateOne, dateTwo;
-		String taskName = extractTaskNameWithoutCommand(commandArguments);
-		taskObj.setName(taskName);
 		assert (commandArguments.contains(ARGUMENT_FROM) && commandArguments
 				.contains(ARGUMENT_TO));
 		String[] endSplit = commandArguments.split(ARGUMENT_TO);
 		String[] startSplit = endSplit[0].split(ARGUMENT_FROM);
 		String remainingCommandString = startSplit[0];
 
-		if (hasKeyword(startSplit[1], keywordDate, "special")) {
+		if (hasKeyword(startSplit[1], keywordDate, keywordType.SPECIAL)) {
 			dateOne = parseSpecialDate(startSplit[1]);
 		} else {
 			dateOne = parseDate(startSplit[1]);
 		}
 
-		if (hasKeyword(endSplit[1], keywordDate, "special")) {
+		if (hasKeyword(endSplit[1], keywordDate, keywordType.SPECIAL)) {
 			dateTwo = parseSpecialDate(endSplit[1]);
 		} else {
 			dateTwo = parseDate(endSplit[1]);
@@ -317,7 +322,7 @@ public class Parser {
 
 	private Calendar parseSpecialDate(String arg) throws Exception {
 		Calendar date = new GregorianCalendar();
-		String keywordToSplitAt = getKeyword(arg, keywordDate, "special");
+		String keywordToSplitAt = getKeyword(arg, keywordDate, keywordType.SPECIAL);
 		String[] newArgs = arg.split(keywordToSplitAt);
 
 		date = new GregorianCalendar();
@@ -404,7 +409,7 @@ public class Parser {
 	}
 	
 	private boolean hasKeyword(String str, ArrayList<WordList> keywordType,
-			String keywordList) {
+			keywordType keywordList) {
 		for (int i = 0; i < keywordType.size(); i++) {
 			WordList curWordList = keywordType.get(i);
 			if (curWordList.getName().equals(keywordList)
@@ -416,7 +421,7 @@ public class Parser {
 	}
 
 	private String getKeyword(String str, ArrayList<WordList> keywordType,
-			String keywordList) {
+			keywordType keywordList) {
 		for (int i = 0; i < keywordType.size(); i++) {
 			WordList curWordList = keywordType.get(i);
 			if (curWordList.getName().equals(keywordList)) {
