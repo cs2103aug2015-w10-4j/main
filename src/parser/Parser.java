@@ -3,7 +3,6 @@ package parser;
 import global.Command;
 import global.Task;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -23,6 +22,14 @@ import java.util.logging.Logger;
  *
  */
 public class Parser {
+	private static final String ERROR_MISSING_START_TIME = "Error: An end time has been entered without start time!";
+	private static final String ERROR_MISSING_END_TIME = "Error: A start time has been entered without end time!";
+	private static final String ERROR_INVALID_DAY_SPECIFIED = "Error: Invalid day specified!";
+	private static final String ERROR_INVALID_NUMBER_OF_ARGUMENTS = "Error: Invalid number of arguments";
+	private static final String ERROR_INVALID_COMMAND_SPECIFIED = "Error: Invalid command specified!";
+	private static final String ERROR_EMPTY_COMMAND_STRING = "Error: Command string is empty";
+	private static final String ERROR_EMPTY_TASK_NAME = "Error: Task name is empty";
+
 	/**
 	 * Parses the command string based on keyword
 	 * 
@@ -34,10 +41,6 @@ public class Parser {
 	Logger logger = Logger.getGlobal();
 
 	// warning messages
-	private static final String WARNING_INSUFFICIENT_ARGUMENT = "Warning: '%s': insufficient command arguments";
-	private static final String WARNING_INVALID_DATE = "Invalid date specified!";
-	private static final String WARNING_INVALID_DAY = "Invalid day specified!";
-	private static final String WARNING_INVALID_MONTH = "Invalid month specified!";
 
 	private static final String[] COMMAND_ADD = { "add" };
 	private static final String[] COMMAND_EDIT = { "edit", "change" };
@@ -121,8 +124,7 @@ public class Parser {
 			commandObject.setArguments(argumentArray);
 			break;
 		default:
-			//oops
-			//throw new Exception("parseCommand: no command word identified.");
+			
 		}
 		return commandObject;
 	}
@@ -149,7 +151,8 @@ public class Parser {
 
 	private Command.Type identifyType(String commandString) throws Exception {
 		if (commandString.length() == 0) {
-			throw new Exception("identifyType: Command string is empty!");
+			logger.info("identifyType: Command string is empty!");
+			throw new Exception(ERROR_EMPTY_COMMAND_STRING);
 		} else {
 			String firstWord = commandString.split(" ", 2)[0];
 			if (isCommandKeyword(firstWord, COMMAND_ADD)) {
@@ -169,7 +172,8 @@ public class Parser {
 			} else if (isCommandKeyword(firstWord, COMMAND_EXIT)) {
 				return Command.Type.EXIT;
 			} else {
-				throw new Exception("Invalid command specified!");
+				logger.info("identifyType: invalid command");
+				throw new Exception(ERROR_INVALID_COMMAND_SPECIFIED);
 			}
 		}
 	}
@@ -207,7 +211,8 @@ public class Parser {
 				taskObject.setLocation(locationArguments[0]);
 				return true;
 			} else {
-				throw new Exception("extractLocation: invalid number of arguments");
+				logger.info("extractLocation: invalid number of arguments");
+				throw new Exception(ERROR_INVALID_NUMBER_OF_ARGUMENTS);
 			}
 		}
 		return false;
@@ -290,7 +295,8 @@ public class Parser {
 				} 
 				logger.finer("parseDate: this/next day determined to be " + date);
 			} else {
-				throw new Exception("parseDate: Invalid day specified!");
+				logger.info("parseDate: invaid day");
+				throw new Exception(ERROR_INVALID_DAY_SPECIFIED);
 			}
 			
 			month = Calendar.getInstance().get(Calendar.MONTH);
@@ -308,7 +314,8 @@ public class Parser {
 				return helperDate;
 			}
 		} else {
-			throw new Exception("parseDate: Invalid arguments for date");
+			logger.info("parseDate: unknown date arguments");
+			throw new Exception("Error: Invalid arguments for date");
 		}
 	}
 	
@@ -385,7 +392,8 @@ public class Parser {
 		logger.fine("extractName: extracting name");
 		String taskName;
 		if (commandString.length() == 0) {
-			throw new Exception("extractName: Command string is empty!");
+			logger.info("extractName: no task information");
+			throw new Exception(ERROR_EMPTY_TASK_NAME);
 		} else if (keywordMarkers.size() > 0) {
 			logger.finer("extractName: markersize > 0");
 			int searchIndex = keywordMarkers.get(0).getIndex() - 1;
@@ -401,11 +409,8 @@ public class Parser {
 			}
 			
 			logger.finer("extractName: past next command word at " + searchIndex);
-			if (searchIndex < 0) {
-				throw new Exception("extractName: No task name found.");
-			} else {
-				taskName = commandString.substring(0, searchIndex);
-			}
+			assert(searchIndex >= 0);
+			taskName = commandString.substring(0, searchIndex);
 		} else {
 			taskName = commandString;
 		}
@@ -456,11 +461,13 @@ public class Parser {
 			curMarkerList.add(markerForEndEvent);
 			return true;
 		} else if (markerForStartEvent != null) {
+			logger.info("getDateField: start time without end time detected");
 			throw new Exception(
-					"getDateField: A start time has been entered without end time!");
+					ERROR_MISSING_END_TIME);
 		} else if (markerForEndEvent != null) {
+			logger.info("getDateField: end time without start time detected");
 			throw new Exception(
-					"getDateField: An end time has been entered without start time!");
+					ERROR_MISSING_START_TIME);
 		} else {
 			return false;
 		}
