@@ -20,6 +20,7 @@ public class Parser {
 
 	// warning messages
 	private static final String WARNING_INSUFFICIENT_ARGUMENT = "Warning: '%s': insufficient command arguments";
+	private static final String WARNING_INVALID_DATE = "Invalid date specified!";
 	private static final String WARNING_INVALID_DAY = "Invalid day specified!";
 	private static final String WARNING_INVALID_MONTH = "Invalid month specified!";
 
@@ -56,6 +57,16 @@ public class Parser {
 				}
 			}
 			return null;
+		}
+		
+		private boolean containsAllStrings(String partOfCommandString) {
+			for (int i = 0; i < listOfWords.size(); i++) {
+				String curWord = listOfWords.get(i);
+				if (!partOfCommandString.contains(curWord)) {
+					return false;
+				}
+			}
+			return true;
 		}
 	};
 
@@ -190,21 +201,8 @@ public class Parser {
 		return commandObject;
 	}
 
-	/*
-	 * Extracts and returns 'name' segment of the command.
-	 */
-	private String extractTaskName(String arg) throws Exception {
-		return arg.split("'")[1];
-	}
-
-	private String extractTaskNameWithoutCommand(String arg) {
-		return arg.split(" ")[0];
-	}
-
 	private boolean extractTaskInformation(Task taskObject, String arguments)
-			throws Exception {
-		//String taskName = extractTaskNameWithoutCommand(arguments);
-		
+			throws Exception {		
 		String dateExtracted = extractDate(arguments, taskObject);
 		String locationExtracted = extractLocation(dateExtracted, taskObject); // for
 																				// extension
@@ -227,7 +225,7 @@ public class Parser {
 	private String extractDate(String arguments, Task taskObj) throws Exception {
 		if (hasKeyword(arguments, keywordDate, keywordType.END)) {
 			return extractOneDate(arguments, taskObj);
-		} else if (hasKeyword(arguments, keywordDate, keywordType.EVENT)) {
+		} else if (hasAllKeywords(arguments, keywordDate, keywordType.EVENT)) {
 			return extractTwoDates(arguments, taskObj);
 		} else {
 			return arguments;
@@ -300,8 +298,13 @@ public class Parser {
 	private Calendar parseDate(String dateString) throws Exception {
 		dateString = dateString.trim();
 		String[] dateArgs = dateString.split(" ");
-
-		int day = Integer.parseInt(dateArgs[0]);
+		
+		int day;
+		try {
+			day = Integer.parseInt(dateArgs[0]);
+		} catch(NumberFormatException e) {
+			throw new Exception(WARNING_INVALID_DATE);
+		}
 
 		int month = Arrays.asList(MONTHS).indexOf(dateArgs[1]);
 		if (month == -1) {
@@ -408,12 +411,25 @@ public class Parser {
 		return false;
 	}
 	
+	
 	private boolean hasKeyword(String str, ArrayList<WordList> keywordType,
 			keywordType keywordList) {
 		for (int i = 0; i < keywordType.size(); i++) {
 			WordList curWordList = keywordType.get(i);
 			if (curWordList.getName().equals(keywordList)
 					&& curWordList.returnIfContainsString(str) != null) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	private boolean hasAllKeywords(String str, ArrayList<WordList> keywordType,
+			keywordType keywordList) {
+		for (int i = 0; i < keywordType.size(); i++) {
+			WordList curWordList = keywordType.get(i);
+			if (curWordList.getName().equals(keywordList)
+					&& curWordList.containsAllStrings(str)) {
 				return true;
 			}
 		}
