@@ -123,12 +123,19 @@ public class Parser {
 			argumentArray = getDeleteIndexes(commandString);
 			commandObject.setArguments(argumentArray);
 			break;
+		case SAVETO:
+			argumentArray = getSaveToArgument(commandString);
+			commandObject.setArguments(argumentArray);
+			break;
 		default:
 			
 		}
 		return commandObject;
 	}
-	
+	private String[] getSaveToArgument(String commandString){
+		String pathString = commandString.split(" ", 2)[0];
+		return new String[]{ pathString };
+	}
 	private String[] getEditIndex(String commandString){
 		String indexString = commandString.split(" ", 2)[0];
 		return new String[]{ indexString };
