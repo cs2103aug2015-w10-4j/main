@@ -32,6 +32,7 @@ import ui.UI;
  */
 public class Logic {
 
+	private static final String ERROR_CANNOT_PARSE_PERIODIC_VALUES = "Error: Unable to parse values for periodic";
 	/*
 	 * Declaration of object variables
 	 */
@@ -106,12 +107,14 @@ public class Logic {
 															// log format
 			logger.addHandler(logHandler);
 			logger.setLevel(Level.FINER); // setting of log level
-
-			listOfTasks = storageObject.getItemList();
+			
+			updateListOfTasks();
 		} catch (FileNotFoundException e) {
 			UIObject.showToUser(ERROR_FILE_NOT_FOUND);
 		} catch (SecurityException | IOException e) {
 			UIObject.showToUser(ERROR_LOG_FILE_INITIALIZE);
+		} catch (Exception e) {
+			UIObject.showToUser(e.getMessage());
 		}
 	}
 
@@ -261,6 +264,8 @@ public class Logic {
 					logger.finer("Index " + (index + 1) + " specified.");
 				}
 			}
+			
+			resolvePeriodic();
 
 			logger.fine("Checking if command should be pushed to history.");
 			if (shouldPushToHistory) {
@@ -296,6 +301,8 @@ public class Logic {
 			}
 		} catch (NumberFormatException e) {
 			return ERROR_INVALID_ARGUMENT;
+		} catch (Exception e) {
+			return e.getMessage();
 		}
 	}
 
@@ -421,6 +428,8 @@ public class Logic {
 				listOfTasks.add(index, userTask);
 				logger.fine("New task added to list.");
 
+				resolvePeriodic();
+				
 				if (shouldPushToHistory) {
 					logger.fine("Pushing command to history.");
 					if (isUndoHistory) {
@@ -459,6 +468,8 @@ public class Logic {
 			}
 		} catch (NumberFormatException e) {
 			return ERROR_INVALID_ARGUMENT;
+		} catch (Exception e) {
+			return e.getMessage();
 		}
 	}
 
@@ -512,6 +523,7 @@ public class Logic {
 	 * @param argumentList
 	 *            the file path string is read from position 0
 	 * @return status string
+	 * @throws Exception 
 	 */
 	String saveFilePath(ArrayList<String> argumentList) {
 		if (isEmptyArgumentList(argumentList)) {
@@ -520,7 +532,7 @@ public class Logic {
 		String filePath = argumentList.get(0);
 		try {
 			boolean locationChanged = storageObject.saveFileToPath(filePath);
-			listOfTasks = storageObject.getItemList();
+			updateListOfTasks();
 			if (locationChanged) {
 				return MESSAGE_SUCCESS_CHANGE_FILE_PATH;
 			} else {
@@ -528,6 +540,8 @@ public class Logic {
 			}
 		} catch (IOException e) {
 			return ERROR_CREATING_FILE;
+		} catch (Exception e) {
+			return e.getMessage();
 		}
 	}
 
@@ -601,6 +615,73 @@ public class Logic {
 			}
 		}
 		return String.format(string, combinedNumberStrings);
+	}
+	
+	private boolean updateListOfTasks() throws Exception {
+		try {
+			listOfTasks = storageObject.getItemList();
+		} catch (FileNotFoundException e) {
+			throw new Exception(ERROR_FILE_NOT_FOUND);
+		}
+		resolvePeriodic();
+		return true;
+	}
+	
+	private boolean resolvePeriodic() throws Exception{
+		for(int i = 0; i < listOfTasks.size(); i++){
+			Task curTask = listOfTasks.get(i);
+			String periodicRepeats = curTask.getPeriodicRepeats();
+			if(periodicRepeats != null){
+				//check if date is updated
+				int periodicRepeatsInt, periodicIntervalValue;
+				String periodicInterval = curTask.getPeriodicInterval();
+				Calendar startingTime = curTask.getStartingTime();
+				Calendar endingTime = curTask.getEndingTime();
+				assert (periodicInterval != null);
+				assert (endingTime != null);
+				String[] periodicIntervalWords = periodicInterval.split(
+						"[ ]+", 2);
+				String periodicIntervalUnit = periodicIntervalWords[1];
+				try {
+					periodicRepeatsInt = Integer.parseInt(periodicRepeats);
+					periodicIntervalValue = Integer
+							.parseInt(periodicIntervalWords[0]);
+				} catch (NumberFormatException e) {
+					throw new Exception(ERROR_CANNOT_PARSE_PERIODIC_VALUES);
+				}
+				
+				Calendar curTime = Calendar.getInstance();
+				
+				
+				while(periodicRepeatsInt > 0 && endingTime.before(curTime)){
+					if(periodicIntervalUnit.equalsIgnoreCase("days")){
+						if(startingTime!= null) {
+							startingTime.add(Calendar.DATE, periodicIntervalValue);
+						}
+						endingTime.add(Calendar.DATE, periodicIntervalValue);
+					} else if (periodicIntervalUnit.equalsIgnoreCase("weeks")){
+						if(startingTime!= null) {
+							startingTime.add(Calendar.WEEK_OF_YEAR, periodicIntervalValue);
+						}
+						endingTime.add(Calendar.WEEK_OF_YEAR, periodicIntervalValue);
+					} else if (periodicIntervalUnit.equalsIgnoreCase("months")){
+						if(startingTime!= null) {
+							startingTime.add(Calendar.MONTH, periodicIntervalValue);
+						}
+						endingTime.add(Calendar.MONTH, periodicIntervalValue);
+					} else {
+						throw new Exception("Error: Periodic interval unit unrecognised.");
+					}
+					periodicRepeatsInt--;
+				}
+				if(periodicRepeatsInt > 0){
+					curTask.setPeriodicRepeats(Integer.toString(periodicRepeatsInt));
+				} else {
+					curTask.setPeriodicRepeats(null);
+				}
+			}
+		}
+		return true;
 	}
 
 	public static Logic getInstance() {
