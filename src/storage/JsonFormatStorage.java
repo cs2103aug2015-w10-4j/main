@@ -63,6 +63,7 @@ public class JsonFormatStorage implements Storage {
 		outputFileWriter.write(LINE_SEPARATOR);
 		
 		outputFileWriter.close();
+		logger.info("JsonFormat write tasks of "+ 	StoreInfo(tasks) +  System.lineSeparator() +" into file: "+ currentFilePath);
 		return true;
 	}
 
@@ -71,6 +72,7 @@ public class JsonFormatStorage implements Storage {
 		tasksArray = tasks.toArray(tasksArray);
 		
 		String jsonFormat = gson.toJson(tasksArray);
+		logger.info("convert to JsonFormat");
 		return jsonFormat;
 	}
 
@@ -102,15 +104,17 @@ public class JsonFormatStorage implements Storage {
 			newFile.createNewFile();
 			currentFilePath = path;
 			isFilePathChanged = true;
+			logger.info("JsonFormat save file to new path: "+path);
 		} else {
 			//exist already, check whether it is the same file
 			//with the current one
 			if (!currentFilePath.equals(path)) {
 				currentFilePath = path;
 				isFilePathChanged = true;
+				logger.info("JsonFormat save file to new path: "+path);
 			}
 		}
-		
+	
 		return isFilePathChanged;
 	}
 
@@ -137,6 +141,7 @@ public class JsonFormatStorage implements Storage {
 		}
 		
 		inputFileScanner.close();
+		logger.info("JsonFormat get items");
 		return result;
 	}
 	
@@ -145,6 +150,15 @@ public class JsonFormatStorage implements Storage {
 			storageInstance = new JsonFormatStorage(true);
 		}
 		return storageInstance;
+	}
+	
+	private String StoreInfo(ArrayList<Task>list){
+		String loggerMsg = "";
+		for(int i = 0; i < list.size(); i++ ) {
+			loggerMsg += list.get(i).getAllInfo() + System.lineSeparator();
+		}
+		return loggerMsg;
+		
 	}
 
 }
