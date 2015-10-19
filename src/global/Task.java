@@ -9,15 +9,13 @@ public class Task {
 	/*
 	 * Declaration of variables
 	 */
-	private static final String PERIODIC_DAILY = "daily";
-	private static final String PERIODIC_WEEKLY = "weekly";
-	private static final String PERIODIC_MONTHLY = "monthly";
-	
+
 	private String name = null;
 	private Calendar startingTime = null;
 	private Calendar endingTime = null;
 	private String location = null;
-	private String periodic = null;
+	private String periodicInterval = null;
+	private String periodicRepeats = null;
 
 	/*
 	 * Constructor
@@ -25,88 +23,90 @@ public class Task {
 	public Task(String name) {
 		this.name = name;
 	}
-	
+
 	public Task(String name, Calendar endingTime) {
 		this.name = name;
 		this.endingTime = endingTime;
 	}
-	
+
 	public Task(String name, Calendar endingTime, String location) {
 		this.name = name;
 		this.endingTime = endingTime;
 		this.location = location;
 	}
-	
+
 	public Task(String name, Calendar startingTime, Calendar endingTime) {
 		this.name = name;
 		this.startingTime = startingTime;
 		this.endingTime = endingTime;
 	}
-	
-	public Task(String name, Calendar startingTime, Calendar endingTime, String location) {
+
+	public Task(String name, Calendar startingTime, Calendar endingTime,
+			String location) {
 		this.name = name;
 		this.startingTime = startingTime;
 		this.endingTime = endingTime;
 		this.location = location;
-	}
-	
-	public Task(String name, Calendar startingTime, Calendar endingTime, String location,String periodic) {
-		this.name = name;
-		this.startingTime = startingTime;
-		this.endingTime = endingTime;
-		this.location = location;
-		this.periodic = periodic;
-		if(isCorrectPeriodic() == false){
-			IllegalArgumentException e = new IllegalArgumentException();
-			throw e;
-		}
-	}
-	
-	
-	public Task() {
-		
 	}
 
-	
+	public Task(String name, Calendar startingTime, Calendar endingTime,
+			String location, String periodicInterval, String periodicRepeats) {
+		this.name = name;
+		this.startingTime = startingTime;
+		this.endingTime = endingTime;
+		this.location = location;
+		this.periodicInterval = periodicInterval;
+		this.periodicRepeats = periodicRepeats;
+	}
+
+	public Task() {
+
+	}
+
 	/*
 	 * Public methods
 	 */
 
-	//returns the name of the task
-	public String getName() {	
+	// returns the name of the task
+	public String getName() {
 		return name;
 	}
-	
+
 	/**
 	 * return time in string format
-	 * @return   time, format : year month Time hour minute (2014 06 04 24 24)
+	 * 
+	 * @return time, format : year month Time hour minute (2014 06 04 24 24)
 	 * @SuppressWarnings("deprecation")
 	 */
 	public Calendar getEndingTime() {
 		return this.endingTime;
 	}
-	
+
 	public Calendar getStartingTime() {
 		return this.startingTime;
 	}
-	
+
 	public String getLocation() {
 		return this.location;
 	}
-	
-	public String getPeriodic() {
-		return this.periodic;
+
+	public String getPeriodicInterval() {
+		return this.periodicInterval;
 	}
-	
-	public boolean hasStartingTime(){
+
+	public String getPeriodicRepeats() {
+		return this.periodicRepeats;
+	}
+
+	public boolean hasStartingTime() {
 		if (this.startingTime == null) {
 			return false;
 		} else {
 			return true;
 		}
 	}
-	
-	public boolean hasEndingTime(){
+
+	public boolean hasEndingTime() {
 		if (this.endingTime == null) {
 			return false;
 		} else {
@@ -114,39 +114,34 @@ public class Task {
 		}
 	}
 
-
-	//change the name of the task
+	// change the name of the task
 	public boolean setName(String newName) {
 		this.name = newName;
 		return true;
 	}
-	
+
 	public boolean setEndingTime(Calendar endingTime) {
 		this.endingTime = endingTime;
 		return true;
 	}
-	
+
 	public boolean setStartingTime(Calendar startingTime) {
 		this.startingTime = startingTime;
 		return true;
 	}
-	
+
 	public boolean setLocation(String location) {
 		this.location = location;
 		return true;
 	}
-	
-	public boolean setPeriodic(String periodic) {
-		this.periodic = periodic;
+
+	public boolean setPeriodicInterval(String periodicInterval) {
+		this.periodicInterval = periodicInterval;
 		return true;
 	}
-	
-	//return false if periodic type is incorrect
-	public boolean isCorrectPeriodic() {
-		String currentPeriodic = getPeriodic();
-		return currentPeriodic.equals(PERIODIC_DAILY) ||
-			   currentPeriodic.equals(PERIODIC_WEEKLY) ||
-			   currentPeriodic.equals(PERIODIC_MONTHLY);
+	public boolean setPeriodicRepeats(String periodicInstances) {
+		this.periodicRepeats = periodicInstances;
+		return true;
 	}
-	
+
 }

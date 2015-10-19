@@ -25,6 +25,10 @@ public class Parser {
 	
 	//status messages
 	
+	private static final String ERROR_INVALID_PERIODIC_INSTANCES = "Error: Invalid periodic instances";
+	private static final String ERROR_INVALID_PERIODIC_INTERVAL_VALUE = "Error: Invalid periodic interval value";
+	private static final String ERROR_INVALID_DATE_SPECIFIED = "Error: Invalid date specified!";
+	private static final String ERROR_INVALID_PERIODIC_INTERVAL = "Error: Invalid periodic interval specified";
 	private static final String ERROR_MISSING_START_TIME = "Error: An end time has been entered without start time!";
 	private static final String ERROR_MISSING_END_TIME = "Error: A start time has been entered without end time!";
 	private static final String ERROR_INVALID_DAY_SPECIFIED = "Error: Invalid day specified!";
@@ -51,16 +55,20 @@ public class Parser {
 	private static final String[] MONTHS = { "jan", "feb", "mar", "apr", "may",
 			"jun", "jul", "aug", "sep", "oct", "nov", "dec" };
 	private static final String[] DAYS = { "sunday" , "monday" , "tuesday" , "wednesday" , "thursday" ,"friday", "saturday" };
+	
+
+	private static final String[] PERIODIC = { "days", "weeks" , "months" };
 
 	private enum FieldType {
-		START_EVENT, END_EVENT, DEADLINE, LOCATION, PERIODIC
+		START_EVENT, END_EVENT, DEADLINE, LOCATION, INTERVAL_PERIODIC, INSTANCES_PERIODIC
 	}
 
 	private static final String[] LOCATION = { "loc" , "at" };
 	private static final String[] DEADLINE = { "by" };
 	private static final String[] START_EVENT = { "start", "from" };
 	private static final String[] END_EVENT = { "end" , "to" };
-	private static final String[] PERIODIC = { "every" , "repeats" };
+	private static final String[] INTERVAL_PERIODIC = { "every" , "repeats" };
+	private static final String[] INSTANCES_PERIODIC = { "for" };
 
 	private class KeywordMarker implements Comparable<KeywordMarker> {
 		private int index;
@@ -208,9 +216,55 @@ public class Parser {
 		
 		logger.fine("extractedTaskInformation: extracting data from string");
 		extractName(commandString, keywordMarkers, taskObject);
-		extractDate(commandString, keywordMarkers, taskObject);
+		boolean hasDate = extractDate(commandString, keywordMarkers, taskObject);
 		extractLocation(commandString, keywordMarkers, taskObject);
+		extractPeriodic(commandString, keywordMarkers, taskObject, hasDate); // valid only if date is specified
 		return true;
+	}
+	
+	private boolean extractPeriodic(String commandString, ArrayList<KeywordMarker> keywordMarkers, Task taskObject, boolean hasDate) throws Exception{
+		String[] periodicIntervalArguments = getArgumentsForField(commandString, keywordMarkers, FieldType.INTERVAL_PERIODIC);
+		String[] periodicInstancesArguments = getArgumentsForField(commandString, keywordMarkers, FieldType.INSTANCES_PERIODIC);
+		if(hasDate && periodicIntervalArguments!= null && periodicInstancesArguments != null){
+			if(periodicIntervalArguments.length == 2){
+				logger.finer("extractPeriodic: interval argument length is 2.");
+				int periodicIntervalValue;
+				try{
+					periodicIntervalValue = Integer.parseInt(periodicIntervalArguments[0]);
+				}catch(NumberFormatException e){
+					throw new Exception(ERROR_INVALID_PERIODIC_INTERVAL_VALUE);
+				}
+				
+				String periodicIntervalUnit = periodicIntervalArguments[1];
+				if(hasKeyword(periodicIntervalUnit, PERIODIC)){
+					taskObject.setPeriodicInterval(periodicIntervalValue + " " + periodicIntervalUnit);
+				} else {
+					logger.info("extractPeriodic: invalid period interval");
+					throw new Exception(ERROR_INVALID_PERIODIC_INTERVAL);
+				}
+				//return true;
+			} else {
+				logger.info("extractPeriodic: invalid number of interval arguments - " + periodicIntervalArguments.length);
+				throw new Exception(ERROR_INVALID_NUMBER_OF_ARGUMENTS);
+			}
+			
+			if(periodicInstancesArguments.length == 1){
+				logger.finer("extractPeriodic: periodic argument length is 1.");
+				int periodicInstancesValue;
+				try{
+					periodicInstancesValue = Integer.parseInt(periodicInstancesArguments[0]);
+				}catch(NumberFormatException e){
+					throw new Exception(ERROR_INVALID_PERIODIC_INSTANCES);
+				}
+				taskObject.setPeriodicRepeats(periodicInstancesArguments[0]);
+			} else {
+				logger.info("extractPeriodic: invalid number of instance arguments - " + periodicInstancesArguments.length);
+				throw new Exception(ERROR_INVALID_NUMBER_OF_ARGUMENTS);
+			}
+
+			return true;
+		}
+		return false;
 	}
 	
 	private boolean extractLocation(String commandString, ArrayList<KeywordMarker> keywordMarkers, Task taskObject) throws Exception{
@@ -276,7 +330,11 @@ public class Parser {
 		logger.fine("parseDate: parsing date");
 		int date, month, year;
 		if (!hasKeyword(dateArguments, DATE_SPECIAL)) {
-			date = Integer.parseInt(dateArguments[0]);
+			try{
+				date = Integer.parseInt(dateArguments[0]);
+			}catch(NumberFormatException e){
+				throw new Exception(ERROR_INVALID_DATE_SPECIFIED);
+			}
 			month = Arrays.asList(MONTHS).indexOf(dateArguments[1]);
 			if(dateArguments.length == 3){
 				year = Integer.parseInt(dateArguments[2]);
@@ -434,8 +492,29 @@ public class Parser {
 		
 		getLocationField(keywordMarkerList, commandString);
 		getDateField(keywordMarkerList, commandString);
-
+		getPeriodicField(keywordMarkerList, commandString);
 		return keywordMarkerList;
+	}
+	
+	private boolean getPeriodicField(ArrayList<KeywordMarker> curMarkerList,
+			String commandString) throws Exception {
+		KeywordMarker markerForIntervalPeriodic = getKeywordMarker(commandString,
+				INTERVAL_PERIODIC);
+		KeywordMarker markerForInstancesPeriodic = getKeywordMarker(commandString,
+				INSTANCES_PERIODIC);
+		if (markerForIntervalPeriodic != null && markerForInstancesPeriodic != null) {
+			markerForIntervalPeriodic.setFieldType(FieldType.INTERVAL_PERIODIC);
+			curMarkerList.add(markerForIntervalPeriodic);
+			markerForInstancesPeriodic.setFieldType(FieldType.INSTANCES_PERIODIC);
+			curMarkerList.add(markerForInstancesPeriodic);
+			return true;
+		} else if (markerForIntervalPeriodic != null) {
+			throw new Exception("Error: Missing number of repeats");
+		} else if (markerForInstancesPeriodic != null) {
+			throw new Exception("Error: Missing repeat interval");
+		} else {
+			return false;
+		}
 	}
 
 	private boolean getLocationField(ArrayList<KeywordMarker> curMarkerList,

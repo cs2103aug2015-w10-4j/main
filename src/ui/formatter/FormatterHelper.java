@@ -17,7 +17,9 @@ public class FormatterHelper {
 															  "startingTime",
 															  "endingTime",
 															  "location",
-															  "periodic" };
+															  "periodicInterval",
+															  "periodicRepeats"
+															  };
 	
 
 	private static final String[] TABLE_COLUMN_NAMES = new String[] { "No.",
@@ -25,9 +27,11 @@ public class FormatterHelper {
 																	  "Starting Time",
 																	  "Ending Time",
 																	  "Location",
-																	  "Period" };
+																	  "Every",
+																	  "Repeats"
+																	  };
 	
-	private static final int COLUMN_COUNT = 6;
+	private static final int COLUMN_COUNT = 7;
 	
 	//additional space at the beginning and the end
 	private static final int ADDITIONAL_SPACE = 2;
