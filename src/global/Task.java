@@ -97,6 +97,11 @@ public class Task {
 	public String getPeriodicRepeats() {
 		return this.periodicRepeats;
 	}
+	
+	public String getAllInfo() {
+		return "Name: "+ name + " Starting time: " + this.startingTime + " Ending Time: "+ this.getEndingTime() +
+				" Location: " +this.location + " Period Interval: "+ this.periodicInterval + " Period Repeats " + this.periodicRepeats;
+	}
 
 	public boolean hasStartingTime() {
 		if (this.startingTime == null) {
