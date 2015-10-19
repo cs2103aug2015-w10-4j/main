@@ -22,6 +22,9 @@ import java.util.logging.Logger;
  *
  */
 public class Parser {
+	
+	//status messages
+	
 	private static final String ERROR_MISSING_START_TIME = "Error: An end time has been entered without start time!";
 	private static final String ERROR_MISSING_END_TIME = "Error: A start time has been entered without end time!";
 	private static final String ERROR_INVALID_DAY_SPECIFIED = "Error: Invalid day specified!";
@@ -30,17 +33,9 @@ public class Parser {
 	private static final String ERROR_EMPTY_COMMAND_STRING = "Error: Command string is empty";
 	private static final String ERROR_EMPTY_TASK_NAME = "Error: Task name is empty";
 
-	/**
-	 * Parses the command string based on keyword
-	 * 
-	 * @param command
-	 * @return commandObject to be executed, or null if invalid
-	 */
 	private static Parser parserInstance = null;
 	
 	Logger logger = Logger.getGlobal();
-
-	// warning messages
 
 	private static final String[] COMMAND_ADD = { "add" };
 	private static final String[] COMMAND_EDIT = { "edit", "change" };
@@ -58,13 +53,14 @@ public class Parser {
 	private static final String[] DAYS = { "sunday" , "monday" , "tuesday" , "wednesday" , "thursday" ,"friday", "saturday" };
 
 	private enum FieldType {
-		START_EVENT, END_EVENT, DEADLINE, LOCATION, THREECHARMONTH, FULLDAY, PERIODIC
+		START_EVENT, END_EVENT, DEADLINE, LOCATION, PERIODIC
 	}
 
 	private static final String[] LOCATION = { "loc" , "at" };
 	private static final String[] DEADLINE = { "by" };
 	private static final String[] START_EVENT = { "start", "from" };
 	private static final String[] END_EVENT = { "end" , "to" };
+	private static final String[] PERIODIC = { "every" , "repeats" };
 
 	private class KeywordMarker implements Comparable<KeywordMarker> {
 		private int index;
@@ -98,6 +94,13 @@ public class Parser {
 		}
 	}
 
+	
+	/**
+	 * Parses the command string based on keyword
+	 * 
+	 * @param command
+	 * @return commandObject to be executed, or null if invalid
+	 */
 	public Command parseCommand(String commandString) throws Exception {
 		commandString = commandString.trim();
 		Command.Type commandType = identifyType(commandString);
