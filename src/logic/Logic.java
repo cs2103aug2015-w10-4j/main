@@ -68,6 +68,7 @@ public class Logic {
 	private static final String MESSAGE_SUCCESS_NO_CHANGE_FILE_PATH = "File path not changed. Entered file path is the same as current one used.";
 	private static final String MESSAGE_DISPLAY_EMPTY = "No items to display.";
 	private static final String SEPARATOR_ITEM_LIST = ", ";
+	private static final String IDENTIFIER_DELETE_ALL = "all";
 	private static final String ERROR_WRITING_FILE = "Error: Unable to write file.";
 	private static final String ERROR_CREATING_FILE = "Error: Unable to create file.";
 	private static final String ERROR_FILE_NOT_FOUND = "Error: Data file not found.";
@@ -331,8 +332,15 @@ public class Logic {
 		try {
 			logger.fine("Cleaning up arguments.");
 			
-			argumentList = removeDuplicates(argumentList);
-			
+			if (argumentList.size() == 1 &&
+					argumentList.get(0).equalsIgnoreCase(IDENTIFIER_DELETE_ALL)) {
+				argumentList.clear();
+				for (int i = 0; i < listOfTasks.size(); i++) {
+					argumentList.add(Integer.toString(i+1));
+				}
+			} else {
+				argumentList = removeDuplicates(argumentList);
+			}
 			for (String str : argumentList) {
 				int index = Integer.parseInt(str) - 1;
 				parsedIntArgumentList.add(index);
