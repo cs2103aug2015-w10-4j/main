@@ -106,7 +106,6 @@ public class FormatterHelper {
 	}
 
 	public static String[] splitString(String string, int lineCharLimit) {
-		assert lineCharLimit > 1 : "Does not work if charLimit = 1";
 		if (string == null) {
 			return new String[] {EMPTY_STRING_SUBSTITUTE};
 		}

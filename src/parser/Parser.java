@@ -118,27 +118,27 @@ public class Parser {
 		String[] argumentArray;
 		
 		switch (commandType) {
-		case ADD:
-			extractTaskInformation(commandString, taskObject);
-			commandObject.addTask(taskObject);
-			break;
-		case EDIT:
-			argumentArray = getEditIndex(commandString);
-			commandObject.setArguments(argumentArray);
-			commandString = clearFirstWord(commandString);
-			
-			extractTaskInformation(commandString, taskObject);
-			commandObject.addTask(taskObject);
-			break;
-		case DELETE:
-			argumentArray = getDeleteIndexes(commandString);
-			commandObject.setArguments(argumentArray);
-			break;
-		case SAVETO:
-			argumentArray = getSaveToArgument(commandString);
-			commandObject.setArguments(argumentArray);
-			break;
-		default:
+			case ADD :
+				extractTaskInformation(commandString, taskObject);
+				commandObject.addTask(taskObject);
+				break;
+			case EDIT :
+				argumentArray = getEditIndex(commandString);
+				commandObject.setArguments(argumentArray);
+				commandString = clearFirstWord(commandString);
+				
+				extractTaskInformation(commandString, taskObject);
+				commandObject.addTask(taskObject);
+				break;
+			case DELETE :
+				argumentArray = getDeleteIndexes(commandString);
+				commandObject.setArguments(argumentArray);
+				break;
+			case SAVETO :
+				argumentArray = getSaveToArgument(commandString);
+				commandObject.setArguments(argumentArray);
+				break;
+			default:
 			
 		}
 		return commandObject;
@@ -565,8 +565,7 @@ public class Parser {
 	private KeywordMarker getKeywordMarker(String commandString,
 			String[] listOfKeywords) {
 		for (int i = 0; i < listOfKeywords.length; i++) {
-			String curKeyword = " " + listOfKeywords[i] + " "; // maybe use
-																// string format
+			String curKeyword = String.format(" %s ", listOfKeywords[i]);
 			int keywordIndex = commandString.indexOf(curKeyword);
 			if (commandString.indexOf(curKeyword) != -1) {
 				int indexOfArgument = keywordIndex + curKeyword.length();

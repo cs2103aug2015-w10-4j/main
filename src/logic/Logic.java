@@ -179,33 +179,33 @@ public class Logic {
 		ArrayList<String> argumentList = commandObject.getArguments();
 
 		switch (commandType) {
-		case ADD:
-			logger.info("ADD command detected");
-			return addItem(userTasks, argumentList, shouldPushToHistory,
-					isUndoHistory);
-		case DELETE:
-			logger.info("DELETE command detected");
-			return deleteItem(argumentList, shouldPushToHistory, isUndoHistory);
-		case EDIT:
-			logger.info("EDIT command detected");
-			return editItem(userTasks, argumentList, shouldPushToHistory,
-					isUndoHistory);
-		case DISPLAY:
-			logger.info("DISPLAY command detected");
-			return displayItems();
-		case UNDO:
-			logger.info("UNDO command detected");
-			return undoCommand();
-		case REDO:
-			logger.info("REDO command detected");
-			return redoCommand();
-		case SAVETO:
-			logger.info("SAVETO command detected");
-			return saveFilePath(argumentList);
-		case EXIT:
-			logger.info("EXIT command detected");
-			return exitProgram();
-		default:
+			case ADD :
+				logger.info("ADD command detected");
+				return addItem(userTasks, argumentList, shouldPushToHistory,
+						isUndoHistory);
+			case DELETE :
+				logger.info("DELETE command detected");
+				return deleteItem(argumentList, shouldPushToHistory, isUndoHistory);
+			case EDIT :
+				logger.info("EDIT command detected");
+				return editItem(userTasks, argumentList, shouldPushToHistory,
+						isUndoHistory);
+			case DISPLAY :
+				logger.info("DISPLAY command detected");
+				return displayItems();
+			case UNDO :
+				logger.info("UNDO command detected");
+				return undoCommand();
+			case REDO :
+				logger.info("REDO command detected");
+				return redoCommand();
+			case SAVETO :
+				logger.info("SAVETO command detected");
+				return saveFilePath(argumentList);
+			case EXIT :
+				logger.info("EXIT command detected");
+				return exitProgram();
+			default :
 		}
 		logger.warning("Command type cannot be identified!");
 		return ERROR_NO_COMMAND_HANDLER;

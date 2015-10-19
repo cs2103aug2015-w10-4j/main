@@ -22,7 +22,6 @@ import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
 
-import parser.Parser;
 import global.Task;
 import ui.formatter.TaskListFormatter;
 
@@ -83,6 +82,8 @@ public class UI {
 	private static final int DISPLAY_AREA_FONT_SIZE = 12;
 	
 	private static final int MAXIMUM_COLUMN_WIDTH = 30;
+	
+	private static final String EMPTY_STRING = "";
 	
 	/*
 	 * Initialization of GUI variables
@@ -251,16 +252,37 @@ public class UI {
 	public String promptUser(String prompt) throws InterruptedException {
 		logger.info("Entering promptUser(prompt = " + prompt + ")");
 		
-		promptLabel.setText(prompt);
-		userInputField.setEditable(true);
-		userInputField.grabFocus();
+		prepareComponentForUserInput(prompt);
 		waitForUserInput();
-		String userInput = userInputField.getText();
-		userInputField.setText("");
+		sanitizeUserInput();
+		
+		String userInput = getUserInput();
+		
+		cleanUserInputField();
 		
 		logger.info("Returning from promptUser");
 		
 		return userInput;
+	}
+
+	private void cleanUserInputField() {
+		userInputField.setText(EMPTY_STRING);
+	}
+
+	private String getUserInput() {
+		return userInputField.getText();
+	}
+	
+	private void sanitizeUserInput() {
+		String userInput = userInputField.getText();
+		userInput = userInput.replaceAll("\t", " ");
+		userInputField.setText(userInput);
+	}
+
+	private void prepareComponentForUserInput(String prompt) {
+		promptLabel.setText(prompt);
+		userInputField.setEditable(true);
+		userInputField.grabFocus();
 	}
 
 	private void waitForUserInput() throws InterruptedException {

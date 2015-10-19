@@ -80,13 +80,13 @@ public class TaskListFormatter {
 			for (int i = 0; i < columnData.length; i++) {
 				if (columnData[i].length >= row) {
 					result.append(StringFormatter.formatString(columnData[i][row - 1],
-															   StringFormatter.Alignment.ALIGN_LEFT,
-															   columnInfo[i].getColumnWidth()));
+							StringFormatter.Alignment.ALIGN_LEFT,
+							columnInfo[i].getColumnWidth()));
 					result.append(VERTICAL_CHAR);
 				} else {
-					result.append(StringFormatter.formatString(NULL_STRING_SUBSTITUTE,
-															   StringFormatter.Alignment.ALIGN_LEFT,
-															   columnInfo[i].getColumnWidth()));
+					result.append(StringFormatter.formatString(NULL_STRING_SUBSTITUTE, 
+							StringFormatter.Alignment.ALIGN_LEFT,
+							columnInfo[i].getColumnWidth()));
 					result.append(VERTICAL_CHAR);
 				}
 			}
@@ -101,9 +101,9 @@ public class TaskListFormatter {
 		
 		result.append(VERTICAL_CHAR);
 		for (int i = 0; i < columnInfo.length; i++) {
-			result.append(StringFormatter.formatString(columnInfo[i].getColumnName(),
-													   StringFormatter.Alignment.ALIGN_CENTER,
-													   columnInfo[i].getColumnWidth()));
+			result.append(StringFormatter.formatString(columnInfo[i].getColumnName(), 
+					StringFormatter.Alignment.ALIGN_CENTER,
+					columnInfo[i].getColumnWidth()));
 			result.append(VERTICAL_CHAR);
 		}
 		result.append(MESSAGE_DISPLAY_NEWLINE);
