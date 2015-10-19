@@ -36,6 +36,8 @@ public class Parser {
 	private static final String ERROR_INVALID_COMMAND_SPECIFIED = "Error: Invalid command specified!";
 	private static final String ERROR_EMPTY_COMMAND_STRING = "Error: Command string is empty";
 	private static final String ERROR_EMPTY_TASK_NAME = "Error: Task name is empty";
+	
+	private static final String WHITE_SPACE_REGEX = "\\s+";
 
 	private static Parser parserInstance = null;
 	
@@ -144,21 +146,21 @@ public class Parser {
 		return commandObject;
 	}
 	private String[] getSaveToArgument(String commandString){
-		String pathString = commandString.split(" ", 2)[0];
+		String pathString = commandString.split(WHITE_SPACE_REGEX, 2)[0];
 		return new String[]{ pathString };
 	}
 	private String[] getEditIndex(String commandString){
-		String indexString = commandString.split(" ", 2)[0];
+		String indexString = commandString.split(WHITE_SPACE_REGEX, 2)[0];
 		return new String[]{ indexString };
 	}
 	
 	private String[] getDeleteIndexes(String commandString){
-		String[] indexArray = commandString.split(" ");
+		String[] indexArray = commandString.split(WHITE_SPACE_REGEX);
 		return indexArray;
 	}
 
 	private String clearFirstWord(String commandString) {
-		String[] splitCommand = commandString.split(" ", 2);
+		String[] splitCommand = commandString.split(WHITE_SPACE_REGEX, 2);
 		assert (splitCommand.length >= 1);
 		if (splitCommand.length == 1) {
 			return "";
@@ -172,7 +174,7 @@ public class Parser {
 			logger.info("identifyType: Command string is empty!");
 			throw new Exception(ERROR_EMPTY_COMMAND_STRING);
 		} else {
-			String firstWord = commandString.split(" ", 2)[0];
+			String firstWord = commandString.split(WHITE_SPACE_REGEX, 2)[0];
 			if (isCommandKeyword(firstWord, COMMAND_ADD)) {
 				return Command.Type.ADD;
 			} else if (isCommandKeyword(firstWord, COMMAND_EDIT)) {
@@ -447,7 +449,7 @@ public class Parser {
 				logger.finer("getArgumentsForField: indexSearch is " + indexSearch);
 				String argumentString = commandString.substring(curIndex,
 						indexSearch);
-				String[] argumentWords = argumentString.split("[ ]+");
+				String[] argumentWords = argumentString.split(WHITE_SPACE_REGEX);
 				return argumentWords;
 			}
 		}

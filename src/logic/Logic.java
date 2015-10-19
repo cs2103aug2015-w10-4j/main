@@ -81,6 +81,8 @@ public class Logic {
 	private static final String ERROR_CANNOT_WRITE_TO_HISTORY = "Error: Unable to store command in history.";
 
 	private static final String WARNING_TIMING_CLASH = "Warning: There are clashing timings between tasks.";
+	
+	private static final String WHITE_SPACE_REGEX = "\\s+";
 
 	/*
 	 * Main program
@@ -640,7 +642,7 @@ public class Logic {
 				assert (periodicInterval != null);
 				assert (endingTime != null);
 				String[] periodicIntervalWords = periodicInterval.split(
-						"[ ]+", 2);
+						WHITE_SPACE_REGEX, 2);
 				String periodicIntervalUnit = periodicIntervalWords[1];
 				try {
 					periodicRepeatsInt = Integer.parseInt(periodicRepeats);
