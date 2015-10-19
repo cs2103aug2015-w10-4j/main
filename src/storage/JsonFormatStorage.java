@@ -63,7 +63,7 @@ public class JsonFormatStorage implements Storage {
 		outputFileWriter.write(LINE_SEPARATOR);
 		
 		outputFileWriter.close();
-		logger.info("JsonFormat write tasks of "+ 	StoreInfo(tasks) +  System.lineSeparator() +" into file: "+ currentFilePath);
+		logger.info("JsonFormat write tasks of "+ 	StoreInfo(tasks) + " into file: "+ currentFilePath);
 		return true;
 	}
 
@@ -155,7 +155,7 @@ public class JsonFormatStorage implements Storage {
 	private String StoreInfo(ArrayList<Task>list){
 		String loggerMsg = "";
 		for(int i = 0; i < list.size(); i++ ) {
-			loggerMsg += list.get(i).getAllInfo() + System.lineSeparator();
+			loggerMsg += list.get(i).getAllInfo() + " ";
 		}
 		return loggerMsg;
 		
