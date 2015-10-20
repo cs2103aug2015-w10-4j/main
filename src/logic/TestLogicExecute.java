@@ -134,6 +134,16 @@ public class TestLogicExecute {
 	}
 	
 	@Test
+	public void logicExecuteNull(){
+		Command commandObject = null;
+		assertEquals("Error: Invalid command.", logicObject.executeCommand(commandObject, true, true));
+		
+		commandObject = new Command(null, new String[]{"123"});
+		assertEquals("Error: Handler for this command type has not been defined.", logicObject.executeCommand(commandObject, true, true));
+		
+	}
+	
+	@Test
 	public void logicExecute(){
 		Task task;
 		Command commandObject;
