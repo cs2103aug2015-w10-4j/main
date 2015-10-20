@@ -96,7 +96,21 @@ public class TestLogicExecute {
 		assertEquals("Displaying items.", logicObject.executeCommand(commandObject, true, true));
 	}
 	
+	@Test
+	public void logicExecuteUndo(){
+		Command commandObject;
+		// case 1
+		commandObject = new Command(Command.Type.UNDO);
+		assertEquals("Error: No history found.", logicObject.executeCommand(commandObject, true, true));
+	}
 	
+	@Test
+	public void logicExecuteRedo(){
+		Command commandObject;
+		// case 1
+		commandObject = new Command(Command.Type.REDO);
+		assertEquals("Error: No history found.", logicObject.executeCommand(commandObject, true, true));
+	}
 	
 	@Test
 	public void logicExecuteSavePath(){
