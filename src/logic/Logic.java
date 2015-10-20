@@ -341,7 +341,6 @@ public class Logic {
 			
 			Collections.sort(parsedIntArgumentList);
 		} catch (NumberFormatException | IndexOutOfBoundsException e) {
-			e.printStackTrace();
 			return ERROR_INVALID_ARGUMENT;
 		}
 

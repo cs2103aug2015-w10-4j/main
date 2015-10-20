@@ -6,10 +6,8 @@ import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -50,8 +48,6 @@ public class UI {
 	 * Declaration of variables
 	 */
 	private Logger logger = Logger.getGlobal();
-	private static ArrayList<String> arr = new ArrayList<String> ();
-	private static int index = 0;
 	
 	private static final int DISPLAY_ROW_COUNT = 30;
 	private static final int DISPLAY_COLUMN_COUNT = 60;
@@ -97,6 +93,7 @@ public class UI {
 	private StatusBar statusBar = new StatusBar();
 	
 	private TaskListFormatter taskListFormatter = TaskListFormatter.getInstance();
+	private UserInputHistory userInputHistory = new UserInputHistory();
 	
 	/*
 	 * Constructor
@@ -211,11 +208,9 @@ public class UI {
 		userInputField.setEditable(false);
 		userInputField.setColumns(USER_INPUT_FIELD_CHAR_COUNT);
 		
-		userInputField.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				synchronized (userInputField) {
-					userInputField.notify();
-				}
+		userInputField.addActionListener(e -> {
+			synchronized (userInputField) {
+				userInputField.notify();
 			}
 		});
 		
@@ -231,31 +226,25 @@ public class UI {
 		userInputField.getInputMap().put(KeyStroke.getKeyStroke("ESCAPE"), clearText);
 		
 		
+		@SuppressWarnings("serial")
 		Action lastText = new AbstractAction() {
 		    public void actionPerformed(ActionEvent e) {
-		    	if(index > 0){
-		        userInputField.setText(arr.get(index-1));
-		        index --;	
-		    	}		       
+		    	String userInputFromHistory = userInputHistory.moveUpInHistory();
+		    	userInputField.setText(userInputFromHistory);
 		    }
 		};
 		userInputField.getInputMap().put(KeyStroke.getKeyStroke("UP"), lastText);
 		
+		@SuppressWarnings("serial")
 		Action nextText = new AbstractAction() {
 		    public void actionPerformed(ActionEvent e) {
-		    	if(index <arr.size() -1) {
-		        userInputField.setText(arr.get(index+1));
-		        index ++;
-		    	}   		      
+		    	String userInputFromHistory = userInputHistory.moveDownInHistory();
+		    	userInputField.setText(userInputFromHistory);
 		    }
 		};
 		userInputField.getInputMap().put(KeyStroke.getKeyStroke("DOWN"), nextText);
 	}
 	
-	
-
-	
-
 	private void prepareFrame() {
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setLayout(new GridBagLayout());
@@ -284,9 +273,8 @@ public class UI {
 		sanitizeUserInput();
 		
 		String userInput = getUserInput();
-		arr.add(userInput);
-		index ++;
 		
+		userInputHistory.addToHistory(userInput);
 		cleanUserInputField();
 		
 		logger.info("Returning from promptUser");
