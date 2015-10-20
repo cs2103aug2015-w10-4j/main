@@ -236,8 +236,8 @@ public class UI {
 		    public void actionPerformed(ActionEvent e) {
 		    	if(index > 0){
 		        userInputField.setText(arr.get(index-1));
-		    	}
 		        index --;	
+		    	}		       
 		    }
 		};
 		userInputField.getInputMap().put(KeyStroke.getKeyStroke("UP"), lastText);
@@ -246,8 +246,8 @@ public class UI {
 		    public void actionPerformed(ActionEvent e) {
 		    	if(index <arr.size() -1) {
 		        userInputField.setText(arr.get(index+1));
-		    	}
-		        index ++;		      
+		        index ++;
+		    	}   		      
 		    }
 		};
 		userInputField.getInputMap().put(KeyStroke.getKeyStroke("DOWN"), nextText);
