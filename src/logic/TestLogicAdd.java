@@ -18,7 +18,7 @@ public class TestLogicAdd {
 	public void setup(){
 		File saveFile = new File("save.txt");
 		saveFile.delete();
-		logicObject = Logic.getInstance();
+		logicObject = new Logic();
 	}
 	
 	@Test
@@ -59,7 +59,6 @@ public class TestLogicAdd {
 	
 	@After
 	public void cleanup(){
-		Logic.destroyAnyInstance();
 		File saveFile = new File("save.txt");
 		saveFile.delete();
 	}

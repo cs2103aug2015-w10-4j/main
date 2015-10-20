@@ -38,7 +38,6 @@ public class Logic {
 	 * Declaration of object variables
 	 */
 	Logger logger = Logger.getGlobal();
-	private static Logic logicInstance = null;
 	UI UIObject;
 	Parser parserObject;
 	Storage storageObject;
@@ -90,18 +89,18 @@ public class Logic {
 	 * Main program
 	 */
 	public static void main(String[] args) {
-		Logic logicObject = Logic.getInstance();
+		Logic logicObject = new Logic();
 		logicObject.start();
 	}
 
 	/*
 	 * Constructor to initialize object variables
 	 */
-	private Logic() {
-		UIObject = UI.getInstance();
-		parserObject = Parser.getInstance();
-		storageObject = JsonFormatStorage.getInstance();
-		historyObject = History.getInstance();
+	public Logic() {
+		UIObject = new UI();
+		parserObject = new Parser();
+		storageObject = new JsonFormatStorage();
+		historyObject = new History();
 		try {
 			FileHandler logHandler = new FileHandler("tasky.log");
 			LogManager.getLogManager().reset(); // removes printout to console
@@ -718,17 +717,6 @@ public class Logic {
 			}
 		}
 		return true;
-	}
-
-	public static Logic getInstance() {
-		if (logicInstance == null) {
-			logicInstance = new Logic();
-		}
-		return logicInstance;
-	}
-
-	public static void destroyAnyInstance() {
-		logicInstance = null;
 	}
 
 	String exitProgram() {

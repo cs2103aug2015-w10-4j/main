@@ -18,7 +18,6 @@ import global.Task;
 
 public class JsonFormatStorage implements Storage {
 	Logger logger = Logger.getGlobal(); // use logger.<log level>(message) to log a message. default log level is info
-	private static JsonFormatStorage storageInstance = null;
 	
 	private static final String LINE_SEPARATOR = System.getProperty("line.separator");
 	private static final String DEFAULT_FILE_PATH = "save.txt";
@@ -30,7 +29,7 @@ public class JsonFormatStorage implements Storage {
 	/**
 	 * Default constructor for JsonFormatStorage. Does not use pretty formatting for JSON.
 	 */
-	JsonFormatStorage() {
+	public JsonFormatStorage() {
 		gson = new GsonBuilder().serializeNulls().create();
 	}
 	
@@ -143,13 +142,6 @@ public class JsonFormatStorage implements Storage {
 		inputFileScanner.close();
 		logger.info("JsonFormat get items");
 		return result;
-	}
-	
-	public static Storage getInstance(){
-		if(storageInstance == null){
-			storageInstance = new JsonFormatStorage(true);
-		}
-		return storageInstance;
 	}
 	
 	private String StoreInfo(ArrayList<Task>list){

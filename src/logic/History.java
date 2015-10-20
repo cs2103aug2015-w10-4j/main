@@ -8,14 +8,11 @@ import parser.Parser;
 
 public class History {
 	Logger logger = Logger.getGlobal();
-	private static History historyInstance = null;
 	ArrayList<Command> commandHistoryList  = new ArrayList<Command>();
 	ArrayList<String> commandStringHistoryList = new ArrayList<String>(); // for future previous command string
 	ArrayList<Command> commandUndoHistoryList = new ArrayList<Command>();
 	
-	private History() {
-		// to make constructor private
-	}
+	
 	
 	boolean pushCommand(Command commandObject, boolean isForUndo) {
 		if (isForUndo) {
@@ -42,12 +39,5 @@ public class History {
 		} else {
 			return null;
 		}
-	}
-	
-	public static History getInstance(){
-		if(historyInstance == null){
-			historyInstance = new History();
-		}
-		return historyInstance;
 	}
 }

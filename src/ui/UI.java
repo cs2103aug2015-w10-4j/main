@@ -50,7 +50,6 @@ public class UI {
 	 * Declaration of variables
 	 */
 	private Logger logger = Logger.getGlobal();
-	private static UI uiInstance = null;
 	private static ArrayList<String> arr = new ArrayList<String> ();
 	private static int index = 0;
 	
@@ -102,7 +101,7 @@ public class UI {
 	/*
 	 * Constructor
 	 */
-	private UI() {
+	public UI() {
 		prepareComponents();
 		addComponentsToPane(frame.getContentPane());
 		displayFrame();
@@ -357,12 +356,5 @@ public class UI {
 		logger.info("Returning from showStatusToUser");
 		
 		return true;
-	}
-	
-	public static UI getInstance(){
-		if(uiInstance == null){
-			uiInstance = new UI();
-		}
-		return uiInstance;
 	}
 }

@@ -17,15 +17,15 @@ Logic logicObject;
 	
 	@Before
 	public void setup(){
+		logicObject = new Logic();
 		File saveFile = new File("save.txt");
 		saveFile.delete();
-		logicObject = Logic.getInstance();
 	}
 	
 
 	
 	@Test
-	public void logicUndoEmpty(){
+	public void logicUndoEmpty() throws Exception{
 		String message = logicObject.undoCommand();
 		assertEquals("Error: No history found.", message);
 	}
@@ -90,8 +90,6 @@ Logic logicObject;
 	
 	@After
 	public void cleanup(){
-		Logic.destroyAnyInstance();
-		logicObject = null;
 	}
 
 }

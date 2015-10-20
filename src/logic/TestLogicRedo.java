@@ -17,9 +17,9 @@ Logic logicObject;
 	
 	@Before
 	public void setup(){
+		logicObject = new Logic();
 		File saveFile = new File("save.txt");
 		saveFile.delete();
-		logicObject = Logic.getInstance();
 	}
 	
 
@@ -108,8 +108,6 @@ Logic logicObject;
 	
 	@After
 	public void cleanup(){
-		Logic.destroyAnyInstance();
-		logicObject = null;
 		File saveFile = new File("save.txt");
 		File anotherSaveFile = new File("anotherSave.txt");
 		saveFile.delete();

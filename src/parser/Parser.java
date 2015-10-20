@@ -38,8 +38,6 @@ public class Parser {
 	private static final String ERROR_EMPTY_TASK_NAME = "Error: Task name is empty";
 	
 	private static final String WHITE_SPACE_REGEX = "\\s+";
-
-	private static Parser parserInstance = null;
 	
 	Logger logger = Logger.getGlobal();
 
@@ -596,12 +594,5 @@ public class Parser {
 			}
 		}
 		return null;
-	}
-
-	public static Parser getInstance() {
-		if (parserInstance == null) {
-			parserInstance = new Parser();
-		}
-		return parserInstance;
 	}
 }
