@@ -33,9 +33,21 @@ Logic logicObject;
 
 	}
 	
+	@Test
+	public void logicRedoadd(){
+		ArrayList<Task> newTasks = new ArrayList<Task>();
+		newTasks.add(new Task("item 1"));
+        logicObject.addItem(newTasks, new ArrayList<String>(), true, true);
+		logicObject.undoCommand();		
+		String message = logicObject.redoCommand();
+		assertEquals("Redo : Deleted item(s) restored.", message);
+		assertEquals("item 1", logicObject.listOfTasks.get(0).getName());
+	}
+	
+	
 
 	@Test
-	public void logicUndoMultipleDelete(){
+	public void logicRedoMultipleDelete(){
 
 		logicObject.listOfTasks = new ArrayList<Task>();
 		logicObject.listOfTasks.add(new Task("some item 1"));

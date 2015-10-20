@@ -30,6 +30,15 @@ Logic logicObject;
 		assertEquals("Error: No history found.", message);
 	}
 	
+	@Test
+	public void logicUndoAdd(){
+
+		ArrayList<Task> newTasks = new ArrayList<Task>();
+		newTasks.add(new Task("item 1"));
+        logicObject.addItem(newTasks, new ArrayList<String>(), true, true);
+		String message = logicObject.undoCommand();		
+		assertEquals("Undo : Added item(s) removed.", message);
+	}
 
 	@Test
 	public void logicUndoMultipleDelete(){
