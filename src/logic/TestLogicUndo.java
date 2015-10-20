@@ -71,19 +71,27 @@ Logic logicObject;
 	public void logicUndoEdit(){
 		ArrayList<Task> listToEdit = new ArrayList<Task>();
 		ArrayList<String> argumentList = new ArrayList<String>();
+		
+		listToEdit.add(new Task("Old item 1"));
+		logicObject.addItem(listToEdit, argumentList, true, true);
 
 		argumentList.add("1");
+		listToEdit.clear();
 		listToEdit.add(new Task("New item 1"));
 		logicObject.editItem(listToEdit, argumentList, true, true);
 		
 		String message = logicObject.undoCommand();		
 		assertEquals("Undo : Reverted edits.", message);
 		
-		assertEquals("some item 1", logicObject.listOfTasks.get(0).getName());
-		assertEquals("some item 2", logicObject.listOfTasks.get(1).getName());
-		assertEquals("some item 3", logicObject.listOfTasks.get(2).getName());
+		assertEquals("Old item 1", logicObject.listOfTasks.get(0).getName());
+		/*assertEquals("some item 2", logicObject.listOfTasks.get(1).getName());
+		assertEquals("some item 3", logicObject.listOfTasks.get(2).getName());*/
 	}
 	
-
+	@After
+	public void cleanup(){
+		Logic.destroyAnyInstance();
+		logicObject = null;
+	}
 
 }
