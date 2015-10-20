@@ -214,7 +214,10 @@ public class Parser {
 			throws Exception {
 		logger.fine("extractTaskInformation: getting keyword markers");
 		ArrayList<KeywordMarker> keywordMarkers = getArrayOfKeywordIndexes(commandString);
+	
 		Collections.sort(keywordMarkers);
+		
+		
 		
 		logger.fine("extractedTaskInformation: extracting data from string");
 		extractName(commandString, keywordMarkers, taskObject);
@@ -271,7 +274,15 @@ public class Parser {
 	
 	private boolean extractLocation(String commandString, ArrayList<KeywordMarker> keywordMarkers, Task taskObject) throws Exception{
 		String[] locationArguments = getArgumentsForField(commandString, keywordMarkers, FieldType.LOCATION);
+		String location = "";
 		if(locationArguments!= null){
+			for(int i =0; i < locationArguments.length; i++) {
+				location += locationArguments[i] + " ";
+			}
+			taskObject.setLocation(location);
+			logger.finer("extractLocation: location added");
+			return true;
+/*	
 			if(locationArguments.length == 1){
 				logger.finer("extractLocation: argument length is 1.");
 				taskObject.setLocation(locationArguments[0]);
@@ -279,7 +290,7 @@ public class Parser {
 			} else {
 				logger.info("extractLocation: invalid number of arguments");
 				throw new Exception(ERROR_INVALID_NUMBER_OF_ARGUMENTS);
-			}
+			}*/
 		}
 		return false;
 	}
@@ -290,6 +301,7 @@ public class Parser {
 		logger.fine("extractDate: getting date arguments");
 		String[] deadlineArguments = getArgumentsForField(commandString,
 				keywordMarkers, FieldType.DEADLINE);
+
 		if (deadlineArguments != null) {
 			for(int i = 0; i < deadlineArguments.length; i++){
 				logger.finer("extractDate: deadlineArguments[" + i + "] contains " +  deadlineArguments[i]);
