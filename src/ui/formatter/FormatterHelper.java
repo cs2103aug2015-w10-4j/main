@@ -22,6 +22,7 @@ public class FormatterHelper {
 															  };
 	
 
+	//TODO: automate this?
 	private static final String[] TABLE_COLUMN_NAMES = new String[] { "No.",
 																	  "Description",
 																	  "Starting Time",
@@ -38,6 +39,13 @@ public class FormatterHelper {
 	
 	private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd MMM yyyy");
 
+	/**
+	 * Find the minimal width for each column, taking into account the content
+	 * of the column and char limit for each line.
+	 * @param taskList
+	 * @param lineCharLimit
+	 * @return an array of ColumnInfo[] (pair of name and width) for each column.
+	 */
 	public static ColumnInfo[] getColumnInfo(List<Task> taskList, int lineCharLimit) {
 		int[] columnLengths = new int[COLUMN_COUNT];
 		
@@ -90,6 +98,11 @@ public class FormatterHelper {
 		return columnInfo;
 	}
 
+	/**
+	 * Convert every field in Task class to its string representation
+	 * @param objectInField
+	 * @return
+	 */
 	public static String getStringRepresentation(Object objectInField) {
 		if (objectInField == null) {
 			return null;
@@ -105,6 +118,13 @@ public class FormatterHelper {
 		return null;
 	}
 
+	/**
+	 * Split string to multiple lines according to character limit for a line as
+	 * specified in lineCharLimit
+	 * @param string
+	 * @param lineCharLimit
+	 * @return an array of string representing the content of string after split
+	 */
 	public static String[] splitString(String string, int lineCharLimit) {
 		if (string == null) {
 			return new String[] {EMPTY_STRING_SUBSTITUTE};
