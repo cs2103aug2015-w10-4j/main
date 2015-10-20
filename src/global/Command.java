@@ -88,4 +88,73 @@ public class Command {
 			argumentList.add(args[i]);
 		}
 	}
+	
+	//-------------has methods------------------//
+	public boolean hasArgumentList() {
+		if(this.getArguments() == null) {
+			return false;
+		} 
+		return true;
+	
+	}
+	
+	public boolean hasTasksList() {
+		if(this.getTasks() == null) {
+			return false;
+		} 
+		return true;
+	}
+	
+	public boolean compareTo(Command cmd) {
+		boolean isTypeSame = false;
+		boolean isAListSame = false;
+		boolean isTasksSame = false;
+		
+		if(cmd.getCommandType().equals(this.getCommandType())){
+		isTypeSame = true;
+		}
+		
+	if(cmd.hasArgumentList() && this.hasArgumentList()) {
+		if(cmd.getArguments().size() == this.getArguments().size()) {
+			int similarCount = 0;
+		for(int i=0; i < cmd.getArguments().size(); i++ ) {
+			if(cmd.getArguments().get(i).equals((this.getArguments().get(i)))) {
+				similarCount ++;
+			}
+		}
+		
+		if(similarCount == cmd.getArguments().size()) {
+			isAListSame = true;
+		}
+		
+		}
+	} else if(cmd.hasArgumentList() == false && this.hasArgumentList() == false) {
+		
+		isAListSame = true;
+	}
+		
+	
+	if(cmd.hasTasksList() && this.hasTasksList() ) {
+		if(cmd.getTasks().size() == this.getTasks().size()) {
+			String cmdStr = "";
+			String thisStr = "";
+		for(int i = 0; i < cmd.getTasks().size(); i++) {
+			cmdStr += cmd.getTasks().get(i).getAllInfo() + " ";
+			thisStr += this.getTasks().get(i).getAllInfo() + " ";
+		}
+		
+		if(cmdStr.equals(thisStr)) {
+			isTasksSame = true;
+		}
+		
+		}
+	} else if(cmd.hasTasksList() == false && this.hasTasksList() == false) {
+		isTasksSame = true;
+	}
+		
+		if(isTypeSame && isAListSame && isTasksSame) {
+			return true;
+		}
+		return false;	
+	}
 }
