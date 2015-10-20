@@ -401,6 +401,11 @@ public class Parser {
 		return helperDate;
 	}
 	
+	/**
+	 * 
+	 * @param givenDayIndex day of the week sunday to saturday -> 1 to 7 
+	 * @return date of the nearest day
+	 */
 	int getNearestDate(int givenDayIndex){
 		Calendar dateHelper = Calendar.getInstance();
 		int curDayIndex = dateHelper.get(Calendar.DAY_OF_WEEK);
