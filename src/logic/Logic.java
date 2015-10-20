@@ -11,6 +11,7 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -153,7 +154,7 @@ public class Logic {
 				UIObject.showStatusToUser(ERROR_WRITING_FILE);
 			} catch (Exception e) {
 				// warning from parsing user command
-				// e.printStackTrace();
+				e.printStackTrace();
 				UIObject.showStatusToUser(e.getMessage());
 			}
 		}
@@ -323,7 +324,7 @@ public class Logic {
 	 */
 	String deleteItem(ArrayList<String> argumentList,
 			boolean shouldPushToHistory, boolean isUndoHistory) {
-		ArrayList<Integer> parsedIntArgumentList = new ArrayList<Integer>();
+		ArrayList<Integer> parsedIntArgumentList = new ArrayList<>();
 		String[] argumentListForReverse;
 		if (isEmptyArgumentList(argumentList)) {
 			return ERROR_INVALID_ARGUMENT;
@@ -332,22 +333,16 @@ public class Logic {
 		try {
 			logger.fine("Cleaning up arguments.");
 			
-			if (argumentList.size() == 1 &&
-					argumentList.get(0).equalsIgnoreCase(IDENTIFIER_DELETE_ALL)) {
-				argumentList.clear();
-				for (int i = 0; i < listOfTasks.size(); i++) {
-					argumentList.add(Integer.toString(i+1));
-				}
-			} else {
-				argumentList = removeDuplicates(argumentList);
-			}
-			for (String str : argumentList) {
-				int index = Integer.parseInt(str) - 1;
-				parsedIntArgumentList.add(index);
+			argumentList = preprocessDeleteKeyword(argumentList);
+			argumentList = removeDuplicates(argumentList);
+			
+			for (String argument : argumentList) {
+				parsedIntArgumentList.add(Integer.parseInt(argument) - 1);
 			}
 			
 			Collections.sort(parsedIntArgumentList);
-		} catch (NumberFormatException e) {
+		} catch (NumberFormatException | IndexOutOfBoundsException e) {
+			e.printStackTrace();
 			return ERROR_INVALID_ARGUMENT;
 		}
 
@@ -363,9 +358,11 @@ public class Logic {
 				tasksRemoved.add(0, listOfTasks.remove(index));
 				logger.fine("Task removed from list.");
 			} else {
+				int offset = 1;
 				while (tasksRemoved.size() != 0) {
-					listOfTasks.add(parsedIntArgumentList.get(i),
+					listOfTasks.add(parsedIntArgumentList.get(i + offset),
 							tasksRemoved.remove(0));
+					offset++;
 				}
 
 				return ERROR_INVALID_INDEX;
@@ -401,6 +398,35 @@ public class Logic {
 			return MESSAGE_SUCCESS_REDO_DELETE;
 		}
 
+	}
+
+	private ArrayList<String> preprocessDeleteKeyword(ArrayList<String> argumentList)
+			throws NumberFormatException, IndexOutOfBoundsException {
+		ArrayList<String> result = new ArrayList<>();
+		if (argumentList.size() == 1 && argumentList.get(0).equalsIgnoreCase(IDENTIFIER_DELETE_ALL)) {
+			argumentList.clear();
+			for (int i = 0; i < listOfTasks.size(); i++) {
+				result.add(String.valueOf(i + 1));
+			}
+		} else {
+			for (String argument : argumentList) {
+				if (argument.indexOf('-', 1) != -1) {
+					int dashPosition = argument.indexOf('-', 1);
+					String leftPart = argument.substring(0, dashPosition);
+					String rightPart = argument.substring(dashPosition + 1, argument.length());
+
+					int fromInclusive = Integer.parseInt(leftPart);
+					int toInclusive = Integer.parseInt(rightPart);
+					for (int index = fromInclusive; index <= toInclusive; index++) {
+						result.add(String.valueOf(index));
+					}
+				} else {
+					//unchecked
+					result.add(argument);
+				}
+			}
+		}
+		return result;
 	}
 
 	/**
@@ -606,12 +632,12 @@ public class Logic {
 	}
 
 	// Create an array with all unique elements
-	private ArrayList<String> removeDuplicates(ArrayList<String> A) {
+	private ArrayList<String> removeDuplicates(ArrayList<String> parsedIntArgumentList) {
 		HashSet<String> hs = new HashSet<>();
-		hs.addAll(A);
-		A.clear();
-		A.addAll(hs);
-		return A;
+		hs.addAll(parsedIntArgumentList);
+		parsedIntArgumentList.clear();
+		parsedIntArgumentList.addAll(hs);
+		return parsedIntArgumentList;
 	}
 
 	private String multipleItemFormatting(String string,

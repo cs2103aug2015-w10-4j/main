@@ -131,6 +131,42 @@ public class TestLogicDelete {
 		assertEquals(logicObject.listOfTasks.size(), 6);
 	}
 	
+	@Test
+	public void logicDeleteMultipleItemsSuccess() {
+		logicObject.listOfTasks = new ArrayList<Task>();
+		for (int i = 'a'; i <= 'z'; i++) {
+			logicObject.listOfTasks.add(new Task(String.valueOf(i)));
+		}
+		
+		ArrayList<String> argumentList = new ArrayList<>();
+		String message;
+		
+		argumentList.add("1-3");
+		argumentList.add("2-5");
+		argumentList.add("24-25");
+		
+		message = logicObject.deleteItem(argumentList, true, true);
+		assertEquals("Item(s) 1, 2, 3, 4, 5, 24, 25 successfully deleted.", message);
+		assertEquals(logicObject.listOfTasks.size(), 19);
+	}
+	
+	@Test
+	public void logicDeleteMultipleItemsFail() {
+		logicObject.listOfTasks = new ArrayList<Task>();
+		for (int i = 'a'; i <= 'z'; i++) {
+			logicObject.listOfTasks.add(new Task(String.valueOf(i)));
+		}
+		
+		ArrayList<String> argumentList = new ArrayList<>();
+		String message;
+		
+		argumentList.add("-1-26");
+		
+		message = logicObject.deleteItem(argumentList, true, true);
+		assertEquals("Error: There is no item at this index.", message);
+		assertEquals(logicObject.listOfTasks.size(), 26);
+	}
+	
 	@After
 	public void cleanup(){
 		Logic.destroyAnyInstance();
