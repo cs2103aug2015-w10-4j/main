@@ -38,24 +38,26 @@ public class StringFormatter {
 		String result = null;
 		String stringFormatArgs;
 		
-		switch (alignment) {
-			case ALIGN_LEFT :
-				stringFormatArgs = String.format(ALIGN_LEFT_ARGS_ARGS, width);
-				result = String.format(stringFormatArgs, str);
-				break;
-			case ALIGN_CENTER :
-				int spaceOnLeft = (width - str.length()) / 2;
-				int spaceOnRight = width - str.length() - spaceOnLeft;
-				stringFormatArgs = String.format(ALIGN_CENTER_ARGS_ARGS, spaceOnLeft + str.length(),
-																	  spaceOnRight);
-				result = String.format(stringFormatArgs, str, "");
-				break;
-			case ALIGN_RIGHT :
-				stringFormatArgs = String.format(ALIGN_RIGHT_ARGS_ARGS, width);
-				result = String.format(stringFormatArgs, str);
-				break;
-			default :
-				assert false;
+		if (width >= str.length()) {
+			switch (alignment) {
+				case ALIGN_LEFT :
+					stringFormatArgs = String.format(ALIGN_LEFT_ARGS_ARGS, width);
+					result = String.format(stringFormatArgs, str);
+					break;
+				case ALIGN_CENTER :
+					int spaceOnLeft = (width - str.length()) / 2;
+					int spaceOnRight = width - str.length() - spaceOnLeft;
+					stringFormatArgs = String.format(ALIGN_CENTER_ARGS_ARGS, spaceOnLeft + str.length(),
+																		  spaceOnRight);
+					result = String.format(stringFormatArgs, str, "");
+					break;
+				case ALIGN_RIGHT :
+					stringFormatArgs = String.format(ALIGN_RIGHT_ARGS_ARGS, width);
+					result = String.format(stringFormatArgs, str);
+					break;
+				default :
+					assert false;
+			}
 		}
 		
 		assert result != null;

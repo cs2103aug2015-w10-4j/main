@@ -131,6 +131,9 @@ public class TestLogicDelete {
 		assertEquals(logicObject.listOfTasks.size(), 6);
 	}
 	
+	/*
+	 * Try to delete tasks with several overlapping range delete
+	 */
 	@Test
 	public void logicDeleteMultipleItemsSuccess() {
 		logicObject.listOfTasks = new ArrayList<Task>();
@@ -150,6 +153,9 @@ public class TestLogicDelete {
 		assertEquals(logicObject.listOfTasks.size(), 19);
 	}
 	
+	/*
+	 * Try to delete a task with invalid index
+	 */
 	@Test
 	public void logicDeleteMultipleItemsFail() {
 		logicObject.listOfTasks = new ArrayList<Task>();
