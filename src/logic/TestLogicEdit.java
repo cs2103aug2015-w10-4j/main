@@ -24,6 +24,9 @@ public class TestLogicEdit {
 		logicObject.listOfTasks.add(new Task("Item 3"));
 	}
 	
+	/*
+	 * Tests corner cases of index in edit item
+	 */
 	@Test
 	public void TestEditOne(){
 		ArrayList<Task> listToEdit = new ArrayList<Task>();
@@ -63,6 +66,9 @@ public class TestLogicEdit {
 		assertEquals("New item 99", logicObject.listOfTasks.get(2).getName());
 	}
 	
+	/*
+	 * Tests editing normal values multiple times
+	 */
 	@Test
 	public void TestEditTwo(){
 		ArrayList<Task> listToEdit = new ArrayList<Task>();
