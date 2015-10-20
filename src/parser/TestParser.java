@@ -19,7 +19,7 @@ public class TestParser {
 
 	@Before
 	public void setup(){
-			parserObj = Parser.getInstance();
+			parserObj = new Parser();
 	}
 	
 	
