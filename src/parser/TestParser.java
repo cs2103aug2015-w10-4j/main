@@ -7,6 +7,8 @@ import global.Task;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -78,5 +80,27 @@ public class TestParser {
 		Command cmd = new Command(Command.Type.DELETE,task);
 		message = parserObj.parseCommand("delete 1");
 		assertEquals("DELETE",message.getCommandType().toString());
+	}
+	
+	@Test
+	public void testParseDate() throws Exception {
+		Calendar expectedDate = new GregorianCalendar();
+		int year = expectedDate.get(Calendar.YEAR);
+		expectedDate.clear();
+		expectedDate.set(year, 8, 18);
+		
+		String[] dateArgs = { "18", "sep"};
+		Calendar date = parserObj.parseDate(dateArgs);
+		
+		assertEquals(expectedDate,date);
+		
+		
+		expectedDate = new GregorianCalendar();
+		expectedDate.add(Calendar.DATE, 1);
+		
+		dateArgs = new String[] { "tomorrow" };
+		date = parserObj.parseDate(dateArgs);
+		
+		assertEquals(expectedDate, date);
 	}
 }

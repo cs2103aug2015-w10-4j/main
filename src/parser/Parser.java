@@ -25,68 +25,68 @@ public class Parser {
 	
 	//status messages
 	
-	private static final String ERROR_INVALID_PERIODIC_INSTANCES = "Error: Invalid periodic instances";
-	private static final String ERROR_INVALID_PERIODIC_INTERVAL_VALUE = "Error: Invalid periodic interval value";
-	private static final String ERROR_INVALID_DATE_SPECIFIED = "Error: Invalid date specified!";
-	private static final String ERROR_INVALID_PERIODIC_INTERVAL = "Error: Invalid periodic interval specified";
-	private static final String ERROR_MISSING_START_TIME = "Error: An end time has been entered without start time!";
-	private static final String ERROR_MISSING_END_TIME = "Error: A start time has been entered without end time!";
-	private static final String ERROR_INVALID_DAY_SPECIFIED = "Error: Invalid day specified!";
-	private static final String ERROR_INVALID_NUMBER_OF_ARGUMENTS = "Error: Invalid number of arguments";
-	private static final String ERROR_INVALID_COMMAND_SPECIFIED = "Error: Invalid command specified!";
-	private static final String ERROR_EMPTY_COMMAND_STRING = "Error: Command string is empty";
-	private static final String ERROR_EMPTY_TASK_NAME = "Error: Task name is empty";
+	static final String ERROR_INVALID_PERIODIC_INSTANCES = "Error: Invalid periodic instances";
+	static final String ERROR_INVALID_PERIODIC_INTERVAL_VALUE = "Error: Invalid periodic interval value";
+	static final String ERROR_INVALID_DATE_SPECIFIED = "Error: Invalid date specified!";
+	static final String ERROR_INVALID_PERIODIC_INTERVAL = "Error: Invalid periodic interval specified";
+	static final String ERROR_MISSING_START_TIME = "Error: An end time has been entered without start time!";
+	static final String ERROR_MISSING_END_TIME = "Error: A start time has been entered without end time!";
+	static final String ERROR_INVALID_DAY_SPECIFIED = "Error: Invalid day specified!";
+	static final String ERROR_INVALID_NUMBER_OF_ARGUMENTS = "Error: Invalid number of arguments";
+	static final String ERROR_INVALID_COMMAND_SPECIFIED = "Error: Invalid command specified!";
+	static final String ERROR_EMPTY_COMMAND_STRING = "Error: Command string is empty";
+	static final String ERROR_EMPTY_TASK_NAME = "Error: Task name is empty";
 	
-	private static final String WHITE_SPACE_REGEX = "\\s+";
+	static final String WHITE_SPACE_REGEX = "\\s+";
 	
 	Logger logger = Logger.getGlobal();
 
-	private static final String[] COMMAND_ADD = { "add" };
-	private static final String[] COMMAND_EDIT = { "edit", "change" };
-	private static final String[] COMMAND_DELETE = { "delete", "del" };
-	private static final String[] COMMAND_UNDO = { "undo" };
-	private static final String[] COMMAND_REDO = { "redo" };
-	private static final String[] COMMAND_EXIT = { "exit" };
-	private static final String[] COMMAND_DISPLAY = { "display" };
-	private static final String[] COMMAND_SAVETO = { "saveto" };
+	static final String[] COMMAND_ADD = { "add" };
+	static final String[] COMMAND_EDIT = { "edit", "change" };
+	static final String[] COMMAND_DELETE = { "delete", "del" };
+	static final String[] COMMAND_UNDO = { "undo" };
+	static final String[] COMMAND_REDO = { "redo" };
+	static final String[] COMMAND_EXIT = { "exit" };
+	static final String[] COMMAND_DISPLAY = { "display" };
+	static final String[] COMMAND_SAVETO = { "saveto" };
 
-	private static final String[] DATE_SPECIAL = { "this", "next", "today", "tomorrow"
+	static final String[] DATE_SPECIAL = { "this", "next", "today", "tomorrow"
 			 };
-	private static final String[] MONTHS = { "jan", "feb", "mar", "apr", "may",
+	static final String[] MONTHS = { "jan", "feb", "mar", "apr", "may",
 			"jun", "jul", "aug", "sep", "oct", "nov", "dec" };
-	private static final String[] DAYS = { "sunday" , "monday" , "tuesday" , "wednesday" , "thursday" ,"friday", "saturday" };
+	static final String[] DAYS = { "sunday" , "monday" , "tuesday" , "wednesday" , "thursday" ,"friday", "saturday" };
 	
 
-	private static final String[] PERIODIC = { "days", "weeks" , "months" };
+	static final String[] PERIODIC = { "days", "weeks" , "months" };
 
-	private enum FieldType {
+	enum FieldType {
 		START_EVENT, END_EVENT, DEADLINE, LOCATION, INTERVAL_PERIODIC, INSTANCES_PERIODIC
 	}
 
-	private static final String[] LOCATION = { "loc" , "at" };
-	private static final String[] DEADLINE = { "by" };
-	private static final String[] START_EVENT = { "start", "from" };
-	private static final String[] END_EVENT = { "end" , "to" };
-	private static final String[] INTERVAL_PERIODIC = { "every" , "repeats" };
-	private static final String[] INSTANCES_PERIODIC = { "for" };
+	static final String[] LOCATION = { "loc" , "at" };
+	static final String[] DEADLINE = { "by" };
+	static final String[] START_EVENT = { "start", "from" };
+	static final String[] END_EVENT = { "end" , "to" };
+	static final String[] INTERVAL_PERIODIC = { "every" , "repeats" };
+	static final String[] INSTANCES_PERIODIC = { "for" };
 
-	private class KeywordMarker implements Comparable<KeywordMarker> {
-		private int index;
-		private FieldType typeOfField;
+	class KeywordMarker implements Comparable<KeywordMarker> {
+		int index;
+		FieldType typeOfField;
 
-		private int getIndex() {
+		int getIndex() {
 			return index;
 		}
 
-		private void setIndex(int i) {
+		void setIndex(int i) {
 			index = i;
 		}
 
-		private FieldType getFieldType() {
+		FieldType getFieldType() {
 			return typeOfField;
 		}
 
-		private void setFieldType(FieldType fieldType) {
+		void setFieldType(FieldType fieldType) {
 			typeOfField = fieldType;
 		}
 
@@ -143,21 +143,21 @@ public class Parser {
 		}
 		return commandObject;
 	}
-	private String[] getSaveToArgument(String commandString){
+	String[] getSaveToArgument(String commandString){
 		String pathString = commandString.split(WHITE_SPACE_REGEX, 2)[0];
 		return new String[]{ pathString };
 	}
-	private String[] getEditIndex(String commandString){
+	String[] getEditIndex(String commandString){
 		String indexString = commandString.split(WHITE_SPACE_REGEX, 2)[0];
 		return new String[]{ indexString };
 	}
 	
-	private String[] getDeleteIndexes(String commandString){
+	String[] getDeleteIndexes(String commandString){
 		String[] indexArray = commandString.split(WHITE_SPACE_REGEX);
 		return indexArray;
 	}
 
-	private String clearFirstWord(String commandString) {
+	String clearFirstWord(String commandString) {
 		String[] splitCommand = commandString.split(WHITE_SPACE_REGEX, 2);
 		assert (splitCommand.length >= 1);
 		if (splitCommand.length == 1) {
@@ -167,7 +167,7 @@ public class Parser {
 		}
 	}
 
-	private Command.Type identifyType(String commandString) throws Exception {
+	Command.Type identifyType(String commandString) throws Exception {
 		if (commandString.length() == 0) {
 			logger.info("identifyType: Command string is empty!");
 			throw new Exception(ERROR_EMPTY_COMMAND_STRING);
@@ -196,7 +196,7 @@ public class Parser {
 		}
 	}
 
-	private boolean isCommandKeyword(String firstWordInCommandString,
+	boolean isCommandKeyword(String firstWordInCommandString,
 			String[] keywords) {
 		for (int i = 0; i < keywords.length; i++) {
 			if (firstWordInCommandString.equalsIgnoreCase(keywords[i])) {
@@ -208,7 +208,7 @@ public class Parser {
 	
 	
 
-	private boolean extractTaskInformation(String commandString, Task taskObject)
+	boolean extractTaskInformation(String commandString, Task taskObject)
 			throws Exception {
 		logger.fine("extractTaskInformation: getting keyword markers");
 		ArrayList<KeywordMarker> keywordMarkers = getArrayOfKeywordIndexes(commandString);
@@ -225,7 +225,7 @@ public class Parser {
 		return true;
 	}
 	
-	private boolean extractPeriodic(String commandString, ArrayList<KeywordMarker> keywordMarkers, Task taskObject, boolean hasDate) throws Exception{
+	boolean extractPeriodic(String commandString, ArrayList<KeywordMarker> keywordMarkers, Task taskObject, boolean hasDate) throws Exception{
 		String[] periodicIntervalArguments = getArgumentsForField(commandString, keywordMarkers, FieldType.INTERVAL_PERIODIC);
 		String[] periodicInstancesArguments = getArgumentsForField(commandString, keywordMarkers, FieldType.INSTANCES_PERIODIC);
 		if(hasDate && periodicIntervalArguments!= null && periodicInstancesArguments != null){
@@ -270,7 +270,7 @@ public class Parser {
 		return false;
 	}
 	
-	private boolean extractLocation(String commandString, ArrayList<KeywordMarker> keywordMarkers, Task taskObject) throws Exception{
+	boolean extractLocation(String commandString, ArrayList<KeywordMarker> keywordMarkers, Task taskObject) throws Exception{
 		String[] locationArguments = getArgumentsForField(commandString, keywordMarkers, FieldType.LOCATION);
 		String location = "";
 		if(locationArguments!= null){
@@ -293,7 +293,7 @@ public class Parser {
 		return false;
 	}
 
-	private boolean extractDate(String commandString,
+	boolean extractDate(String commandString,
 			ArrayList<KeywordMarker> keywordMarkers, Task taskObject) throws Exception {
 		// check deadline/start_event & end_event
 		logger.fine("extractDate: getting date arguments");
@@ -338,7 +338,7 @@ public class Parser {
 		}
 	}
 
-	private Calendar parseDate(String[] dateArguments) throws Exception {
+	Calendar parseDate(String[] dateArguments) throws Exception {
 		logger.fine("parseDate: parsing date");
 		int date, month, year;
 		Calendar helperDate;
@@ -401,7 +401,7 @@ public class Parser {
 		return helperDate;
 	}
 	
-	private int getNearestDate(int givenDayIndex){
+	int getNearestDate(int givenDayIndex){
 		Calendar dateHelper = Calendar.getInstance();
 		int curDayIndex = dateHelper.get(Calendar.DAY_OF_WEEK);
 		logger.fine("getNearestDate: given day is " + givenDayIndex);
@@ -414,7 +414,7 @@ public class Parser {
 		return newDate;
 	}
 	
-	private boolean hasKeyword(String word, String[] keywords){
+	boolean hasKeyword(String word, String[] keywords){
 		for(int i = 0; i < keywords.length; i++){
 			if(word.equalsIgnoreCase(keywords[i])){
 				return true;
@@ -422,7 +422,7 @@ public class Parser {
 		}
 		return false;
 	}
-	private boolean hasKeyword(String[] words, String[] keywords){
+	boolean hasKeyword(String[] words, String[] keywords){
 		for(int i = 0; i < words.length; i++){
 			if(hasKeyword(words[i], keywords)){
 				return true;
@@ -431,7 +431,7 @@ public class Parser {
 		return false;
 	}
 
-	private String[] getArgumentsForField(String commandString,
+	String[] getArgumentsForField(String commandString,
 			ArrayList<KeywordMarker> keywordMarkers, FieldType typeOfField) {
 		for (int i = 0; i < keywordMarkers.size(); i++) {
 			KeywordMarker curKeywordMarker = keywordMarkers.get(i);
@@ -468,7 +468,7 @@ public class Parser {
 		return null;
 	}
 
-	private boolean extractName(String commandString,
+	boolean extractName(String commandString,
 			ArrayList<KeywordMarker> keywordMarkers, Task taskObject)
 			throws Exception {
 		logger.fine("extractName: extracting name");
@@ -500,7 +500,7 @@ public class Parser {
 		return true;
 	}
 
-	private ArrayList<KeywordMarker> getArrayOfKeywordIndexes(
+	ArrayList<KeywordMarker> getArrayOfKeywordIndexes(
 			String commandString) throws Exception {
 		ArrayList<KeywordMarker> keywordMarkerList = new ArrayList<KeywordMarker>();
 		
@@ -510,7 +510,7 @@ public class Parser {
 		return keywordMarkerList;
 	}
 	
-	private boolean getPeriodicField(ArrayList<KeywordMarker> curMarkerList,
+	boolean getPeriodicField(ArrayList<KeywordMarker> curMarkerList,
 			String commandString) throws Exception {
 		KeywordMarker markerForIntervalPeriodic = getKeywordMarker(commandString,
 				INTERVAL_PERIODIC);
@@ -531,7 +531,7 @@ public class Parser {
 		}
 	}
 
-	private boolean getLocationField(ArrayList<KeywordMarker> curMarkerList,
+	boolean getLocationField(ArrayList<KeywordMarker> curMarkerList,
 			String commandString) {
 		KeywordMarker markerForLocation = getKeywordMarker(commandString,
 				LOCATION);
@@ -543,7 +543,7 @@ public class Parser {
 		return false;
 	}
 
-	private boolean getDateField(ArrayList<KeywordMarker> curMarkerList,
+	boolean getDateField(ArrayList<KeywordMarker> curMarkerList,
 			String commandString) throws Exception {
 		KeywordMarker markerForDeadline = getKeywordMarker(commandString,
 				DEADLINE);
@@ -576,7 +576,7 @@ public class Parser {
 		}
 	}
 
-	private KeywordMarker getKeywordMarker(String commandString,
+	KeywordMarker getKeywordMarker(String commandString,
 			String[] listOfKeywords) {
 		for (int i = 0; i < listOfKeywords.length; i++) {
 			String curKeyword = String.format(" %s ", listOfKeywords[i]);
