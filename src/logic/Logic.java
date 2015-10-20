@@ -7,12 +7,9 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
-import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.LogManager;
@@ -341,7 +338,6 @@ public class Logic {
 			
 			Collections.sort(parsedIntArgumentList);
 		} catch (NumberFormatException | IndexOutOfBoundsException e) {
-			e.printStackTrace();
 			return ERROR_INVALID_ARGUMENT;
 		}
 
