@@ -341,6 +341,7 @@ public class Parser {
 	private Calendar parseDate(String[] dateArguments) throws Exception {
 		logger.fine("parseDate: parsing date");
 		int date, month, year;
+		Calendar helperDate;
 		if (!hasKeyword(dateArguments, DATE_SPECIAL)) {
 			try{
 				date = Integer.parseInt(dateArguments[0]);
@@ -354,10 +355,9 @@ public class Parser {
 				year = Calendar.getInstance().get(Calendar.YEAR);
 			}
 
-			Calendar helperDate = new GregorianCalendar();
+			helperDate = new GregorianCalendar();
+			helperDate.clear();
 			helperDate.set(year, month, date);
-
-			return helperDate;
 		} else if(dateArguments.length == 2){ // this/next <day>
 			logger.finer("parseDate: dateArguments[0] contains " + dateArguments[0]);
 			logger.finer("parseDate: dateArguments[1] contains " + dateArguments[1]);
@@ -382,14 +382,15 @@ public class Parser {
 			month = Calendar.getInstance().get(Calendar.MONTH);
 			year = Calendar.getInstance().get(Calendar.YEAR);
 			
-			Calendar helperDate = new GregorianCalendar();
+			helperDate = new GregorianCalendar();
+			helperDate.clear();
 			helperDate.set(year, month, date);
 			return helperDate;
 		} else if (dateArguments.length == 1){ // today/tomorrow
 			if(dateArguments[0].equalsIgnoreCase(DATE_SPECIAL[2])){
 				return new GregorianCalendar();
 			} else {
-				Calendar helperDate = new GregorianCalendar();
+				helperDate = new GregorianCalendar();
 				helperDate.add(Calendar.DATE, 1);
 				return helperDate;
 			}
@@ -397,6 +398,7 @@ public class Parser {
 			logger.info("parseDate: unknown date arguments");
 			throw new Exception("Error: Invalid arguments for date");
 		}
+		return helperDate;
 	}
 	
 	private int getNearestDate(int givenDayIndex){

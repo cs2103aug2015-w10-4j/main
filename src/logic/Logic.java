@@ -29,8 +29,6 @@ import ui.UI;
  *
  */
 public class Logic {
-
-	private static final String ERROR_CANNOT_PARSE_PERIODIC_VALUES = "Error: Unable to parse values for periodic";
 	/*
 	 * Declaration of object variables
 	 */
@@ -49,7 +47,6 @@ public class Logic {
 	 */
 	private static final String MESSAGE_WELCOME = "Welcome to Tasky! This is an open source project";
 	private static final String MESSAGE_PROMPT_COMMAND = "command :";
-
 	private static final String MESSAGE_SUCCESS_UNDO_ADD = "Undo : Deleted item(s) restored.";
 	private static final String MESSAGE_SUCCESS_REDO_ADD = "Redo : Deleted item(s) restored.";
 	private static final String MESSAGE_SUCCESS_UNDO_DELETE = "Undo : Added item(s) removed.";
@@ -77,6 +74,7 @@ public class Logic {
 	private static final String ERROR_UI_INTERRUPTED = "Error: UI prompt has been interrupted.";
 	private static final String ERROR_NO_HISTORY = "Error: No history found.";
 	private static final String ERROR_CANNOT_WRITE_TO_HISTORY = "Error: Unable to store command in history.";
+	private static final String ERROR_CANNOT_PARSE_PERIODIC_VALUES = "Error: Unable to parse values for periodic";
 
 	private static final String WARNING_TIMING_CLASH = "Warning: There are clashing timings between tasks.";
 	
@@ -504,10 +502,6 @@ public class Logic {
 		}
 	}
 
-	boolean isValidIndex(int index) {
-		return index >= 0 && index < listOfTasks.size();
-	}
-
 	String displayItems() {
 		if (listOfTasks.isEmpty()) {
 			return MESSAGE_DISPLAY_EMPTY;
@@ -524,6 +518,12 @@ public class Logic {
 		return UIObject.showTasks(listOfTasks);
 	}
 
+	/**
+	 * Retrieves the last command from history and attempts to execute it.
+	 * this will push the reversed version of the command to the redo history 
+	 * 
+	 * @return status message
+	 */
 	String undoCommand() {
 		Command previousCommand = historyObject.getPreviousCommand(true);
 		if (previousCommand == null) {
@@ -532,6 +532,12 @@ public class Logic {
 		return executeCommand(previousCommand, true, false);
 	}
 
+	/**
+	 * Retrieves the last command from undo history and attempts to execute it.
+	 * this will no longer push it to history, therefore, you can't undo a redo
+	 * 
+	 * @return status message
+	 */
 	String redoCommand() {
 		Command previousCommand = historyObject.getPreviousCommand(false);
 		if (previousCommand == null) {
@@ -574,6 +580,10 @@ public class Logic {
 		} catch (Exception e) {
 			return e.getMessage();
 		}
+	}
+	
+	boolean isValidIndex(int index) {
+		return index >= 0 && index < listOfTasks.size();
 	}
 
 	boolean isEmptyArgumentList(ArrayList<String> argumentList) {
@@ -627,7 +637,7 @@ public class Logic {
 	}
 
 	// Create an array with all unique elements
-	private ArrayList<String> removeDuplicates(ArrayList<String> parsedIntArgumentList) {
+	ArrayList<String> removeDuplicates(ArrayList<String> parsedIntArgumentList) {
 		HashSet<String> hs = new HashSet<>();
 		hs.addAll(parsedIntArgumentList);
 		parsedIntArgumentList.clear();
@@ -635,7 +645,7 @@ public class Logic {
 		return parsedIntArgumentList;
 	}
 
-	private String multipleItemFormatting(String string,
+	String multipleItemFormatting(String string,
 			ArrayList<Integer> parsedIntList) {
 		Collections.sort(parsedIntList);
 		String combinedNumberStrings = "";
@@ -648,7 +658,7 @@ public class Logic {
 		return String.format(string, combinedNumberStrings);
 	}
 	
-	private boolean updateListOfTasks() throws Exception {
+	boolean updateListOfTasks() throws Exception {
 		try {
 			listOfTasks = storageObject.getItemList();
 		} catch (FileNotFoundException e) {
@@ -658,7 +668,7 @@ public class Logic {
 		return true;
 	}
 	
-	private boolean resolvePeriodic() throws Exception{
+	boolean resolvePeriodic() throws Exception{
 		for(int i = 0; i < listOfTasks.size(); i++){
 			Task curTask = listOfTasks.get(i);
 			String periodicRepeats = curTask.getPeriodicRepeats();
