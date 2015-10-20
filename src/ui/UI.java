@@ -6,6 +6,7 @@ import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.List;
@@ -92,7 +93,7 @@ public class UI {
 	private JTextField userInputField = new JTextField(USER_INPUT_FIELD_CHAR_COUNT);
 	private StatusBar statusBar = new StatusBar();
 	
-	private TaskListFormatter taskListFormatter = TaskListFormatter.getInstance();
+	private TaskListFormatter taskListFormatter = new TaskListFormatter();
 	private UserInputHistory userInputHistory = new UserInputHistory();
 	
 	/*
@@ -208,9 +209,11 @@ public class UI {
 		userInputField.setEditable(false);
 		userInputField.setColumns(USER_INPUT_FIELD_CHAR_COUNT);
 		
-		userInputField.addActionListener(e -> {
-			synchronized (userInputField) {
-				userInputField.notify();
+		userInputField.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				synchronized (userInputField) {
+					userInputField.notify();
+				}
 			}
 		});
 		

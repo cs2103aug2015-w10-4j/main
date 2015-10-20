@@ -7,8 +7,6 @@ import global.Task;
 
 public class TaskListFormatter {
 
-	private static TaskListFormatter instance = null;
-
 	private static final String NULL_STRING_SUBSTITUTE = "";
 	
 	private static final String MESSAGE_DISPLAY_NEWLINE = System.getProperty("line.separator");
@@ -17,13 +15,6 @@ public class TaskListFormatter {
 	private static final char INTERSECTION_CHAR = '+';
 	private static final char HORIZONTAL_CHAR = '-';
 	private static final char VERTICAL_CHAR = '|';
-	
-	public static TaskListFormatter getInstance() {
-		if (instance == null) {
-			instance = new TaskListFormatter();
-		}
-		return instance;
-	}
 	
 	public String formatTaskList(List<Task> taskList, int lineCharLimit) {
 		if (taskList.size() == 0) {
