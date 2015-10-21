@@ -50,6 +50,7 @@ public class Parser {
 	static final String[] COMMAND_UNMARK = { "unmark" };
 	static final String[] COMMAND_EXIT = { "exit" };
 	static final String[] COMMAND_DISPLAY = { "display" };
+	static final String[] COMMAND_SEARCH = { "search" };
 	static final String[] COMMAND_SAVETO = { "saveto" };
 
 	static final String[] DATE_SPECIAL = { "this", "next", "today", "tomorrow"
@@ -125,7 +126,7 @@ public class Parser {
 				commandObject.addTask(taskObject);
 				break;
 			case EDIT :
-				argumentArray = getEditIndex(commandString);
+				argumentArray = getOneIndex(commandString);
 				commandObject.setArguments(argumentArray);
 				commandString = clearFirstWord(commandString);
 				
@@ -146,6 +147,9 @@ public class Parser {
 			case UNMARK :
 				argumentArray = getMultipleIndexes(commandString);
 				commandObject.setArguments(argumentArray);
+			case SEARCH :
+				argumentArray = getMultipleIndexes(commandString);
+				commandObject.setArguments(argumentArray);
 			default:
 			
 		}
@@ -155,7 +159,7 @@ public class Parser {
 		String pathString = commandString.split(WHITE_SPACE_REGEX, 2)[0];
 		return new String[]{ pathString };
 	}
-	String[] getEditIndex(String commandString){
+	String[] getOneIndex(String commandString){
 		String indexString = commandString.split(WHITE_SPACE_REGEX, 2)[0];
 		return new String[]{ indexString };
 	}
@@ -197,10 +201,12 @@ public class Parser {
 				return Command.Type.DISPLAY;
 			} else if (isCommandKeyword(firstWord, COMMAND_EXIT)) {
 				return Command.Type.EXIT;
-			}else if (isCommandKeyword(firstWord, COMMAND_MARK)) {
+			} else if (isCommandKeyword(firstWord, COMMAND_MARK)) {
 				return Command.Type.MARK;
-			}else if (isCommandKeyword(firstWord, COMMAND_UNMARK)) {
+			} else if (isCommandKeyword(firstWord, COMMAND_UNMARK)) {
 				return Command.Type.UNMARK;
+			} else if (isCommandKeyword(firstWord, COMMAND_SEARCH)) {
+				return Command.Type.SEARCH;
 			} else {
 				logger.info("identifyType: invalid command");
 				throw new Exception(ERROR_INVALID_COMMAND_SPECIFIED);

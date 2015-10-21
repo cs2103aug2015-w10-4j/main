@@ -38,6 +38,7 @@ public class Logic {
 	Storage storageObject;
 	History historyObject;
 	ArrayList<Task> listOfTasks = new ArrayList<Task>();
+	ArrayList<String> listFilter = new ArrayList<String>();
 
 	// date format converter
 	static SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM yyyy");
@@ -61,6 +62,7 @@ public class Logic {
 	private static final String MESSAGE_SUCCESS_DELETE = "Item(s) %s successfully deleted.";
 	private static final String MESSAGE_SUCCESS_MARKED = "Item(s) %s successfully marked.";
 	private static final String MESSAGE_SUCCESS_UNMARKED = "Item(s) %s successfully unmarked.";
+	private static final String MESSAGE_SUCCESS_SEARCH = "Search results for '%s'";
 	private static final String MESSAGE_SUCCESS_EDIT = "Item(s) %s successfully edited.";
 	private static final String MESSAGE_SUCCESS_EXIT = "Exiting program...";
 	private static final String MESSAGE_SUCCESS_DISPLAY = "Displaying items.";
@@ -213,11 +215,14 @@ public class Logic {
 					logger.info("EXIT command detected");
 					return exitProgram();
 				case MARK:
-					logger.info("MARKDONE command detected");
+					logger.info("MARK command detected");
 					return markDoneStatus(argumentList, shouldPushToHistory, isUndoHistory, true);
 				case UNMARK:
-					logger.info("UNMARKDONE command detected");
+					logger.info("UNMARK command detected");
 					return markDoneStatus(argumentList, shouldPushToHistory, isUndoHistory, false);
+				case SEARCH:
+					logger.info("SEARCH command detected");
+					return searchForTaskName(argumentList);
 				default :
 					logger.warning("Command type cannot be identified!");
 					return ERROR_NO_COMMAND_HANDLER;
@@ -406,6 +411,23 @@ public class Logic {
 		} else {
 			return MESSAGE_SUCCESS_REDO_DELETE;
 		}
+
+	}
+	
+	String searchForTaskName(ArrayList<String> argumentList) {
+		String searchTerm = "";
+		if (isEmptyArgumentList(argumentList)) {
+			return ERROR_INVALID_ARGUMENT;
+		}
+		for(int i = 0; i < argumentList.size(); i++){
+			searchTerm += argumentList.get(i);
+			if(i != argumentList.size() - 1){
+				searchTerm += " ";
+			}
+		}
+		listFilter.add(searchTerm);
+		
+		return String.format(MESSAGE_SUCCESS_SEARCH, searchTerm);
 
 	}
 	
@@ -627,7 +649,34 @@ public class Logic {
 	 * @return calls the UI to display updated list of items
 	 */
 	boolean showUpdatedItems() {
-		return UIObject.showTasks(listOfTasks);
+		if(listFilter.size() == 0){
+			// default view
+			return UIObject.showTasks(listOfTasks);
+		}else {
+			ArrayList<Task> filteredList = new ArrayList<Task>();
+			for (int i = 0; i < listOfTasks.size(); i++) {
+				filteredList.add(listOfTasks.get(i));
+			}
+
+			for (int j = 0; j < listFilter.size(); j++) {
+				String curSearchTerm = listFilter.get(j);
+				int i = 0;
+				while (i < filteredList.size()) {
+					Task curTask = filteredList.get(i);
+					if (!curTask.getName().contains(curSearchTerm)) {
+						filteredList.remove(i);
+					} else {
+						i++;
+					}
+				}
+			}
+			listFilter.clear();
+			return UIObject.showTasks(filteredList);
+		}
+		
+		
+
+		
 	}
 
 	/**
