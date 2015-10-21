@@ -58,7 +58,7 @@ public class TestParser {
 			message = parserObj.parseCommand("edit");
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			//e.printStackTrace();
 			assertEquals("Error: Task name is empty", e.getMessage());
 		}
 	

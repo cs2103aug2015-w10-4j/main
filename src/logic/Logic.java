@@ -154,7 +154,7 @@ public class Logic {
 				UIObject.showStatusToUser(ERROR_WRITING_FILE);
 			} catch (Exception e) {
 				// warning from parsing user command
-				e.printStackTrace();
+				//e.printStackTrace();
 				UIObject.showStatusToUser(e.getMessage());
 			}
 		}
