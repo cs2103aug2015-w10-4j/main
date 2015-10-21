@@ -69,6 +69,9 @@ public class Command {
 		this.commandType = commandType;
 	}
 	
+	public void setTask(int index, Task task){
+		this.tasks.set(index,task);
+	}
 	public void addTask(Task task) {
 		if (this.tasks == null) {
 			this.tasks = new ArrayList<Task>();

@@ -142,7 +142,7 @@ public class Logic {
 		while (true) {
 			try {
 				String userInput = UIObject.promptUser(MESSAGE_PROMPT_COMMAND);
-				Command commandObject = parserObject.parseCommand(userInput);
+				Command commandObject = parserObject.parseCommand(userInput,listOfTasks);
 				String executionResult = executeCommand(commandObject, true,
 						true);
 				UIObject.showStatusToUser(executionResult);

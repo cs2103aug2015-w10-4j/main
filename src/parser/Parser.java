@@ -10,6 +10,9 @@ import java.util.Collections;
 import java.util.GregorianCalendar;
 import java.util.logging.Logger;
 
+import logic.Logic;
+import storage.Storage;
+
 /**
  * To allow parser to parse a new field for task,
  * 1. Add to enum FieldType
@@ -73,6 +76,29 @@ public class Parser {
 	static final String[] INTERVAL_PERIODIC = { "every" , "repeats" };
 	static final String[] INSTANCES_PERIODIC = { "for" };
 
+	
+	public String editPartIs(String keyword){
+		if(hasKeyword(keyword,LOCATION)) {
+			return "LOCATION";
+		} 
+		if(hasKeyword(keyword,DEADLINE)) {
+			return "DEADLINE";
+		} 
+		if(hasKeyword(keyword,START_EVENT)) {
+			return "START_EVENT";
+		} 
+		if(hasKeyword(keyword,END_EVENT)) {
+			return "END_EVENT";
+		} 
+		if(hasKeyword(keyword,INTERVAL_PERIODIC)) {
+			return "INTERVAL_PERIODIC";
+		} 
+		if(hasKeyword(keyword,INSTANCES_PERIODIC)) {
+			return "INSTANCES_PERIODIC";
+		}
+		return "";
+	}
+	
 	class KeywordMarker implements Comparable<KeywordMarker> {
 		int index;
 		FieldType typeOfField;
@@ -112,7 +138,7 @@ public class Parser {
 	 * @param command
 	 * @return commandObject to be executed, or null if invalid
 	 */
-	public Command parseCommand(String commandString) throws Exception {
+	public Command parseCommand(String commandString,ArrayList<Task>listTasks) throws Exception {
 		commandString = commandString.trim();
 		Command.Type commandType = identifyType(commandString);
 		commandString = clearFirstWord(commandString);
@@ -127,11 +153,18 @@ public class Parser {
 				break;
 			case EDIT :
 				argumentArray = getOneIndex(commandString);
+				String editpart = editPartIs(getTwoIndex(commandString));
+				if(!editpart.equals("")) {
+					String newLocation = "";	
+					 executeSpecialEdit(editpart,commandString,listTasks,commandObject,argumentArray);
+				} else {
 				commandObject.setArguments(argumentArray);
 				commandString = clearFirstWord(commandString);
 				
 				extractTaskInformation(commandString, taskObject);
 				commandObject.addTask(taskObject);
+		
+				}
 				break;
 			case DELETE :
 				argumentArray = getMultipleIndexes(commandString);
@@ -149,6 +182,9 @@ public class Parser {
 				commandObject.setArguments(argumentArray);
 			case SEARCH :
 				argumentArray = getMultipleIndexes(commandString);
+				for(int j=0;j<argumentArray.length;j++ ){
+					System.out.println(argumentArray[j]);
+				}
 				commandObject.setArguments(argumentArray);
 			default:
 			
@@ -164,6 +200,10 @@ public class Parser {
 		return new String[]{ indexString };
 	}
 	
+	String getTwoIndex(String commandString){
+		return commandString.split(WHITE_SPACE_REGEX)[1];
+	}
+	
 	String[] getMultipleIndexes(String commandString){
 		String[] indexArray = commandString.split(WHITE_SPACE_REGEX);
 		return indexArray;
@@ -177,6 +217,36 @@ public class Parser {
 		} else {
 			return splitCommand[1];
 		}
+	}
+	
+	void executeSpecialEdit(String editpart, String commandString, ArrayList<Task>listTasks,Command commandObject,String[] argumentArray) {
+		String newLocation = "";
+		if (editpart.equals("LOCATION")) {
+					String[] argumentArr = getMultipleIndexes(commandString);
+				for(int i =2; i <argumentArr.length; i++ ) {
+					newLocation += argumentArr[i]+ " ";
+				}
+				
+				Task editTask = listTasks.get(Integer.parseInt(argumentArray[0])-1);
+				editTask.setLocation(newLocation);
+				
+				commandObject.setArguments(argumentArray);
+				commandObject.setTask(Integer.parseInt(argumentArray[0])-1,editTask);
+				listTasks.set(Integer.parseInt(argumentArray[0])-1,editTask);
+	
+			
+			} else if (editpart.equals("DEADLINE")) {
+				
+			} else if (editpart.equals("START_EVENT")) {
+				
+			} else if (editpart.equals("END_EVENT")) {
+				
+			} else if (editpart.equals("INTERVAL_PERIODIC")) {
+				
+			} else if (editpart.equals("INSTANCES_PERIODIC")) {
+				
+			}
+			
 	}
 
 	Command.Type identifyType(String commandString) throws Exception {
@@ -228,6 +298,7 @@ public class Parser {
 
 	boolean extractTaskInformation(String commandString, Task taskObject)
 			throws Exception {
+		System.out.println("commandString "+commandString);
 		logger.fine("extractTaskInformation: getting keyword markers");
 		ArrayList<KeywordMarker> keywordMarkers = getArrayOfKeywordIndexes(commandString);
 	
