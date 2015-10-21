@@ -51,10 +51,16 @@ public class Logic {
 	private static final String MESSAGE_SUCCESS_REDO_ADD = "Redo : Deleted item(s) restored.";
 	private static final String MESSAGE_SUCCESS_UNDO_DELETE = "Undo : Added item(s) removed.";
 	private static final String MESSAGE_SUCCESS_REDO_DELETE = "Redo : Added item(s) removed.";
+	private static final String MESSAGE_SUCCESS_UNDO_MARK = "Undo : Item(s) successfully marked.";
+	private static final String MESSAGE_SUCCESS_REDO_MARK = "Redo : Item(s) successfully marked.";
+	private static final String MESSAGE_SUCCESS_UNDO_UNMARK = "Undo : Item(s) successfully unmarked.";
+	private static final String MESSAGE_SUCCESS_REDO_UNMARK = "Redo : Item(s) successfully unmarked.";
 	private static final String MESSAGE_SUCCESS_UNDO_EDIT = "Undo : Reverted edits.";
 	private static final String MESSAGE_SUCCESS_REDO_EDIT = "Redo : Reverted edits.";
 	private static final String MESSAGE_SUCCESS_ADD = "Item(s) %s successfully added.";
 	private static final String MESSAGE_SUCCESS_DELETE = "Item(s) %s successfully deleted.";
+	private static final String MESSAGE_SUCCESS_MARKED = "Item(s) %s successfully marked.";
+	private static final String MESSAGE_SUCCESS_UNMARKED = "Item(s) %s successfully unmarked.";
 	private static final String MESSAGE_SUCCESS_EDIT = "Item(s) %s successfully edited.";
 	private static final String MESSAGE_SUCCESS_EXIT = "Exiting program...";
 	private static final String MESSAGE_SUCCESS_DISPLAY = "Displaying items.";
@@ -206,6 +212,12 @@ public class Logic {
 				case EXIT :
 					logger.info("EXIT command detected");
 					return exitProgram();
+				case MARK:
+					logger.info("MARKDONE command detected");
+					return markDoneStatus(argumentList, shouldPushToHistory, isUndoHistory, true);
+				case UNMARK:
+					logger.info("UNMARKDONE command detected");
+					return markDoneStatus(argumentList, shouldPushToHistory, isUndoHistory, false);
 				default :
 					logger.warning("Command type cannot be identified!");
 					return ERROR_NO_COMMAND_HANDLER;
@@ -395,6 +407,102 @@ public class Logic {
 			return MESSAGE_SUCCESS_REDO_DELETE;
 		}
 
+	}
+	
+	String markDoneStatus(ArrayList<String> argumentList,
+			boolean shouldPushToHistory, boolean isUndoHistory, boolean status) {
+		ArrayList<Integer> parsedIntArgumentList = new ArrayList<>();
+		String[] argumentListForReverse;
+		if (isEmptyArgumentList(argumentList)) {
+			return ERROR_INVALID_ARGUMENT;
+		}
+		
+		try {
+			logger.fine("Cleaning up arguments.");
+			
+			argumentList = preprocessDeleteKeyword(argumentList);
+			argumentList = removeDuplicates(argumentList);
+			
+			for (String argument : argumentList) {
+				parsedIntArgumentList.add(Integer.parseInt(argument) - 1);
+			}
+			
+			Collections.sort(parsedIntArgumentList);
+		} catch (NumberFormatException | IndexOutOfBoundsException e) {
+			return ERROR_INVALID_ARGUMENT;
+		}
+
+		argumentListForReverse = new String[argumentList.size()];
+
+		for (int i = parsedIntArgumentList.size() - 1; i >= 0; i--) {
+			int index = parsedIntArgumentList.get(i);
+			if (!isValidIndex(index)) {
+				return ERROR_INVALID_INDEX;
+			}
+
+		}
+		ArrayList<Task> tasksRemoved = new ArrayList<Task>();
+		for (int i = parsedIntArgumentList.size() - 1; i >= 0; i--) {
+			int index = parsedIntArgumentList.get(i);
+			argumentListForReverse[i] = argumentList.get(i); // for undo
+
+			// add to start of list to maintain order
+			Task taskRemoved = listOfTasks.remove(index);
+			tasksRemoved.add(0, taskRemoved);
+			Task cloneOfTask = taskRemoved.clone();
+			cloneOfTask.setDone(status);
+			listOfTasks.add(index, cloneOfTask);
+			logger.fine("Task marked/unmarked.");
+		}
+
+		// for history
+		if (shouldPushToHistory) {
+			logger.fine("Pushing command to history.");
+			if (isUndoHistory) {
+				logger.finer("Command is NOT called by undo.");
+
+				logger.finer("Attempting to reverse command and push it to history.");
+				// handle history
+				if(status){
+					if (!pushToHistory(new Command(Command.Type.UNMARK,
+							argumentListForReverse, tasksRemoved))) {
+						return ERROR_CANNOT_WRITE_TO_HISTORY;
+					}
+					return multipleItemFormatting(MESSAGE_SUCCESS_MARKED,
+							parsedIntArgumentList);
+				}else{
+					if (!pushToHistory(new Command(Command.Type.MARK,
+							argumentListForReverse, tasksRemoved))) {
+						return ERROR_CANNOT_WRITE_TO_HISTORY;
+					}
+					return multipleItemFormatting(MESSAGE_SUCCESS_UNMARKED,
+							parsedIntArgumentList);
+				}
+			} else {
+				logger.finer("Command is called by undo.");
+
+				logger.finer("Attempting to reverse command and push it to undoHistory.");
+				if(status){
+					if (!pushToUndoHistory(new Command(Command.Type.UNMARK,
+							argumentListForReverse, tasksRemoved))) {
+						return ERROR_CANNOT_WRITE_TO_HISTORY;
+					}
+					return MESSAGE_SUCCESS_UNDO_MARK;
+				}else{
+					if (!pushToUndoHistory(new Command(Command.Type.MARK,
+							argumentListForReverse, tasksRemoved))) {
+						return ERROR_CANNOT_WRITE_TO_HISTORY;
+					}
+					return MESSAGE_SUCCESS_UNDO_UNMARK;
+				}
+			}
+		} else {
+			if(status){
+				return MESSAGE_SUCCESS_REDO_MARK;
+			}else{
+				return MESSAGE_SUCCESS_REDO_UNMARK;
+			}
+		}
 	}
 
 	private ArrayList<String> preprocessDeleteKeyword(ArrayList<String> argumentList)

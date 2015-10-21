@@ -16,6 +16,7 @@ public class Task {
 	private String location = null;
 	private String periodicInterval = null;
 	private String periodicRepeats = null;
+	private boolean isDone = false;
 
 	/*
 	 * Constructor
@@ -118,6 +119,9 @@ public class Task {
 			return true;
 		}
 	}
+	public boolean isDone(){
+		return this.isDone;
+	}
 
 	// change the name of the task
 	public boolean setName(String newName) {
@@ -147,6 +151,22 @@ public class Task {
 	public boolean setPeriodicRepeats(String periodicInstances) {
 		this.periodicRepeats = periodicInstances;
 		return true;
+	}
+	public boolean setDone(boolean status){
+		this.isDone = status;
+		return true;
+	}
+	
+	public Task clone(){
+		Task newTask = new Task();
+		newTask.setName(this.getName());
+		newTask.setStartingTime(this.getStartingTime());
+		newTask.setEndingTime(this.getEndingTime());
+		newTask.setLocation(this.getLocation());
+		newTask.setPeriodicInterval(this.getPeriodicInterval());
+		newTask.setPeriodicRepeats(this.getPeriodicRepeats());
+		newTask.isDone = this.isDone();
+		return newTask;
 	}
 
 }

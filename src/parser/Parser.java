@@ -46,6 +46,8 @@ public class Parser {
 	static final String[] COMMAND_DELETE = { "delete", "del" };
 	static final String[] COMMAND_UNDO = { "undo" };
 	static final String[] COMMAND_REDO = { "redo" };
+	static final String[] COMMAND_MARK = { "mark" };
+	static final String[] COMMAND_UNMARK = { "unmark" };
 	static final String[] COMMAND_EXIT = { "exit" };
 	static final String[] COMMAND_DISPLAY = { "display" };
 	static final String[] COMMAND_SAVETO = { "saveto" };
@@ -131,13 +133,19 @@ public class Parser {
 				commandObject.addTask(taskObject);
 				break;
 			case DELETE :
-				argumentArray = getDeleteIndexes(commandString);
+				argumentArray = getMultipleIndexes(commandString);
 				commandObject.setArguments(argumentArray);
 				break;
 			case SAVETO :
 				argumentArray = getSaveToArgument(commandString);
 				commandObject.setArguments(argumentArray);
 				break;
+			case MARK :
+				argumentArray = getMultipleIndexes(commandString);
+				commandObject.setArguments(argumentArray);
+			case UNMARK :
+				argumentArray = getMultipleIndexes(commandString);
+				commandObject.setArguments(argumentArray);
 			default:
 			
 		}
@@ -152,7 +160,7 @@ public class Parser {
 		return new String[]{ indexString };
 	}
 	
-	String[] getDeleteIndexes(String commandString){
+	String[] getMultipleIndexes(String commandString){
 		String[] indexArray = commandString.split(WHITE_SPACE_REGEX);
 		return indexArray;
 	}
@@ -189,6 +197,10 @@ public class Parser {
 				return Command.Type.DISPLAY;
 			} else if (isCommandKeyword(firstWord, COMMAND_EXIT)) {
 				return Command.Type.EXIT;
+			}else if (isCommandKeyword(firstWord, COMMAND_MARK)) {
+				return Command.Type.MARK;
+			}else if (isCommandKeyword(firstWord, COMMAND_UNMARK)) {
+				return Command.Type.UNMARK;
 			} else {
 				logger.info("identifyType: invalid command");
 				throw new Exception(ERROR_INVALID_COMMAND_SPECIFIED);
