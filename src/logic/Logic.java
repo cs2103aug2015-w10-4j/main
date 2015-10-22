@@ -254,14 +254,14 @@ public class Logic {
 				redoStatus = MESSAGE_SUCCESS_REDO_EDIT;
 				break;
 			case MARK:
-				normalStatus = MESSAGE_SUCCESS_UNMARK;
-				undoStatus = MESSAGE_SUCCESS_UNDO_UNMARK;
-				redoStatus = MESSAGE_SUCCESS_REDO_UNMARK;
-				break;
-			case UNMARK:
 				normalStatus = MESSAGE_SUCCESS_MARK;
 				undoStatus = MESSAGE_SUCCESS_UNDO_MARK;
 				redoStatus = MESSAGE_SUCCESS_REDO_MARK;
+				break;
+			case UNMARK:
+				normalStatus = MESSAGE_SUCCESS_UNMARK;
+				undoStatus = MESSAGE_SUCCESS_UNDO_UNMARK;
+				redoStatus = MESSAGE_SUCCESS_REDO_UNMARK;
 				break;
 			default:
 				return ERROR_HISTORY_NO_COMMAND_HANDLER;
@@ -422,7 +422,8 @@ public class Logic {
 
 		}
 
-		String historyStatus = pushToHistory(Command.Type.DELETE, new Command(Command.Type.ADD, argumentListForReverse, tasksRemoved), shouldPushToHistory, isUndoHistory);
+		Command commandToPush = new Command(Command.Type.ADD, argumentListForReverse, tasksRemoved);
+		String historyStatus = pushToHistory(Command.Type.DELETE, commandToPush, shouldPushToHistory, isUndoHistory);
 		historyStatus = multipleItemFormatting(historyStatus, parsedIntArgumentList);
 		return historyStatus;
 
@@ -433,20 +434,19 @@ public class Logic {
 		if (isEmptyArgumentList(argumentList)) {
 			return ERROR_INVALID_ARGUMENT;
 		}
-		for(int i = 0; i < argumentList.size(); i++){
+		for (int i = 0; i < argumentList.size(); i++) {
 			searchTerm += argumentList.get(i);
-			if(i != argumentList.size() - 1){
+			if (i != argumentList.size() - 1) {
 				searchTerm += " ";
 			}
 		}
 		listFilter.add(searchTerm);
-		
-		return String.format(MESSAGE_SUCCESS_SEARCH, searchTerm);
 
+		return String.format(MESSAGE_SUCCESS_SEARCH, searchTerm);
 	}
 	
 	String markDoneStatus(ArrayList<String> argumentList,
-			boolean shouldPushToHistory, boolean isUndoHistory, boolean status) {
+			boolean shouldPushToHistory, boolean isUndoHistory, boolean isDone) {
 		ArrayList<Integer> parsedIntArgumentList = new ArrayList<>();
 		String[] argumentListForReverse;
 		if (isEmptyArgumentList(argumentList)) {
@@ -486,12 +486,22 @@ public class Logic {
 			Task taskRemoved = listOfTasks.remove(index);
 			tasksRemoved.add(0, taskRemoved);
 			Task cloneOfTask = taskRemoved.clone();
-			cloneOfTask.setDone(status);
+			cloneOfTask.setDone(isDone);
 			listOfTasks.add(index, cloneOfTask);
 			logger.fine("Task marked/unmarked.");
 		}
-
-		String historyStatus = pushToHistory(Command.Type.MARK, new Command(Command.Type.UNMARK, argumentListForReverse), shouldPushToHistory, isUndoHistory);
+		
+		Command.Type commandType;
+		Command.Type reversedCommandType;
+		if(isDone){
+			commandType = Command.Type.MARK;
+			reversedCommandType = Command.Type.UNMARK;
+		}else{
+			commandType = Command.Type.UNMARK;
+			reversedCommandType = Command.Type.MARK;
+		}
+		Command commandToPush = new Command(reversedCommandType, argumentListForReverse);
+		String historyStatus = pushToHistory(commandType, commandToPush, shouldPushToHistory, isUndoHistory);
 		historyStatus = multipleItemFormatting(historyStatus, parsedIntArgumentList);
 		return historyStatus;
 	}
