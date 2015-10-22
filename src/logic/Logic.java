@@ -348,7 +348,7 @@ public class Logic {
 		try {
 			logger.fine("Cleaning up arguments.");
 			
-			argumentList = preprocessDeleteKeyword(argumentList);
+			argumentList = preprocessDeleteArgument(argumentList);
 			argumentList = removeDuplicates(argumentList);
 			
 			for (String argument : argumentList) {
@@ -442,7 +442,7 @@ public class Logic {
 		try {
 			logger.fine("Cleaning up arguments.");
 			
-			argumentList = preprocessDeleteKeyword(argumentList);
+			argumentList = preprocessDeleteArgument(argumentList);
 			argumentList = removeDuplicates(argumentList);
 			
 			for (String argument : argumentList) {
@@ -527,13 +527,13 @@ public class Logic {
 		}
 	}
 
-	private ArrayList<String> preprocessDeleteKeyword(ArrayList<String> argumentList)
+	ArrayList<String> preprocessDeleteArgument(ArrayList<String> argumentList)
 			throws NumberFormatException, IndexOutOfBoundsException {
-		ArrayList<String> result = new ArrayList<>();
+		ArrayList<String> finalArgumentList = new ArrayList<>();
 		if (argumentList.size() == 1 && argumentList.get(0).equalsIgnoreCase(IDENTIFIER_DELETE_ALL)) {
 			argumentList.clear();
 			for (int i = 0; i < listOfTasks.size(); i++) {
-				result.add(String.valueOf(i + 1));
+				finalArgumentList.add(String.valueOf(i + 1));
 			}
 		} else {
 			for (String argument : argumentList) {
@@ -545,15 +545,15 @@ public class Logic {
 					int fromInclusive = Integer.parseInt(leftPart);
 					int toInclusive = Integer.parseInt(rightPart);
 					for (int index = fromInclusive; index <= toInclusive; index++) {
-						result.add(String.valueOf(index));
+						finalArgumentList.add(String.valueOf(index));
 					}
 				} else {
 					//unchecked
-					result.add(argument);
+					finalArgumentList.add(argument);
 				}
 			}
 		}
-		return result;
+		return finalArgumentList;
 	}
 
 	/**
