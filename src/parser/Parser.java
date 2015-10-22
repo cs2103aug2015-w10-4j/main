@@ -30,6 +30,7 @@ public class Parser {
 	
 	static final String ERROR_INVALID_PERIODIC_INSTANCES = "Error: Invalid periodic instances";
 	static final String ERROR_INVALID_PERIODIC_INTERVAL_VALUE = "Error: Invalid periodic interval value";
+	static final String ERROR_INVALID_MONTH_SPECIFIED = "Error: Invalid date specified!";
 	static final String ERROR_INVALID_DATE_SPECIFIED = "Error: Invalid date specified!";
 	static final String ERROR_INVALID_PERIODIC_INTERVAL = "Error: Invalid periodic interval specified";
 	static final String ERROR_MISSING_START_TIME = "Error: An end time has been entered without start time!";
@@ -454,52 +455,60 @@ public class Parser {
 		logger.fine("parseDate: parsing date");
 		int date, month, year;
 		Calendar helperDate;
-		if (!hasKeyword(dateArguments, DATE_SPECIAL)) {
-			try{
+		if (!hasKeyword(dateArguments, DATE_SPECIAL)
+				&& dateArguments.length != 1) {
+			try {
 				date = Integer.parseInt(dateArguments[0]);
-			}catch(NumberFormatException e){
+			} catch (NumberFormatException e) {
 				throw new Exception(ERROR_INVALID_DATE_SPECIFIED);
 			}
 			month = Arrays.asList(MONTHS).indexOf(dateArguments[1]);
-			if(dateArguments.length == 3){
+			if (month == -1) {
+				throw new Exception(ERROR_INVALID_MONTH_SPECIFIED);
+			}
+			if (dateArguments.length == 3) {
 				year = Integer.parseInt(dateArguments[2]);
-			}else{
+			} else {
 				year = Calendar.getInstance().get(Calendar.YEAR);
 			}
 
 			helperDate = new GregorianCalendar();
 			helperDate.clear();
 			helperDate.set(year, month, date);
-		} else if(dateArguments.length == 2){ // this/next <day>
-			logger.finer("parseDate: dateArguments[0] contains " + dateArguments[0]);
-			logger.finer("parseDate: dateArguments[1] contains " + dateArguments[1]);
+		} else if (dateArguments.length == 2) { // this/next <day>
+			logger.finer("parseDate: dateArguments[0] contains "
+					+ dateArguments[0]);
+			logger.finer("parseDate: dateArguments[1] contains "
+					+ dateArguments[1]);
 			String firstWord = dateArguments[0];
 			String secondWord = dateArguments[1];
-			
-			if(hasKeyword(secondWord, DAYS)){
+
+			if (hasKeyword(secondWord, DAYS)) {
 				int dayIndex = Arrays.asList(DAYS).indexOf(secondWord) + 1;
-				assert(firstWord.equalsIgnoreCase(DATE_SPECIAL[0])
-						|| firstWord.equalsIgnoreCase(DATE_SPECIAL[1]));
-				if(firstWord.equalsIgnoreCase(DATE_SPECIAL[0])){//this
+				assert (firstWord.equalsIgnoreCase(DATE_SPECIAL[0]) || firstWord
+						.equalsIgnoreCase(DATE_SPECIAL[1]));
+				if (firstWord.equalsIgnoreCase(DATE_SPECIAL[0])) {// this
 					date = getNearestDate(dayIndex);
-				} else {//next
+				} else {// next
 					date = getNearestDate(dayIndex) + DAYS.length;
-				} 
-				logger.finer("parseDate: this/next day determined to be " + date);
+				}
+				logger.finer("parseDate: this/next day determined to be "
+						+ date);
 			} else {
-				logger.info("parseDate: invaid day");
+				logger.info("parseDate: invalid day");
 				throw new Exception(ERROR_INVALID_DAY_SPECIFIED);
 			}
-			
+
 			month = Calendar.getInstance().get(Calendar.MONTH);
 			year = Calendar.getInstance().get(Calendar.YEAR);
-			
+
 			helperDate = new GregorianCalendar();
 			helperDate.clear();
 			helperDate.set(year, month, date);
 			return helperDate;
-		} else if (dateArguments.length == 1){ // today/tomorrow
-			if(dateArguments[0].equalsIgnoreCase(DATE_SPECIAL[2])){
+		} else if (hasKeyword(dateArguments, DATE_SPECIAL)
+				&& dateArguments.length == 1) { // today/tomorrow
+			if (dateArguments[0].equalsIgnoreCase(DATE_SPECIAL[2])) {
 				return new GregorianCalendar();
 			} else {
 				helperDate = new GregorianCalendar();
