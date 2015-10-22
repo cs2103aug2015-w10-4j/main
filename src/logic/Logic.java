@@ -29,6 +29,7 @@ import ui.UI;
  *
  */
 public class Logic {
+	private static final String ERROR_UNSPECIFIED_TIMING = "Error: Cannot convert into periodic task due to unspecified timing.";
 	/*
 	 * Declaration of object variables
 	 */
@@ -142,7 +143,8 @@ public class Logic {
 		while (true) {
 			try {
 				String userInput = UIObject.promptUser(MESSAGE_PROMPT_COMMAND);
-				Command commandObject = parserObject.parseCommand(userInput,listOfTasks);
+				Command commandObject = parserObject.parseCommand(userInput);
+				
 				String executionResult = executeCommand(commandObject, true,
 						true);
 				UIObject.showStatusToUser(executionResult);
@@ -348,7 +350,7 @@ public class Logic {
 		try {
 			logger.fine("Cleaning up arguments.");
 			
-			argumentList = preprocessDeleteKeyword(argumentList);
+			argumentList = preprocessDeleteArgument(argumentList);
 			argumentList = removeDuplicates(argumentList);
 			
 			for (String argument : argumentList) {
@@ -442,7 +444,7 @@ public class Logic {
 		try {
 			logger.fine("Cleaning up arguments.");
 			
-			argumentList = preprocessDeleteKeyword(argumentList);
+			argumentList = preprocessDeleteArgument(argumentList);
 			argumentList = removeDuplicates(argumentList);
 			
 			for (String argument : argumentList) {
@@ -527,13 +529,13 @@ public class Logic {
 		}
 	}
 
-	private ArrayList<String> preprocessDeleteKeyword(ArrayList<String> argumentList)
+	ArrayList<String> preprocessDeleteArgument(ArrayList<String> argumentList)
 			throws NumberFormatException, IndexOutOfBoundsException {
-		ArrayList<String> result = new ArrayList<>();
+		ArrayList<String> finalArgumentList = new ArrayList<>();
 		if (argumentList.size() == 1 && argumentList.get(0).equalsIgnoreCase(IDENTIFIER_DELETE_ALL)) {
 			argumentList.clear();
 			for (int i = 0; i < listOfTasks.size(); i++) {
-				result.add(String.valueOf(i + 1));
+				finalArgumentList.add(String.valueOf(i + 1));
 			}
 		} else {
 			for (String argument : argumentList) {
@@ -545,17 +547,41 @@ public class Logic {
 					int fromInclusive = Integer.parseInt(leftPart);
 					int toInclusive = Integer.parseInt(rightPart);
 					for (int index = fromInclusive; index <= toInclusive; index++) {
-						result.add(String.valueOf(index));
+						finalArgumentList.add(String.valueOf(index));
 					}
 				} else {
 					//unchecked
-					result.add(argument);
+					finalArgumentList.add(argument);
 				}
 			}
 		}
-		return result;
+		return finalArgumentList;
 	}
-
+	
+	String editSpecialField(Task newTask, Task clonedTask) {
+		if (newTask.hasName()) {
+			clonedTask.setName(newTask.getName());
+		}
+		if (newTask.hasLocation()) {
+			clonedTask.setLocation(newTask.getLocation());
+		}
+		if (newTask.hasStartingTime()) {
+			clonedTask.setStartingTime(newTask.getStartingTime());
+			clonedTask.setEndingTime(newTask.getEndingTime());
+		}
+		if (newTask.hasEndingTime() && !newTask.hasStartingTime()) {
+			clonedTask.setEndingTime(newTask.getEndingTime());
+		}
+		if (newTask.hasPeriodicInterval() || newTask.hasPeriodicRepeats()) {
+			if(!clonedTask.hasEndingTime()){
+				return ERROR_UNSPECIFIED_TIMING;
+			} else {
+				clonedTask.setPeriodicInterval(newTask.getPeriodicInterval());
+				clonedTask.setPeriodicRepeats(newTask.getPeriodicRepeats());
+			}
+		}
+		return null;
+	}
 	/**
 	 * Replaces an item from the list of tasks in memory with the new userTask
 	 * 
@@ -586,9 +612,15 @@ public class Logic {
 				if (hasClashes(userTask)) {
 					hasClashes = true;
 				}
+				Task newTask = taskEdited.clone();
+				String statusOfSpecialEdit = editSpecialField(userTask, newTask);
+				if (statusOfSpecialEdit != null) {
+					return statusOfSpecialEdit;
+				}
 				listOfTasks.remove(index);
 				logger.fine("Old task removed from list.");
-				listOfTasks.add(index, userTask);
+				
+				listOfTasks.add(index, newTask);
 				logger.fine("New task added to list.");
 
 				resolvePeriodic();

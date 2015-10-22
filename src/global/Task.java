@@ -111,7 +111,35 @@ public class Task {
 			return true;
 		}
 	}
-
+	
+	public boolean hasName() {
+		if(this.name != null) {
+			return true;
+		} 
+			return false;		
+	}
+	
+	public boolean hasLocation() {
+		if(this.location != null) {
+			return true;
+		}
+		return false;
+	}
+	
+	public boolean hasPeriodicInterval() {
+		if(this.periodicInterval != null) {
+			return true;
+		}
+		return false;
+	}
+	
+	public boolean hasPeriodicRepeats() {
+		if(this.periodicRepeats != null) {
+			return true;
+		}
+		return false;
+	}
+	
 	public boolean hasEndingTime() {
 		if (this.endingTime == null) {
 			return false;
