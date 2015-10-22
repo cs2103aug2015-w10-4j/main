@@ -219,7 +219,7 @@ public class Parser {
 		}
 	}
 	
-	void executeSpecialEdit(String editpart, String commandString, ArrayList<Task>listTasks,Command commandObject,String[] argumentArray) {
+	void executeSpecialEdit(String editpart, String commandString, ArrayList<Task>listTasks,Command commandObject,String[] argumentArray) throws Exception {
 		String newLocation = "";
 		if (editpart.equals("LOCATION")) {
 					String[] argumentArr = getMultipleIndexes(commandString);
@@ -231,21 +231,37 @@ public class Parser {
 				editTask.setLocation(newLocation);
 				
 				commandObject.setArguments(argumentArray);
-				commandObject.setTask(Integer.parseInt(argumentArray[0])-1,editTask);
+				commandObject.addTask(editTask);
+			//	commandObject.setTask(Integer.parseInt(argumentArray[0])-1,editTask);
 				listTasks.set(Integer.parseInt(argumentArray[0])-1,editTask);
 	
 			
 			} else if (editpart.equals("DEADLINE")) {
+				String[] argumentArr = getMultipleIndexes(commandString);
+				Task editTask = listTasks.get(Integer.parseInt(argumentArray[0])-1);
+				ArrayList<KeywordMarker> keywordMarkers = getArrayOfKeywordIndexes(commandString);
+				extractDate(commandString,keywordMarkers,editTask);
+				commandObject.setArguments(argumentArray);
+				commandObject.addTask(editTask);
 				
-			} else if (editpart.equals("START_EVENT")) {
 				
-			} else if (editpart.equals("END_EVENT")) {
+			} else if (editpart.equals("START_EVENT") || editpart.equals("END_EVENT")) {
+				String[] argumentArr = getMultipleIndexes(commandString);
+				Task editTask = listTasks.get(Integer.parseInt(argumentArray[0])-1);
+				ArrayList<KeywordMarker> keywordMarkers = getArrayOfKeywordIndexes(commandString);
+				extractDate(commandString,keywordMarkers,editTask);
+				commandObject.setArguments(argumentArray);
+				commandObject.addTask(editTask);
 				
-			} else if (editpart.equals("INTERVAL_PERIODIC")) {
 				
-			} else if (editpart.equals("INSTANCES_PERIODIC")) {
+			} else if (editpart.equals("INTERVAL_PERIODIC") || editpart.equals("INSTANCES_PERIODIC")) {
+				Task editTask = listTasks.get(Integer.parseInt(argumentArray[0])-1);
+				ArrayList<KeywordMarker> keywordMarkers = getArrayOfKeywordIndexes(commandString);
+				extractPeriodic(commandString, keywordMarkers, editTask, true);
+				commandObject.setArguments(argumentArray);
+				commandObject.addTask(editTask);
 				
-			}
+			} 
 			
 	}
 
@@ -384,10 +400,12 @@ public class Parser {
 
 	boolean extractDate(String commandString,
 			ArrayList<KeywordMarker> keywordMarkers, Task taskObject) throws Exception {
+		System.out.println("commandString "+commandString);
 		// check deadline/start_event & end_event
 		logger.fine("extractDate: getting date arguments");
 		String[] deadlineArguments = getArgumentsForField(commandString,
 				keywordMarkers, FieldType.DEADLINE);
+		
 
 		if (deadlineArguments != null) {
 			for(int i = 0; i < deadlineArguments.length; i++){
