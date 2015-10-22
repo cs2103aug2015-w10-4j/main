@@ -75,26 +75,32 @@ public class Parser {
 	static final String[] END_EVENT = { "end" , "to" };
 	static final String[] INTERVAL_PERIODIC = { "every" , "repeats" };
 	static final String[] INSTANCES_PERIODIC = { "for" };
+	static final String S_LOCATION = "LOCATION";
+	static final String S_DEADLINE = "DEADLINE";
+	static final String S_START_EVENT = "START_EVENT";
+	static final String S_END_EVENT = "END_EVENT";
+	static final String S_INTERVAL_PERIODIC = "INTERVAL_PERIODIC";
+	static final String S_INSTANCES_PERIODIC = "INSTANCES_PERIODIC";
 
 	
 	public String editPartIs(String keyword){
 		if(hasKeyword(keyword,LOCATION)) {
-			return "LOCATION";
+			return S_LOCATION;
 		} 
 		if(hasKeyword(keyword,DEADLINE)) {
-			return "DEADLINE";
+			return S_DEADLINE;
 		} 
 		if(hasKeyword(keyword,START_EVENT)) {
-			return "START_EVENT";
+			return S_START_EVENT;
 		} 
 		if(hasKeyword(keyword,END_EVENT)) {
-			return "END_EVENT";
+			return S_END_EVENT;
 		} 
 		if(hasKeyword(keyword,INTERVAL_PERIODIC)) {
-			return "INTERVAL_PERIODIC";
+			return S_INTERVAL_PERIODIC;
 		} 
 		if(hasKeyword(keyword,INSTANCES_PERIODIC)) {
-			return "INSTANCES_PERIODIC";
+			return S_INSTANCES_PERIODIC;
 		}
 		return "";
 	}
@@ -182,9 +188,6 @@ public class Parser {
 				commandObject.setArguments(argumentArray);
 			case SEARCH :
 				argumentArray = getMultipleIndexes(commandString);
-				for(int j=0;j<argumentArray.length;j++ ){
-					System.out.println(argumentArray[j]);
-				}
 				commandObject.setArguments(argumentArray);
 			default:
 			
@@ -221,7 +224,7 @@ public class Parser {
 	
 	void executeSpecialEdit(String editpart, String commandString, ArrayList<Task>listTasks,Command commandObject,String[] argumentArray) throws Exception {
 		String newLocation = "";
-		if (editpart.equals("LOCATION")) {
+		if (editpart.equals(S_LOCATION)) {
 					String[] argumentArr = getMultipleIndexes(commandString);
 				for(int i =2; i <argumentArr.length; i++ ) {
 					newLocation += argumentArr[i]+ " ";
@@ -236,7 +239,7 @@ public class Parser {
 				listTasks.set(Integer.parseInt(argumentArray[0])-1,editTask);
 	
 			
-			} else if (editpart.equals("DEADLINE")) {
+			} else if (editpart.equals(S_DEADLINE)) {
 				String[] argumentArr = getMultipleIndexes(commandString);
 				Task editTask = listTasks.get(Integer.parseInt(argumentArray[0])-1);
 				ArrayList<KeywordMarker> keywordMarkers = getArrayOfKeywordIndexes(commandString);
@@ -245,7 +248,7 @@ public class Parser {
 				commandObject.addTask(editTask);
 				
 				
-			} else if (editpart.equals("START_EVENT") || editpart.equals("END_EVENT")) {
+			} else if (editpart.equals(S_START_EVENT) || editpart.equals(S_END_EVENT)) {
 				String[] argumentArr = getMultipleIndexes(commandString);
 				Task editTask = listTasks.get(Integer.parseInt(argumentArray[0])-1);
 				ArrayList<KeywordMarker> keywordMarkers = getArrayOfKeywordIndexes(commandString);
@@ -254,14 +257,16 @@ public class Parser {
 				commandObject.addTask(editTask);
 				
 				
-			} else if (editpart.equals("INTERVAL_PERIODIC") || editpart.equals("INSTANCES_PERIODIC")) {
+			} else if (editpart.equals(S_INTERVAL_PERIODIC) || editpart.equals(S_INSTANCES_PERIODIC)) {
 				Task editTask = listTasks.get(Integer.parseInt(argumentArray[0])-1);
 				ArrayList<KeywordMarker> keywordMarkers = getArrayOfKeywordIndexes(commandString);
 				extractPeriodic(commandString, keywordMarkers, editTask, true);
 				commandObject.setArguments(argumentArray);
 				commandObject.addTask(editTask);
 				
-			} 
+			} else{
+				//assertion error
+			}
 			
 	}
 
@@ -314,7 +319,6 @@ public class Parser {
 
 	boolean extractTaskInformation(String commandString, Task taskObject)
 			throws Exception {
-		System.out.println("commandString "+commandString);
 		logger.fine("extractTaskInformation: getting keyword markers");
 		ArrayList<KeywordMarker> keywordMarkers = getArrayOfKeywordIndexes(commandString);
 	
@@ -400,7 +404,6 @@ public class Parser {
 
 	boolean extractDate(String commandString,
 			ArrayList<KeywordMarker> keywordMarkers, Task taskObject) throws Exception {
-		System.out.println("commandString "+commandString);
 		// check deadline/start_event & end_event
 		logger.fine("extractDate: getting date arguments");
 		String[] deadlineArguments = getArgumentsForField(commandString,
