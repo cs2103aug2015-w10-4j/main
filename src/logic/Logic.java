@@ -61,8 +61,8 @@ public class Logic {
 	private static final String MESSAGE_SUCCESS_REDO_EDIT = "Redo : Reverted edits.";
 	private static final String MESSAGE_SUCCESS_ADD = "Item(s) %s successfully added.";
 	private static final String MESSAGE_SUCCESS_DELETE = "Item(s) %s successfully deleted.";
-	private static final String MESSAGE_SUCCESS_MARKED = "Item(s) %s successfully marked.";
-	private static final String MESSAGE_SUCCESS_UNMARKED = "Item(s) %s successfully unmarked.";
+	private static final String MESSAGE_SUCCESS_MARK = "Item(s) %s successfully marked.";
+	private static final String MESSAGE_SUCCESS_UNMARK = "Item(s) %s successfully unmarked.";
 	private static final String MESSAGE_SUCCESS_SEARCH = "Search results for '%s'";
 	private static final String MESSAGE_SUCCESS_EDIT = "Item(s) %s successfully edited.";
 	private static final String MESSAGE_SUCCESS_EXIT = "Exiting program...";
@@ -79,6 +79,7 @@ public class Logic {
 	private static final String ERROR_INVALID_ARGUMENT = "Error: Invalid argument for command.";
 	private static final String ERROR_INVALID_COMMAND = "Error: Invalid command.";
 	private static final String ERROR_NO_COMMAND_HANDLER = "Error: Handler for this command type has not been defined.";
+	private static final String ERROR_HISTORY_NO_COMMAND_HANDLER = "Error: History called by unidentified command.";
 	private static final String ERROR_INVALID_INDEX = "Error: There is no item at this index.";
 	private static final String ERROR_UI_INTERRUPTED = "Error: UI prompt has been interrupted.";
 	private static final String ERROR_NO_HISTORY = "Error: No history found.";
@@ -231,6 +232,67 @@ public class Logic {
 			}
 		}
 	}
+	
+	String pushToHistory(Command.Type commandType, Command commandToPush, boolean shouldPushToHistory, boolean isUndoHistory){
+		String normalStatus;
+		String undoStatus;
+		String redoStatus;
+		switch(commandType){
+			case ADD:
+				normalStatus = MESSAGE_SUCCESS_ADD;
+				undoStatus = MESSAGE_SUCCESS_UNDO_ADD;
+				redoStatus = MESSAGE_SUCCESS_REDO_ADD;
+				break;
+			case DELETE:
+				normalStatus = MESSAGE_SUCCESS_DELETE;
+				undoStatus = MESSAGE_SUCCESS_UNDO_DELETE;
+				redoStatus = MESSAGE_SUCCESS_REDO_DELETE;
+				break;
+			case EDIT:
+				normalStatus = MESSAGE_SUCCESS_EDIT;
+				undoStatus = MESSAGE_SUCCESS_UNDO_EDIT;
+				redoStatus = MESSAGE_SUCCESS_REDO_EDIT;
+				break;
+			case MARK:
+				normalStatus = MESSAGE_SUCCESS_UNMARK;
+				undoStatus = MESSAGE_SUCCESS_UNDO_UNMARK;
+				redoStatus = MESSAGE_SUCCESS_REDO_UNMARK;
+				break;
+			case UNMARK:
+				normalStatus = MESSAGE_SUCCESS_MARK;
+				undoStatus = MESSAGE_SUCCESS_UNDO_MARK;
+				redoStatus = MESSAGE_SUCCESS_REDO_MARK;
+				break;
+			default:
+				return ERROR_HISTORY_NO_COMMAND_HANDLER;
+		}
+		
+		logger.fine("Checking if command should be pushed to history.");
+		if (shouldPushToHistory) {
+			logger.finer("Pushing command to history.");
+
+			logger.finer("Checking if command is called by undo.");
+			if (isUndoHistory) {
+				logger.finer("Command is NOT called by undo.");
+
+				logger.finer("Attempting to reverse command and push it to history.");
+				if (!historyObject.pushCommand(commandToPush, true)) {
+					return ERROR_CANNOT_WRITE_TO_HISTORY;
+				}
+				return normalStatus;
+			} else {
+				logger.finer("Command is called by undo.");
+
+				logger.finer("Attempting to reverse command and push it to undoHistory.");
+				if (!historyObject.pushCommand(commandToPush, false)) {
+					return ERROR_CANNOT_WRITE_TO_HISTORY;
+				}
+				return undoStatus;
+			}
+		} else {
+			return redoStatus;
+		}
+	}
 
 	/**
 	 * Adds an item to the list of tasks in memory
@@ -288,38 +350,12 @@ public class Logic {
 			
 			resolvePeriodic();
 
-			logger.fine("Checking if command should be pushed to history.");
-			if (shouldPushToHistory) {
-				logger.finer("Pushing command to history.");
-
-				logger.finer("Checking if command is called by undo.");
-				if (isUndoHistory) {
-					logger.finer("Command is NOT called by undo.");
-
-					logger.finer("Attempting to reverse command and push it to history.");
-					if (!pushToHistory(new Command(Command.Type.DELETE,
-							argumentListForReverse))) {
-						return ERROR_CANNOT_WRITE_TO_HISTORY;
-					}
-					if (hasClashes) {
-						return WARNING_TIMING_CLASH;
-					} else {
-						return multipleItemFormatting(MESSAGE_SUCCESS_ADD,
-								parsedIntList);
-					}
-				} else {
-					logger.finer("Command is called by undo.");
-
-					logger.finer("Attempting to reverse command and push it to undoHistory.");
-					if (!pushToUndoHistory(new Command(Command.Type.DELETE,
-							argumentListForReverse))) {
-						return ERROR_CANNOT_WRITE_TO_HISTORY;
-					}
-					return MESSAGE_SUCCESS_UNDO_ADD;
-				}
-			} else {
-				return MESSAGE_SUCCESS_REDO_ADD;
+			String historyStatus = pushToHistory(Command.Type.ADD, new Command(Command.Type.DELETE, argumentListForReverse), shouldPushToHistory, isUndoHistory);
+			historyStatus = multipleItemFormatting(historyStatus, parsedIntList);
+			if (hasClashes) {
+				return WARNING_TIMING_CLASH;
 			}
+			return historyStatus;
 		} catch (NumberFormatException e) {
 			return ERROR_INVALID_ARGUMENT;
 		} catch (Exception e) {
@@ -386,33 +422,9 @@ public class Logic {
 
 		}
 
-		// for history
-		if (shouldPushToHistory) {
-			logger.fine("Pushing command to history.");
-			if (isUndoHistory) {
-				logger.finer("Command is NOT called by undo.");
-
-				logger.finer("Attempting to reverse command and push it to history.");
-				// handle history
-				if (!pushToHistory(new Command(Command.Type.ADD,
-						argumentListForReverse, tasksRemoved))) {
-					return ERROR_CANNOT_WRITE_TO_HISTORY;
-				}
-				return multipleItemFormatting(MESSAGE_SUCCESS_DELETE,
-						parsedIntArgumentList);
-			} else {
-				logger.finer("Command is called by undo.");
-
-				logger.finer("Attempting to reverse command and push it to undoHistory.");
-				if (!pushToUndoHistory(new Command(Command.Type.ADD,
-						argumentListForReverse, tasksRemoved))) {
-					return ERROR_CANNOT_WRITE_TO_HISTORY;
-				}
-				return MESSAGE_SUCCESS_UNDO_DELETE;
-			}
-		} else {
-			return MESSAGE_SUCCESS_REDO_DELETE;
-		}
+		String historyStatus = pushToHistory(Command.Type.DELETE, new Command(Command.Type.ADD, argumentListForReverse, tasksRemoved), shouldPushToHistory, isUndoHistory);
+		historyStatus = multipleItemFormatting(historyStatus, parsedIntArgumentList);
+		return historyStatus;
 
 	}
 	
@@ -479,54 +491,9 @@ public class Logic {
 			logger.fine("Task marked/unmarked.");
 		}
 
-		// for history
-		if (shouldPushToHistory) {
-			logger.fine("Pushing command to history.");
-			if (isUndoHistory) {
-				logger.finer("Command is NOT called by undo.");
-
-				logger.finer("Attempting to reverse command and push it to history.");
-				// handle history
-				if(status){
-					if (!pushToHistory(new Command(Command.Type.UNMARK,
-							argumentListForReverse, tasksRemoved))) {
-						return ERROR_CANNOT_WRITE_TO_HISTORY;
-					}
-					return multipleItemFormatting(MESSAGE_SUCCESS_MARKED,
-							parsedIntArgumentList);
-				}else{
-					if (!pushToHistory(new Command(Command.Type.MARK,
-							argumentListForReverse, tasksRemoved))) {
-						return ERROR_CANNOT_WRITE_TO_HISTORY;
-					}
-					return multipleItemFormatting(MESSAGE_SUCCESS_UNMARKED,
-							parsedIntArgumentList);
-				}
-			} else {
-				logger.finer("Command is called by undo.");
-
-				logger.finer("Attempting to reverse command and push it to undoHistory.");
-				if(status){
-					if (!pushToUndoHistory(new Command(Command.Type.UNMARK,
-							argumentListForReverse, tasksRemoved))) {
-						return ERROR_CANNOT_WRITE_TO_HISTORY;
-					}
-					return MESSAGE_SUCCESS_UNDO_MARK;
-				}else{
-					if (!pushToUndoHistory(new Command(Command.Type.MARK,
-							argumentListForReverse, tasksRemoved))) {
-						return ERROR_CANNOT_WRITE_TO_HISTORY;
-					}
-					return MESSAGE_SUCCESS_UNDO_UNMARK;
-				}
-			}
-		} else {
-			if(status){
-				return MESSAGE_SUCCESS_REDO_MARK;
-			}else{
-				return MESSAGE_SUCCESS_REDO_UNMARK;
-			}
-		}
+		String historyStatus = pushToHistory(Command.Type.MARK, new Command(Command.Type.UNMARK, argumentListForReverse), shouldPushToHistory, isUndoHistory);
+		historyStatus = multipleItemFormatting(historyStatus, parsedIntArgumentList);
+		return historyStatus;
 	}
 
 	ArrayList<String> preprocessDeleteArgument(ArrayList<String> argumentList)
@@ -582,6 +549,7 @@ public class Logic {
 		}
 		return null;
 	}
+	
 	/**
 	 * Replaces an item from the list of tasks in memory with the new userTask
 	 * 
@@ -625,39 +593,16 @@ public class Logic {
 
 				resolvePeriodic();
 				
-				if (shouldPushToHistory) {
-					logger.fine("Pushing command to history.");
-					if (isUndoHistory) {
-						logger.finer("Command is NOT called by undo.");
-
-						logger.finer("Attempting to reverse command and push it to history.");
-						ArrayList<Integer> parsedIndex = new ArrayList<Integer>();
-						parsedIndex.add(index);
-						String[] indexString = { Integer.toString(index + 1) };
-						if (!pushToHistory(new Command(Command.Type.EDIT,
-								indexString, taskEdited))) {
-							return ERROR_CANNOT_WRITE_TO_HISTORY;
-						}
-						if (hasClashes) {
-							return WARNING_TIMING_CLASH;
-						} else {
-							return multipleItemFormatting(MESSAGE_SUCCESS_EDIT,
-									parsedIndex);
-						}
-					} else {
-						logger.finer("Command is called by undo.");
-
-						logger.finer("Attempting to reverse command and push it to undoHistory.");
-						String[] indexString = { Integer.toString(index + 1) };
-						if (!pushToUndoHistory(new Command(Command.Type.EDIT,
-								indexString, taskEdited))) {
-							return ERROR_CANNOT_WRITE_TO_HISTORY;
-						}
-						return MESSAGE_SUCCESS_UNDO_EDIT;
-					}
-				} else {
-					return MESSAGE_SUCCESS_REDO_EDIT;
+				String[] indexString = { Integer.toString(index + 1) };
+				ArrayList<Integer> parsedIntArgumentList = new ArrayList<Integer>();
+				parsedIntArgumentList.add(index);
+				String historyStatus = pushToHistory(Command.Type.EDIT, new Command(Command.Type.EDIT,
+						indexString, taskEdited), shouldPushToHistory, isUndoHistory);
+				historyStatus = multipleItemFormatting(historyStatus, parsedIntArgumentList);
+				if(hasClashes){
+					return WARNING_TIMING_CLASH;
 				}
+				return historyStatus;
 			} else {
 				return ERROR_INVALID_INDEX;
 			}
@@ -737,14 +682,6 @@ public class Logic {
 			return ERROR_NO_HISTORY;
 		}
 		return executeCommand(previousCommand, false, false);
-	}
-
-	boolean pushToHistory(Command commandObject) {
-		return historyObject.pushCommand(commandObject, true);
-	}
-
-	boolean pushToUndoHistory(Command commandObject) {
-		return historyObject.pushCommand(commandObject, false);
 	}
 
 	/**
