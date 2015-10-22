@@ -49,16 +49,13 @@ public class Logic {
 	 */
 	private static final String MESSAGE_WELCOME = "Welcome to Tasky! This is an open source project";
 	private static final String MESSAGE_PROMPT_COMMAND = "command :";
-	private static final String MESSAGE_SUCCESS_UNDO_ADD = "Undo : Deleted item(s) restored.";
-	private static final String MESSAGE_SUCCESS_REDO_ADD = "Redo : Deleted item(s) restored.";
-	private static final String MESSAGE_SUCCESS_UNDO_DELETE = "Undo : Added item(s) removed.";
-	private static final String MESSAGE_SUCCESS_REDO_DELETE = "Redo : Added item(s) removed.";
-	private static final String MESSAGE_SUCCESS_UNDO_MARK = "Undo : Item(s) successfully marked.";
-	private static final String MESSAGE_SUCCESS_REDO_MARK = "Redo : Item(s) successfully marked.";
-	private static final String MESSAGE_SUCCESS_UNDO_UNMARK = "Undo : Item(s) successfully unmarked.";
-	private static final String MESSAGE_SUCCESS_REDO_UNMARK = "Redo : Item(s) successfully unmarked.";
-	private static final String MESSAGE_SUCCESS_UNDO_EDIT = "Undo : Reverted edits.";
-	private static final String MESSAGE_SUCCESS_REDO_EDIT = "Redo : Reverted edits.";
+	private static final String MESSAGE_UNDO = "Undo : ";
+	private static final String MESSAGE_REDO = "Redo : ";
+	private static final String MESSAGE_SUCCESS_HISTORY_ADD = "Deleted item(s) restored.";
+	private static final String MESSAGE_SUCCESS_HISTORY_DELETE = "Added item(s) removed.";
+	private static final String MESSAGE_SUCCESS_HISTORY_MARK = "Item(s) successfully marked.";
+	private static final String MESSAGE_SUCCESS_HISTORY_UNMARK = "Item(s) successfully unmarked.";
+	private static final String MESSAGE_SUCCESS_HISTORY_EDIT = "Reverted edits.";
 	private static final String MESSAGE_SUCCESS_ADD = "Item(s) %s successfully added.";
 	private static final String MESSAGE_SUCCESS_DELETE = "Item(s) %s successfully deleted.";
 	private static final String MESSAGE_SUCCESS_MARK = "Item(s) %s successfully marked.";
@@ -240,28 +237,28 @@ public class Logic {
 		switch(commandType){
 			case ADD:
 				normalStatus = MESSAGE_SUCCESS_ADD;
-				undoStatus = MESSAGE_SUCCESS_UNDO_ADD;
-				redoStatus = MESSAGE_SUCCESS_REDO_ADD;
+				undoStatus = MESSAGE_UNDO + MESSAGE_SUCCESS_HISTORY_ADD;
+				redoStatus = MESSAGE_REDO + MESSAGE_SUCCESS_HISTORY_ADD;
 				break;
 			case DELETE:
 				normalStatus = MESSAGE_SUCCESS_DELETE;
-				undoStatus = MESSAGE_SUCCESS_UNDO_DELETE;
-				redoStatus = MESSAGE_SUCCESS_REDO_DELETE;
+				undoStatus = MESSAGE_UNDO + MESSAGE_SUCCESS_HISTORY_DELETE;
+				redoStatus = MESSAGE_REDO + MESSAGE_SUCCESS_HISTORY_DELETE;
 				break;
 			case EDIT:
 				normalStatus = MESSAGE_SUCCESS_EDIT;
-				undoStatus = MESSAGE_SUCCESS_UNDO_EDIT;
-				redoStatus = MESSAGE_SUCCESS_REDO_EDIT;
+				undoStatus = MESSAGE_UNDO + MESSAGE_SUCCESS_HISTORY_EDIT;
+				redoStatus = MESSAGE_REDO + MESSAGE_SUCCESS_HISTORY_EDIT;
 				break;
 			case MARK:
 				normalStatus = MESSAGE_SUCCESS_MARK;
-				undoStatus = MESSAGE_SUCCESS_UNDO_MARK;
-				redoStatus = MESSAGE_SUCCESS_REDO_MARK;
+				undoStatus = MESSAGE_UNDO + MESSAGE_SUCCESS_HISTORY_MARK;
+				redoStatus = MESSAGE_REDO + MESSAGE_SUCCESS_HISTORY_MARK;
 				break;
 			case UNMARK:
 				normalStatus = MESSAGE_SUCCESS_UNMARK;
-				undoStatus = MESSAGE_SUCCESS_UNDO_UNMARK;
-				redoStatus = MESSAGE_SUCCESS_REDO_UNMARK;
+				undoStatus = MESSAGE_UNDO + MESSAGE_SUCCESS_HISTORY_UNMARK;
+				redoStatus = MESSAGE_REDO + MESSAGE_SUCCESS_HISTORY_UNMARK;
 				break;
 			default:
 				return ERROR_HISTORY_NO_COMMAND_HANDLER;
