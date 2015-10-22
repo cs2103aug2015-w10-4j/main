@@ -144,7 +144,7 @@ public class Parser {
 	 * @param command
 	 * @return commandObject to be executed, or null if invalid
 	 */
-	public Command parseCommand(String commandString,ArrayList<Task>listTasks) throws Exception {
+	public Command parseCommand(String commandString) throws Exception {
 		commandString = commandString.trim();
 		Command.Type commandType = identifyType(commandString);
 		commandString = clearFirstWord(commandString);
@@ -162,7 +162,7 @@ public class Parser {
 				String editpart = editPartIs(getTwoIndex(commandString));
 				if(!editpart.equals("")) {
 					String newLocation = "";	
-					 executeSpecialEdit(editpart,commandString,listTasks,commandObject,argumentArray);
+					 executeSpecialEdit(editpart, commandString, commandObject, argumentArray);
 				} else {
 				commandObject.setArguments(argumentArray);
 				commandString = clearFirstWord(commandString);
@@ -223,8 +223,9 @@ public class Parser {
 	}
 	
 	void executeSpecialEdit(String editpart, String commandString,
-			ArrayList<Task> listTasks, Command commandObject,
+			 Command commandObject,
 			String[] argumentArray) throws Exception {
+		Task editTask = new Task();
 		String newLocation = "";
 		if (editpart.equals(S_LOCATION)) {
 			String[] argumentArr = getMultipleIndexes(commandString);
@@ -232,19 +233,17 @@ public class Parser {
 				newLocation += argumentArr[i] + " ";
 			}
 
-			Task editTask = listTasks
-					.get(Integer.parseInt(argumentArray[0]) - 1);
+		//	Task editTask = listTasks.get(Integer.parseInt(argumentArray[0]) - 1);
 			editTask.setLocation(newLocation);
 
 			commandObject.setArguments(argumentArray);
 			commandObject.addTask(editTask);
 			// commandObject.setTask(Integer.parseInt(argumentArray[0])-1,editTask);
-			listTasks.set(Integer.parseInt(argumentArray[0]) - 1, editTask);
+		
 
 		} else if (editpart.equals(S_DEADLINE)) {
 			String[] argumentArr = getMultipleIndexes(commandString);
-			Task editTask = listTasks
-					.get(Integer.parseInt(argumentArray[0]) - 1);
+			//Task editTask = listTasks.get(Integer.parseInt(argumentArray[0]) - 1);
 			ArrayList<KeywordMarker> keywordMarkers = getArrayOfKeywordIndexes(commandString);
 			extractDate(commandString, keywordMarkers, editTask);
 			commandObject.setArguments(argumentArray);
@@ -253,8 +252,7 @@ public class Parser {
 		} else if (editpart.equals(S_START_EVENT)
 				|| editpart.equals(S_END_EVENT)) {
 			String[] argumentArr = getMultipleIndexes(commandString);
-			Task editTask = listTasks
-					.get(Integer.parseInt(argumentArray[0]) - 1);
+		//	Task editTask = listTasks.get(Integer.parseInt(argumentArray[0]) - 1);
 			ArrayList<KeywordMarker> keywordMarkers = getArrayOfKeywordIndexes(commandString);
 			extractDate(commandString, keywordMarkers, editTask);
 			commandObject.setArguments(argumentArray);
@@ -262,8 +260,7 @@ public class Parser {
 
 		} else if (editpart.equals(S_INTERVAL_PERIODIC)
 				|| editpart.equals(S_INSTANCES_PERIODIC)) {
-			Task editTask = listTasks
-					.get(Integer.parseInt(argumentArray[0]) - 1);
+		//	Task editTask = listTasks.get(Integer.parseInt(argumentArray[0]) - 1);
 			ArrayList<KeywordMarker> keywordMarkers = getArrayOfKeywordIndexes(commandString);
 			extractPeriodic(commandString, keywordMarkers, editTask, true);
 			commandObject.setArguments(argumentArray);

@@ -142,7 +142,8 @@ public class Logic {
 		while (true) {
 			try {
 				String userInput = UIObject.promptUser(MESSAGE_PROMPT_COMMAND);
-				Command commandObject = parserObject.parseCommand(userInput,listOfTasks);
+				Command commandObject = parserObject.parseCommand(userInput);
+				
 				String executionResult = executeCommand(commandObject, true,
 						true);
 				UIObject.showStatusToUser(executionResult);
@@ -555,7 +556,29 @@ public class Logic {
 		}
 		return finalArgumentList;
 	}
-
+   Task editSpecialField(ArrayList<Task> userTasks, int index, ArrayList<Task> listOfTasks) {
+	  Task editTask = listOfTasks.get(index);
+	  Task newTask = userTasks.get(0);
+	if(newTask.hasName()) {		
+		editTask.setName(newTask.getName());
+	  }
+	if(newTask.hasLocation()) {	
+		editTask.setLocation(newTask.getLocation());
+	  }
+	if(newTask.hasStartingTime()) {
+		editTask.setStartingTime(newTask.getStartingTime());
+		editTask.setEndingTime(newTask.getEndingTime());
+		
+	  }
+	if(newTask.hasEndingTime() && !newTask.hasStartingTime()) {
+		editTask.setEndingTime(newTask.getEndingTime());
+	  }
+	if(newTask.hasPeriodicInterval() || newTask.hasPeriodicRepeats()) {
+	editTask.setPeriodicInterval(newTask.getPeriodicInterval());
+	editTask.setPeriodicRepeats(newTask.getPeriodicRepeats());
+	  }
+	  return editTask;
+     }
 	/**
 	 * Replaces an item from the list of tasks in memory with the new userTask
 	 * 
@@ -586,8 +609,10 @@ public class Logic {
 				if (hasClashes(userTask)) {
 					hasClashes = true;
 				}
+				userTask = editSpecialField(userTasks, index, listOfTasks);
 				listOfTasks.remove(index);
 				logger.fine("Old task removed from list.");
+				
 				listOfTasks.add(index, userTask);
 				logger.fine("New task added to list.");
 
