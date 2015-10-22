@@ -16,6 +16,7 @@ import global.Task;
 public class TestTaskListFormatter {
 
 	private static final int ONE_BILLION = (int) 1e9;
+	private static final String NEW_LINE = System.getProperty("line.separator");
 	
 	private TaskListFormatter formatter;
 	private Calendar timeForTesting;
@@ -37,13 +38,13 @@ public class TestTaskListFormatter {
 		taskList.add(new Task("Task with 2 dates", timeForTesting, timeForTesting));
 		
 		String result = formatter.formatTaskList(taskList, ONE_BILLION);
-		String expected = "+-----+--------------------------+---------------+-------------+----------+-------+---------+\n"
-				        + "| No. |       Description        | Starting Time | Ending Time | Location | Every | Repeats |\n"
-				        + "+-----+--------------------------+---------------+-------------+----------+-------+---------+\n"
-				        + "|1    |Task with only description|-              |-            |-         |-      |-        |\n"
-				        + "+-----+--------------------------+---------------+-------------+----------+-------+---------+\n"
-				        + "|2    |Task with 2 dates         |03 Dec 2020    |03 Dec 2020  |-         |-      |-        |\n"
-				        + "+-----+--------------------------+---------------+-------------+----------+-------+---------+\n";
+		String expected = "+-----+--------------------------+---------------+-------------+----------+-------+---------+" + NEW_LINE
+				        + "| No. |       Description        | Starting Time | Ending Time | Location | Every | Repeats |" + NEW_LINE
+				        + "+-----+--------------------------+---------------+-------------+----------+-------+---------+" + NEW_LINE
+				        + "|1    |Task with only description|-              |-            |-         |-      |-        |" + NEW_LINE
+				        + "+-----+--------------------------+---------------+-------------+----------+-------+---------+" + NEW_LINE
+				        + "|2    |Task with 2 dates         |03 Dec 2020    |03 Dec 2020  |-         |-      |-        |" + NEW_LINE
+				        + "+-----+--------------------------+---------------+-------------+----------+-------+---------+" + NEW_LINE;
 		assertEquals(result, expected);
 	}
 	
@@ -59,17 +60,17 @@ public class TestTaskListFormatter {
 				timeForTesting, "NUS SoC"));
 		
 		String result = formatter.formatTaskList(taskList, 30);
-		String expected = "+-----+------------------------------+---------------+-------------+----------+-------+---------+\n"
-				        + "| No. |         Description          | Starting Time | Ending Time | Location | Every | Repeats |\n"
-				        + "+-----+------------------------------+---------------+-------------+----------+-------+---------+\n"
-				        + "|1    |Task with only description    |-              |-            |-         |-      |-        |\n"
-				        + "+-----+------------------------------+---------------+-------------+----------+-------+---------+\n"
-				        + "|2    |Task with 2 dates             |03 Dec 2020    |03 Dec 2020  |-         |-      |-        |\n"
-				        + "+-----+------------------------------+---------------+-------------+----------+-------+---------+\n"
-				        + "|3    |Task with a very long long lon|-              |03 Dec 2020  |NUS SoC   |-      |-        |\n"
-				        + "|     |g long description with locati|               |             |          |       |         |\n"
-				        + "|     |on and date                   |               |             |          |       |         |\n"
-				        + "+-----+------------------------------+---------------+-------------+----------+-------+---------+\n";
+		String expected = "+-----+------------------------------+---------------+-------------+----------+-------+---------+" + NEW_LINE
+				        + "| No. |         Description          | Starting Time | Ending Time | Location | Every | Repeats |" + NEW_LINE
+				        + "+-----+------------------------------+---------------+-------------+----------+-------+---------+" + NEW_LINE
+				        + "|1    |Task with only description    |-              |-            |-         |-      |-        |" + NEW_LINE
+				        + "+-----+------------------------------+---------------+-------------+----------+-------+---------+" + NEW_LINE
+				        + "|2    |Task with 2 dates             |03 Dec 2020    |03 Dec 2020  |-         |-      |-        |" + NEW_LINE
+				        + "+-----+------------------------------+---------------+-------------+----------+-------+---------+" + NEW_LINE
+				        + "|3    |Task with a very long long lon|-              |03 Dec 2020  |NUS SoC   |-      |-        |" + NEW_LINE
+				        + "|     |g long description with locati|               |             |          |       |         |" + NEW_LINE
+				        + "|     |on and date                   |               |             |          |       |         |" + NEW_LINE
+				        + "+-----+------------------------------+---------------+-------------+----------+-------+---------+" + NEW_LINE;
 		assertEquals(expected, result);
 	}
 	
