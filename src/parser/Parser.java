@@ -85,22 +85,23 @@ public class Parser {
 
 	
 	public String editPartIs(String keyword){
-		if(hasKeyword(keyword,LOCATION)) {
+		System.out.println("keyword is " + keyword);
+		if (hasKeyword(keyword, LOCATION)) {
 			return S_LOCATION;
-		} 
-		if(hasKeyword(keyword,DEADLINE)) {
+		}
+		if (hasKeyword(keyword, DEADLINE)) {
 			return S_DEADLINE;
-		} 
-		if(hasKeyword(keyword,START_EVENT)) {
+		}
+		if (hasKeyword(keyword, START_EVENT)) {
 			return S_START_EVENT;
-		} 
-		if(hasKeyword(keyword,END_EVENT)) {
+		}
+		if (hasKeyword(keyword, END_EVENT)) {
 			return S_END_EVENT;
-		} 
-		if(hasKeyword(keyword,INTERVAL_PERIODIC)) {
+		}
+		if (hasKeyword(keyword, INTERVAL_PERIODIC)) {
 			return S_INTERVAL_PERIODIC;
-		} 
-		if(hasKeyword(keyword,INSTANCES_PERIODIC)) {
+		}
+		if (hasKeyword(keyword, INSTANCES_PERIODIC)) {
 			return S_INSTANCES_PERIODIC;
 		}
 		return "";
@@ -159,18 +160,18 @@ public class Parser {
 				commandObject.addTask(taskObject);
 				break;
 			case EDIT :
+				// need to fix edit
 				argumentArray = getOneIndex(commandString);
 				String editpart = editPartIs(getTwoIndex(commandString));
-				if(!editpart.equals("")) {
-					String newLocation = "";	
-					 executeSpecialEdit(editpart, commandString, commandObject, argumentArray);
+				if (!editpart.equals("")) {
+					executeSpecialEdit(editpart, commandString, commandObject,
+							argumentArray);
 				} else {
-				commandObject.setArguments(argumentArray);
-				commandString = clearFirstWord(commandString);
-				
-				extractTaskInformation(commandString, taskObject);
-				commandObject.addTask(taskObject);
-		
+					commandObject.setArguments(argumentArray);
+					commandString = clearFirstWord(commandString);
+
+					extractTaskInformation(commandString, taskObject);
+					commandObject.addTask(taskObject);
 				}
 				break;
 			case DELETE :

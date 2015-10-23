@@ -612,7 +612,6 @@ public class Logic {
 		if (listOfTasks.isEmpty()) {
 			return MESSAGE_DISPLAY_EMPTY;
 		} else {
-			// showUpdatedItems();
 			return MESSAGE_SUCCESS_DISPLAY;
 		}
 	}
@@ -627,41 +626,41 @@ public class Logic {
 	 */
 	boolean showUpdatedItems() {
 		listOfShownTasks.clear();
-		if(listFilter.size() == 0){
+		if (listFilter.size() == 0) {
 			ArrayList<Task> listOfFloating = new ArrayList<Task>();
 			ArrayList<Task> listOfDeadlines = new ArrayList<Task>();
 			ArrayList<Task> listOfEvents = new ArrayList<Task>();
-			for(int i = 0; i < listOfTasks.size(); i++){
+			for (int i = 0; i < listOfTasks.size(); i++) {
 				Task curTask = listOfTasks.get(i);
-				if(curTask.hasEndingTime()){
-					if(curTask.hasStartingTime()){
+				if (curTask.hasEndingTime()) {
+					if (curTask.hasStartingTime()) {
 						listOfEvents.add(curTask);
-					}else{
+					} else {
 						listOfDeadlines.add(curTask);
 					}
-				}else{
+				} else {
 					listOfFloating.add(curTask);
 				}
 			}
 			
-			if(listOfFloating.size() >= 3){
+			if (listOfFloating.size() >= 3) {
 				listOfShownTasks.addAll(listOfFloating.subList(0, 3));
-			}else{
+			} else {
 				listOfShownTasks.addAll(listOfFloating);
 			}
-			if(listOfDeadlines.size() >= 3){
+			if (listOfDeadlines.size() >= 3) {
 				listOfShownTasks.addAll(listOfDeadlines.subList(0, 3));
-			}else{
+			} else {
 				listOfShownTasks.addAll(listOfDeadlines);
 			}
-			if(listOfEvents.size() >= 3){
+			if (listOfEvents.size() >= 3) {
 				listOfShownTasks.addAll(listOfEvents.subList(0, 3));
-			}else{
+			} else {
 				listOfShownTasks.addAll(listOfEvents);
 			}
 			// default view
 			return UIObject.showTasks(listOfShownTasks);
-		}else {
+		} else {
 			ArrayList<Task> listOfShownTasks = new ArrayList<Task>();
 			for (int i = 0; i < listOfTasks.size(); i++) {
 				listOfShownTasks.add(listOfTasks.get(i));
