@@ -85,7 +85,6 @@ public class Parser {
 
 	
 	public String editPartIs(String keyword){
-		System.out.println("keyword is " + keyword);
 		if (hasKeyword(keyword, LOCATION)) {
 			return S_LOCATION;
 		}
