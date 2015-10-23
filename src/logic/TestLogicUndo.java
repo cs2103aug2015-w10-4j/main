@@ -83,7 +83,7 @@ Logic logicObject;
 		String message = logicObject.undoCommand();		
 		assertEquals("Undo : Reverted edits.", message);
 		
-		assertEquals("New item 1", logicObject.listOfTasks.get(0).getName());
+		assertEquals("Old item 1", logicObject.listOfTasks.get(0).getName());
 		/*assertEquals("some item 2", logicObject.listOfTasks.get(1).getName());
 		assertEquals("some item 3", logicObject.listOfTasks.get(2).getName());*/
 	}
