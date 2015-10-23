@@ -5,7 +5,7 @@ import java.util.Calendar;
 /**
  * This is a data structure to store the details of a task
  */
-public class Task {
+public class Task implements Comparable<Task> {
 	/*
 	 * Declaration of variables
 	 */
@@ -195,6 +195,38 @@ public class Task {
 		newTask.setPeriodicRepeats(this.getPeriodicRepeats());
 		newTask.isDone = this.isDone();
 		return newTask;
+	}
+	
+	public int compareTo(Task taskObj){
+		Calendar thisTime;
+		Calendar objTime;
+		if(this.hasStartingTime()){
+			thisTime = this.getStartingTime();
+		}else{
+			thisTime = this.getEndingTime();
+		}
+		
+		if(taskObj.hasStartingTime()){
+			objTime = taskObj.getStartingTime();
+		}else{
+			objTime = taskObj.getEndingTime();
+		}
+		
+		if(thisTime == null && objTime == null){
+			return 0;
+		}else if(thisTime == null){
+			return -1;
+		}else if(objTime == null){
+			return 1;
+		}else{
+			if(thisTime.before(objTime)){
+				return -1;
+			}else if(thisTime.after(objTime)){
+				return 1;
+			}else{
+				return 0;
+			}
+		}
 	}
 
 }

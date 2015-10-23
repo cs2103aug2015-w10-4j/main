@@ -40,6 +40,7 @@ public class Logic {
 	Storage storageObject;
 	History historyObject;
 	ArrayList<Task> listOfTasks = new ArrayList<Task>();
+	ArrayList<Task> listOfShownTasks = new ArrayList<Task>();
 	ArrayList<Task> listFilter = new ArrayList<Task>();
 
 	// date format converter
@@ -616,34 +617,71 @@ public class Logic {
 		}
 	}
 
+	boolean sortListOfTasks(){ // by time
+		Collections.sort(listOfTasks);
+		return true;
+	}
+	
 	/**
 	 * @return calls the UI to display updated list of items
 	 */
 	boolean showUpdatedItems() {
+		listOfShownTasks.clear();
 		if(listFilter.size() == 0){
+			ArrayList<Task> listOfFloating = new ArrayList<Task>();
+			ArrayList<Task> listOfDeadlines = new ArrayList<Task>();
+			ArrayList<Task> listOfEvents = new ArrayList<Task>();
+			for(int i = 0; i < listOfTasks.size(); i++){
+				Task curTask = listOfTasks.get(i);
+				if(curTask.hasEndingTime()){
+					if(curTask.hasStartingTime()){
+						listOfEvents.add(curTask);
+					}else{
+						listOfDeadlines.add(curTask);
+					}
+				}else{
+					listOfFloating.add(curTask);
+				}
+			}
+			
+			if(listOfFloating.size() >= 3){
+				listOfShownTasks.addAll(listOfFloating.subList(0, 3));
+			}else{
+				listOfShownTasks.addAll(listOfFloating);
+			}
+			if(listOfDeadlines.size() >= 3){
+				listOfShownTasks.addAll(listOfDeadlines.subList(0, 3));
+			}else{
+				listOfShownTasks.addAll(listOfDeadlines);
+			}
+			if(listOfEvents.size() >= 3){
+				listOfShownTasks.addAll(listOfEvents.subList(0, 3));
+			}else{
+				listOfShownTasks.addAll(listOfEvents);
+			}
 			// default view
-			return UIObject.showTasks(listOfTasks);
+			return UIObject.showTasks(listOfShownTasks);
 		}else {
-			ArrayList<Task> filteredList = new ArrayList<Task>();
+			ArrayList<Task> listOfShownTasks = new ArrayList<Task>();
 			for (int i = 0; i < listOfTasks.size(); i++) {
-				filteredList.add(listOfTasks.get(i));
+				listOfShownTasks.add(listOfTasks.get(i));
 			}
 
 			for (int j = 0; j < listFilter.size(); j++) {
 				Task curFilter = listFilter.get(j);
 				String searchTaskName = curFilter.getName();
 				int i = 0;
-				while (i < filteredList.size()) {
-					Task curTask = filteredList.get(i);
+				while (i < listOfShownTasks.size()) {
+					Task curTask = listOfShownTasks.get(i);
 					if (!curTask.getName().contains(searchTaskName)) {
-						filteredList.remove(i);
+						listOfShownTasks.remove(i);
 					} else {
 						i++;
 					}
 				}
 			}
 			listFilter.clear();
-			return UIObject.showTasks(filteredList);
+			return UIObject.showTasks(listOfShownTasks);
 		}
 		
 		
