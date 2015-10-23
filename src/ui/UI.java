@@ -19,6 +19,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
@@ -101,7 +102,7 @@ public class UI {
 	private TextFormatter taskListFormatter = new TextFormatter();
 	private UserInputHistory userInputHistory = new UserInputHistory();
 	
-	private static final boolean useJTable = false;
+	private static final boolean useJTable = true;
 	
 	/*
 	 * Constructor
@@ -341,6 +342,32 @@ public class UI {
 
 		displayAreaPanel.add(textArea, constraint);
 		displayAreaPanel.revalidate();
+		displayAreaPanel.repaint();
+
+		return true;
+	}
+	
+	//TODO: extract magic strings
+	private boolean showToUser(TaskyTableModel model) {
+		JTable table = new JTable(model);
+		
+		displayAreaPanel.removeAll();
+		
+		GridBagConstraints constraint = new GridBagConstraints();
+		constraint.weightx = 1.0;
+		constraint.gridx = constraint.gridy = 0;
+		constraint.gridwidth = constraint.gridheight = 1;
+		constraint.fill = GridBagConstraints.HORIZONTAL;
+		
+		displayAreaPanel.add(table.getTableHeader(), constraint);
+		
+		constraint.gridy = 1;
+		constraint.weighty = 1;
+		constraint.fill = GridBagConstraints.BOTH;
+		
+		displayAreaPanel.add(table, constraint);
+		displayAreaPanel.revalidate();
+		displayAreaPanel.repaint();
 
 		return true;
 	}
@@ -358,15 +385,14 @@ public class UI {
 	 * @return true if successful
 	 */
 	public boolean showTasks(List<Task> tasks) {
-		Object[][] objectArrayTaskList = FormatterHelper.getTaskListData(tasks);
+		Object[][] taskListData = FormatterHelper.getTaskListData(tasks);
 		if (!useJTable) {
-			String formattedTaskList = taskListFormatter.formatTaskList(objectArrayTaskList,
+			String formattedTaskList = taskListFormatter.formatTaskList(taskListData,
 					MAXIMUM_COLUMN_WIDTH);
-			showToUser(formattedTaskList);
-			return true;
+			return showToUser(formattedTaskList);
 		} else {
-			assert false : "Not yet implemented";
-			return false;
+			TaskyTableModel tableModel = new TaskyTableModel(taskListData);
+			return showToUser(tableModel);
 		}
 	}
 	

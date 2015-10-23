@@ -34,10 +34,10 @@ public class FormatterHelper {
 																	  "Status"
 																	  };
 	
+	public static final int COLUMN_COUNT = 8;
+
 	private static final String TASK_DONE = "Done.";
 	private static final String TASK_NOT_DONE = "Not done yet.";
-
-	private static final int COLUMN_COUNT = 8;
 	
 	//additional space at the beginning and the end
 	private static final int ADDITIONAL_SPACE = 2;
@@ -59,8 +59,6 @@ public class FormatterHelper {
 			int columnLength = TABLE_COLUMN_NAMES[i].length() + ADDITIONAL_SPACE;
 			
 			for (int j = 0; j < taskListData.length; j++) {
-				assert taskListData[j][i] != null;
-
 				String entry = getStringRepresentation(taskListData[j][i]);
 
 				int currentEntryLength = entry.length();
@@ -95,7 +93,7 @@ public class FormatterHelper {
 		} else if (objectInField instanceof Calendar) {
 			return String.format("%s", DATE_FORMAT.format(((Calendar) objectInField).getTime()));
 		} else if (objectInField instanceof Boolean) {
-			return String.format("%s", (Boolean) objectInField ? TASK_DONE
+			return String.format("%s", Boolean.TRUE.equals(objectInField) ? TASK_DONE
 					: TASK_NOT_DONE);
 		}
 		
@@ -155,9 +153,8 @@ public class FormatterHelper {
 						currentField.setAccessible(true);
 						
 						Object objectInField = currentField.get(currentTask);
-						String stringRepresentation = getStringRepresentation(objectInField);
 						
-						result[i][j] = stringRepresentation;
+						result[i][j] = objectInField;
 					} catch (SecurityException | NoSuchFieldException | IllegalAccessException e) {
 						assert currentField != null;
 						assert false; //should not happen
