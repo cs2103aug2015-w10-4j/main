@@ -18,21 +18,26 @@ public class FormatterHelper {
 															  "endingTime",
 															  "location",
 															  "periodicInterval",
-															  "periodicRepeats"
+															  "periodicRepeats",
+															  "isDone"
 															  };
 	
 
 	//TODO: automate this?
-	private static final String[] TABLE_COLUMN_NAMES = new String[] { "No.",
+	public static final String[] TABLE_COLUMN_NAMES = new String[] { "No.",
 																	  "Description",
 																	  "Starting Time",
 																	  "Ending Time",
 																	  "Location",
 																	  "Every",
-																	  "Repeats"
+																	  "Repeats",
+																	  "Status"
 																	  };
 	
-	private static final int COLUMN_COUNT = 7;
+	private static final String TASK_DONE = "Done.";
+	private static final String TASK_NOT_DONE = "Not done yet.";
+
+	private static final int COLUMN_COUNT = 8;
 	
 	//additional space at the beginning and the end
 	private static final int ADDITIONAL_SPACE = 2;
@@ -46,47 +51,24 @@ public class FormatterHelper {
 	 * @param lineCharLimit
 	 * @return an array of ColumnInfo[] (pair of name and width) for each column.
 	 */
-	public static ColumnInfo[] getColumnInfo(List<Task> taskList, int lineCharLimit) {
+	public static ColumnInfo[] getColumnInfo(Object[][] taskListData, int lineCharLimit) {
 		int[] columnLengths = new int[COLUMN_COUNT];
 		
 		for (int i = 0; i < columnLengths.length; i++) {
 			//coulumn length should be at least as long as the column name length
 			int columnLength = TABLE_COLUMN_NAMES[i].length() + ADDITIONAL_SPACE;
 			
-			for (int j = 0; j < taskList.size(); j++) {
-				Task task = taskList.get(j);
+			for (int j = 0; j < taskListData.length; j++) {
+				assert taskListData[j][i] != null;
+
+				String entry = getStringRepresentation(taskListData[j][i]);
+
+				int currentEntryLength = entry.length();
+				currentEntryLength = Math.min(currentEntryLength, lineCharLimit);
 				
-				if (i == 0) { //the first column is the number
-					String numberAsString = String.valueOf(i + 1);
-					int currentRowColumnLength = numberAsString.length();
-					if (currentRowColumnLength > lineCharLimit) {
-						currentRowColumnLength = lineCharLimit;
-					}
-					columnLength = Math.max(columnLength, currentRowColumnLength);
-				} else {
-					Field currentField = null;
-					
-					try {
-						currentField = Task.class.getDeclaredField(FIELD_NAMES[i]);
-						currentField.setAccessible(true);
-						
-						Object objectInField = currentField.get(task);
-						String stringRepresentation = getStringRepresentation(objectInField);
-						
-						if (stringRepresentation != null) {
-							int currentRowColumnLength = stringRepresentation.length();
-							if (currentRowColumnLength > lineCharLimit) {
-								currentRowColumnLength = lineCharLimit;
-							}
-							columnLength = Math.max(columnLength, currentRowColumnLength);
-						}
-					} catch (SecurityException | NoSuchFieldException | IllegalAccessException e) {
-						assert currentField != null;
-						assert false; //should not happen
-					}
-				}
+				columnLength  = Math.max(columnLength, currentEntryLength);
 			}
-			
+
 			columnLengths[i] = columnLength;
 		}
 		
@@ -105,16 +87,19 @@ public class FormatterHelper {
 	 */
 	public static String getStringRepresentation(Object objectInField) {
 		if (objectInField == null) {
-			return null;
+			return EMPTY_STRING_SUBSTITUTE;
 		}
 		
 		if (objectInField instanceof String) {
 			return (String) objectInField;
 		} else if (objectInField instanceof Calendar) {
 			return String.format("%s", DATE_FORMAT.format(((Calendar) objectInField).getTime()));
+		} else if (objectInField instanceof Boolean) {
+			return String.format("%s", (Boolean) objectInField ? TASK_DONE
+					: TASK_NOT_DONE);
 		}
 		
-		assert false : "Fields in Task object can only be either String or Calendar";
+		assert false : "Fields in Task object can only be either String, Calendar, or Boolean";
 		return null;
 	}
 
@@ -150,6 +135,38 @@ public class FormatterHelper {
 		String[] resultArray = resultList.toArray(new String[] {});
 		
 		return resultArray;
+	}
+	
+	public static Object[][] getTaskListData(List<Task> tasks) {
+		//including the number column
+		Object[][] result = new Object[tasks.size()][COLUMN_COUNT];
+		
+		for (int i = 0; i < tasks.size(); i++) {
+			Task currentTask = tasks.get(i);
+			
+			for (int j = 0; j < COLUMN_COUNT; j++) {
+				if (j == 0) {
+					result[i][j] = String.valueOf(i + 1);
+				} else {
+					Field currentField = null;
+
+					try {
+						currentField = Task.class.getDeclaredField(FIELD_NAMES[j]);
+						currentField.setAccessible(true);
+						
+						Object objectInField = currentField.get(currentTask);
+						String stringRepresentation = getStringRepresentation(objectInField);
+						
+						result[i][j] = stringRepresentation;
+					} catch (SecurityException | NoSuchFieldException | IllegalAccessException e) {
+						assert currentField != null;
+						assert false; //should not happen
+					}
+				}
+			}
+		}
+		
+		return result;
 	}
 	
 }

@@ -16,7 +16,7 @@ public class Task {
 	private String location = null;
 	private String periodicInterval = null;
 	private String periodicRepeats = null;
-	private boolean isDone = false;
+	private Boolean isDone = false;
 
 	/*
 	 * Constructor
