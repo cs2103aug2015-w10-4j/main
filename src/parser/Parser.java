@@ -549,9 +549,10 @@ public class Parser {
 		}
 		return false;
 	}
+	
 	boolean hasKeyword(String[] words, String[] keywords){
 		for(int i = 0; i < words.length; i++){
-			if(hasKeyword(words[i], keywords)){
+			if (hasKeyword(words[i], keywords)) {
 				return true;
 			}
 		}

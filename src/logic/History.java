@@ -12,11 +12,14 @@ public class History {
 	ArrayList<Command> commandUndoHistoryList = new ArrayList<Command>();
 	
 	
-	
+	boolean clearUndoHistoryList(){
+		commandUndoHistoryList.clear();
+		return true;
+	}
 	boolean pushCommand(Command commandObject, boolean isForUndo) {
 		if (isForUndo) {
 			commandHistoryList.add(commandObject);
-			commandUndoHistoryList.clear();
+			//commandUndoHistoryList.clear();
 		} else {
 			commandUndoHistoryList.add(commandObject);
 		}
