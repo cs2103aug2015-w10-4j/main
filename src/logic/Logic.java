@@ -29,6 +29,7 @@ import ui.UI;
  *
  */
 public class Logic {
+	private static final String ERROR_NO_FILTER = "Error: No filter detected for search";
 	private static final String ERROR_UNSPECIFIED_TIMING = "Error: Cannot convert into periodic task due to unspecified timing.";
 	/*
 	 * Declaration of object variables
@@ -39,7 +40,7 @@ public class Logic {
 	Storage storageObject;
 	History historyObject;
 	ArrayList<Task> listOfTasks = new ArrayList<Task>();
-	ArrayList<String> listFilter = new ArrayList<String>();
+	ArrayList<Task> listFilter = new ArrayList<Task>();
 
 	// date format converter
 	static SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM yyyy");
@@ -60,7 +61,7 @@ public class Logic {
 	private static final String MESSAGE_SUCCESS_DELETE = "Item(s) %s successfully deleted.";
 	private static final String MESSAGE_SUCCESS_MARK = "Item(s) %s successfully marked.";
 	private static final String MESSAGE_SUCCESS_UNMARK = "Item(s) %s successfully unmarked.";
-	private static final String MESSAGE_SUCCESS_SEARCH = "Search results for '%s'";
+	private static final String MESSAGE_SUCCESS_SEARCH = "Search results.";// for '%s'";
 	private static final String MESSAGE_SUCCESS_EDIT = "Item(s) %s successfully edited.";
 	private static final String MESSAGE_SUCCESS_EXIT = "Exiting program...";
 	private static final String MESSAGE_SUCCESS_DISPLAY = "Displaying items.";
@@ -222,7 +223,7 @@ public class Logic {
 					return markDoneStatus(argumentList, shouldPushToHistory, isUndoHistory, false);
 				case SEARCH:
 					logger.info("SEARCH command detected");
-					return searchForTaskName(argumentList);
+					return searchFilter(userTasks);
 				default :
 					logger.warning("Command type cannot be identified!");
 					return ERROR_NO_COMMAND_HANDLER;
@@ -426,20 +427,15 @@ public class Logic {
 
 	}
 	
-	String searchForTaskName(ArrayList<String> argumentList) {
-		String searchTerm = "";
-		if (isEmptyArgumentList(argumentList)) {
-			return ERROR_INVALID_ARGUMENT;
-		}
-		for (int i = 0; i < argumentList.size(); i++) {
-			searchTerm += argumentList.get(i);
-			if (i != argumentList.size() - 1) {
-				searchTerm += " ";
-			}
-		}
-		listFilter.add(searchTerm);
+	String searchFilter(ArrayList<Task> userTasks) {
+		if (userTasks.size() == 0) {
+			return ERROR_NO_FILTER;
+		} else {
+			Task taskObject = userTasks.get(0);
+			listFilter.add(taskObject);
 
-		return String.format(MESSAGE_SUCCESS_SEARCH, searchTerm);
+			return MESSAGE_SUCCESS_SEARCH;
+		}
 	}
 	
 	String markDoneStatus(ArrayList<String> argumentList,
@@ -643,11 +639,12 @@ public class Logic {
 			}
 
 			for (int j = 0; j < listFilter.size(); j++) {
-				String curSearchTerm = listFilter.get(j);
+				Task curFilter = listFilter.get(j);
+				String searchTaskName = curFilter.getName();
 				int i = 0;
 				while (i < filteredList.size()) {
 					Task curTask = filteredList.get(i);
-					if (!curTask.getName().contains(curSearchTerm)) {
+					if (!curTask.getName().contains(searchTaskName)) {
 						filteredList.remove(i);
 					} else {
 						i++;

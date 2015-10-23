@@ -189,7 +189,8 @@ public class Parser {
 				commandObject.setArguments(argumentArray);
 			case SEARCH :
 				argumentArray = getMultipleIndexes(commandString);
-				commandObject.setArguments(argumentArray);
+				extractTaskInformation(commandString, taskObject);
+				commandObject.addTask(taskObject);
 			default:
 			
 		}
