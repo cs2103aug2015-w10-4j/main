@@ -127,12 +127,12 @@ public class Logic {
 	}
 
 	void start() {
-		showWelcomeMessage();
-		showUpdatedItems();
+		initializeDisplay();
 		readAndExecuteUserInput();
 	}
 
-	void showWelcomeMessage() {
+	void initializeDisplay() {
+		showUpdatedItems();
 		UIObject.showStatusToUser(MESSAGE_WELCOME);
 	}
 
@@ -168,6 +168,7 @@ public class Logic {
 
 	/**
 	 * Executes a command based on commandObject
+	 * 
 	 * 
 	 * @param commandObject
 	 * @param shouldClearHistory
@@ -234,6 +235,15 @@ public class Logic {
 		}
 	}
 	
+	/**
+	 * Pushes a reversed command to history, and returns the
+	 * respective status message
+	 * @param commandType
+	 * @param commandToPush
+	 * @param shouldClearHistory
+	 * @param isUndoHistory
+	 * @return
+	 */
 	String pushToHistory(Command.Type commandType, Command commandToPush, boolean shouldClearHistory, boolean isUndoHistory){
 		String normalStatus;
 		String undoStatus;
@@ -318,17 +328,7 @@ public class Logic {
 			if (isEmptyArgumentList(argumentList)) {
 				for (int i = 0; i < userTasks.size(); i++) {
 					int index = i + listOfTasks.size();
-					Task curTask = userTasks.get(i);
-					if (curTask.hasPeriodicInterval()) {
-						ArrayList<Task> splitTasks = splitPeriodic(curTask);
-						listOfTasks.addAll(index, splitTasks);
-						for(int j = 0; j < splitTasks.size(); j++){
-							parsedIntList.add(index+j);
-						}
-					} else {
-						listOfTasks.add(index, curTask);
-						parsedIntList.add(index);
-					}
+					addHelper(userTasks, parsedIntList, i, index);
 				}
 				logger.finer("No specified index. Defaulting all items to the end of list.");
 			} else if (argumentList.size() != userTasks.size()) {
@@ -337,18 +337,7 @@ public class Logic {
 				logger.fine("Adding tasks to list.");
 				for (int i = 0; i < userTasks.size(); i++) {
 					int index = Integer.parseInt(argumentList.get(i)) - 1;
-					Task curTask = userTasks.get(i);
-					if (curTask.hasPeriodicInterval()) {
-						ArrayList<Task> splitTasks = splitPeriodic(curTask);
-						listOfTasks.addAll(index, splitTasks);
-						for(int j = 0; j < splitTasks.size(); j++){
-							parsedIntList.add(index+j);
-						}
-					} else {
-						listOfTasks.add(index, curTask);
-					}
-
-					parsedIntList.add(index);
+					addHelper(userTasks, parsedIntList, i, index);
 					logger.finer("Index " + (index + 1) + " specified.");
 				}
 			}
@@ -362,7 +351,7 @@ public class Logic {
 			}
 
 			String historyStatus = pushToHistory(Command.Type.ADD, new Command(Command.Type.DELETE, argumentListForReverse), shouldClearHistory, isUndoHistory);
-			historyStatus = multipleItemFormatting(historyStatus, parsedIntList);
+			historyStatus = statusItemFormatting(historyStatus, parsedIntList);
 			if (hasClashes) {
 				return WARNING_TIMING_CLASH;
 			}
@@ -375,7 +364,38 @@ public class Logic {
 	}
 
 	/**
-	 * Deletes an item from the list of tasks in memory
+	 * Helper for the addItem method
+	 * 
+	 * Mainly used to extract a given user task from the parser,
+	 * then attempts to split the task if it is recurring. At the
+	 * same time, it helps to keep track of the index the items are
+	 * added at so that the reversed command can be created
+	 * @param userTasks
+	 * @param parsedIntList
+	 * @param i
+	 * @param index
+	 * @throws Exception
+	 */
+	private void addHelper(ArrayList<Task> userTasks,
+			ArrayList<Integer> parsedIntList, int i, int index)
+			throws Exception {
+		Task curTask = userTasks.get(i);
+		if (curTask.hasPeriodicInterval()) {
+			ArrayList<Task> splitTasks = splitPeriodic(curTask);
+			listOfTasks.addAll(index, splitTasks);
+			for(int j = 0; j < splitTasks.size(); j++){
+				parsedIntList.add(index+j);
+			}
+		} else {
+			listOfTasks.add(index, curTask);
+		}
+
+		parsedIntList.add(index);
+	}
+
+	/**
+	 * Deletes item from the list of tasks in memory
+	 * This method will also push a reversed version of the command to history
 	 * 
 	 * @param argumentList
 	 *            all elements in this array should be integer strings elements
@@ -435,7 +455,7 @@ public class Logic {
 
 		Command commandToPush = new Command(Command.Type.ADD, argumentListForReverse, tasksRemoved);
 		String historyStatus = pushToHistory(Command.Type.DELETE, commandToPush, shouldClearHistory, isUndoHistory);
-		historyStatus = multipleItemFormatting(historyStatus, parsedIntArgumentList);
+		historyStatus = statusItemFormatting(historyStatus, parsedIntArgumentList);
 		return historyStatus;
 
 	}
@@ -451,6 +471,14 @@ public class Logic {
 		}
 	}
 	
+	/**
+	 * Marks or unmarks a task as done based on the isDone parameter
+	 * @param argumentList
+	 * @param shouldClearHistory
+	 * @param isUndoHistory
+	 * @param isDone
+	 * @return
+	 */
 	String markDoneStatus(ArrayList<String> argumentList,
 			boolean shouldClearHistory, boolean isUndoHistory, boolean isDone) {
 		ArrayList<Integer> parsedIntArgumentList = new ArrayList<>();
@@ -481,8 +509,8 @@ public class Logic {
 			if (!isValidIndex(index)) {
 				return ERROR_INVALID_INDEX;
 			}
-
 		}
+		
 		ArrayList<Task> tasksRemoved = new ArrayList<Task>();
 		for (int i = parsedIntArgumentList.size() - 1; i >= 0; i--) {
 			int index = parsedIntArgumentList.get(i);
@@ -499,19 +527,27 @@ public class Logic {
 		
 		Command.Type commandType;
 		Command.Type reversedCommandType;
-		if(isDone){
+		if (isDone) {
 			commandType = Command.Type.MARK;
 			reversedCommandType = Command.Type.UNMARK;
-		}else{
+		} else {
 			commandType = Command.Type.UNMARK;
 			reversedCommandType = Command.Type.MARK;
 		}
 		Command commandToPush = new Command(reversedCommandType, argumentListForReverse);
 		String historyStatus = pushToHistory(commandType, commandToPush, shouldClearHistory, isUndoHistory);
-		historyStatus = multipleItemFormatting(historyStatus, parsedIntArgumentList);
+		historyStatus = statusItemFormatting(historyStatus, parsedIntArgumentList);
 		return historyStatus;
 	}
 
+	/**
+	 * Identifies special keywords in the argumentlist, and returns a
+	 * usable arraylist of index strings
+	 * @param argumentList
+	 * @return
+	 * @throws NumberFormatException
+	 * @throws IndexOutOfBoundsException
+	 */
 	ArrayList<String> preprocessDeleteArgument(ArrayList<String> argumentList)
 			throws NumberFormatException, IndexOutOfBoundsException {
 		ArrayList<String> finalArgumentList = new ArrayList<>();
@@ -608,7 +644,7 @@ public class Logic {
 				parsedIntArgumentList.add(index);
 				String historyStatus = pushToHistory(Command.Type.EDIT, new Command(Command.Type.EDIT,
 						indexString, taskEdited), shouldClearHistory, isUndoHistory);
-				historyStatus = multipleItemFormatting(historyStatus, parsedIntArgumentList);
+				historyStatus = statusItemFormatting(historyStatus, parsedIntArgumentList);
 				if(hasClashes){
 					return WARNING_TIMING_CLASH;
 				}
@@ -631,12 +667,24 @@ public class Logic {
 		}
 	}
 
+	/**
+	 * Sorts a list of tasks by time
+	 * The starting time for a task is used if it exists
+	 * Else the ending time for a task is used instead
+	 * @return
+	 */
 	boolean sortListOfTasks(){ // by time
 		Collections.sort(listOfTasks);
 		return true;
 	}
 	
 	/**
+	 * This method filters the list of tasks to be shown to the user,
+	 * based on the current list of filter keywords
+	 * 
+	 * It will attempt to show the 3 most urgent tasks in each category of
+	 * floating/deadline/event by default if there are no filter keywords
+	 * 
 	 * @return calls the UI to display updated list of items
 	 */
 	boolean showUpdatedItems() {
@@ -676,7 +724,7 @@ public class Logic {
 			// default view
 			return UIObject.showTasks(listOfShownTasks);
 		} else {
-			ArrayList<Task> listOfShownTasks = new ArrayList<Task>();
+			listOfShownTasks = new ArrayList<Task>();
 			for (int i = 0; i < listOfTasks.size(); i++) {
 				listOfShownTasks.add(listOfTasks.get(i));
 			}
@@ -770,6 +818,13 @@ public class Logic {
 		return false;
 	}
 
+	/**
+	 * Checks if a list of tasks has timing clashes with other
+	 * tasks in memory
+	 * 
+	 * @param task
+	 * @return whether there is a clash or not
+	 */
 	boolean haveClashes(ArrayList<Task> tasks) {
 		for (int i = 0; i < tasks.size(); i++) {
 			if (hasClashes(tasks.get(i))) {
@@ -779,6 +834,13 @@ public class Logic {
 		return false;
 	}
 
+	/**
+	 * Checks if a given task has timing clashes with other
+	 * tasks in memory
+	 * 
+	 * @param task
+	 * @return whether there is a clash or not
+	 */
 	boolean hasClashes(Task task) {
 		if (task.getStartingTime() != null && task.getEndingTime() != null) {
 			for (int i = 0; i < listOfTasks.size(); i++) {
@@ -793,6 +855,16 @@ public class Logic {
 		return false;
 	}
 
+	/**
+	 * Checks if 2 tasks are clashing
+	 * Note that this method expects that both tasks have
+	 * starting & ending times, if not the program will
+	 * stop execution.
+	 * 
+	 * @param taskOne
+	 * @param taskTwo
+	 * @return whether there is a clash or not
+	 */
 	boolean isClashing(Task taskOne, Task taskTwo) {
 		Calendar taskOneStart = taskOne.getStartingTime();
 		Calendar taskOneEnd = taskOne.getEndingTime();
@@ -822,7 +894,19 @@ public class Logic {
 		return parsedIntArgumentList;
 	}
 
-	String multipleItemFormatting(String string,
+	/**
+	 * Given a string & a list of integers,
+	 * concatenate the integers nicely into the form "1,2,3,..." and
+	 * use it to format the given string. At the end of the method,
+	 * the resulting string is returned
+	 * 
+	 * This is mainly used for status formatting
+	 * 
+	 * @param string
+	 * @param parsedIntList
+	 * @return resultingString
+	 */
+	String statusItemFormatting(String string,
 			ArrayList<Integer> parsedIntList) {
 		Collections.sort(parsedIntList);
 		String combinedNumberStrings = "";
@@ -835,6 +919,11 @@ public class Logic {
 		return String.format(string, combinedNumberStrings);
 	}
 	
+	/**
+	 * Reads the task list from the data file
+	 * @return
+	 * @throws Exception
+	 */
 	boolean updateListOfTasks() throws Exception {
 		try {
 			listOfTasks = storageObject.getItemList();
@@ -844,6 +933,14 @@ public class Logic {
 		return true;
 	}
 	
+	/**
+	 * Creates a list of tasks with timings offset from the given
+	 * recurring task, then returns it
+	 * 
+	 * @param recurringTask
+	 * @return
+	 * @throws Exception
+	 */
 	ArrayList<Task> splitPeriodic(Task recurringTask) throws Exception{
 		if (!recurringTask.hasPeriodicInterval() || !recurringTask.hasPeriodicRepeats()) {
 			return null; // no periodic to split
@@ -864,6 +961,12 @@ public class Logic {
 		}
 	}
 	
+	/**
+	 * Pushes back the starting & ending time of a given task by a specified interval
+	 * @param curTask a task to be modified
+	 * @param periodicIntervalString a time interval in the form <integer> <days/weeks/months>
+	 * 
+	 */
 	boolean addInterval(Task curTask, String periodicIntervalString) throws Exception{
 		String[] periodicIntervalWords = periodicIntervalString.split(
 				WHITE_SPACE_REGEX, 2);
