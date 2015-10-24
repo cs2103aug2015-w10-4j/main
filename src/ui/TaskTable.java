@@ -5,16 +5,22 @@ import java.awt.Component;
 
 import javax.swing.JTable;
 import javax.swing.table.TableCellRenderer;
-import javax.swing.table.TableModel;
+
+import ui.tasktable.TaskTableModel;
 
 @SuppressWarnings("serial")
 public class TaskTable extends JTable {
 	
 	private static final Color DEFAULT_COLOR = Color.WHITE;
 	private static final Color ALTERNATE_COLOR = Color.LIGHT_GRAY;
+	private static final Color DONE_COLOR = Color.GREEN;
 	
-	public TaskTable(TableModel dm) {
+	private TaskTableModel model = null;
+	
+	public TaskTable(TaskTableModel dm) {
 		super(dm);
+		
+		this.model = dm;
 	}
 	
 	public Component prepareRenderer(TableCellRenderer renderer, int row, int column) {
@@ -24,6 +30,11 @@ public class TaskTable extends JTable {
 			c.setBackground(DEFAULT_COLOR);
 		} else {
 			c.setBackground(ALTERNATE_COLOR);
+		}
+		
+		//If the task is done, make it green
+		if (model.isTaskDone(row).equals(Boolean.TRUE)) {
+			c.setBackground(DONE_COLOR);
 		}
 
 		return c;

@@ -2,6 +2,7 @@ package ui.tasktable;
 
 import javax.swing.table.AbstractTableModel;
 
+import global.Pair;
 import ui.formatter.TableModelFormatter;
 
 @SuppressWarnings("serial")
@@ -18,12 +19,16 @@ public class TaskTableModel extends AbstractTableModel {
 	private final TableModelFormatter formatter = new TableModelFormatter();
 	
 	private Object[][] data = null;
+	private Boolean[] isDone;
 	
 	public TaskTableModel(Object[][] taskListData) {
 		super();
 
 		assert taskListData != null;
-		data = formatter.formatTaskList(taskListData);
+
+		Pair<Object[][], Boolean[]> formattedData = formatter.formatTaskList(taskListData);
+		data = formattedData.getFirst();
+		isDone = formattedData.getSecond();
 	}
 	
 	@Override
@@ -44,6 +49,11 @@ public class TaskTableModel extends AbstractTableModel {
 	@Override
 	public Object getValueAt(int rowIndex, int columnIndex) {
 		return data[rowIndex][columnIndex];
+	}
+	
+	public Boolean isTaskDone(int taskIndex) {
+		assert isDone[taskIndex] != null;
+		return isDone[taskIndex];
 	}
 
 }
