@@ -207,10 +207,12 @@ public class Task implements Comparable<Task> {
 	public Task clone(){
 		Task newTask = new Task();
 		newTask.setName(this.getName());
-		if(this.hasStartingTime()){
-			newTask.setStartingTime((Calendar)this.getStartingTime().clone());
+		if (this.hasStartingTime()) {
+			newTask.setStartingTime((Calendar) this.getStartingTime().clone());
 		}
-		newTask.setEndingTime((Calendar)this.getEndingTime().clone());
+		if (this.hasEndingTime()) {
+			newTask.setEndingTime((Calendar) this.getEndingTime().clone());
+		}
 		newTask.setLocation(this.getLocation());
 		newTask.setPeriodicInterval(this.getPeriodicInterval());
 		newTask.setPeriodicRepeats(this.getPeriodicRepeats());

@@ -29,8 +29,6 @@ import ui.UI;
  *
  */
 public class Logic {
-	private static final String ERROR_NO_FILTER = "Error: No filter detected for search";
-	private static final String ERROR_UNSPECIFIED_TIMING = "Error: Cannot convert into periodic task due to unspecified timing.";
 	/*
 	 * Declaration of object variables
 	 */
@@ -84,6 +82,9 @@ public class Logic {
 	private static final String ERROR_NO_HISTORY = "Error: No history found.";
 	private static final String ERROR_CANNOT_WRITE_TO_HISTORY = "Error: Unable to store command in history.";
 	private static final String ERROR_CANNOT_PARSE_PERIODIC_VALUES = "Error: Unable to parse values for periodic";
+	private static final String ERROR_NO_FILTER = "Error: No filter detected for search";
+	private static final String ERROR_EDIT_CANNOT_RECURRING = "Error: Cannot convert a normal task to recurring";
+	
 
 	private static final String WARNING_TIMING_CLASH = "Warning: There are clashing timings between tasks.";
 	
@@ -555,12 +556,7 @@ public class Logic {
 			clonedTask.setEndingTime(newTask.getEndingTime());
 		}
 		if (newTask.hasPeriodicInterval() || newTask.hasPeriodicRepeats()) {
-			if(!clonedTask.hasEndingTime()){
-				return ERROR_UNSPECIFIED_TIMING;
-			} else {
-				clonedTask.setPeriodicInterval(newTask.getPeriodicInterval());
-				clonedTask.setPeriodicRepeats(newTask.getPeriodicRepeats());
-			}
+			return ERROR_EDIT_CANNOT_RECURRING;
 		}
 		return null;
 	}
@@ -595,6 +591,7 @@ public class Logic {
 				if (hasClashes(userTask)) {
 					hasClashes = true;
 				}
+
 				Task newTask = taskEdited.clone();
 				String statusOfSpecialEdit = editSpecialField(userTask, newTask);
 				if (statusOfSpecialEdit != null) {
