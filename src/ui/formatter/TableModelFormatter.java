@@ -16,11 +16,7 @@ public class TableModelFormatter {
 			Boolean isDone = (Boolean) taskList[i][IS_DONE_FIELD_NO];
 			
 			for (int j = 0; j < COLUMN_COUNT; j++) {
-				if (j == 0) {
-					tableModelData[i][j] = String.valueOf(i + 1);
-				} else {
-					tableModelData[i][j] = FormatterHelper.getStringRepresentation(taskList[i][j - 1]);
-				}
+				tableModelData[i][j] = FormatterHelper.getStringRepresentation(taskList[i][j]);
 				
 				if (isDone) {
 					tableModelData[i][j] = STRIKE_HTML_TAG_BEGIN + tableModelData[i][j] +
