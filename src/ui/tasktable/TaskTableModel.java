@@ -1,11 +1,11 @@
-package ui.taskytable;
+package ui.tasktable;
 
 import javax.swing.table.AbstractTableModel;
 
 import ui.formatter.TableModelFormatter;
 
 @SuppressWarnings("serial")
-public class TaskyTableModel extends AbstractTableModel {
+public class TaskTableModel extends AbstractTableModel {
 	
 	private final String[] columnNames = {"No.",
 			"Description",
@@ -19,7 +19,7 @@ public class TaskyTableModel extends AbstractTableModel {
 	
 	private Object[][] data = null;
 	
-	public TaskyTableModel(Object[][] taskListData) {
+	public TaskTableModel(Object[][] taskListData) {
 		super();
 
 		assert taskListData != null;

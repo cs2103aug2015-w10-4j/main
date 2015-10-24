@@ -19,7 +19,6 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
@@ -28,7 +27,7 @@ import javax.swing.SwingConstants;
 import global.Task;
 import ui.formatter.FormatterHelper;
 import ui.formatter.TextFormatter;
-import ui.taskytable.TaskyTableModel;
+import ui.tasktable.TaskTableModel;
 
 public class UI {
 	
@@ -349,8 +348,8 @@ public class UI {
 	}
 	
 	//TODO: extract magic strings
-	private boolean showToUser(TaskyTableModel model) {
-		JTable table = new JTable(model);
+	private boolean showToUser(TaskTableModel model) {
+		TaskTable table = new TaskTable(model);
 		
 		displayAreaPanel.removeAll();
 		
@@ -392,7 +391,7 @@ public class UI {
 					MAXIMUM_COLUMN_WIDTH);
 			return showToUser(formattedTaskList);
 		} else {
-			TaskyTableModel tableModel = new TaskyTableModel(taskListData);
+			TaskTableModel tableModel = new TaskTableModel(taskListData);
 			return showToUser(tableModel);
 		}
 	}
