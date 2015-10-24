@@ -127,11 +127,12 @@ public class Logic {
 
 	void start() {
 		showWelcomeMessage();
+		showUpdatedItems();
 		readAndExecuteUserInput();
 	}
 
 	void showWelcomeMessage() {
-		UIObject.showToUser(MESSAGE_WELCOME);
+		UIObject.showStatusToUser(MESSAGE_WELCOME);
 	}
 
 	/**
@@ -305,8 +306,6 @@ public class Logic {
 			logger.fine("Attempting to determine index.");
 			ArrayList<Integer> parsedIntList = new ArrayList<Integer>(); // for
 																			// status
-			String[] argumentListForReverse = new String[userTasks.size()]; // for
-																			// undo
 			boolean hasClashes = false;
 
 			logger.fine("Checking for clashes.");
@@ -318,10 +317,17 @@ public class Logic {
 			if (isEmptyArgumentList(argumentList)) {
 				for (int i = 0; i < userTasks.size(); i++) {
 					int index = i + listOfTasks.size();
-					listOfTasks.add(index, userTasks.get(i));
-
-					parsedIntList.add(index);
-					argumentListForReverse[i] = Integer.toString(index + 1);
+					Task curTask = userTasks.get(i);
+					if (curTask.hasPeriodicInterval()) {
+						ArrayList<Task> splitTasks = splitPeriodic(curTask);
+						listOfTasks.addAll(index, splitTasks);
+						for(int j = 0; j < splitTasks.size(); j++){
+							parsedIntList.add(index+j);
+						}
+					} else {
+						listOfTasks.add(index, curTask);
+						parsedIntList.add(index);
+					}
 				}
 				logger.finer("No specified index. Defaulting all items to the end of list.");
 			} else if (argumentList.size() != userTasks.size()) {
@@ -330,15 +336,29 @@ public class Logic {
 				logger.fine("Adding tasks to list.");
 				for (int i = 0; i < userTasks.size(); i++) {
 					int index = Integer.parseInt(argumentList.get(i)) - 1;
-					listOfTasks.add(index, userTasks.get(i));
+					Task curTask = userTasks.get(i);
+					if (curTask.hasPeriodicInterval()) {
+						ArrayList<Task> splitTasks = splitPeriodic(curTask);
+						listOfTasks.addAll(index, splitTasks);
+						for(int j = 0; j < splitTasks.size(); j++){
+							parsedIntList.add(index+j);
+						}
+					} else {
+						listOfTasks.add(index, curTask);
+					}
 
 					parsedIntList.add(index);
-					argumentListForReverse[i] = argumentList.get(i);
 					logger.finer("Index " + (index + 1) + " specified.");
 				}
 			}
 			
-			resolvePeriodic();
+
+			String[] argumentListForReverse = new String[parsedIntList.size()];
+			Integer[] integerArr = new Integer[parsedIntList.size()];
+			parsedIntList.toArray(integerArr);
+			for(int i = 0; i < parsedIntList.size(); i++){
+				argumentListForReverse[i] = String.valueOf(integerArr[i]+1);
+			}
 
 			String historyStatus = pushToHistory(Command.Type.ADD, new Command(Command.Type.DELETE, argumentListForReverse), shouldClearHistory, isUndoHistory);
 			historyStatus = multipleItemFormatting(historyStatus, parsedIntList);
@@ -585,8 +605,6 @@ public class Logic {
 				
 				listOfTasks.add(index, newTask);
 				logger.fine("New task added to list.");
-
-				resolvePeriodic();
 				
 				String[] indexString = { Integer.toString(index + 1) };
 				ArrayList<Integer> parsedIntArgumentList = new ArrayList<Integer>();
@@ -826,64 +844,54 @@ public class Logic {
 		} catch (FileNotFoundException e) {
 			throw new Exception(ERROR_FILE_NOT_FOUND);
 		}
-		resolvePeriodic();
 		return true;
 	}
 	
-	boolean resolvePeriodic() throws Exception{
-		for(int i = 0; i < listOfTasks.size(); i++){
-			Task curTask = listOfTasks.get(i);
-			String periodicRepeats = curTask.getPeriodicRepeats();
-			if(periodicRepeats != null){
-				//check if date is updated
-				int periodicRepeatsInt, periodicIntervalValue;
-				String periodicInterval = curTask.getPeriodicInterval();
-				Calendar startingTime = curTask.getStartingTime();
-				Calendar endingTime = curTask.getEndingTime();
-				assert (periodicInterval != null);
-				assert (endingTime != null);
-				String[] periodicIntervalWords = periodicInterval.split(
-						WHITE_SPACE_REGEX, 2);
-				String periodicIntervalUnit = periodicIntervalWords[1];
-				try {
-					periodicRepeatsInt = Integer.parseInt(periodicRepeats);
-					periodicIntervalValue = Integer
-							.parseInt(periodicIntervalWords[0]);
-				} catch (NumberFormatException e) {
-					throw new Exception(ERROR_CANNOT_PARSE_PERIODIC_VALUES);
-				}
-				
-				Calendar curTime = Calendar.getInstance();
-				
-				
-				while(periodicRepeatsInt > 0 && endingTime.before(curTime)){
-					if(periodicIntervalUnit.equalsIgnoreCase("days")){
-						if(startingTime!= null) {
-							startingTime.add(Calendar.DATE, periodicIntervalValue);
-						}
-						endingTime.add(Calendar.DATE, periodicIntervalValue);
-					} else if (periodicIntervalUnit.equalsIgnoreCase("weeks")){
-						if(startingTime!= null) {
-							startingTime.add(Calendar.WEEK_OF_YEAR, periodicIntervalValue);
-						}
-						endingTime.add(Calendar.WEEK_OF_YEAR, periodicIntervalValue);
-					} else if (periodicIntervalUnit.equalsIgnoreCase("months")){
-						if(startingTime!= null) {
-							startingTime.add(Calendar.MONTH, periodicIntervalValue);
-						}
-						endingTime.add(Calendar.MONTH, periodicIntervalValue);
-					} else {
-						throw new Exception("Error: Periodic interval unit unrecognised.");
-					}
-					periodicRepeatsInt--;
-				}
-				if(periodicRepeatsInt > 0){
-					curTask.setPeriodicRepeats(Integer.toString(periodicRepeatsInt));
-				} else {
-					curTask.setPeriodicRepeats(null);
-				}
+	ArrayList<Task> splitPeriodic(Task recurringTask) throws Exception{
+		if (!recurringTask.hasPeriodicInterval() || !recurringTask.hasPeriodicRepeats()) {
+			return null; // no periodic to split
+		} else {
+			String noOfRepeatsString = recurringTask.getPeriodicRepeats();
+			int noOfRepeats = Integer.parseInt(noOfRepeatsString);
+			String periodicIntervalString = recurringTask.getPeriodicInterval();
+			recurringTask.setPeriodicRepeats(null);
+			recurringTask.setPeriodicInterval(null);
+
+			ArrayList<Task> listOfRecurringTasks = new ArrayList<Task>();
+			for (int i = 0; i < noOfRepeats; i++) {
+				Task newTask = recurringTask.clone();
+				listOfRecurringTasks.add(newTask);
+				addInterval(recurringTask, periodicIntervalString);
 			}
+			return listOfRecurringTasks;
 		}
+	}
+	
+	boolean addInterval(Task curTask, String periodicIntervalString) throws Exception{
+		String[] periodicIntervalWords = periodicIntervalString.split(
+				WHITE_SPACE_REGEX, 2);
+		String periodicIntervalUnit = periodicIntervalWords[1];
+		int periodicInterval;
+		try {
+			periodicInterval = Integer
+					.parseInt(periodicIntervalWords[0]);
+		} catch (NumberFormatException e) {
+			throw new Exception(ERROR_CANNOT_PARSE_PERIODIC_VALUES);
+		}
+		
+		int calendarUnit;
+		if(periodicIntervalUnit.equalsIgnoreCase("days")){
+			calendarUnit = Calendar.DATE;
+		} else if(periodicIntervalUnit.equalsIgnoreCase("weeks")) {
+			calendarUnit = Calendar.WEEK_OF_YEAR;
+		} else {
+			calendarUnit = Calendar.YEAR;
+		}
+		
+		if(curTask.hasStartingTime()) {
+			curTask.getStartingTime().add(calendarUnit, periodicInterval);
+		}
+		curTask.getEndingTime().add(calendarUnit, periodicInterval);
 		return true;
 	}
 

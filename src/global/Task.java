@@ -1,6 +1,7 @@
 package global;
 
 import java.util.Calendar;
+import java.util.GregorianCalendar;
 
 /**
  * This is a data structure to store the details of a task
@@ -17,6 +18,7 @@ public class Task implements Comparable<Task> {
 	private String periodicInterval = null;
 	private String periodicRepeats = null;
 	private boolean isDone = false;
+	private Integer id = null;
 
 	/*
 	 * Constructor
@@ -103,6 +105,10 @@ public class Task implements Comparable<Task> {
 		return "Name: "+ name + " Starting time: " + this.startingTime + " Ending Time: "+ this.getEndingTime() +
 				" Location: " +this.location + " Period Interval: "+ this.periodicInterval + " Period Repeats " + this.periodicRepeats;
 	}
+	
+	public int getId(){
+		return this.id;
+	}
 
 	public boolean hasStartingTime() {
 		if (this.startingTime == null) {
@@ -147,6 +153,15 @@ public class Task implements Comparable<Task> {
 			return true;
 		}
 	}
+	
+	public boolean hasId() {
+		if (this.id == null) {
+			return false;
+		} else {
+			return true;
+		}
+	}
+	
 	public boolean isDone(){
 		return this.isDone;
 	}
@@ -184,12 +199,18 @@ public class Task implements Comparable<Task> {
 		this.isDone = status;
 		return true;
 	}
+	public boolean setId(int index){
+		this.id = index;
+		return true;
+	}
 	
 	public Task clone(){
 		Task newTask = new Task();
 		newTask.setName(this.getName());
-		newTask.setStartingTime(this.getStartingTime());
-		newTask.setEndingTime(this.getEndingTime());
+		if(this.hasStartingTime()){
+			newTask.setStartingTime((Calendar)this.getStartingTime().clone());
+		}
+		newTask.setEndingTime((Calendar)this.getEndingTime().clone());
 		newTask.setLocation(this.getLocation());
 		newTask.setPeriodicInterval(this.getPeriodicInterval());
 		newTask.setPeriodicRepeats(this.getPeriodicRepeats());
