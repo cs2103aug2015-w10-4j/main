@@ -28,6 +28,7 @@ import javax.swing.SwingConstants;
 import global.Task;
 import ui.formatter.FormatterHelper;
 import ui.formatter.TextFormatter;
+import ui.taskytable.TaskyTableModel;
 
 public class UI {
 	
