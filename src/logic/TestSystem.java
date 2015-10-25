@@ -28,6 +28,8 @@ public class TestSystem {
 	@Before
 	public void setup(){
 			parserObj = new Parser();
+			File newSaveFile = new File("newsave.txt");
+			newSaveFile.delete();
 			File saveFile = new File("save.txt");
 			saveFile.delete();
 			logicObject = new Logic();
@@ -68,9 +70,69 @@ public class TestSystem {
 	}
 	
 	/*
+	 * pass string from parser to logic, test deleting a task
+	 * followed by passing the result task to storage and test whether the result stored is correct or not
+	 * add task1 before testing
+	 */
+	@Test
+	public void testLogicParserStorageEdit() throws Exception {
+        Command commandObject = parserObj.parseCommand("add task1");
+		
+		logicObject.executeCommand(commandObject, true,
+				true);
+
+		commandObject = parserObj.parseCommand("edit 1 homework next tuesday loc nus every 2 days for 2");
+		
+		String executionResult = logicObject.executeCommand(commandObject, true,
+				true);
+		ArrayList<Task> listOfTasks = logicObject.listOfTasks;
+		storageObj.writeItemList(listOfTasks);
+		ArrayList<Task> message = storageObj.getItemList();
+		String resultStr = "";
+		
+		resultStr = message.get(0).getAllInfo();
+		
+			
+		assertEquals("Name: homework next tuesday Starting time: null Ending Time: null Location: nus  Period Interval: null Period Repeats null", resultStr);
+	}
+	
+	/*
+	 * pass string from parser to logic, test deleting a task
+	 * followed by passing the result task to storage and test whether the result stored is correct or not
+	 * add 3 tasks before testing
+	 */
+	@Test
+	public void testLogicParserStorageDelete() throws Exception {
+        Command commandObject = parserObj.parseCommand("add task1");
+        logicObject.executeCommand(commandObject, true,
+				true);
+        commandObject = parserObj.parseCommand("add task2");
+        logicObject.executeCommand(commandObject, true,
+				true);
+       commandObject = parserObj.parseCommand("add task3");
+       logicObject.executeCommand(commandObject, true,
+				true);
+		
+
+		commandObject = parserObj.parseCommand("edit 1 homework next tuesday loc nus every 2 days for 2");
+		
+		String executionResult = logicObject.executeCommand(commandObject, true,
+				true);
+		ArrayList<Task> listOfTasks = logicObject.listOfTasks;
+		storageObj.writeItemList(listOfTasks);
+		ArrayList<Task> message = storageObj.getItemList();
+		String resultStr = "";
+		for( int i=0; i < listOfTasks.size(); i++ ) {
+		resultStr += message.get(i).getAllInfo() +" ";
+		}
+			
+		assertEquals("Name: homework next tuesday Starting time: null Ending Time: null Location: nus  Period Interval: null Period Repeats null Name: task2 Starting time: null Ending Time: null Location: null Period Interval: null Period Repeats null Name: task3 Starting time: null Ending Time: null Location: null Period Interval: null Period Repeats null ", resultStr);
+	}
+	
+	/*
 	 * pass data from logic to storage to store file
 	 * test on storage side, whether the file stored is the correct one or not
-	 */
+	*/
 	@Test
 	public void testLogicStorage() throws Exception {
 
@@ -87,5 +149,5 @@ public class TestSystem {
 			
 		assertEquals("task", resultStr);
 	}
-	
+	 
 }
