@@ -18,6 +18,7 @@ public class Task implements Comparable<Task> {
 	private String periodicInterval = null;
 	private String periodicRepeats = null;
 	private Boolean isDone = false;
+	private Integer id = null;
 
 	/*
 	 * Constructor
