@@ -211,7 +211,7 @@ public class UI {
 	}
 	
 	private void prepareDisplayAreaPanel() {
-		displayAreaPanel.setLayout(new GridBagLayout());
+		displayAreaPanel.setLayout(new VerticalLayout());
 	}
 
 	private void prepareUserInput() {
@@ -327,45 +327,28 @@ public class UI {
 	 * @param stringToShow
 	 * @return true if successful
 	 */
-	//TODO: extract magic strings
 	public boolean showToUser(String stringToShow) {
 		JTextArea textArea = createJTextAreaWithMonospaceFont();
 		textArea.setText(stringToShow);
 
 		displayAreaPanel.removeAll();
-
-		GridBagConstraints constraint = new GridBagConstraints();
-		constraint.weightx = constraint.weighty = 1.0;
-		constraint.gridx = constraint.gridy = 0;
-		constraint.gridwidth = constraint.gridheight = 1;
-		constraint.fill = GridBagConstraints.BOTH;
-
-		displayAreaPanel.add(textArea, constraint);
+		displayAreaPanel.add(textArea);
 		displayAreaPanel.revalidate();
 		displayAreaPanel.repaint();
 
 		return true;
 	}
 	
-	//TODO: extract magic strings
 	private boolean showToUser(TaskTableModel model) {
 		TaskTable table = new TaskTable(model);
 		
 		displayAreaPanel.removeAll();
+
+		VerticalLayout displayAreaPanelLayout = (VerticalLayout) displayAreaPanel.getLayout();
+		displayAreaPanelLayout.resetLayout();
 		
-		GridBagConstraints constraint = new GridBagConstraints();
-		constraint.weightx = 1.0;
-		constraint.gridx = constraint.gridy = 0;
-		constraint.gridwidth = constraint.gridheight = 1;
-		constraint.fill = GridBagConstraints.HORIZONTAL;
-		
-		displayAreaPanel.add(table.getTableHeader(), constraint);
-		
-		constraint.gridy = 1;
-		constraint.weighty = 1;
-		constraint.fill = GridBagConstraints.BOTH;
-		
-		displayAreaPanel.add(table, constraint);
+		displayAreaPanel.add(table.getTableHeader());
+		displayAreaPanel.add(table);
 		displayAreaPanel.revalidate();
 		displayAreaPanel.repaint();
 
