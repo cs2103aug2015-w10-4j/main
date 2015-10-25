@@ -1,11 +1,6 @@
 package ui.formatter;
 
-import java.lang.reflect.Field;
-import java.util.List;
-
-import global.Task;
-
-public class TaskListFormatter {
+public class TextFormatter {
 
 	private static final String NULL_STRING_SUBSTITUTE = "";
 	
@@ -16,48 +11,34 @@ public class TaskListFormatter {
 	private static final char HORIZONTAL_CHAR = '-';
 	private static final char VERTICAL_CHAR = '|';
 	
-	public String formatTaskList(List<Task> taskList, int lineCharLimit) {
-		if (taskList.size() == 0) {
+	public String formatTaskList(Object[][] taskList, int lineCharLimit) {
+		if (taskList.length == 0) {
 			return MESSAGE_DISPLAY_EMPTY;
 		}
+
 		ColumnInfo[] columnInfo = FormatterHelper.getColumnInfo(taskList, lineCharLimit);
 		
 		StringBuilder result = new StringBuilder();
 		result.append(getRowSeparator(columnInfo));
 		result.append(getHeader(columnInfo));
-		for (int i = 0; i < taskList.size(); i++) {
-			Task task = taskList.get(i);
+		for (int i = 0; i < taskList.length; i++) {
+			Object[] currentTaskInfo = taskList[i];
 			
 			result.append(getRowSeparator(columnInfo));
-			result.append(getTaskData(columnInfo, task, i, lineCharLimit));
+			result.append(getTaskData(columnInfo, currentTaskInfo, i, lineCharLimit));
 		}
 		result.append(getRowSeparator(columnInfo));
 		
 		return result.toString();
 	}
 
-	private String getTaskData(ColumnInfo[] columnInfo, Task task, int taskId, int lineCharLimit) {
+	private String getTaskData(ColumnInfo[] columnInfo, Object[] task, int taskId, int lineCharLimit) {
 		StringBuilder result = new StringBuilder();
 		
 		String[][] columnData = new String[columnInfo.length][];
 		
 		for (int i = 0; i < columnInfo.length; i++) {
-			String stringRepresentation = null;
-			try {
-				if (i == 0) {
-					stringRepresentation = String.valueOf(taskId + 1);
-				} else {
-					Field currentField = Task.class.getDeclaredField(FormatterHelper.FIELD_NAMES[i]);
-					currentField.setAccessible(true);
-					
-					Object objectInField = currentField.get(task);
-					stringRepresentation = FormatterHelper.getStringRepresentation(objectInField);
-				}
-			} catch (NoSuchFieldException | SecurityException e) {
-				assert false;
-			} catch (IllegalArgumentException | IllegalAccessException e) {
-				assert false;
-			}
+			String stringRepresentation = FormatterHelper.getStringRepresentation(task[i]);
 			columnData[i] = FormatterHelper.splitString(stringRepresentation, lineCharLimit);
 		}
 		

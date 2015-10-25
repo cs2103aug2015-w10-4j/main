@@ -18,12 +18,12 @@ public class TestTaskListFormatter {
 	private static final int ONE_BILLION = (int) 1e9;
 	private static final String NEW_LINE = System.getProperty("line.separator");
 	
-	private TaskListFormatter formatter;
+	private TextFormatter formatter;
 	private Calendar timeForTesting;
 
 	@Before
 	public void setup(){
-		formatter = new TaskListFormatter();
+		formatter = new TextFormatter();
 		timeForTesting = new GregorianCalendar();
 		timeForTesting.set(2020, 11, 3);
 	}
@@ -37,15 +37,17 @@ public class TestTaskListFormatter {
 		taskList.add(new Task("Task with only description"));
 		taskList.add(new Task("Task with 2 dates", timeForTesting, timeForTesting));
 		
-		String result = formatter.formatTaskList(taskList, ONE_BILLION);
-		String expected = "+-----+--------------------------+---------------+-------------+----------+-------+---------+" + NEW_LINE
-				        + "| No. |       Description        | Starting Time | Ending Time | Location | Every | Repeats |" + NEW_LINE
-				        + "+-----+--------------------------+---------------+-------------+----------+-------+---------+" + NEW_LINE
-				        + "|1    |Task with only description|-              |-            |-         |-      |-        |" + NEW_LINE
-				        + "+-----+--------------------------+---------------+-------------+----------+-------+---------+" + NEW_LINE
-				        + "|2    |Task with 2 dates         |03 Dec 2020    |03 Dec 2020  |-         |-      |-        |" + NEW_LINE
-				        + "+-----+--------------------------+---------------+-------------+----------+-------+---------+" + NEW_LINE;
-		assertEquals(result, expected);
+		Object[][] taskListData = FormatterHelper.getTaskListData(taskList);
+
+		String result = formatter.formatTaskList(taskListData, ONE_BILLION);
+		String expected = "+-----+--------------------------+---------------+-------------+----------+-------+---------+-------------+" + NEW_LINE
+				        + "| No. |       Description        | Starting Time | Ending Time | Location | Every | Repeats |   Status    |" + NEW_LINE
+				        + "+-----+--------------------------+---------------+-------------+----------+-------+---------+-------------+" + NEW_LINE
+				        + "|1    |Task with only description|-              |-            |-         |-      |-        |Not done yet.|" + NEW_LINE
+				        + "+-----+--------------------------+---------------+-------------+----------+-------+---------+-------------+" + NEW_LINE
+				        + "|2    |Task with 2 dates         |03 Dec 2020    |03 Dec 2020  |-         |-      |-        |Not done yet.|" + NEW_LINE
+				        + "+-----+--------------------------+---------------+-------------+----------+-------+---------+-------------+" + NEW_LINE;
+		assertEquals(expected, result);
 	}
 	
 	/*
@@ -59,18 +61,20 @@ public class TestTaskListFormatter {
 		taskList.add(new Task("Task with a very long long long long description with location and date",
 				timeForTesting, "NUS SoC"));
 		
-		String result = formatter.formatTaskList(taskList, 30);
-		String expected = "+-----+------------------------------+---------------+-------------+----------+-------+---------+" + NEW_LINE
-				        + "| No. |         Description          | Starting Time | Ending Time | Location | Every | Repeats |" + NEW_LINE
-				        + "+-----+------------------------------+---------------+-------------+----------+-------+---------+" + NEW_LINE
-				        + "|1    |Task with only description    |-              |-            |-         |-      |-        |" + NEW_LINE
-				        + "+-----+------------------------------+---------------+-------------+----------+-------+---------+" + NEW_LINE
-				        + "|2    |Task with 2 dates             |03 Dec 2020    |03 Dec 2020  |-         |-      |-        |" + NEW_LINE
-				        + "+-----+------------------------------+---------------+-------------+----------+-------+---------+" + NEW_LINE
-				        + "|3    |Task with a very long long lon|-              |03 Dec 2020  |NUS SoC   |-      |-        |" + NEW_LINE
-				        + "|     |g long description with locati|               |             |          |       |         |" + NEW_LINE
-				        + "|     |on and date                   |               |             |          |       |         |" + NEW_LINE
-				        + "+-----+------------------------------+---------------+-------------+----------+-------+---------+" + NEW_LINE;
+		Object[][] taskListData = FormatterHelper.getTaskListData(taskList);
+
+		String result = formatter.formatTaskList(taskListData, 30);
+		String expected = "+-----+------------------------------+---------------+-------------+----------+-------+---------+-------------+" + NEW_LINE
+				        + "| No. |         Description          | Starting Time | Ending Time | Location | Every | Repeats |   Status    |" + NEW_LINE
+				        + "+-----+------------------------------+---------------+-------------+----------+-------+---------+-------------+" + NEW_LINE
+				        + "|1    |Task with only description    |-              |-            |-         |-      |-        |Not done yet.|" + NEW_LINE
+				        + "+-----+------------------------------+---------------+-------------+----------+-------+---------+-------------+" + NEW_LINE
+				        + "|2    |Task with 2 dates             |03 Dec 2020    |03 Dec 2020  |-         |-      |-        |Not done yet.|" + NEW_LINE
+				        + "+-----+------------------------------+---------------+-------------+----------+-------+---------+-------------+" + NEW_LINE
+				        + "|3    |Task with a very long long lon|-              |03 Dec 2020  |NUS SoC   |-      |-        |Not done yet.|" + NEW_LINE
+				        + "|     |g long description with locati|               |             |          |       |         |             |" + NEW_LINE
+				        + "|     |on and date                   |               |             |          |       |         |             |" + NEW_LINE
+				        + "+-----+------------------------------+---------------+-------------+----------+-------+---------+-------------+" + NEW_LINE;
 		assertEquals(expected, result);
 	}
 	

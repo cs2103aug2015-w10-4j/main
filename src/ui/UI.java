@@ -5,8 +5,10 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.List;
@@ -17,13 +19,18 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.JViewport;
 import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
 
 import global.Task;
-import ui.formatter.TaskListFormatter;
+import ui.formatter.FormatterHelper;
+import ui.formatter.TextFormatter;
+import ui.tasktable.TaskTableModel;
 
 public class UI {
 	
@@ -50,8 +57,8 @@ public class UI {
 	 */
 	private Logger logger = Logger.getGlobal();
 	
-	private static final int DISPLAY_ROW_COUNT = 30;
-	private static final int DISPLAY_COLUMN_COUNT = 60;
+	private static final int DEFAULT_WIDTH = 480;
+	private static final int DEFAULT_HEIGHT = 320;
 	private static final int USER_INPUT_FIELD_CHAR_COUNT = 50;
 	private static final int PROMPT_LABEL_CHAR_COUNT = 10;
 	
@@ -78,23 +85,29 @@ public class UI {
 	private static final String FRAME_TITLE = "Tasky";
 	private static final String DEFAULT_PROMPT = "command ";
 	private static final String DISPLAY_AREA_FONT_NAME = "Lucida Console";
+	private static final int DISPLAY_AREA_FONT_STYLE = Font.PLAIN;
 	private static final int DISPLAY_AREA_FONT_SIZE = 12;
 	
 	private static final int MAXIMUM_COLUMN_WIDTH = 30;
 	
 	private static final String EMPTY_STRING = "";
 	
+	private static final int SCROLL_SPEED = 10;
+	
 	/*
 	 * Initialization of GUI variables
 	 */
 	private JFrame frame = new JFrame(FRAME_TITLE);
-	private JTextArea displayArea = new JTextArea();
+	private JPanel displayAreaPanel = new JPanel();
+	private JScrollPane displayAreaScrollPane = new JScrollPane(displayAreaPanel);
 	private JLabel promptLabel = new JLabel(DEFAULT_PROMPT, PROMPT_LABEL_CHAR_COUNT);
 	private JTextField userInputField = new JTextField(USER_INPUT_FIELD_CHAR_COUNT);
 	private StatusBar statusBar = new StatusBar();
 	
-	private TaskListFormatter taskListFormatter = new TaskListFormatter();
+	private TextFormatter taskListFormatter = new TextFormatter();
 	private UserInputHistory userInputHistory = new UserInputHistory();
+	
+	private static final boolean useJTable = true;
 	
 	/*
 	 * Constructor
@@ -106,7 +119,7 @@ public class UI {
 	}
 	
 	private void addComponentsToPane(Container contentPane) {
-		addDisplayArea(contentPane);
+		addDisplayAreaScrollPane(contentPane);
 		addPromptLabel(contentPane);
 		addUserInputField(contentPane);
 		addStatusBar(contentPane);
@@ -161,7 +174,7 @@ public class UI {
 		contentPane.add(promptLabel, constraint);
 	}
 
-	private void addDisplayArea(Container contentPane) {
+	private void addDisplayAreaScrollPane(Container contentPane) {
 		GridBagConstraints constraint = new GridBagConstraints();
 		
 		constraint.fill = GridBagConstraints.BOTH;
@@ -177,7 +190,7 @@ public class UI {
 				"DISPLAY_AREA", "GridBagConstraints.HORIZONTAL",
 				STATUS_BAR_POS_X, STATUS_BAR_POS_Y, STATUS_BAR_LEN_Y, STATUS_BAR_LEN_X, 1.0, 1.0));
 		
-		contentPane.add(displayArea, constraint);
+		contentPane.add(displayAreaScrollPane, constraint);
 	}
 
 	private void displayFrame() {
@@ -189,7 +202,8 @@ public class UI {
 	private void prepareComponents() {
 		prepareFrame();
 		prepareUserInput();
-		prepareDisplayArea();
+		prepareDisplayAreaPanel();
+		prepareDisplayAreaScrollPane();
 		preparePromptLabel();
 	}
 
@@ -197,12 +211,12 @@ public class UI {
 		promptLabel.setHorizontalAlignment(SwingConstants.CENTER);
 	}
 
-	private void prepareDisplayArea() {
-		displayArea.setEditable(false);
-		displayArea.setFont(new Font(DISPLAY_AREA_FONT_NAME, Font.PLAIN, DISPLAY_AREA_FONT_SIZE));
-		displayArea.setRows(DISPLAY_ROW_COUNT);
-		displayArea.setColumns(DISPLAY_COLUMN_COUNT);
-		displayArea.setPreferredSize(new Dimension(DISPLAY_ROW_COUNT, DISPLAY_COLUMN_COUNT));
+	private void prepareDisplayAreaScrollPane() {
+		displayAreaScrollPane.setPreferredSize(new Dimension(DEFAULT_WIDTH, DEFAULT_HEIGHT));
+	}
+	
+	private void prepareDisplayAreaPanel() {
+		displayAreaPanel.setLayout(new VerticalLayout());
 	}
 
 	private void prepareUserInput() {
@@ -246,8 +260,50 @@ public class UI {
 		    }
 		};
 		userInputField.getInputMap().put(KeyStroke.getKeyStroke("DOWN"), nextText);
+		
+		@SuppressWarnings("serial")
+		Action scrollDown = new AbstractAction() {
+			public void actionPerformed(ActionEvent e) {
+				JViewport viewPort = displayAreaScrollPane.getViewport();
+				Point position = viewPort.getViewPosition();
+				movePosition(viewPort, position, 0, SCROLL_SPEED);
+				viewPort.setViewPosition(position);
+			}
+		};
+		userInputField.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_PAGE_DOWN, 0), scrollDown);
+		
+		@SuppressWarnings("serial")
+		Action scrollUp = new AbstractAction() {
+			public void actionPerformed(ActionEvent e) {
+				JViewport viewPort = displayAreaScrollPane.getViewport();
+				Point position = viewPort.getViewPosition();
+				movePosition(viewPort, position, 0, -SCROLL_SPEED);
+				viewPort.setViewPosition(position);
+			}
+		};
+		userInputField.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_PAGE_UP, 0), scrollUp);
+		
 	}
 	
+	private void movePosition(JViewport viewPort, Point position, int dx, int dy) {
+		position.x += dx;
+		position.y += dy;
+		
+		position.x = Math.max(position.x, 0);
+		position.x = Math.min(position.x, getViewPortMaxX(viewPort));
+		
+		position.y = Math.max(position.y, 0);
+		position.y = Math.min(position.y, getViewPortMaxY(viewPort));
+	}
+	
+	private int getViewPortMaxX(JViewport viewPort) {
+		return viewPort.getView().getWidth() - viewPort.getWidth();
+	}
+	
+	private int getViewPortMaxY(JViewport viewPort) {
+		return viewPort.getView().getHeight() - viewPort.getHeight();
+	}
+
 	private void prepareFrame() {
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setLayout(new GridBagLayout());
@@ -319,19 +375,57 @@ public class UI {
 	 * @return true if successful
 	 */
 	public boolean showToUser(String stringToShow) {
-		displayArea.setText(stringToShow);
+		JTextArea textArea = createJTextAreaWithMonospaceFont();
+		textArea.setText(stringToShow);
+
+		displayAreaPanel.removeAll();
+		displayAreaPanel.add(textArea);
+		displayAreaPanel.revalidate();
+		displayAreaPanel.repaint();
+
 		return true;
 	}
 	
+	private boolean showToUser(TaskTableModel model) {
+		TaskTable table = new TaskTable(model);
+		table.setFocusable(false);
+		table.setRowSelectionAllowed(false);
+		
+		displayAreaPanel.removeAll();
+
+		VerticalLayout displayAreaPanelLayout = (VerticalLayout) displayAreaPanel.getLayout();
+		displayAreaPanelLayout.resetLayout();
+		
+		displayAreaPanel.add(table.getTableHeader());
+		displayAreaPanel.add(table);
+		displayAreaPanel.revalidate();
+		displayAreaPanel.repaint();
+
+		return true;
+	}
+	
+	private JTextArea createJTextAreaWithMonospaceFont() {
+		JTextArea textArea = new JTextArea();
+		textArea.setFont(new Font(DISPLAY_AREA_FONT_NAME, DISPLAY_AREA_FONT_STYLE,
+				DISPLAY_AREA_FONT_SIZE));
+		return textArea;
+	}
+
 	/**
 	 * Asks the UI to display the list of tasks
 	 * @param tasks
 	 * @return true if successful
 	 */
-	public boolean showTasks(List<Task> taskList) {
-		String textFormatTaskList = taskListFormatter.formatTaskList(taskList, MAXIMUM_COLUMN_WIDTH);
-		showToUser(textFormatTaskList);
-		return true;
+	public boolean showTasks(List<Task> tasks) {
+		Object[][] taskListData = FormatterHelper.getTaskListData(tasks);
+		if (!useJTable) {
+			String formattedTaskList = taskListFormatter.formatTaskList(taskListData,
+					MAXIMUM_COLUMN_WIDTH);
+			return showToUser(formattedTaskList);
+		} else {
+			TaskTableModel tableModel = new TaskTableModel(taskListData);
+			return showToUser(tableModel);
+		}
 	}
 	
 	/**
