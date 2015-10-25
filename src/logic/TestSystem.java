@@ -34,6 +34,10 @@ public class TestSystem {
 			storageObj = new JsonFormatStorage(true);
 	}
 	
+	/*
+	 * pass string from parser to logic, test adding a simple task
+	 * test on logic side, check whether the logic process command correct or not
+	 */
 	@Test
 	public void testLogicParserSimpleAdd() throws Exception {
 
@@ -44,6 +48,29 @@ public class TestSystem {
 		assertEquals("Item(s) 1 successfully added.",executionResult);
 	}
 	
+	/*
+	 * pass string from parser to logic, test deleting a task
+	 * add task1 before testing
+	 * test on logic side, check whether the logic process command correct or not
+	 */
+	@Test
+	public void testLogicParserSimpleDelete() throws Exception {
+        Command commandObject = parserObj.parseCommand("add task1");
+		
+		logicObject.executeCommand(commandObject, true,
+				true);
+
+		commandObject = parserObj.parseCommand("delete 1");
+		
+		String executionResult = logicObject.executeCommand(commandObject, true,
+				true);
+		assertEquals("Item(s) 1 successfully deleted.",executionResult);
+	}
+	
+	/*
+	 * pass data from logic to storage to store file
+	 * test on storage side, whether the file stored is the correct one or not
+	 */
 	@Test
 	public void testLogicStorage() throws Exception {
 
