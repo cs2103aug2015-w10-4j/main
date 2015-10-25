@@ -5,8 +5,10 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.List;
@@ -21,6 +23,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.JViewport;
 import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
 
@@ -88,6 +91,8 @@ public class UI {
 	private static final int MAXIMUM_COLUMN_WIDTH = 30;
 	
 	private static final String EMPTY_STRING = "";
+	
+	private static final int SCROLL_SPEED = 10;
 	
 	/*
 	 * Initialization of GUI variables
@@ -255,8 +260,50 @@ public class UI {
 		    }
 		};
 		userInputField.getInputMap().put(KeyStroke.getKeyStroke("DOWN"), nextText);
+		
+		@SuppressWarnings("serial")
+		Action scrollDown = new AbstractAction() {
+			public void actionPerformed(ActionEvent e) {
+				JViewport viewPort = displayAreaScrollPane.getViewport();
+				Point position = viewPort.getViewPosition();
+				movePosition(viewPort, position, 0, SCROLL_SPEED);
+				viewPort.setViewPosition(position);
+			}
+		};
+		userInputField.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_PAGE_DOWN, 0), scrollDown);
+		
+		@SuppressWarnings("serial")
+		Action scrollUp = new AbstractAction() {
+			public void actionPerformed(ActionEvent e) {
+				JViewport viewPort = displayAreaScrollPane.getViewport();
+				Point position = viewPort.getViewPosition();
+				movePosition(viewPort, position, 0, -SCROLL_SPEED);
+				viewPort.setViewPosition(position);
+			}
+		};
+		userInputField.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_PAGE_UP, 0), scrollUp);
+		
 	}
 	
+	private void movePosition(JViewport viewPort, Point position, int dx, int dy) {
+		position.x += dx;
+		position.y += dy;
+		
+		position.x = Math.max(position.x, 0);
+		position.x = Math.min(position.x, getViewPortMaxX(viewPort));
+		
+		position.y = Math.max(position.y, 0);
+		position.y = Math.min(position.y, getViewPortMaxY(viewPort));
+	}
+	
+	private int getViewPortMaxX(JViewport viewPort) {
+		return viewPort.getView().getWidth() - viewPort.getWidth();
+	}
+	
+	private int getViewPortMaxY(JViewport viewPort) {
+		return viewPort.getView().getHeight() - viewPort.getHeight();
+	}
+
 	private void prepareFrame() {
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setLayout(new GridBagLayout());
@@ -341,6 +388,8 @@ public class UI {
 	
 	private boolean showToUser(TaskTableModel model) {
 		TaskTable table = new TaskTable(model);
+		table.setFocusable(false);
+		table.setRowSelectionAllowed(false);
 		
 		displayAreaPanel.removeAll();
 
