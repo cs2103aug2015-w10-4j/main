@@ -1,5 +1,6 @@
 package ui;
 
+import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -82,6 +83,9 @@ public class UI {
 	private static final int STATUS_BAR_LEN_Y = 1;
 	private static final int STATUS_BAR_LEN_X = 3;
 	
+	private static final int INVISIBLE_JPANEL_WIDTH = 100;
+	private static final int INVISIBLE_JPANEL_HEIGHT = 20;
+	
 	private static final String FRAME_TITLE = "Tasky";
 	private static final String DEFAULT_PROMPT = "command ";
 	private static final String DISPLAY_AREA_FONT_NAME = "Lucida Console";
@@ -93,6 +97,10 @@ public class UI {
 	private static final String EMPTY_STRING = "";
 	
 	private static final int SCROLL_SPEED = 10;
+	
+	public enum DisplayType {
+		DEFAULT, FILTERED
+	}
 	
 	/*
 	 * Initialization of GUI variables
@@ -206,7 +214,7 @@ public class UI {
 		prepareDisplayAreaScrollPane();
 		preparePromptLabel();
 	}
-
+	
 	private void preparePromptLabel() {
 		promptLabel.setHorizontalAlignment(SwingConstants.CENTER);
 	}
@@ -217,6 +225,7 @@ public class UI {
 	
 	private void prepareDisplayAreaPanel() {
 		displayAreaPanel.setLayout(new VerticalLayout());
+		displayAreaPanel.setBackground(Color.WHITE);
 	}
 
 	private void prepareUserInput() {
@@ -386,24 +395,35 @@ public class UI {
 		return true;
 	}
 	
-	private boolean showToUser(TaskTableModel model) {
-		TaskTable table = new TaskTable(model);
-		table.setFocusable(false);
-		table.setRowSelectionAllowed(false);
-		
+	private boolean showToUser(TaskTableModel[] tableModels) {
 		displayAreaPanel.removeAll();
 
 		VerticalLayout displayAreaPanelLayout = (VerticalLayout) displayAreaPanel.getLayout();
 		displayAreaPanelLayout.resetLayout();
 		
-		displayAreaPanel.add(table.getTableHeader());
-		displayAreaPanel.add(table);
+		for (TaskTableModel tableModel : tableModels) {
+			TaskTable currentTable = new TaskTable(tableModel);
+			currentTable.setFocusable(false);
+			currentTable.setRowSelectionAllowed(false);
+			displayAreaPanel.add(currentTable.getTableHeader());
+			displayAreaPanel.add(currentTable);
+			displayAreaPanel.add(createInvisibleJPanel(INVISIBLE_JPANEL_WIDTH,
+					INVISIBLE_JPANEL_HEIGHT));
+		}
+		
 		displayAreaPanel.revalidate();
 		displayAreaPanel.repaint();
 
 		return true;
 	}
 	
+	private JPanel createInvisibleJPanel(int width, int height) {
+		JPanel invisiblePanel = new JPanel();
+		invisiblePanel.setSize(new Dimension(width, height));
+		invisiblePanel.setOpaque(false);
+		return invisiblePanel;
+	}
+
 	private JTextArea createJTextAreaWithMonospaceFont() {
 		JTextArea textArea = new JTextArea();
 		textArea.setFont(new Font(DISPLAY_AREA_FONT_NAME, DISPLAY_AREA_FONT_STYLE,
@@ -416,15 +436,23 @@ public class UI {
 	 * @param tasks
 	 * @return true if successful
 	 */
-	public boolean showTasks(List<Task> tasks) {
-		Object[][] taskListData = FormatterHelper.getTaskListData(tasks);
+	public boolean showTasks(List<Task> tasks, DisplayType displayType) {
+		Object[][][] taskListsData = FormatterHelper.getTaskListData(tasks,
+				displayType == DisplayType.DEFAULT);
+		assert taskListsData != null;
 		if (!useJTable) {
-			String formattedTaskList = taskListFormatter.formatTaskList(taskListData,
+			String formattedTaskList = taskListFormatter.formatTaskList(taskListsData,
 					MAXIMUM_COLUMN_WIDTH);
 			return showToUser(formattedTaskList);
 		} else {
-			TaskTableModel tableModel = new TaskTableModel(taskListData);
-			return showToUser(tableModel);
+			TaskTableModel[] tableModels = new TaskTableModel[taskListsData.length];
+
+			for (int taskListIndex = 0; taskListIndex < taskListsData.length; taskListIndex++) {
+				Object[][] currentTaskListData = taskListsData[taskListIndex];
+				tableModels[taskListIndex] = new TaskTableModel(currentTaskListData);
+			}
+
+			return showToUser(tableModels);
 		}
 	}
 	

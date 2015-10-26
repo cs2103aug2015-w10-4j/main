@@ -135,35 +135,85 @@ public class FormatterHelper {
 		return resultArray;
 	}
 	
-	public static Object[][] getTaskListData(List<Task> tasks) {
-		//including the number column
-		Object[][] result = new Object[tasks.size()][COLUMN_COUNT];
-		
-		for (int i = 0; i < tasks.size(); i++) {
-			Task currentTask = tasks.get(i);
-			
-			for (int j = 0; j < COLUMN_COUNT; j++) {
-				if (j == 0) {
-					result[i][j] = String.valueOf(i + 1);
-				} else {
-					Field currentField = null;
+	public static Object[][][] getTaskListData(List<Task> tasks, boolean needTaskSplit) {
+		List<List<Task>> taskLists = new ArrayList<List<Task>>();
+		if (needTaskSplit) {
+			taskLists = splitTask(tasks);
+		} else {
+			taskLists.add(tasks);
+		}
 
-					try {
-						currentField = Task.class.getDeclaredField(FIELD_NAMES[j]);
-						currentField.setAccessible(true);
-						
-						Object objectInField = currentField.get(currentTask);
-						
-						result[i][j] = objectInField;
-					} catch (SecurityException | NoSuchFieldException | IllegalAccessException e) {
-						assert currentField != null;
-						assert false; //should not happen
+		Object[][][] result = new Object[taskLists.size()][][];
+		//we want the numberings for all taskLists synchronized
+		int numberCounter = 0;
+		for (int taskListIndex = 0; taskListIndex < taskLists.size(); taskListIndex++) {
+			List<Task> currentTaskList = taskLists.get(taskListIndex);
+
+			//including the number column
+			Object[][] currentTaskListData = new Object[currentTaskList.size()][COLUMN_COUNT];
+
+			for (int i = 0; i < currentTaskList.size(); i++) {
+				Task currentTask = currentTaskList.get(i);
+				
+				for (int j = 0; j < COLUMN_COUNT; j++) {
+					if (j == 0) {
+						currentTaskListData[i][j] = String.valueOf(numberCounter + 1);
+						numberCounter++;
+					} else {
+						Field currentField = null;
+
+						try {
+							currentField = Task.class.getDeclaredField(FIELD_NAMES[j]);
+							currentField.setAccessible(true);
+							
+							Object objectInField = currentField.get(currentTask);
+							
+							currentTaskListData[i][j] = objectInField;
+						} catch (SecurityException | NoSuchFieldException | IllegalAccessException e) {
+							assert currentField != null;
+							assert false; //should not happen
+						}
 					}
 				}
 			}
+			
+			result[taskListIndex] = currentTaskListData;
 		}
 		
 		return result;
+	}
+
+	private static List<List<Task>> splitTask(List<Task> tasks) {
+		List<List<Task>> taskLists = new ArrayList<List<Task>>();
+
+		for (int i = 0; i < tasks.size(); i++) {
+			Task currentTask = tasks.get(i);
+			Task previousTask = i == 0 ? null : tasks.get(i - 1);
+			
+			if (!areInSameList(currentTask, previousTask)) {
+				taskLists.add(new ArrayList<Task>());
+			}
+
+			int lastTaskListIndex = taskLists.size() - 1;
+			taskLists.get(lastTaskListIndex).add(currentTask);
+		}
+
+		return taskLists;
+	}
+
+	private static boolean areInSameList(Task currentTask, Task previousTask) {
+		assert currentTask != null;
+		if (previousTask == null) {
+			return false;
+		}
+		if (currentTask.hasEndingTime() != previousTask.hasEndingTime()) {
+			return false;
+		}
+		if (currentTask.hasEndingTime() && previousTask.hasEndingTime() &&
+				!currentTask.getEndingTime().equals(previousTask.getEndingTime())) {
+			return false;
+		}
+		return true;
 	}
 	
 }

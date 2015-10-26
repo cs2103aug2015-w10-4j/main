@@ -40,12 +40,15 @@ public class TaskTable extends JTable {
 		TableCellRenderer headerRenderer = tableHeader.getDefaultRenderer();
 		JLabel headerLabel = (JLabel) headerRenderer;
 		headerLabel.setHorizontalAlignment(SwingConstants.CENTER);
+		
+		setShowGrid(true);
+		setGridColor(Color.LIGHT_GRAY);
 	}
 	
 	public Component prepareRenderer(TableCellRenderer renderer, int row, int column) {
 		Component c = super.prepareRenderer(renderer, row, column);
 
-		if (row % 2 == 1) {
+		if (row % 2 == 0) {
 			c.setBackground(DEFAULT_COLOR);
 		} else {
 			c.setBackground(ALTERNATE_COLOR);

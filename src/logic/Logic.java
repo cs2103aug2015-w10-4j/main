@@ -20,6 +20,7 @@ import parser.Parser;
 import storage.Storage;
 import storage.JsonFormatStorage;
 import ui.UI;
+import ui.UI.DisplayType;
 
 /**
  * This file contains the main program of the command-line calendar, Tasky.
@@ -726,7 +727,7 @@ public class Logic {
 				listOfShownTasks.addAll(listOfEvents);
 			}
 			// default view
-			return UIObject.showTasks(listOfShownTasks);
+			return UIObject.showTasks(listOfShownTasks, DisplayType.DEFAULT);
 		} else {
 			listOfShownTasks = new ArrayList<Task>();
 			for (int i = 0; i < listOfTasks.size(); i++) {
@@ -765,7 +766,7 @@ public class Logic {
 				}
 			}
 			listFilter.clear();
-			return UIObject.showTasks(listOfShownTasks);
+			return UIObject.showTasks(listOfShownTasks, DisplayType.FILTERED);
 		}
 		
 		

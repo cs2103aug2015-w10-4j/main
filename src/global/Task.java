@@ -7,10 +7,10 @@ import java.util.GregorianCalendar;
  * This is a data structure to store the details of a task
  */
 public class Task implements Comparable<Task> {
+
 	/*
 	 * Declaration of variables
 	 */
-
 	private String name = null;
 	private Calendar startingTime = null;
 	private Calendar endingTime = null;

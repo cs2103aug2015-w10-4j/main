@@ -11,25 +11,38 @@ public class TextFormatter {
 	private static final char HORIZONTAL_CHAR = '-';
 	private static final char VERTICAL_CHAR = '|';
 	
-	public String formatTaskList(Object[][] taskList, int lineCharLimit) {
-		if (taskList.length == 0) {
+	public String formatTaskList(Object[][][] taskLists, int lineCharLimit) {
+		if (isEmpty(taskLists)) {
 			return MESSAGE_DISPLAY_EMPTY;
 		}
 
-		ColumnInfo[] columnInfo = FormatterHelper.getColumnInfo(taskList, lineCharLimit);
-		
 		StringBuilder result = new StringBuilder();
-		result.append(getRowSeparator(columnInfo));
-		result.append(getHeader(columnInfo));
-		for (int i = 0; i < taskList.length; i++) {
-			Object[] currentTaskInfo = taskList[i];
+		for (Object[][] taskList : taskLists) {
+			ColumnInfo[] columnInfo = FormatterHelper.getColumnInfo(taskList, lineCharLimit);
 			
 			result.append(getRowSeparator(columnInfo));
-			result.append(getTaskData(columnInfo, currentTaskInfo, i, lineCharLimit));
+			result.append(getHeader(columnInfo));
+			for (int i = 0; i < taskList.length; i++) {
+				Object[] currentTaskInfo = taskList[i];
+				
+				result.append(getRowSeparator(columnInfo));
+				result.append(getTaskData(columnInfo, currentTaskInfo, i, lineCharLimit));
+			}
+			result.append(getRowSeparator(columnInfo));
+			result.append(MESSAGE_DISPLAY_NEWLINE);
 		}
-		result.append(getRowSeparator(columnInfo));
 		
 		return result.toString();
+	}
+
+	private boolean isEmpty(Object[][][] taskLists) {
+		int maxLength = 0;
+		for (Object[][] taskList : taskLists) {
+			if (taskList != null) {
+				maxLength = Math.max(maxLength, taskList.length);
+			}
+		}
+		return maxLength == 0;
 	}
 
 	private String getTaskData(ColumnInfo[] columnInfo, Object[] task, int taskId, int lineCharLimit) {
