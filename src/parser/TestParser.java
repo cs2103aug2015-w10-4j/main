@@ -23,7 +23,7 @@ public class TestParser {
 	public void setup(){
 			parserObj = new Parser();
 	}
-	/*
+
 
 	@Test
 	public void testParserAddEmptyName() {
@@ -59,11 +59,54 @@ public class TestParser {
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			//e.printStackTrace();
-			assertEquals("Error: Task name is empty", e.getMessage());
+			assertEquals("Error: Invalid number of arguments", e.getMessage());
 		}
 	
 	}
 	
+	@Test
+	public void testParserEditSpecial() throws Exception {
+		Command message;
+
+		message = parserObj.parseCommand("edit 1 every 2 days for 2");
+		assertEquals("Name: null Starting time: null Ending Time: null Location: null Period Interval: 2 days Period Repeats 2", message.getTask(0).getAllInfo());
+		
+	
+	}
+	
+	@Test
+	public void testParserEditNormal() throws Exception {
+		Command message;
+
+		message = parserObj.parseCommand("edit 1 task1 loc nus by next friday");
+		String actual ="Name: task1 Starting time: null Ending Time: java.util.GregorianCalendar[time=?,areFieldsSet=false,areAllFieldsSet=false,lenient=true,zone=sun.util.calendar.ZoneInfo[id=\"Asia/Singapore\",offset=28800000,dstSavings=0,useDaylight=false,transitions=9,lastRule=null],firstDayOfWeek=1,minimalDaysInFirstWeek=1,ERA=?,YEAR=2015,MONTH=9,WEEK_OF_YEAR=?,WEEK_OF_MONTH=?,DAY_OF_MONTH=37,DAY_OF_YEAR=?,DAY_OF_WEEK=?,DAY_OF_WEEK_IN_MONTH=?,AM_PM=?,HOUR=?,HOUR_OF_DAY=?,MINUTE=?,SECOND=?,MILLISECOND=?,ZONE_OFFSET=?,DST_OFFSET=?] Location: nus  Period Interval: null Period Repeats null";
+		assertEquals(actual, message.getTask(0).getAllInfo());
+		
+	
+	}
+	
+	@Test
+	public void testParserSearch() throws Exception {
+		Command message;
+
+		message = parserObj.parseCommand("search task");
+		String actual ="Name: task Starting time: null Ending Time: null Location: null Period Interval: null Period Repeats null";
+		assertEquals(actual, message.getTask(0).getAllInfo());
+		
+	
+	}
+	/*
+	@Test
+	public void testParserSaveto() throws Exception {
+		Command message;
+
+		message = parserObj.parseCommand("saveto new.txt");
+		String actual ="Name: task Starting time: null Ending Time: null Location: null Period Interval: null Period Repeats null";
+		assertEquals(actual, message.getTask(0).getAllInfo());
+		
+	
+	}
+	*/
 	@Test
 	public void testParserAdd() throws Exception {
 		Command message;
@@ -81,8 +124,7 @@ public class TestParser {
 		message = parserObj.parseCommand("delete 1");
 		assertEquals("DELETE",message.getCommandType().toString());
 	}
-	*/
-	/*
+	
 	@Test
 	public void testParseDate() throws Exception {
 		Calendar expectedDate = new GregorianCalendar();
@@ -95,7 +137,7 @@ public class TestParser {
 		
 		assertEquals(expectedDate,date);
 		
-		*/
+		
 		// this doesn't work because of milliseconds difference =.=
 		/*
 		expectedDate = new GregorianCalendar();
@@ -106,7 +148,7 @@ public class TestParser {
 		
 		assertEquals(expectedDate, date);
 		*/
-/*	}
+	}
 
 	@Test
 	public void testGetNearestDate(){
@@ -116,5 +158,5 @@ public class TestParser {
 		
 		assertEquals(todayDate+(5-today)%7, parserObj.getNearestDate(5));
 	}
-*/
+
 }

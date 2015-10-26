@@ -75,7 +75,7 @@ public class TestSystem {
 	 * add task1 before testing
 	 */
 	@Test
-	public void testLogicParserStorageEdit() throws Exception {
+	public void testLogicParserStorageEditOne() throws Exception {
         Command commandObject = parserObj.parseCommand("add task1");
 		
 		logicObject.executeCommand(commandObject, true,
@@ -95,6 +95,50 @@ public class TestSystem {
 			
 		assertEquals("Name: homework next tuesday Starting time: null Ending Time: null Location: nus  Period Interval: null Period Repeats null", resultStr);
 	}
+	
+	/*
+	 * pass string from parser to logic, test editing a few tasks using special editing
+	 * followed by passing the result task to storage and test whether the result stored is correct or not
+	 * add task1,task2,task3 before testing
+	 */
+	@Test
+	public void testLogicParserStorageEditTwo() throws Exception {
+        Command commandObject = parserObj.parseCommand("add task1");
+		logicObject.executeCommand(commandObject, true,
+				true);
+		
+		commandObject = parserObj.parseCommand("add task2");
+		logicObject.executeCommand(commandObject, true,
+					true);
+			
+		commandObject = parserObj.parseCommand("add task3");
+		logicObject.executeCommand(commandObject, true,
+						true);	
+
+		commandObject = parserObj.parseCommand("edit 1 homework next tuesday loc nus every 2 days for 2");
+		logicObject.executeCommand(commandObject, true,
+				true);
+		
+        commandObject = parserObj.parseCommand("edit 1 loc nus");
+		logicObject.executeCommand(commandObject, true,
+				true);
+		
+		 commandObject = parserObj.parseCommand("edit 3 every 2 days for 2");
+			logicObject.executeCommand(commandObject, true,
+					true);
+		
+		ArrayList<Task> listOfTasks = logicObject.listOfTasks;
+		storageObj.writeItemList(listOfTasks);
+		ArrayList<Task> message = storageObj.getItemList();
+		String resultStr = "";
+		
+		for( int i=0; i < listOfTasks.size(); i++ ) {
+			resultStr += message.get(i).getAllInfo() +" ";
+			}
+	
+		assertEquals("Name: homework next tuesday Starting time: null Ending Time: null Location: nus  Period Interval: null Period Repeats null Name: task2 Starting time: null Ending Time: null Location: null Period Interval: null Period Repeats null Name: task3 Starting time: null Ending Time: null Location: null Period Interval: null Period Repeats null ", resultStr);
+	}
+	
 	
 	/*
 	 * pass string from parser to logic, test deleting a task
