@@ -9,6 +9,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
+import java.util.GregorianCalendar;
 import java.util.HashSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -682,6 +683,41 @@ public class Logic {
 		return true;
 	}
 	
+	boolean isTimingInDay(Calendar time, Calendar date) {
+		Calendar dateStart = new GregorianCalendar();
+		dateStart.set(date.get(Calendar.YEAR), date.get(Calendar.MONTH),
+				date.get(Calendar.DATE), 0, 0, 0);
+
+		Calendar dateEnd = new GregorianCalendar();
+		dateEnd.set(date.get(Calendar.YEAR), date.get(Calendar.MONTH),
+				date.get(Calendar.DATE) + 1, 0, 0, 0);
+		if (time.after(dateStart) && time.before(dateEnd)) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	ArrayList<Task> getTasksInDay(ArrayList<Task> listOfEventsDeadlines, Calendar date){
+		ArrayList<Task> listOfTasksInDay = new ArrayList<Task>();
+		for(int i = 0; i < listOfEventsDeadlines.size(); i++){
+			Task curTask = listOfEventsDeadlines.get(i);
+			if(curTask.hasStartingTime()){
+				Calendar startTime = curTask.getStartingTime();
+				if(isTimingInDay(startTime, date)){
+					listOfTasksInDay.add(curTask);
+				}
+			}else{
+				Calendar endTime = curTask.getEndingTime();
+				if(isTimingInDay(endTime, date)){
+					listOfTasksInDay.add(curTask);
+				}
+			}
+		}
+		
+		return listOfTasksInDay;
+	}
+	
 	/**
 	 * This method filters the list of tasks to be shown to the user,
 	 * based on the current list of filter keywords
@@ -695,35 +731,66 @@ public class Logic {
 		listOfShownTasks.clear();
 		if (listFilter.size() == 0) {
 			ArrayList<Task> listOfFloating = new ArrayList<Task>();
-			ArrayList<Task> listOfDeadlines = new ArrayList<Task>();
-			ArrayList<Task> listOfEvents = new ArrayList<Task>();
+			ArrayList<Task> listOfEventsDeadlines = new ArrayList<Task>();
 			for (int i = 0; i < listOfTasks.size(); i++) {
 				Task curTask = listOfTasks.get(i);
 				if (curTask.hasEndingTime()) {
-					if (curTask.hasStartingTime()) {
-						listOfEvents.add(curTask);
-					} else {
-						listOfDeadlines.add(curTask);
-					}
+					listOfEventsDeadlines.add(curTask);
 				} else {
 					listOfFloating.add(curTask);
 				}
 			}
+			Collections.sort(listOfEventsDeadlines);
+			
+			ArrayList<Task> listOfFirstDate = new ArrayList<Task>();
+			ArrayList<Task> listOfSecondDate = new ArrayList<Task>();
+			if (listOfEventsDeadlines.size() != 0) {
+				Task firstTask = listOfEventsDeadlines.get(0);
+				Calendar firstDate, secondDate = null;
+				if (firstTask.hasStartingTime()) {
+					firstDate = firstTask.getStartingTime();
+				} else {
+					firstDate = firstTask.getEndingTime();
+				}
+				listOfFirstDate = getTasksInDay(listOfEventsDeadlines,
+						firstDate);
+
+				int i = 1;
+				while (i < listOfEventsDeadlines.size() && secondDate == null) {
+					Task curTask = listOfEventsDeadlines.get(i);
+					if (curTask.hasStartingTime()) {
+						if (!isTimingInDay(curTask.getStartingTime(), firstDate)) {
+							secondDate = curTask.getStartingTime();
+						}
+					} else {
+						if (!isTimingInDay(curTask.getEndingTime(), firstDate)) {
+							secondDate = curTask.getEndingTime();
+						}
+					}
+					i++;
+				}
+				if (secondDate != null) {
+					listOfSecondDate = getTasksInDay(listOfEventsDeadlines,
+							secondDate);
+				}
+			}
+			if (listOfFirstDate.size() >= 3) {
+				listOfShownTasks.addAll(listOfFirstDate.subList(0, 3));
+			} else {
+				listOfShownTasks.addAll(listOfFirstDate);
+			}
+
+			if (listOfSecondDate.size() >= 3) {
+				listOfShownTasks.addAll(listOfSecondDate.subList(0, 3));
+			} else {
+				listOfShownTasks.addAll(listOfSecondDate);
+			}
+			
 			
 			if (listOfFloating.size() >= 3) {
 				listOfShownTasks.addAll(listOfFloating.subList(0, 3));
 			} else {
 				listOfShownTasks.addAll(listOfFloating);
-			}
-			if (listOfDeadlines.size() >= 3) {
-				listOfShownTasks.addAll(listOfDeadlines.subList(0, 3));
-			} else {
-				listOfShownTasks.addAll(listOfDeadlines);
-			}
-			if (listOfEvents.size() >= 3) {
-				listOfShownTasks.addAll(listOfEvents.subList(0, 3));
-			} else {
-				listOfShownTasks.addAll(listOfEvents);
 			}
 			// default view
 			return UIObject.showTasks(listOfShownTasks);
