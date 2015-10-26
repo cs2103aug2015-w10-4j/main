@@ -3,6 +3,7 @@ package ui;
 import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Insets;
 
 @SuppressWarnings("serial")
 public class VerticalLayout extends GridBagLayout {
@@ -17,6 +18,7 @@ public class VerticalLayout extends GridBagLayout {
 
 	private int componentCount = 0;
 	private Component lastComponent = null;
+	private GridBagConstraints lastComponentConstraint = null;
 	
 	public VerticalLayout() {
 		super();
@@ -25,7 +27,8 @@ public class VerticalLayout extends GridBagLayout {
 	@Override
 	public void addLayoutComponent(Component comp, Object constraint) {
 		assert comp != null : "Cannot add null Component";
-		assert constraint == null : "Can only be called from java.awt.Container.add(Component comp)";
+		assert constraint == null ||
+				constraint instanceof Insets : "Can only accept Insets as constraint";
 		
 		resetLastComponentWeightY();
 		
@@ -37,24 +40,20 @@ public class VerticalLayout extends GridBagLayout {
 		newComponentConstraint.gridheight = COMPONENT_GRID_HEIGHT;
 		newComponentConstraint.gridwidth = COMPONENT_GRID_WIDTH;
 		newComponentConstraint.fill = COMPONENT_FILL;
+		if (constraint != null) {
+			newComponentConstraint.insets = (Insets) constraint;
+		}
 		
 		super.addLayoutComponent(comp, newComponentConstraint);
 		componentCount++;
 		lastComponent = comp;
+		lastComponentConstraint = newComponentConstraint;
 	}
 	
 	private void resetLastComponentWeightY() {
 		if (lastComponent != null) {
-			GridBagConstraints oldComponentConstraint = new GridBagConstraints();
-			oldComponentConstraint.weightx = COMPONENT_WEIGHT_X;
-			oldComponentConstraint.weighty = NEUTRAL_WEIGHT;
-			oldComponentConstraint.gridy = componentCount - 1;
-			oldComponentConstraint.gridx = COMPONENT_POS_X;
-			oldComponentConstraint.gridheight = COMPONENT_GRID_HEIGHT;
-			oldComponentConstraint.gridwidth = COMPONENT_GRID_WIDTH;
-			oldComponentConstraint.fill = COMPONENT_FILL;
-			
-			super.setConstraints(lastComponent, oldComponentConstraint);
+			lastComponentConstraint.weighty = NEUTRAL_WEIGHT;
+			super.setConstraints(lastComponent, lastComponentConstraint);
 		}
 	}
 	
