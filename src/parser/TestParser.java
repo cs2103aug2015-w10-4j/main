@@ -95,18 +95,32 @@ public class TestParser {
 		
 	
 	}
-	/*
+	
 	@Test
 	public void testParserSaveto() throws Exception {
 		Command message;
-
 		message = parserObj.parseCommand("saveto new.txt");
-		String actual ="Name: task Starting time: null Ending Time: null Location: null Period Interval: null Period Repeats null";
-		assertEquals(actual, message.getTask(0).getAllInfo());
-		
-	
+		String actual ="new.txt";
+		assertEquals(actual, message.getArguments().get(0));	
 	}
-	*/
+	
+
+	@Test
+	public void testParserMark() throws Exception {
+		Command message;
+		message = parserObj.parseCommand("mark 1");
+		String actual ="1";
+		assertEquals(actual, message.getArguments().get(0));	
+	}
+	
+	@Test
+	public void testParserUnMark() throws Exception {
+		Command message;
+		message = parserObj.parseCommand("unmark 1");
+		String actual ="1";
+		assertEquals(actual, message.getArguments().get(0));	
+	}
+	
 	@Test
 	public void testParserAdd() throws Exception {
 		Command message;
