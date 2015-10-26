@@ -160,17 +160,21 @@ public class Parser {
 				break;
 			case EDIT :
 				// need to fix edit
+				if(commandString.split(" ").length ==1) {// if insufficient arguments .eg "edit"
+					throw new Exception(ERROR_INVALID_NUMBER_OF_ARGUMENTS);
+				} else {//if special editing.eg edit 1 loc nus
 				argumentArray = getOneIndex(commandString);
 				FieldType editType = editPartIs(getTwoIndex(commandString));
 				if (editType != null) {
 					executeSpecialEdit(editType, commandString, commandObject,
 							argumentArray);
-				} else {
+				} else {// normal editing
 					commandObject.setArguments(argumentArray);
 					commandString = clearFirstWord(commandString);
 
 					extractTaskInformation(commandString, taskObject);
 					commandObject.addTask(taskObject);
+				}
 				}
 				break;
 			case DELETE :
