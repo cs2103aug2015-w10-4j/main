@@ -41,7 +41,9 @@ public class Logic {
 	ArrayList<Task> listOfTasks = new ArrayList<Task>();
 	ArrayList<Task> listOfShownTasks = new ArrayList<Task>();
 	ArrayList<Task> listFilter = new ArrayList<Task>();
-
+	private static final int ID_RANGE = 1000;
+	private static final int RECURRING_MAX = 100;
+	
 	// date format converter
 	static SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM yyyy");
 
@@ -1091,13 +1093,13 @@ public class Logic {
 			Task curTask = listOfTasks.get(i);
 			idList[i] = curTask.getId();
 		}
-		for (int i = 0; i < 1000; i++) {
+		for (int i = 0; i < ID_RANGE; i++) {
 			boolean isUsed = false;
 			// check if id is used
 			for(int j = 0; j < listOfTasks.size(); j++){
 				Task curTask = listOfTasks.get(j);
 				int curId = curTask.getId();
-				if(curId / 100 == i){
+				if(curId / RECURRING_MAX == i){
 					isUsed = true;
 				}
 			}
