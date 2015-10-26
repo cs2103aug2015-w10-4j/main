@@ -161,6 +161,7 @@ public class Parser {
 					FieldType editType = editPartIs(getTwoIndex(commandString));
 					if (editType != null) {
 						commandObject.setArguments(argumentArray);
+						commandString = clearFirstWord(commandString);
 						parseField(editType, commandString, commandObject);
 					} else {// normal editing
 						commandObject.setArguments(argumentArray);

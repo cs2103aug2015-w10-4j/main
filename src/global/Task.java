@@ -18,7 +18,7 @@ public class Task implements Comparable<Task> {
 	private String periodicInterval = null;
 	private String periodicRepeats = null;
 	private Boolean isDone = false;
-	private Integer id = null;
+	private int id = -1;
 
 	/*
 	 * Constructor
@@ -106,7 +106,7 @@ public class Task implements Comparable<Task> {
 				" Location: " +this.location + " Period Interval: "+ this.periodicInterval + " Period Repeats " + this.periodicRepeats;
 	}
 	
-	public int getId(){
+	public Integer getId(){
 		return this.id;
 	}
 
@@ -155,7 +155,7 @@ public class Task implements Comparable<Task> {
 	}
 	
 	public boolean hasId() {
-		if (this.id == null) {
+		if (this.id == -1) {
 			return false;
 		} else {
 			return true;

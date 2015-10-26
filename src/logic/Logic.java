@@ -380,17 +380,21 @@ public class Logic {
 			ArrayList<Integer> parsedIntList, int i, int index)
 			throws Exception {
 		Task curTask = userTasks.get(i);
+		int newIdPrefix = getNewIdPrefix();
 		if (curTask.hasPeriodicInterval()) {
 			ArrayList<Task> splitTasks = splitPeriodic(curTask);
+			for (int j = 0; j < splitTasks.size(); j++) {
+				splitTasks.get(j).setId(newIdPrefix * 100 + j);
+			}
 			listOfTasks.addAll(index, splitTasks);
-			for(int j = 0; j < splitTasks.size(); j++){
-				parsedIntList.add(index+j);
+			for (int j = 0; j < splitTasks.size(); j++) {
+				parsedIntList.add(index + j);
 			}
 		} else {
+			curTask.setId(newIdPrefix*100);
 			listOfTasks.add(index, curTask);
+			parsedIntList.add(index);
 		}
-
-		parsedIntList.add(index);
 	}
 
 	/**
@@ -750,10 +754,9 @@ public class Logic {
 				String searchLocation = curFilter.getLocation();
 				int i = 0;
 				if (searchLocation != null) {
-					//System.out.println("searchLocation is '" + searchLocation + "'");
 					while (i < listOfShownTasks.size()) {
 						Task curTask = listOfShownTasks.get(i);
-						if (!curTask.getLocation().contains(searchLocation)) {
+						if (curTask.getLocation() == null || !curTask.getLocation().contains(searchLocation)) {
 							listOfShownTasks.remove(i);
 						} else {
 							i++;
@@ -1012,6 +1015,30 @@ public class Logic {
 		}
 		curTask.getEndingTime().add(calendarUnit, periodicInterval);
 		return true;
+	}
+	
+	int getNewIdPrefix(){
+		int[] idList = new int[listOfTasks.size()];
+
+		for (int i = 0; i < listOfTasks.size(); i++) {
+			Task curTask = listOfTasks.get(i);
+			idList[i] = curTask.getId();
+		}
+		for (int i = 0; i < 1000; i++) {
+			boolean isUsed = false;
+			// check if id is used
+			for(int j = 0; j < listOfTasks.size(); j++){
+				Task curTask = listOfTasks.get(j);
+				int curId = curTask.getId();
+				if(curId / 100 == i){
+					isUsed = true;
+				}
+			}
+			if(!isUsed){
+				return i;
+			}
+		}
+		return -1; // all ids are used up!
 	}
 
 	String exitProgram() {
