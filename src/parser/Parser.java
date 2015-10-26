@@ -188,19 +188,13 @@ public class Parser {
 				commandObject.setArguments(argumentArray);
 				break;
 			case SEARCH :
-				if(commandString.split(" ").length ==1) {// if insufficient arguments .eg "edit"
-					throw new Exception(ERROR_INVALID_NUMBER_OF_ARGUMENTS);
-				} else {//if special editing.eg edit 1 loc nus
-					//argumentArray = getOneIndex(commandString);
-					FieldType editType = editPartIs(getOneIndex(commandString)[0]);
-					if (editType != null) {
-						parseField(editType, commandString, commandObject);
-					} else {// normal editing
-						commandString = clearFirstWord(commandString);
-
-						extractTaskInformation(commandString, taskObject);
-						commandObject.addTask(taskObject);
-					}
+				FieldType editType = editPartIs(getOneIndex(commandString)[0]);
+				if (editType != null) {
+					parseField(editType, commandString, commandObject);
+				} else {// normal editing
+					//commandString = clearFirstWord(commandString);
+					extractTaskInformation(commandString, taskObject);
+					commandObject.addTask(taskObject);
 				}
 				break;
 			default:
@@ -242,12 +236,10 @@ public class Parser {
 		String newLocation = "";
 		if (editType.equals(FieldType.LOCATION)) {
 			String[] argumentArr = getMultipleIndexes(commandString);
-			
 			for (int i = 1; i < argumentArr.length; i++) {
 				newLocation += argumentArr[i] + " ";
 			}
 			newLocation = newLocation.trim();
-			
 			editTask.setLocation(newLocation);
 			commandObject.addTask(editTask);
 		} else if (editType.equals(FieldType.DEADLINE)) {
