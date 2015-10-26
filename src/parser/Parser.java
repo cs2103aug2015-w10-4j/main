@@ -76,12 +76,6 @@ public class Parser {
 	static final String[] END_EVENT = { "end" , "to" };
 	static final String[] INTERVAL_PERIODIC = { "every" , "repeats" };
 	static final String[] INSTANCES_PERIODIC = { "for" };
-	static final String S_LOCATION = "LOCATION";
-	static final String S_DEADLINE = "DEADLINE";
-	static final String S_START_EVENT = "START_EVENT";
-	static final String S_END_EVENT = "END_EVENT";
-	static final String S_INTERVAL_PERIODIC = "INTERVAL_PERIODIC";
-	static final String S_INSTANCES_PERIODIC = "INSTANCES_PERIODIC";
 
 	
 	public FieldType editPartIs(String keyword){
@@ -163,18 +157,18 @@ public class Parser {
 				if(commandString.split(" ").length ==1) {// if insufficient arguments .eg "edit"
 					throw new Exception(ERROR_INVALID_NUMBER_OF_ARGUMENTS);
 				} else {//if special editing.eg edit 1 loc nus
-				argumentArray = getOneIndex(commandString);
-				FieldType editType = editPartIs(getTwoIndex(commandString));
-				if (editType != null) {
-					executeSpecialEdit(editType, commandString, commandObject,
-							argumentArray);
-				} else {// normal editing
-					commandObject.setArguments(argumentArray);
-					commandString = clearFirstWord(commandString);
+					argumentArray = getOneIndex(commandString);
+					FieldType editType = editPartIs(getTwoIndex(commandString));
+					if (editType != null) {
+						commandObject.setArguments(argumentArray);
+						parseField(editType, commandString, commandObject);
+					} else {// normal editing
+						commandObject.setArguments(argumentArray);
+						commandString = clearFirstWord(commandString);
 
-					extractTaskInformation(commandString, taskObject);
-					commandObject.addTask(taskObject);
-				}
+						extractTaskInformation(commandString, taskObject);
+						commandObject.addTask(taskObject);
+					}
 				}
 				break;
 			case DELETE :
@@ -194,9 +188,20 @@ public class Parser {
 				commandObject.setArguments(argumentArray);
 				break;
 			case SEARCH :
-				argumentArray = getMultipleIndexes(commandString);
-				extractTaskInformation(commandString, taskObject);
-				commandObject.addTask(taskObject);
+				if(commandString.split(" ").length ==1) {// if insufficient arguments .eg "edit"
+					throw new Exception(ERROR_INVALID_NUMBER_OF_ARGUMENTS);
+				} else {//if special editing.eg edit 1 loc nus
+					//argumentArray = getOneIndex(commandString);
+					FieldType editType = editPartIs(getOneIndex(commandString)[0]);
+					if (editType != null) {
+						parseField(editType, commandString, commandObject);
+					} else {// normal editing
+						commandString = clearFirstWord(commandString);
+
+						extractTaskInformation(commandString, taskObject);
+						commandObject.addTask(taskObject);
+					}
+				}
 				break;
 			default:
 			
@@ -231,37 +236,33 @@ public class Parser {
 		}
 	}
 	
-	void executeSpecialEdit(FieldType editType, String commandString,
-			 Command commandObject,
-			String[] argumentArray) throws Exception {
+	void parseField(FieldType editType, String commandString,
+			 Command commandObject) throws Exception {
 		Task editTask = new Task();
 		String newLocation = "";
 		if (editType.equals(FieldType.LOCATION)) {
 			String[] argumentArr = getMultipleIndexes(commandString);
-			for (int i = 2; i < argumentArr.length; i++) {
+			
+			for (int i = 1; i < argumentArr.length; i++) {
 				newLocation += argumentArr[i] + " ";
 			}
+			newLocation = newLocation.trim();
 			
 			editTask.setLocation(newLocation);
-
-			commandObject.setArguments(argumentArray);
 			commandObject.addTask(editTask);
 		} else if (editType.equals(FieldType.DEADLINE)) {
 			ArrayList<KeywordMarker> keywordMarkers = getArrayOfKeywordIndexes(commandString);
 			extractDate(commandString, keywordMarkers, editTask);
-			commandObject.setArguments(argumentArray);
 			commandObject.addTask(editTask);
 		} else if (editType.equals(FieldType.START_EVENT)
 				|| editType.equals(FieldType.END_EVENT)) {
 			ArrayList<KeywordMarker> keywordMarkers = getArrayOfKeywordIndexes(commandString);
 			extractDate(commandString, keywordMarkers, editTask);
-			commandObject.setArguments(argumentArray);
 			commandObject.addTask(editTask);
 		} else if (editType.equals(FieldType.INTERVAL_PERIODIC)
 				|| editType.equals(FieldType.INSTANCES_PERIODIC)) {
 			ArrayList<KeywordMarker> keywordMarkers = getArrayOfKeywordIndexes(commandString);
 			extractPeriodic(commandString, keywordMarkers, editTask, true);
-			commandObject.setArguments(argumentArray);
 			commandObject.addTask(editTask);
 		} else {
 			// assertion error

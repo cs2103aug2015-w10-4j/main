@@ -733,12 +733,31 @@ public class Logic {
 				Task curFilter = listFilter.get(j);
 				String searchTaskName = curFilter.getName();
 				int i = 0;
-				while (i < listOfShownTasks.size()) {
-					Task curTask = listOfShownTasks.get(i);
-					if (!curTask.getName().contains(searchTaskName)) {
-						listOfShownTasks.remove(i);
-					} else {
-						i++;
+				if (searchTaskName != null) {
+					while (i < listOfShownTasks.size()) {
+						Task curTask = listOfShownTasks.get(i);
+						if (!curTask.getName().contains(searchTaskName)) {
+							listOfShownTasks.remove(i);
+						} else {
+							i++;
+						}
+					}
+				}
+			}
+			
+			for (int j = 0; j < listFilter.size(); j++) {
+				Task curFilter = listFilter.get(j);
+				String searchLocation = curFilter.getLocation();
+				int i = 0;
+				if (searchLocation != null) {
+					//System.out.println("searchLocation is '" + searchLocation + "'");
+					while (i < listOfShownTasks.size()) {
+						Task curTask = listOfShownTasks.get(i);
+						if (!curTask.getLocation().contains(searchLocation)) {
+							listOfShownTasks.remove(i);
+						} else {
+							i++;
+						}
 					}
 				}
 			}
