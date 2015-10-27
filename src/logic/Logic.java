@@ -479,7 +479,7 @@ public class Logic {
 			ArrayList<Integer> parsedIntArgumentList) throws Exception {
 		ArrayList<Integer> remappedArgumentList = new ArrayList<Integer>();
 		for (int oldIndex : parsedIntArgumentList) {
-			if (oldIndex < listOfShownTasks.size()) {
+			if (oldIndex < listOfShownTasks.size() && oldIndex >= 0) {
 				Task task = listOfShownTasks.get(oldIndex);
 				int newIndex = listOfTasks.indexOf(task);
 				remappedArgumentList.add(newIndex);
