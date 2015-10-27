@@ -13,10 +13,6 @@ import org.junit.Test;
 public class TestLogicEdit {
 	Logic logicObject;
 	
-	public void addHelper(Task newTask){
-		logicObject.listOfTasks.add(newTask);
-		logicObject.listOfShownTasks.add(newTask);
-	}
 	
 	@Before
 	public void setup(){
@@ -24,9 +20,9 @@ public class TestLogicEdit {
 		saveFile.delete();
 		logicObject = new Logic();
 		
-		addHelper(new Task("Item 1"));
-		addHelper(new Task("Item 2"));
-		addHelper(new Task("Item 3"));
+		logicObject.listOfTasks.add(new Task("Item 1"));
+		logicObject.listOfTasks.add(new Task("Item 2"));
+		logicObject.listOfTasks.add(new Task("Item 3"));
 	}
 	
 	/*
@@ -38,7 +34,7 @@ public class TestLogicEdit {
 		ArrayList<Integer> indexList = new ArrayList<Integer>();
 		String message;
 		
-		indexList.add(4);
+		indexList.add(3);
 		listToEdit.add(new Task("New item 99"));
 		message = logicObject.editItem(listToEdit, indexList, true, true);
 		assertEquals("Error: There is no item at this index.", message);
@@ -47,7 +43,7 @@ public class TestLogicEdit {
 		assertEquals("Item 3", logicObject.listOfTasks.get(2).getName());
 		
 		indexList.clear();
-		indexList.add(3);
+		indexList.add(2);
 		message = logicObject.editItem(listToEdit, indexList, true, true);
 		assertEquals("Item(s) 3 successfully edited.", message);
 		assertEquals("Item 1", logicObject.listOfTasks.get(0).getName());
@@ -55,7 +51,7 @@ public class TestLogicEdit {
 		assertEquals("New item 99", logicObject.listOfTasks.get(2).getName());
 		
 		indexList.clear();
-		indexList.add(0);
+		indexList.add(-1);
 		message = logicObject.editItem(listToEdit, indexList, true, true);
 		assertEquals("Error: There is no item at this index.", message);
 		assertEquals("Item 1", logicObject.listOfTasks.get(0).getName());
@@ -63,7 +59,7 @@ public class TestLogicEdit {
 		assertEquals("New item 99", logicObject.listOfTasks.get(2).getName());
 		
 		indexList.clear();
-		indexList.add(-1);
+		indexList.add(-2);
 		message = logicObject.editItem(listToEdit, indexList, true, true);
 		assertEquals("Error: There is no item at this index.", message);
 		assertEquals("Item 1", logicObject.listOfTasks.get(0).getName());
@@ -80,7 +76,7 @@ public class TestLogicEdit {
 		ArrayList<Integer> indexList = new ArrayList<Integer>();
 		String message;
 		
-		indexList.add(1);
+		indexList.add(0);
 		listToEdit.add(new Task("New item 1"));
 		message = logicObject.editItem(listToEdit, indexList, true, true);
 		assertEquals("Item(s) 1 successfully edited.", message);
@@ -90,7 +86,7 @@ public class TestLogicEdit {
 		
 		indexList.clear();
 		listToEdit.clear();
-		indexList.add(2);
+		indexList.add(1);
 		listToEdit.add(new Task("New item 2"));
 		message = logicObject.editItem(listToEdit, indexList, true, true);
 		assertEquals("Item(s) 2 successfully edited.", message);
@@ -100,7 +96,7 @@ public class TestLogicEdit {
 		
 		indexList.clear();
 		listToEdit.clear();
-		indexList.add(3);
+		indexList.add(2);
 		listToEdit.add(new Task("New item 3"));
 		message = logicObject.editItem(listToEdit, indexList, true, true);
 		assertEquals("Item(s) 3 successfully edited.", message);
@@ -111,7 +107,7 @@ public class TestLogicEdit {
 		indexList.clear();
 		logicObject.showUpdatedItems();
 		listToEdit.clear();
-		indexList.add(2);
+		indexList.add(1);
 		listToEdit.add(new Task("item 2 changed again!"));
 		message = logicObject.editItem(listToEdit, indexList, true, true);
 		assertEquals("Item(s) 2 successfully edited.", message);

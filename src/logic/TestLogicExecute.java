@@ -77,10 +77,6 @@ public class TestLogicExecute {
 		commandObject = new Command(Command.Type.DELETE, args);
 		assertEquals("Item(s) 2 successfully deleted.", logicObject.executeCommand(commandObject, true, true));
 		
-		args = new String[1];
-		args[0] = "four";
-		commandObject = new Command(Command.Type.DELETE, args);
-		assertEquals("Error: Invalid argument for command.", logicObject.executeCommand(commandObject, true, true));
 	}
 	
 	@Test
@@ -136,34 +132,6 @@ public class TestLogicExecute {
 		
 		commandObject = new Command(null, new String[]{"123"});
 		assertEquals("Error: Handler for this command type has not been defined.", logicObject.executeCommand(commandObject, true, true));
-		
-	}
-	
-	@Test
-	public void logicExecute(){
-		Task task;
-		Command commandObject;
-		String[] args;
-		// case 1
-		task = new Task();
-		task.setName("Submit assignment");
-		commandObject = new Command(Command.Type.ADD, task);
-		assertEquals("Item(s) 4 successfully added.", logicObject.executeCommand(commandObject, true, true));
-		
-		args = new String[1];
-		args[0] = "1";
-		commandObject = new Command(Command.Type.DELETE, args);
-		assertEquals("Item(s) 1 successfully deleted.", logicObject.executeCommand(commandObject, true, true));
-		
-		args = new String[1];
-		args[0] = "2";
-		commandObject = new Command(Command.Type.DELETE, args);
-		assertEquals("Item(s) 2 successfully deleted.", logicObject.executeCommand(commandObject, true, true));
-		
-		args = new String[1];
-		args[0] = "3";
-		commandObject = new Command(Command.Type.DELETE, args);
-		assertEquals("Item(s) 3 successfully deleted.", logicObject.executeCommand(commandObject, true, true));
 		
 	}
 	

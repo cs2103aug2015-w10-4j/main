@@ -13,10 +13,6 @@ import org.junit.Test;
 public class TestLogicDelete {
 	Logic logicObject;
 	
-	public void addHelper(Task newTask){
-		logicObject.listOfTasks.add(newTask);
-		logicObject.listOfShownTasks.add(newTask);
-	}
 	
 	@Before
 	public void setup(){
@@ -31,9 +27,9 @@ public class TestLogicDelete {
 		Task task1 = new Task("item 1");
 		Task task2 = new Task("item 2");
 		Task task3 = new Task("item 3");
-		addHelper(task1);
-		addHelper(task2);
-		addHelper(task3);
+		logicObject.listOfTasks.add(task1);
+		logicObject.listOfTasks.add(task2);
+		logicObject.listOfTasks.add(task3);
     
 		
 		ArrayList<Integer> argumentList = new ArrayList<Integer>();
@@ -49,7 +45,7 @@ public class TestLogicDelete {
 		assertEquals("Error: There is no item at this index.", message);
 		
 		argumentList.clear();
-		argumentList.add(0);
+		argumentList.add(-2);
 		message = logicObject.deleteItem(argumentList, true, true);
 		assertEquals("Error: There is no item at this index.", message);
 		
@@ -61,21 +57,21 @@ public class TestLogicDelete {
 		argumentList.clear();
 		argumentList.add(2);
 		message = logicObject.deleteItem(argumentList, true, true);
-		assertEquals("Item(s) 2 successfully deleted.", message);
+		assertEquals("Item(s) 3 successfully deleted.", message);
 	}
 	
 	@Test
 	public void logicDeleteMultipleOne(){
 		logicObject.listOfTasks = new ArrayList<Task>();
-		addHelper(new Task("some item 1"));
-		addHelper(new Task("some item 2"));	
-		addHelper(new Task("some item 3"));
+		logicObject.listOfTasks.add(new Task("some item 1"));
+		logicObject.listOfTasks.add(new Task("some item 2"));	
+		logicObject.listOfTasks.add(new Task("some item 3"));
 		
 		ArrayList<Integer> indexList = new ArrayList<Integer>();		
 
-		indexList.add(1);
-		indexList.add(3);
+		indexList.add(0);
 		indexList.add(2);
+		indexList.add(1);
 		
 		String message = logicObject.deleteItem(indexList, true, true);
 		assertEquals("Item(s) 1, 2, 3 successfully deleted.", message);
@@ -84,22 +80,19 @@ public class TestLogicDelete {
 	@Test
 	public void logicDeleteMultipleTwo(){
 		logicObject.listOfTasks = new ArrayList<Task>();
-		addHelper(new Task("some item 1"));
-		addHelper(new Task("some item 2"));
-		addHelper(new Task("some item 3"));
-		addHelper(new Task("some item 4"));
-		addHelper(new Task("some item 5"));
-		addHelper(new Task("some item 6"));
+		logicObject.listOfTasks.add(new Task("some item 1"));
+		logicObject.listOfTasks.add(new Task("some item 2"));
+		logicObject.listOfTasks.add(new Task("some item 3"));
+		logicObject.listOfTasks.add(new Task("some item 4"));
+		logicObject.listOfTasks.add(new Task("some item 5"));
+		logicObject.listOfTasks.add(new Task("some item 6"));
 		
 		
 		ArrayList<Integer> indexList = new ArrayList<Integer>();
 		
-		indexList.add(1);
-		indexList.add(3);
+		indexList.add(0);
 		indexList.add(2);
 		indexList.add(1);
-		indexList.add(3);
-		indexList.add(2);
 		
 		String message = logicObject.deleteItem(indexList, true, true);
 		assertEquals("Item(s) 1, 2, 3 successfully deleted.", message);
@@ -137,7 +130,7 @@ public class TestLogicDelete {
 	public void logicDeleteMultipleItemsSuccess() {
 		logicObject.listOfTasks = new ArrayList<Task>();
 		for (int i = 'a'; i <= 'z'; i++) {
-			addHelper((new Task(String.valueOf(i))));
+			logicObject.listOfTasks.add((new Task(String.valueOf(i))));
 		}
 		
 		ArrayList<Integer> indexList = new ArrayList<>();
@@ -152,7 +145,7 @@ public class TestLogicDelete {
 		indexList.add(25);
 		
 		message = logicObject.deleteItem(indexList, true, true);
-		assertEquals("Item(s) 1, 2, 3, 4, 5, 24, 25 successfully deleted.", message);
+		assertEquals("Item(s) 2, 3, 4, 5, 6, 25, 26 successfully deleted.", message);
 		assertEquals(logicObject.listOfTasks.size(), 19);
 	}
 	

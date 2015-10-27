@@ -15,10 +15,6 @@ public class TestLogicRedo {
 	
 Logic logicObject;
 
-	public void addHelper(Task newTask) {
-		logicObject.listOfTasks.add(newTask);
-		logicObject.listOfShownTasks.add(newTask);
-	}
 	
 	@Before
 	public void setup(){
@@ -56,21 +52,18 @@ Logic logicObject;
 	public void logicRedoMultipleDelete(){
 
 		logicObject.listOfTasks = new ArrayList<Task>();
-		addHelper(new Task("some item 1"));
-        addHelper(new Task("some item 2"));	
-		addHelper(new Task("some item 3"));
-		addHelper(new Task("some item 4"));
-        addHelper(new Task("some item 5"));	
-		addHelper(new Task("some item 6"));
+		logicObject.listOfTasks.add(new Task("some item 1"));
+        logicObject.listOfTasks.add(new Task("some item 2"));	
+		logicObject.listOfTasks.add(new Task("some item 3"));
+		logicObject.listOfTasks.add(new Task("some item 4"));
+        logicObject.listOfTasks.add(new Task("some item 5"));	
+		logicObject.listOfTasks.add(new Task("some item 6"));
 		
 		ArrayList<Integer> indexList = new ArrayList<Integer>();
 		
-		indexList.add(1);
-		indexList.add(3);
+		indexList.add(0);
 		indexList.add(2);
 		indexList.add(1);
-		indexList.add(3);
-		indexList.add(2);
 		
 		logicObject.deleteItem(indexList, true, true);
 	
@@ -97,14 +90,13 @@ Logic logicObject;
 		logicObject.listOfTasks.add(new Task("some item 3"));
 		
 		
-		indexList.add(1);
+		indexList.add(0);
 		listToEdit.add(new Task("New item 1"));
 
 		logicObject.editItem(listToEdit, indexList, true, true);
 		
 
-		logicObject.undoCommand();		
-		logicObject.showUpdatedItems();
+		logicObject.undoCommand();
 		String message = logicObject.redoCommand();		
 		assertEquals("Redo : Item(s) 1 successfully edited.", message);
 		
