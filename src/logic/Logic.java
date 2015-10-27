@@ -192,7 +192,7 @@ public class Logic {
 		Command.Type commandType = commandObject.getCommandType();
 		ArrayList<Task> userTasks = commandObject.getTasks();
 		ArrayList<String> argumentList = commandObject.getArguments();
-		if(commandType == null){
+		if (commandType == null) {
 			logger.warning("Command type is null!");
 			return ERROR_NO_COMMAND_HANDLER;
 		} else {
@@ -248,10 +248,10 @@ public class Logic {
 	 * @param isUndoHistory
 	 * @return
 	 */
-	String pushToHistory(Command.Type commandType, Command commandToPush, boolean shouldClearHistory, boolean isUndoHistory){
+	String pushToHistory(Command.Type commandType, Command commandToPush, boolean shouldClearHistory, boolean isUndoHistory) {
 		String normalStatus;
 		String undoStatus;
-		switch(commandType){
+		switch (commandType) {
 			case ADD:
 				normalStatus = MESSAGE_SUCCESS_ADD;
 				undoStatus = MESSAGE_UNDO + MESSAGE_SUCCESS_HISTORY_ADD;
@@ -350,8 +350,8 @@ public class Logic {
 			String[] argumentListForReverse = new String[parsedIntList.size()];
 			Integer[] integerArr = new Integer[parsedIntList.size()];
 			parsedIntList.toArray(integerArr);
-			for(int i = 0; i < parsedIntList.size(); i++){
-				argumentListForReverse[i] = String.valueOf(integerArr[i]+1);
+			for (int i = 0; i < parsedIntList.size(); i++) {
+				argumentListForReverse[i] = String.valueOf(integerArr[i] + 1);
 			}
 
 			String historyStatus = pushToHistory(Command.Type.ADD, new Command(Command.Type.DELETE, argumentListForReverse), shouldClearHistory, isUndoHistory);
@@ -388,14 +388,14 @@ public class Logic {
 		if (curTask.hasPeriodicInterval()) {
 			ArrayList<Task> splitTasks = splitPeriodic(curTask);
 			for (int j = 0; j < splitTasks.size(); j++) {
-				splitTasks.get(j).setId(newIdPrefix * 100 + j);
+				splitTasks.get(j).setId(newIdPrefix * RECURRING_MAX + j);
 			}
 			listOfTasks.addAll(index, splitTasks);
 			for (int j = 0; j < splitTasks.size(); j++) {
 				parsedIntList.add(index + j);
 			}
 		} else {
-			curTask.setId(newIdPrefix*100);
+			curTask.setId(newIdPrefix * RECURRING_MAX);
 			listOfTasks.add(index, curTask);
 			parsedIntList.add(index);
 		}
@@ -436,13 +436,13 @@ public class Logic {
 			return ERROR_INVALID_ARGUMENT;
 		}
 		
-		ArrayList<Integer> remappedArgumentList = new ArrayList<Integer>();
-		for(int oldIndex : parsedIntArgumentList){
-			Task task = listOfShownTasks.get(oldIndex);
-			int newIndex = listOfTasks.indexOf(task);
-			remappedArgumentList.add(newIndex);
+		ArrayList<Integer> remappedArgumentList;
+		try {
+			remappedArgumentList = remapArguments(parsedIntArgumentList);
+		} catch (Exception e) {
+			return e.getMessage();
 		}
-		Collections.sort(parsedIntArgumentList);
+		Collections.sort(remappedArgumentList);
 
 		argumentListForReverse = new String[argumentList.size()];
 
@@ -473,6 +473,21 @@ public class Logic {
 		historyStatus = statusItemFormatting(historyStatus, parsedIntArgumentList);
 		return historyStatus;
 
+	}
+
+	private ArrayList<Integer> remapArguments(
+			ArrayList<Integer> parsedIntArgumentList) throws Exception {
+		ArrayList<Integer> remappedArgumentList = new ArrayList<Integer>();
+		for (int oldIndex : parsedIntArgumentList) {
+			if (oldIndex < listOfShownTasks.size()) {
+				Task task = listOfShownTasks.get(oldIndex);
+				int newIndex = listOfTasks.indexOf(task);
+				remappedArgumentList.add(newIndex);
+			} else {
+				throw new Exception(ERROR_INVALID_INDEX);
+			}
+		}
+		return remappedArgumentList;
 	}
 	
 	String searchFilter(ArrayList<Task> userTasks) {
@@ -636,7 +651,11 @@ public class Logic {
 		Task userTask = userTasks.get(0); // should only have 1 item
 		try {
 			logger.fine("Attempting to determine index.");
-			int index = Integer.parseInt(argumentList.get(0)) - 1;
+			ArrayList<Integer> parsedIntArgumentList = new ArrayList<Integer>();
+			parsedIntArgumentList.add(Integer.parseInt(argumentList.get(0)) - 1);
+			ArrayList<Integer> remappedArgumentList = remapArguments(parsedIntArgumentList);
+			int index = remappedArgumentList.get(0);
+			
 			boolean hasClashes = false;
 			if (isValidIndex(index)) {
 				// for history
@@ -657,12 +676,10 @@ public class Logic {
 				logger.fine("New task added to list.");
 				
 				String[] indexString = { Integer.toString(index + 1) };
-				ArrayList<Integer> parsedIntArgumentList = new ArrayList<Integer>();
-				parsedIntArgumentList.add(index);
 				String historyStatus = pushToHistory(Command.Type.EDIT, new Command(Command.Type.EDIT,
 						indexString, taskEdited), shouldClearHistory, isUndoHistory);
 				historyStatus = statusItemFormatting(historyStatus, parsedIntArgumentList);
-				if(hasClashes){
+				if (hasClashes) {
 					return WARNING_TIMING_CLASH;
 				}
 				return historyStatus;
@@ -691,7 +708,7 @@ public class Logic {
 	 * Else the ending time for a task is used instead
 	 * @return
 	 */
-	boolean sortListOfTasks(){ // by time
+	boolean sortListOfTasks() { // by time
 		Collections.sort(listOfTasks);
 		return true;
 	}
@@ -711,23 +728,24 @@ public class Logic {
 		}
 	}
 	
-	ArrayList<Task> getTasksInDay(ArrayList<Task> listOfEventsDeadlines, Calendar date){
+	ArrayList<Task> getTasksInDay(ArrayList<Task> listOfEventsDeadlines,
+			Calendar date) {
 		ArrayList<Task> listOfTasksInDay = new ArrayList<Task>();
-		for(int i = 0; i < listOfEventsDeadlines.size(); i++){
+		for (int i = 0; i < listOfEventsDeadlines.size(); i++) {
 			Task curTask = listOfEventsDeadlines.get(i);
-			if(curTask.hasStartingTime()){
+			if (curTask.hasStartingTime()) {
 				Calendar startTime = curTask.getStartingTime();
-				if(isTimingInDay(startTime, date)){
+				if (isTimingInDay(startTime, date)) {
 					listOfTasksInDay.add(curTask);
 				}
-			}else{
+			} else {
 				Calendar endTime = curTask.getEndingTime();
-				if(isTimingInDay(endTime, date)){
+				if (isTimingInDay(endTime, date)) {
 					listOfTasksInDay.add(curTask);
 				}
 			}
 		}
-		
+
 		return listOfTasksInDay;
 	}
 	
@@ -1081,9 +1099,9 @@ public class Logic {
 		}
 		
 		int calendarUnit;
-		if(periodicIntervalUnit.equalsIgnoreCase("days")){
+		if (periodicIntervalUnit.equalsIgnoreCase("days")) {
 			calendarUnit = Calendar.DATE;
-		} else if(periodicIntervalUnit.equalsIgnoreCase("weeks")) {
+		} else if (periodicIntervalUnit.equalsIgnoreCase("weeks")) {
 			calendarUnit = Calendar.WEEK_OF_YEAR;
 		} else {
 			calendarUnit = Calendar.YEAR;
@@ -1096,7 +1114,7 @@ public class Logic {
 		return true;
 	}
 	
-	int getNewIdPrefix(){
+	int getNewIdPrefix() {
 		int[] idList = new int[listOfTasks.size()];
 
 		for (int i = 0; i < listOfTasks.size(); i++) {
@@ -1106,14 +1124,14 @@ public class Logic {
 		for (int i = 0; i < ID_RANGE; i++) {
 			boolean isUsed = false;
 			// check if id is used
-			for(int j = 0; j < listOfTasks.size(); j++){
+			for (int j = 0; j < listOfTasks.size(); j++) {
 				Task curTask = listOfTasks.get(j);
 				int curId = curTask.getId();
-				if(curId / RECURRING_MAX == i){
+				if (curId / RECURRING_MAX == i) {
 					isUsed = true;
 				}
 			}
-			if(!isUsed){
+			if (!isUsed) {
 				return i;
 			}
 		}
