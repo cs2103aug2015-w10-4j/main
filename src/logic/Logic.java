@@ -249,10 +249,32 @@ public class Logic {
 					return exitProgram();
 				case MARK:
 					logger.info("MARK command detected");
-					return markDoneStatus(argumentList, shouldClearHistory, isUndoHistory, true);
+					argumentList = preprocessDeleteArgument(argumentList);
+					argumentList = removeDuplicates(argumentList);
+					if (shouldClearHistory) {
+						try {
+							indexList = remapArguments(argumentList);
+						} catch (Exception e) {
+							return e.getMessage();
+						}
+					} else {
+						indexList = parseIntList(argumentList);
+					}
+					return markDoneStatus(indexList, shouldClearHistory, isUndoHistory, true);
 				case UNMARK:
 					logger.info("UNMARK command detected");
-					return markDoneStatus(argumentList, shouldClearHistory, isUndoHistory, false);
+					argumentList = preprocessDeleteArgument(argumentList);
+					argumentList = removeDuplicates(argumentList);
+					if (shouldClearHistory) {
+						try {
+							indexList = remapArguments(argumentList);
+						} catch (Exception e) {
+							return e.getMessage();
+						}
+					} else {
+						indexList = parseIntList(argumentList);
+					}
+					return markDoneStatus(indexList, shouldClearHistory, isUndoHistory, false);
 				case SEARCH:
 					logger.info("SEARCH command detected");
 					return searchFilter(userTasks);
@@ -516,48 +538,33 @@ public class Logic {
 	
 	/**
 	 * Marks or unmarks a task as done based on the isDone parameter
-	 * @param argumentList
+	 * @param indexList
 	 * @param shouldClearHistory
 	 * @param isUndoHistory
 	 * @param isDone
 	 * @return
 	 */
-	String markDoneStatus(ArrayList<String> argumentList,
+	String markDoneStatus(ArrayList<Integer> indexList,
 			boolean shouldClearHistory, boolean isUndoHistory, boolean isDone) {
-		ArrayList<Integer> parsedIntArgumentList = new ArrayList<>();
 		String[] argumentListForReverse;
-		if (isEmptyArgumentList(argumentList)) {
+		if (isEmptyIndexList(indexList)) {
 			return ERROR_INVALID_ARGUMENT;
 		}
 		
-		try {
-			logger.fine("Cleaning up arguments.");
-			
-			argumentList = preprocessDeleteArgument(argumentList);
-			argumentList = removeDuplicates(argumentList);
-			
-			for (String argument : argumentList) {
-				parsedIntArgumentList.add(Integer.parseInt(argument) - 1);
-			}
-			
-			Collections.sort(parsedIntArgumentList);
-		} catch (NumberFormatException | IndexOutOfBoundsException e) {
-			return ERROR_INVALID_ARGUMENT;
-		}
+		Collections.sort(indexList);
+		argumentListForReverse = new String[indexList.size()];
 
-		argumentListForReverse = new String[argumentList.size()];
-
-		for (int i = parsedIntArgumentList.size() - 1; i >= 0; i--) {
-			int index = parsedIntArgumentList.get(i);
+		for (int i = indexList.size() - 1; i >= 0; i--) {
+			int index = indexList.get(i);
 			if (!isValidIndex(index)) {
 				return ERROR_INVALID_INDEX;
 			}
 		}
 		
 		ArrayList<Task> tasksRemoved = new ArrayList<Task>();
-		for (int i = parsedIntArgumentList.size() - 1; i >= 0; i--) {
-			int index = parsedIntArgumentList.get(i);
-			argumentListForReverse[i] = argumentList.get(i); // for undo
+		for (int i = indexList.size() - 1; i >= 0; i--) {
+			int index = indexList.get(i);
+			argumentListForReverse[i] = String.valueOf(index); // for undo
 
 			// add to start of list to maintain order
 			Task taskRemoved = listOfTasks.remove(index);
@@ -579,7 +586,7 @@ public class Logic {
 		}
 		Command commandToPush = new Command(reversedCommandType, argumentListForReverse);
 		String historyStatus = pushToHistory(commandType, commandToPush, shouldClearHistory, isUndoHistory);
-		historyStatus = statusItemFormatting(historyStatus, parsedIntArgumentList);
+		historyStatus = statusItemFormatting(historyStatus, indexList);
 		return historyStatus;
 	}
 
@@ -722,18 +729,8 @@ public class Logic {
 	}
 	
 	boolean isTimingInDay(Calendar time, Calendar date) {
-		Calendar dateStart = new GregorianCalendar();
-		dateStart.set(date.get(Calendar.YEAR), date.get(Calendar.MONTH),
-				date.get(Calendar.DATE), 0, 0, 0);
-
-		Calendar dateEnd = new GregorianCalendar();
-		dateEnd.set(date.get(Calendar.YEAR), date.get(Calendar.MONTH),
-				date.get(Calendar.DATE) + 1, 0, 0, 0);
-		if (time.after(dateStart) && time.before(dateEnd)) {
-			return true;
-		} else {
-			return false;
-		}
+		return time.get(Calendar.YEAR) == date.get(Calendar.YEAR) &&
+				time.get(Calendar.DAY_OF_YEAR) == date.get(Calendar.DAY_OF_YEAR);
 	}
 	
 	ArrayList<Task> getTasksInDay(ArrayList<Task> listOfEventsDeadlines,
