@@ -51,16 +51,16 @@ Logic logicObject;
         logicObject.listOfTasks.add(new Task("some item 5"));	
 		logicObject.listOfTasks.add(new Task("some item 6"));
 		
-		ArrayList<String> argumentList = new ArrayList<String>();
+		ArrayList<Integer> indexList = new ArrayList<Integer>();
 		
-		argumentList.add("1");
-		argumentList.add("3");
-		argumentList.add("2");
-		argumentList.add("1");
-		argumentList.add("3");
-		argumentList.add("2");
+		indexList.add(1);
+		indexList.add(3);
+		indexList.add(2);
+		indexList.add(1);
+		indexList.add(3);
+		indexList.add(2);
 		
-		logicObject.deleteItem(argumentList, true, true);
+		logicObject.deleteItem(indexList, true, true);
 	
 	
 		String message = logicObject.undoCommand();		
@@ -70,15 +70,15 @@ Logic logicObject;
 	@Test
 	public void logicUndoEdit(){
 		ArrayList<Task> listToEdit = new ArrayList<Task>();
-		ArrayList<String> argumentList = new ArrayList<String>();
+		ArrayList<Integer> indexList = new ArrayList<Integer>();
 		
 		listToEdit.add(new Task("Old item 1"));
-		logicObject.addItem(listToEdit, argumentList, true, true);
+		logicObject.addItem(listToEdit, new ArrayList<String>(), true, true);
 
-		argumentList.add("1");
+		indexList.add(1);
 		listToEdit.clear();
 		listToEdit.add(new Task("New item 1"));
-		logicObject.editItem(listToEdit, argumentList, true, true);
+		logicObject.editItem(listToEdit, indexList, true, true);
 		
 		String message = logicObject.undoCommand();		
 		assertEquals("Undo : Reverted edits.", message);

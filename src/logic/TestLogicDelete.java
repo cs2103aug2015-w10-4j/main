@@ -28,40 +28,30 @@ public class TestLogicDelete {
 		logicObject.listOfTasks.add(new Task("item 3"));
     
 		
-		ArrayList<String> argumentList = new ArrayList<String>();
+		ArrayList<Integer> argumentList = new ArrayList<Integer>();
 		String message;
-		
-		argumentList.add("six");
-		message = logicObject.deleteItem(argumentList, true, true);
-		assertEquals("Error: Invalid argument for command.", message);
-		
 		argumentList.clear();
-		argumentList.add("item 12");
-		message = logicObject.deleteItem(argumentList, true, true);
-		assertEquals("Error: Invalid argument for command.", message);
-		
-		argumentList.clear();
-		argumentList.add("4");
+		argumentList.add(4);
 		message = logicObject.deleteItem(argumentList, true, true);
 		assertEquals("Error: There is no item at this index.", message);
 		
 		argumentList.clear();
-		argumentList.add("-1");
+		argumentList.add(-1);
 		message = logicObject.deleteItem(argumentList, true, true);
 		assertEquals("Error: There is no item at this index.", message);
 		
 		argumentList.clear();
-		argumentList.add("0");
+		argumentList.add(0);
 		message = logicObject.deleteItem(argumentList, true, true);
 		assertEquals("Error: There is no item at this index.", message);
 		
 		argumentList.clear();
-		argumentList.add("55");
+		argumentList.add(55);
 		message = logicObject.deleteItem(argumentList, true, true);
 		assertEquals("Error: There is no item at this index.", message);
 		
 		argumentList.clear();
-		argumentList.add("2");
+		argumentList.add(2);
 		message = logicObject.deleteItem(argumentList, true, true);
 		assertEquals("Item(s) 2 successfully deleted.", message);
 	}
@@ -73,13 +63,13 @@ public class TestLogicDelete {
         logicObject.listOfTasks.add(new Task("some item 2"));	
 		logicObject.listOfTasks.add(new Task("some item 3"));
 		
-		ArrayList<String> argumentList = new ArrayList<String>();		
+		ArrayList<Integer> indexList = new ArrayList<Integer>();		
 
-		argumentList.add("1");
-		argumentList.add("3");
-		argumentList.add("2");
+		indexList.add(1);
+		indexList.add(3);
+		indexList.add(2);
 		
-		String message = logicObject.deleteItem(argumentList, true, true);
+		String message = logicObject.deleteItem(indexList, true, true);
 		assertEquals("Item(s) 1, 2, 3 successfully deleted.", message);
 	}
 	
@@ -93,16 +83,16 @@ public class TestLogicDelete {
         logicObject.listOfTasks.add(new Task("some item 5"));	
 		logicObject.listOfTasks.add(new Task("some item 6"));
 		
-		ArrayList<String> argumentList = new ArrayList<String>();
+		ArrayList<Integer> indexList = new ArrayList<Integer>();
 		
-		argumentList.add("1");
-		argumentList.add("3");
-		argumentList.add("2");
-		argumentList.add("1");
-		argumentList.add("3");
-		argumentList.add("2");
+		indexList.add(1);
+		indexList.add(3);
+		indexList.add(2);
+		indexList.add(1);
+		indexList.add(3);
+		indexList.add(2);
 		
-		String message = logicObject.deleteItem(argumentList, true, true);
+		String message = logicObject.deleteItem(indexList, true, true);
 		assertEquals("Item(s) 1, 2, 3 successfully deleted.", message);
 	}
 	
@@ -116,17 +106,17 @@ public class TestLogicDelete {
         logicObject.listOfTasks.add(new Task("some item 5"));	
 		logicObject.listOfTasks.add(new Task("some item 6"));
 		
-		ArrayList<String> argumentList = new ArrayList<String>();
+		ArrayList<Integer> indexList = new ArrayList<Integer>();
 		String message;
 		
-		argumentList.add("6");
-		argumentList.add("22");
-		argumentList.add("2");
-		argumentList.add("4");
-		argumentList.add("6");
-		argumentList.add("6");
+		indexList.add(6);
+		indexList.add(22);
+		indexList.add(2);
+		indexList.add(4);
+		indexList.add(6);
+		indexList.add(6);
 		
-		message = logicObject.deleteItem(argumentList, true, true);
+		message = logicObject.deleteItem(indexList, true, true);
 		assertEquals("Error: There is no item at this index.", message);
 		assertEquals(logicObject.listOfTasks.size(), 6);
 	}
@@ -141,14 +131,18 @@ public class TestLogicDelete {
 			logicObject.listOfTasks.add(new Task(String.valueOf(i)));
 		}
 		
-		ArrayList<String> argumentList = new ArrayList<>();
+		ArrayList<Integer> indexList = new ArrayList<>();
 		String message;
 		
-		argumentList.add("1-3");
-		argumentList.add("2-5");
-		argumentList.add("24-25");
+		indexList.add(1);
+		indexList.add(2);
+		indexList.add(3);
+		indexList.add(4);
+		indexList.add(5);
+		indexList.add(24);
+		indexList.add(25);
 		
-		message = logicObject.deleteItem(argumentList, true, true);
+		message = logicObject.deleteItem(indexList, true, true);
 		assertEquals("Item(s) 1, 2, 3, 4, 5, 24, 25 successfully deleted.", message);
 		assertEquals(logicObject.listOfTasks.size(), 19);
 	}
@@ -163,12 +157,15 @@ public class TestLogicDelete {
 			logicObject.listOfTasks.add(new Task(String.valueOf(i)));
 		}
 		
-		ArrayList<String> argumentList = new ArrayList<>();
+		ArrayList<Integer> indexList = new ArrayList<>();
 		String message;
 		
-		argumentList.add("-1-26");
+		indexList.add(-1);
+		indexList.add(2);
+		indexList.add(-3);
 		
-		message = logicObject.deleteItem(argumentList, true, true);
+		
+		message = logicObject.deleteItem(indexList, true, true);
 		assertEquals("Error: There is no item at this index.", message);
 		assertEquals(logicObject.listOfTasks.size(), 26);
 	}

@@ -38,7 +38,7 @@ Logic logicObject;
 		ArrayList<Task> newTasks = new ArrayList<Task>();
 		newTasks.add(new Task("item 1"));
         logicObject.addItem(newTasks, new ArrayList<String>(), true, true);
-		logicObject.undoCommand();		
+		logicObject.undoCommand();
 		String message = logicObject.redoCommand();
 		assertEquals("Redo : Item(s) 1 successfully added.", message);
 		assertEquals("item 1", logicObject.listOfTasks.get(0).getName());
@@ -57,16 +57,16 @@ Logic logicObject;
         logicObject.listOfTasks.add(new Task("some item 5"));	
 		logicObject.listOfTasks.add(new Task("some item 6"));
 		
-		ArrayList<String> argumentList = new ArrayList<String>();
+		ArrayList<Integer> indexList = new ArrayList<Integer>();
 		
-		argumentList.add("1");
-		argumentList.add("3");
-		argumentList.add("2");
-		argumentList.add("1");
-		argumentList.add("3");
-		argumentList.add("2");
+		indexList.add(1);
+		indexList.add(3);
+		indexList.add(2);
+		indexList.add(1);
+		indexList.add(3);
+		indexList.add(2);
 		
-		logicObject.deleteItem(argumentList, true, true);
+		logicObject.deleteItem(indexList, true, true);
 	
 	
 		String message = logicObject.undoCommand();		
@@ -87,15 +87,15 @@ Logic logicObject;
 	@Test
 	public void logicUndoEdit(){
 		ArrayList<Task> listToEdit = new ArrayList<Task>();
-		ArrayList<String> argumentList = new ArrayList<String>();
+		ArrayList<Integer> indexList = new ArrayList<Integer>();
 		logicObject.listOfTasks.add(new Task("some item 2"));	
 		logicObject.listOfTasks.add(new Task("some item 3"));
 		
 		
-		argumentList.add("1");
+		indexList.add(1);
 		listToEdit.add(new Task("New item 1"));
 
-		logicObject.editItem(listToEdit, argumentList, true, true);
+		logicObject.editItem(listToEdit, indexList, true, true);
 		
 		logicObject.undoCommand();		
 		String message = logicObject.redoCommand();		

@@ -188,7 +188,6 @@ public class Logic {
 		if (commandObject == null) {
 			return ERROR_INVALID_COMMAND;
 		}
-
 		Command.Type commandType = commandObject.getCommandType();
 		ArrayList<Task> userTasks = commandObject.getTasks();
 		ArrayList<String> argumentList = commandObject.getArguments();
@@ -199,26 +198,36 @@ public class Logic {
 		} else {
 			switch (commandType) {
 				case ADD :
+					argumentList = removeDuplicates(argumentList);
+					indexList = parseIntList(argumentList);
 					logger.info("ADD command detected");
-					return addItem(userTasks, argumentList, shouldClearHistory,
+					return addItem(userTasks, indexList, shouldClearHistory,
 							isUndoHistory);
 				case DELETE :
 					argumentList = preprocessDeleteArgument(argumentList);
 					argumentList = removeDuplicates(argumentList);
-					try {
-						indexList = remapArguments(argumentList);
-					} catch (Exception e) {
-						return e.getMessage();
+					if (shouldClearHistory) {
+						try {
+							indexList = remapArguments(argumentList);
+						} catch (Exception e) {
+							return e.getMessage();
+						}
+					} else {
+						indexList = parseIntList(argumentList);
 					}
 					logger.info("DELETE command detected");
 					return deleteItem(indexList, shouldClearHistory, isUndoHistory);
 				case EDIT :
 					argumentList = preprocessDeleteArgument(argumentList);
 					argumentList = removeDuplicates(argumentList);
-					try {
-						indexList = remapArguments(argumentList);
-					} catch (Exception e) {
-						return e.getMessage();
+					if (shouldClearHistory) {
+						try {
+							indexList = remapArguments(argumentList);
+						} catch (Exception e) {
+							return e.getMessage();
+						}
+					} else {
+						indexList = parseIntList(argumentList);
 					}
 					logger.info("EDIT command detected");
 					return editItem(userTasks, indexList, shouldClearHistory,
@@ -252,6 +261,14 @@ public class Logic {
 					return ERROR_NO_COMMAND_HANDLER;
 			}
 		}
+	}
+	
+	ArrayList<Integer> parseIntList(ArrayList<String> argumentList){
+		ArrayList<Integer> intList = new ArrayList<Integer>();
+		for(int i = 0; i < argumentList.size(); i++){
+			intList.add(Integer.parseInt(argumentList.get(i)));
+		}
+		return intList;
 	}
 	
 	/**
@@ -320,7 +337,7 @@ public class Logic {
 	 * 
 	 * @param userTasks
 	 *            an arraylist of tasks to be added
-	 * @param argumentList
+	 * @param indexList
 	 *            if empty, tasks will be added to the back of the list in the
 	 *            order given in userTasks else should contain the same number
 	 *            of elements as userTasks, to determine the positions the tasks
@@ -330,12 +347,12 @@ public class Logic {
 	 * 
 	 * @return status string
 	 */
-	String addItem(ArrayList<Task> userTasks, ArrayList<String> argumentList,
+	String addItem(ArrayList<Task> userTasks, ArrayList<Integer> indexList,
 			boolean shouldClearHistory, boolean isUndoHistory) {
 		try {
 			logger.fine("Attempting to determine index.");
-			ArrayList<Integer> parsedIntList = new ArrayList<Integer>(); // for
-																			// status
+			ArrayList<Integer> parsedIntList = new ArrayList<Integer>();
+			
 			boolean hasClashes = false;
 
 			logger.fine("Checking for clashes.");
@@ -344,18 +361,18 @@ public class Logic {
 				hasClashes = true;
 			}
 
-			if (isEmptyArgumentList(argumentList)) {
+			if (isEmptyIndexList(indexList)) {
 				for (int i = 0; i < userTasks.size(); i++) {
 					int index = i + listOfTasks.size();
 					addHelper(userTasks, parsedIntList, i, index);
 				}
 				logger.finer("No specified index. Defaulting all items to the end of list.");
-			} else if (argumentList.size() != userTasks.size()) {
+			} else if (indexList.size() != userTasks.size()) {
 				return ERROR_INVALID_ARGUMENT;
 			} else {
 				logger.fine("Adding tasks to list.");
 				for (int i = 0; i < userTasks.size(); i++) {
-					int index = Integer.parseInt(argumentList.get(i)) - 1;
+					int index = indexList.get(i);
 					addHelper(userTasks, parsedIntList, i, index);
 					logger.finer("Index " + (index + 1) + " specified.");
 				}
@@ -366,7 +383,7 @@ public class Logic {
 			Integer[] integerArr = new Integer[parsedIntList.size()];
 			parsedIntList.toArray(integerArr);
 			for (int i = 0; i < parsedIntList.size(); i++) {
-				argumentListForReverse[i] = String.valueOf(integerArr[i] + 1);
+				argumentListForReverse[i] = String.valueOf(integerArr[i]);
 			}
 
 			String historyStatus = pushToHistory(Command.Type.ADD, new Command(Command.Type.DELETE, argumentListForReverse), shouldClearHistory, isUndoHistory);
@@ -472,7 +489,7 @@ public class Logic {
 			ArrayList<String> argumentList) throws Exception {
 		ArrayList<Integer> remappedArgumentList = new ArrayList<Integer>();
 		for (String oldIndexString : argumentList) {
-			int oldIndex = Integer.parseInt(oldIndexString);
+			int oldIndex = Integer.parseInt(oldIndexString) - 1;
 			if (oldIndex < listOfShownTasks.size() && oldIndex >= 0) {
 				Task task = listOfShownTasks.get(oldIndex);
 				int newIndex = listOfTasks.indexOf(task);
@@ -666,7 +683,7 @@ public class Logic {
 				listOfTasks.add(index, newTask);
 				logger.fine("New task added to list.");
 				
-				String[] indexString = { Integer.toString(index + 1) };
+				String[] indexString = { Integer.toString(index) };
 				String historyStatus = pushToHistory(Command.Type.EDIT, new Command(Command.Type.EDIT,
 						indexString, taskEdited), shouldClearHistory, isUndoHistory);
 				historyStatus = statusItemFormatting(historyStatus, indexList);
@@ -1004,6 +1021,9 @@ public class Logic {
 
 	// Create an array with all unique elements
 	ArrayList<String> removeDuplicates(ArrayList<String> parsedIntArgumentList) {
+		if(parsedIntArgumentList == null){
+			return new ArrayList<String>();
+		}
 		HashSet<String> hs = new HashSet<>();
 		hs.addAll(parsedIntArgumentList);
 		parsedIntArgumentList.clear();
