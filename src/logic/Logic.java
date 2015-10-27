@@ -192,6 +192,7 @@ public class Logic {
 		Command.Type commandType = commandObject.getCommandType();
 		ArrayList<Task> userTasks = commandObject.getTasks();
 		ArrayList<String> argumentList = commandObject.getArguments();
+		ArrayList<Integer> indexList = new ArrayList<Integer>();
 		if (commandType == null) {
 			logger.warning("Command type is null!");
 			return ERROR_NO_COMMAND_HANDLER;
@@ -202,11 +203,25 @@ public class Logic {
 					return addItem(userTasks, argumentList, shouldClearHistory,
 							isUndoHistory);
 				case DELETE :
+					argumentList = preprocessDeleteArgument(argumentList);
+					argumentList = removeDuplicates(argumentList);
+					try {
+						indexList = remapArguments(argumentList);
+					} catch (Exception e) {
+						return e.getMessage();
+					}
 					logger.info("DELETE command detected");
-					return deleteItem(argumentList, shouldClearHistory, isUndoHistory);
+					return deleteItem(indexList, shouldClearHistory, isUndoHistory);
 				case EDIT :
+					argumentList = preprocessDeleteArgument(argumentList);
+					argumentList = removeDuplicates(argumentList);
+					try {
+						indexList = remapArguments(argumentList);
+					} catch (Exception e) {
+						return e.getMessage();
+					}
 					logger.info("EDIT command detected");
-					return editItem(userTasks, argumentList, shouldClearHistory,
+					return editItem(userTasks, indexList, shouldClearHistory,
 							isUndoHistory);
 				case DISPLAY :
 					logger.info("DISPLAY command detected");
@@ -414,43 +429,21 @@ public class Logic {
 	 * 
 	 * @return status string
 	 */
-	String deleteItem(ArrayList<String> argumentList,
+	String deleteItem(ArrayList<Integer> indexList,
 			boolean shouldClearHistory, boolean isUndoHistory) {
-		ArrayList<Integer> parsedIntArgumentList = new ArrayList<>();
 		String[] argumentListForReverse;
-		if (isEmptyArgumentList(argumentList)) {
+		if (isEmptyIndexList(indexList)) {
 			return ERROR_INVALID_ARGUMENT;
 		}
-		
-		try {
-			logger.fine("Cleaning up arguments.");
-			
-			argumentList = preprocessDeleteArgument(argumentList);
-			argumentList = removeDuplicates(argumentList);
-			
-			for (String argument : argumentList) {
-				parsedIntArgumentList.add(Integer.parseInt(argument) - 1);
-			}
-			
-		} catch (NumberFormatException | IndexOutOfBoundsException e) {
-			return ERROR_INVALID_ARGUMENT;
-		}
-		
-		ArrayList<Integer> remappedArgumentList;
-		try {
-			remappedArgumentList = remapArguments(parsedIntArgumentList);
-		} catch (Exception e) {
-			return e.getMessage();
-		}
-		Collections.sort(remappedArgumentList);
+		Collections.sort(indexList);
 
-		argumentListForReverse = new String[argumentList.size()];
+		argumentListForReverse = new String[indexList.size()];
 
 		ArrayList<Task> tasksRemoved = new ArrayList<Task>();
-		for (int i = remappedArgumentList.size() - 1; i >= 0; i--) {
-			int index = remappedArgumentList.get(i);
+		for (int i = indexList.size() - 1; i >= 0; i--) {
+			int index = indexList.get(i);
 			if (isValidIndex(index)) {
-				argumentListForReverse[i] = argumentList.get(i); // for undo
+				argumentListForReverse[i] = Integer.toString(indexList.get(i)); // for undo
 
 				// add to start of list to maintain order
 				tasksRemoved.add(0, listOfTasks.remove(index));
@@ -458,7 +451,7 @@ public class Logic {
 			} else {
 				int offset = 1;
 				while (tasksRemoved.size() != 0) {
-					listOfTasks.add(remappedArgumentList.get(i + offset),
+					listOfTasks.add(indexList.get(i + offset),
 							tasksRemoved.remove(0));
 					offset++;
 				}
@@ -470,16 +463,17 @@ public class Logic {
 
 		Command commandToPush = new Command(Command.Type.ADD, argumentListForReverse, tasksRemoved);
 		String historyStatus = pushToHistory(Command.Type.DELETE, commandToPush, shouldClearHistory, isUndoHistory);
-		historyStatus = statusItemFormatting(historyStatus, parsedIntArgumentList);
+		historyStatus = statusItemFormatting(historyStatus, indexList);
 		return historyStatus;
 
 	}
 
 	private ArrayList<Integer> remapArguments(
-			ArrayList<Integer> parsedIntArgumentList) throws Exception {
+			ArrayList<String> argumentList) throws Exception {
 		ArrayList<Integer> remappedArgumentList = new ArrayList<Integer>();
-		for (int oldIndex : parsedIntArgumentList) {
-			if (oldIndex < listOfShownTasks.size()) {
+		for (String oldIndexString : argumentList) {
+			int oldIndex = Integer.parseInt(oldIndexString);
+			if (oldIndex < listOfShownTasks.size() && oldIndex >= 0) {
 				Task task = listOfShownTasks.get(oldIndex);
 				int newIndex = listOfTasks.indexOf(task);
 				remappedArgumentList.add(newIndex);
@@ -635,7 +629,7 @@ public class Logic {
 	 * @param userTasks
 	 *            this should be of size 1 which contains the new task to
 	 *            replaced with. all other tasks will be ignored
-	 * @param argumentList
+	 * @param indexList
 	 *            a number string, which contains the index position of the task
 	 *            to edit
 	 * @param shouldClearHistory
@@ -643,18 +637,15 @@ public class Logic {
 	 * 
 	 * @return status string
 	 */
-	String editItem(ArrayList<Task> userTasks, ArrayList<String> argumentList,
+	String editItem(ArrayList<Task> userTasks, ArrayList<Integer> indexList,
 			boolean shouldClearHistory, boolean isUndoHistory) {
-		if (isEmptyArgumentList(argumentList)) {
+		if (isEmptyIndexList(indexList)) {
 			return ERROR_INVALID_ARGUMENT;
 		}
 		Task userTask = userTasks.get(0); // should only have 1 item
 		try {
 			logger.fine("Attempting to determine index.");
-			ArrayList<Integer> parsedIntArgumentList = new ArrayList<Integer>();
-			parsedIntArgumentList.add(Integer.parseInt(argumentList.get(0)) - 1);
-			ArrayList<Integer> remappedArgumentList = remapArguments(parsedIntArgumentList);
-			int index = remappedArgumentList.get(0);
+			int index = indexList.get(0);
 			
 			boolean hasClashes = false;
 			if (isValidIndex(index)) {
@@ -678,7 +669,7 @@ public class Logic {
 				String[] indexString = { Integer.toString(index + 1) };
 				String historyStatus = pushToHistory(Command.Type.EDIT, new Command(Command.Type.EDIT,
 						indexString, taskEdited), shouldClearHistory, isUndoHistory);
-				historyStatus = statusItemFormatting(historyStatus, parsedIntArgumentList);
+				historyStatus = statusItemFormatting(historyStatus, indexList);
 				if (hasClashes) {
 					return WARNING_TIMING_CLASH;
 				}
@@ -932,6 +923,13 @@ public class Logic {
 
 	boolean isEmptyArgumentList(ArrayList<String> argumentList) {
 		if (argumentList == null || argumentList.isEmpty()) {
+			return true;
+		}
+		return false;
+	}
+	
+	boolean isEmptyIndexList(ArrayList<Integer> indexList) {
+		if (indexList == null || indexList.isEmpty()) {
 			return true;
 		}
 		return false;
