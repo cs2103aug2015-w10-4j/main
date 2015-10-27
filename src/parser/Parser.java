@@ -70,8 +70,9 @@ public class Parser {
 		START_EVENT, END_EVENT, DEADLINE, LOCATION, INTERVAL_PERIODIC, INSTANCES_PERIODIC
 	}
 
-	static final String[] LOCATION = { "loc" , "at" };
+	static final String[] LOCATION = { "loc", "at" };
 	static final String[] DEADLINE = { "by" };
+	static final String[] TIME = { "am", "pm", "h" };
 	static final String[] START_EVENT = { "start", "from" };
 	static final String[] END_EVENT = { "end" , "to" };
 	static final String[] INTERVAL_PERIODIC = { "every" , "repeats" };
@@ -154,7 +155,7 @@ public class Parser {
 				break;
 			case EDIT :
 				// need to fix edit
-				if(commandString.split(" ").length ==1) {// if insufficient arguments .eg "edit"
+				if (commandString.split(" ").length ==1) {// if insufficient arguments .eg "edit"
 					throw new Exception(ERROR_INVALID_NUMBER_OF_ARGUMENTS);
 				} else {//if special editing.eg edit 1 loc nus
 					argumentArray = getOneIndex(commandString);
@@ -244,6 +245,7 @@ public class Parser {
 			editTask.setLocation(newLocation);
 			commandObject.addTask(editTask);
 		} else if (editType.equals(FieldType.DEADLINE)) {
+			commandString = " " + commandString;
 			ArrayList<KeywordMarker> keywordMarkers = getArrayOfKeywordIndexes(commandString);
 			extractDate(commandString, keywordMarkers, editTask);
 			commandObject.addTask(editTask);
@@ -400,7 +402,6 @@ public class Parser {
 		logger.fine("extractDate: getting date arguments");
 		String[] deadlineArguments = getArgumentsForField(commandString,
 				keywordMarkers, FieldType.DEADLINE);
-		
 
 		if (deadlineArguments != null) {
 			for(int i = 0; i < deadlineArguments.length; i++){
@@ -502,11 +503,16 @@ public class Parser {
 			} else {
 				helperDate = new GregorianCalendar();
 				helperDate.add(Calendar.DATE, 1);
-				return helperDate;
 			}
 		} else {
 			logger.info("parseDate: unknown date arguments");
 			throw new Exception("Error: Invalid arguments for date");
+		}
+		
+		// start parsing of time. if no time is specified, returned date object 
+		// will have time field of 00:00:00
+		if (hasKeyword(dateArguments, TIME)) {
+			
 		}
 		return helperDate;
 	}
@@ -619,7 +625,6 @@ public class Parser {
 	ArrayList<KeywordMarker> getArrayOfKeywordIndexes(
 			String commandString) throws Exception {
 		ArrayList<KeywordMarker> keywordMarkerList = new ArrayList<KeywordMarker>();
-		
 		getLocationField(keywordMarkerList, commandString);
 		getDateField(keywordMarkerList, commandString);
 		getPeriodicField(keywordMarkerList, commandString);

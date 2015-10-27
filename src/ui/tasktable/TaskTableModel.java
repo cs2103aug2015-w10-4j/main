@@ -11,7 +11,7 @@ public class TaskTableModel extends AbstractTableModel {
 	private final String[] columnNames = {"No.",
 			"Description",
 			"Starting Time",
-			"Ending Time",
+			" Ending Time ",
 			"Location",
 			"Every",
 			"Repeat"
