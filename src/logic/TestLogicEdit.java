@@ -13,15 +13,20 @@ import org.junit.Test;
 public class TestLogicEdit {
 	Logic logicObject;
 	
+	public void addHelper(Task newTask){
+		logicObject.listOfTasks.add(newTask);
+		logicObject.listOfShownTasks.add(newTask);
+	}
+	
 	@Before
 	public void setup(){
 		File saveFile = new File("save.txt");
 		saveFile.delete();
 		logicObject = new Logic();
 		
-		logicObject.listOfTasks.add(new Task("Item 1"));
-		logicObject.listOfTasks.add(new Task("Item 2"));
-		logicObject.listOfTasks.add(new Task("Item 3"));
+		addHelper(new Task("Item 1"));
+		addHelper(new Task("Item 2"));
+		addHelper(new Task("Item 3"));
 	}
 	
 	/*
@@ -104,6 +109,7 @@ public class TestLogicEdit {
 		assertEquals("New item 3", logicObject.listOfTasks.get(2).getName());
 		
 		indexList.clear();
+		logicObject.showUpdatedItems();
 		listToEdit.clear();
 		indexList.add(2);
 		listToEdit.add(new Task("item 2 changed again!"));

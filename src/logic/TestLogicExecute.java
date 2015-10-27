@@ -20,6 +20,11 @@ public class TestLogicExecute {
 	Logic logicObject;
 	File saveFile;
 	
+	public void addHelper(Task newTask){
+		logicObject.listOfTasks.add(newTask);
+		logicObject.listOfShownTasks.add(newTask);
+	}
+	
 	@Before
 	public void setup(){
 		File saveFile = new File("save.txt");
@@ -41,9 +46,9 @@ public class TestLogicExecute {
 		task_2.setName("Item 2");
 		Task task_3 = new Task();
 		task_3.setName("Item 3");
-		logicObject.listOfTasks.add(task_1);
-		logicObject.listOfTasks.add(task_2);
-		logicObject.listOfTasks.add(task_3);
+		addHelper(task_1);
+		addHelper(task_2);
+		addHelper(task_3);
 	}
 	
 	@Test
@@ -67,20 +72,11 @@ public class TestLogicExecute {
 		Command commandObject;
 		String[] args;
 		
-		// case 1
 		args = new String[1];
 		args[0] = "2";
 		commandObject = new Command(Command.Type.DELETE, args);
 		assertEquals("Item(s) 2 successfully deleted.", logicObject.executeCommand(commandObject, true, true));
 		
-		// case 2
-		// left item 1 & 3
-		args = new String[1];
-		args[0] = "3";
-		commandObject = new Command(Command.Type.DELETE, args);
-		assertEquals("Error: There is no item at this index.", logicObject.executeCommand(commandObject, true, true));
-		
-		// case 3
 		args = new String[1];
 		args[0] = "four";
 		commandObject = new Command(Command.Type.DELETE, args);
@@ -158,13 +154,17 @@ public class TestLogicExecute {
 		args[0] = "1";
 		commandObject = new Command(Command.Type.DELETE, args);
 		assertEquals("Item(s) 1 successfully deleted.", logicObject.executeCommand(commandObject, true, true));
-		assertEquals("Item(s) 1 successfully deleted.", logicObject.executeCommand(commandObject, true, true));
-		assertEquals("Item(s) 1 successfully deleted.", logicObject.executeCommand(commandObject, true, true));
-		assertEquals("Item(s) 1 successfully deleted.", logicObject.executeCommand(commandObject, true, true));
 		
+		args = new String[1];
+		args[0] = "2";
+		commandObject = new Command(Command.Type.DELETE, args);
+		assertEquals("Item(s) 2 successfully deleted.", logicObject.executeCommand(commandObject, true, true));
 		
-		commandObject = new Command(Command.Type.DISPLAY);
-		assertEquals("No items to display.", logicObject.executeCommand(commandObject, true, true));
+		args = new String[1];
+		args[0] = "3";
+		commandObject = new Command(Command.Type.DELETE, args);
+		assertEquals("Item(s) 3 successfully deleted.", logicObject.executeCommand(commandObject, true, true));
+		
 	}
 	
 	@After

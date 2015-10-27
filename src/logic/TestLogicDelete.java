@@ -13,6 +13,11 @@ import org.junit.Test;
 public class TestLogicDelete {
 	Logic logicObject;
 	
+	public void addHelper(Task newTask){
+		logicObject.listOfTasks.add(newTask);
+		logicObject.listOfShownTasks.add(newTask);
+	}
+	
 	@Before
 	public void setup(){
 		File saveFile = new File("save.txt");
@@ -22,10 +27,13 @@ public class TestLogicDelete {
 	
 	@Test
 	public void logicDeleteOne(){
-		logicObject.listOfTasks = new ArrayList<Task>();
-		logicObject.listOfTasks.add(new Task("item 1"));
-		logicObject.listOfTasks.add(new Task("item 2"));
-		logicObject.listOfTasks.add(new Task("item 3"));
+		logicObject.listOfShownTasks = new ArrayList<Task>();
+		Task task1 = new Task("item 1");
+		Task task2 = new Task("item 2");
+		Task task3 = new Task("item 3");
+		addHelper(task1);
+		addHelper(task2);
+		addHelper(task3);
     
 		
 		ArrayList<Integer> argumentList = new ArrayList<Integer>();
@@ -59,9 +67,9 @@ public class TestLogicDelete {
 	@Test
 	public void logicDeleteMultipleOne(){
 		logicObject.listOfTasks = new ArrayList<Task>();
-		logicObject.listOfTasks.add(new Task("some item 1"));
-        logicObject.listOfTasks.add(new Task("some item 2"));	
-		logicObject.listOfTasks.add(new Task("some item 3"));
+		addHelper(new Task("some item 1"));
+		addHelper(new Task("some item 2"));	
+		addHelper(new Task("some item 3"));
 		
 		ArrayList<Integer> indexList = new ArrayList<Integer>();		
 
@@ -76,12 +84,13 @@ public class TestLogicDelete {
 	@Test
 	public void logicDeleteMultipleTwo(){
 		logicObject.listOfTasks = new ArrayList<Task>();
-		logicObject.listOfTasks.add(new Task("some item 1"));
-        logicObject.listOfTasks.add(new Task("some item 2"));	
-		logicObject.listOfTasks.add(new Task("some item 3"));
-		logicObject.listOfTasks.add(new Task("some item 4"));
-        logicObject.listOfTasks.add(new Task("some item 5"));	
-		logicObject.listOfTasks.add(new Task("some item 6"));
+		addHelper(new Task("some item 1"));
+		addHelper(new Task("some item 2"));
+		addHelper(new Task("some item 3"));
+		addHelper(new Task("some item 4"));
+		addHelper(new Task("some item 5"));
+		addHelper(new Task("some item 6"));
+		
 		
 		ArrayList<Integer> indexList = new ArrayList<Integer>();
 		
@@ -128,7 +137,7 @@ public class TestLogicDelete {
 	public void logicDeleteMultipleItemsSuccess() {
 		logicObject.listOfTasks = new ArrayList<Task>();
 		for (int i = 'a'; i <= 'z'; i++) {
-			logicObject.listOfTasks.add(new Task(String.valueOf(i)));
+			addHelper((new Task(String.valueOf(i))));
 		}
 		
 		ArrayList<Integer> indexList = new ArrayList<>();

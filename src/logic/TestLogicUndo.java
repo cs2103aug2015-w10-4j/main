@@ -14,6 +14,11 @@ import org.junit.Test;
 public class TestLogicUndo {
 	
 Logic logicObject;
+
+	public void addHelper(Task newTask) {
+		logicObject.listOfTasks.add(newTask);
+		logicObject.listOfShownTasks.add(newTask);
+	}
 	
 	@Before
 	public void setup(){
@@ -35,7 +40,8 @@ Logic logicObject;
 
 		ArrayList<Task> newTasks = new ArrayList<Task>();
 		newTasks.add(new Task("item 1"));
-        logicObject.addItem(newTasks, new ArrayList<String>(), true, true);
+        logicObject.addItem(newTasks, new ArrayList<Integer>(), true, true);
+        logicObject.showUpdatedItems();
 		String message = logicObject.undoCommand();		
 		assertEquals("Undo : Added item(s) removed.", message);
 	}
@@ -44,12 +50,12 @@ Logic logicObject;
 	public void logicUndoMultipleDelete(){
 
 		logicObject.listOfTasks = new ArrayList<Task>();
-		logicObject.listOfTasks.add(new Task("some item 1"));
-        logicObject.listOfTasks.add(new Task("some item 2"));	
-		logicObject.listOfTasks.add(new Task("some item 3"));
-		logicObject.listOfTasks.add(new Task("some item 4"));
-        logicObject.listOfTasks.add(new Task("some item 5"));	
-		logicObject.listOfTasks.add(new Task("some item 6"));
+		addHelper(new Task("some item 1"));
+        addHelper(new Task("some item 2"));	
+		addHelper(new Task("some item 3"));
+		addHelper(new Task("some item 4"));
+		addHelper(new Task("some item 5"));	
+		addHelper(new Task("some item 6"));
 		
 		ArrayList<Integer> indexList = new ArrayList<Integer>();
 		
@@ -73,13 +79,13 @@ Logic logicObject;
 		ArrayList<Integer> indexList = new ArrayList<Integer>();
 		
 		listToEdit.add(new Task("Old item 1"));
-		logicObject.addItem(listToEdit, new ArrayList<String>(), true, true);
+		logicObject.addItem(listToEdit, new ArrayList<Integer>(), true, true);
 
 		indexList.add(1);
 		listToEdit.clear();
 		listToEdit.add(new Task("New item 1"));
 		logicObject.editItem(listToEdit, indexList, true, true);
-		
+
 		String message = logicObject.undoCommand();		
 		assertEquals("Undo : Reverted edits.", message);
 		

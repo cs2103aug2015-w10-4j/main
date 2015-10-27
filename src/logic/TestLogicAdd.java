@@ -20,7 +20,7 @@ public class TestLogicAdd {
 	public String addItem(String taskName){
 		ArrayList<Task> newTasks = new ArrayList<Task>();
 		newTasks.add(new Task(taskName));
-		return logicObject.addItem(newTasks, new ArrayList<String>(), true, true);
+		return logicObject.addItem(newTasks, new ArrayList<Integer>(), true, true);
 	}
 	
 	public String addItem(String taskName, Calendar deadline){
@@ -28,7 +28,7 @@ public class TestLogicAdd {
 		Task curTask = new Task(taskName);
 		curTask.setEndingTime(deadline);
 		newTasks.add(curTask);
-		return logicObject.addItem(newTasks, new ArrayList<String>(), true, true);
+		return logicObject.addItem(newTasks, new ArrayList<Integer>(), true, true);
 	}
 	
 	public String addItem(String taskName, Calendar startTime, Calendar endTime){
@@ -37,7 +37,7 @@ public class TestLogicAdd {
 		curTask.setStartingTime(startTime);
 		curTask.setEndingTime(endTime);
 		newTasks.add(curTask);
-		return logicObject.addItem(newTasks, new ArrayList<String>(), true, true);
+		return logicObject.addItem(newTasks, new ArrayList<Integer>(), true, true);
 	}
 	
 	@Before
