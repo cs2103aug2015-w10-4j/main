@@ -432,16 +432,23 @@ public class Logic {
 				parsedIntArgumentList.add(Integer.parseInt(argument) - 1);
 			}
 			
-			Collections.sort(parsedIntArgumentList);
 		} catch (NumberFormatException | IndexOutOfBoundsException e) {
 			return ERROR_INVALID_ARGUMENT;
 		}
+		
+		ArrayList<Integer> remappedArgumentList = new ArrayList<Integer>();
+		for(int oldIndex : parsedIntArgumentList){
+			Task task = listOfShownTasks.get(oldIndex);
+			int newIndex = listOfTasks.indexOf(task);
+			remappedArgumentList.add(newIndex);
+		}
+		Collections.sort(parsedIntArgumentList);
 
 		argumentListForReverse = new String[argumentList.size()];
 
 		ArrayList<Task> tasksRemoved = new ArrayList<Task>();
-		for (int i = parsedIntArgumentList.size() - 1; i >= 0; i--) {
-			int index = parsedIntArgumentList.get(i);
+		for (int i = remappedArgumentList.size() - 1; i >= 0; i--) {
+			int index = remappedArgumentList.get(i);
 			if (isValidIndex(index)) {
 				argumentListForReverse[i] = argumentList.get(i); // for undo
 
@@ -451,7 +458,7 @@ public class Logic {
 			} else {
 				int offset = 1;
 				while (tasksRemoved.size() != 0) {
-					listOfTasks.add(parsedIntArgumentList.get(i + offset),
+					listOfTasks.add(remappedArgumentList.get(i + offset),
 							tasksRemoved.remove(0));
 					offset++;
 				}
@@ -472,6 +479,8 @@ public class Logic {
 		if (userTasks.size() == 0) {
 			return ERROR_NO_FILTER;
 		} else {
+			listFilter.clear();
+			
 			Task taskObject = userTasks.get(0);
 			listFilter.add(taskObject);
 
@@ -668,6 +677,7 @@ public class Logic {
 	}
 
 	String displayItems() {
+		listFilter.clear();
 		if (listOfTasks.isEmpty()) {
 			return MESSAGE_DISPLAY_EMPTY;
 		} else {
@@ -834,7 +844,6 @@ public class Logic {
 					}
 				}
 			}
-			listFilter.clear();
 			return UIObject.showTasks(listOfShownTasks, DisplayType.FILTERED);
 		}
 		
