@@ -722,18 +722,8 @@ public class Logic {
 	}
 	
 	boolean isTimingInDay(Calendar time, Calendar date) {
-		Calendar dateStart = new GregorianCalendar();
-		dateStart.set(date.get(Calendar.YEAR), date.get(Calendar.MONTH),
-				date.get(Calendar.DATE), 0, 0, 0);
-
-		Calendar dateEnd = new GregorianCalendar();
-		dateEnd.set(date.get(Calendar.YEAR), date.get(Calendar.MONTH),
-				date.get(Calendar.DATE) + 1, 0, 0, 0);
-		if (time.after(dateStart) && time.before(dateEnd)) {
-			return true;
-		} else {
-			return false;
-		}
+		return time.get(Calendar.YEAR) == date.get(Calendar.YEAR) &&
+				time.get(Calendar.DAY_OF_YEAR) == date.get(Calendar.DAY_OF_YEAR);
 	}
 	
 	ArrayList<Task> getTasksInDay(ArrayList<Task> listOfEventsDeadlines,
