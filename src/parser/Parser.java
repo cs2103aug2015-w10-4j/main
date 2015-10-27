@@ -32,6 +32,8 @@ public class Parser {
 	static final String ERROR_INVALID_PERIODIC_INTERVAL_VALUE = "Error: Invalid periodic interval value";
 	static final String ERROR_INVALID_MONTH_SPECIFIED = "Error: Invalid date specified!";
 	static final String ERROR_INVALID_DATE_SPECIFIED = "Error: Invalid date specified!";
+	static final String ERROR_INVALID_TIME = "Error: Invalid time!";
+	static final String ERROR_INVALID_TIME_FORMAT = "Error: Invalid time format specified!";
 	static final String ERROR_INVALID_PERIODIC_INTERVAL = "Error: Invalid periodic interval specified";
 	static final String ERROR_MISSING_START_TIME = "Error: An end time has been entered without start time!";
 	static final String ERROR_MISSING_END_TIME = "Error: A start time has been entered without end time!";
@@ -40,6 +42,7 @@ public class Parser {
 	static final String ERROR_INVALID_COMMAND_SPECIFIED = "Error: Invalid command specified!";
 	static final String ERROR_EMPTY_COMMAND_STRING = "Error: Command string is empty";
 	static final String ERROR_EMPTY_TASK_NAME = "Error: Task name is empty";
+
 	
 	static final String WHITE_SPACE_REGEX = "\\s+";
 	
@@ -72,7 +75,8 @@ public class Parser {
 
 	static final String[] LOCATION = { "loc", "at" };
 	static final String[] DEADLINE = { "by" };
-	static final String[] TIME = { "am", "pm", "h" };
+	static final String[] TIME = { "H", "AM", "PM" };
+	static final String TIME_SEPERATOR = ".";
 	static final String[] START_EVENT = { "start", "from" };
 	static final String[] END_EVENT = { "end" , "to" };
 	static final String[] INTERVAL_PERIODIC = { "every" , "repeats" };
@@ -441,10 +445,64 @@ public class Parser {
 		}
 	}
 
-	Calendar parseDate(String[] dateArguments) throws Exception {
+	// if time not specified, it will be parsed to 00:00 AM
+	Calendar parseDate(String[] dateArgumentsTemp) throws Exception {
 		logger.fine("parseDate: parsing date");
-		int date, month, year;
+		int date, month, year, hour = 0, minute = 0, AMPM = 0;
+		Integer hourOfDay = null;
 		Calendar helperDate;
+		
+		// start of parsing time
+		// time argument in dateArguments is removed from array
+		// new array is created since array length cannot be modified
+		String[] dateArguments;
+		if (hasTimeKeyword(dateArgumentsTemp, TIME)) {
+			dateArguments = new String[dateArgumentsTemp.length - 1];
+			for (int i = 0; i < dateArgumentsTemp.length; i++) {
+				boolean keywordFound = false;
+				for (int n = 0; n < TIME.length; n++) {
+					// low-level check if TIME keywords is present at the end of the argument e.g. 6(pm)
+					System.out.println(dateArgumentsTemp[i].lastIndexOf(TIME[n]));
+					System.out.println(dateArgumentsTemp[i].length() - 2);
+					if (dateArgumentsTemp[i].lastIndexOf(TIME[n]) >= dateArgumentsTemp[i].length() - 2) {
+						keywordFound = true;
+						try {
+							String tempTime = dateArgumentsTemp[i];
+							tempTime = tempTime.replace(TIME[n], "");
+							if (n == 0) {	// h: 24 hour time format
+								hourOfDay = Integer.parseInt(tempTime.substring(0, 2));
+								minute = Integer.parseInt(tempTime.substring(2));
+							} else {	// am/pm: 12 hour time format
+								AMPM = n == 1 ? 0 : 1;
+								if (tempTime.contains(TIME_SEPERATOR)) { // check if minutes is specified
+									minute = Integer.parseInt(tempTime.split(TIME_SEPERATOR)[1]);
+									hour = Integer.parseInt(tempTime.split(TIME_SEPERATOR)[0]);
+								} else {
+									hour = Integer.parseInt(tempTime);
+								}
+								// for 12 hour time format, 12am/pm means hour = 0
+								hour = hour == 12 ? 0 : hour;
+							}
+							// although Calendar can parse beyond this range, it will be
+							// misleading for the user. so throw exception
+							if (hour > 12 || hour < 0 || minute > 59) {
+								throw new Exception(ERROR_INVALID_TIME);
+							}
+						} catch (ArrayIndexOutOfBoundsException|NumberFormatException e) {
+							throw new Exception(ERROR_INVALID_TIME_FORMAT);
+						} catch (Exception e) {
+							throw e;
+						}
+					}
+				}
+				if (!keywordFound) {
+					dateArguments[i] = dateArgumentsTemp[i];
+				}			
+			}
+		} else {
+			dateArguments = dateArgumentsTemp;
+		}
+		
 		if (!hasKeyword(dateArguments, DATE_SPECIAL)
 				&& dateArguments.length != 1) {
 			try {
@@ -495,11 +553,10 @@ public class Parser {
 			helperDate = new GregorianCalendar();
 			helperDate.clear();
 			helperDate.set(year, month, date);
-			return helperDate;
 		} else if (hasKeyword(dateArguments, DATE_SPECIAL)
 				&& dateArguments.length == 1) { // today/tomorrow
 			if (dateArguments[0].equalsIgnoreCase(DATE_SPECIAL[2])) {
-				return new GregorianCalendar();
+				helperDate = new GregorianCalendar();
 			} else {
 				helperDate = new GregorianCalendar();
 				helperDate.add(Calendar.DATE, 1);
@@ -508,15 +565,18 @@ public class Parser {
 			logger.info("parseDate: unknown date arguments");
 			throw new Exception("Error: Invalid arguments for date");
 		}
-		
-		// start parsing of time. if no time is specified, returned date object 
-		// will have time field of 00:00:00
-		if (hasKeyword(dateArguments, TIME)) {
-			
+
+		if (hourOfDay == null) {
+			helperDate.set(Calendar.HOUR, hour);
+			helperDate.set(Calendar.AM_PM, AMPM);
+		} else {
+			helperDate.set(Calendar.HOUR_OF_DAY, hourOfDay);
 		}
+		helperDate.set(Calendar.MINUTE, minute);
 		return helperDate;
 	}
 	
+
 	/**
 	 * 
 	 * @param givenDayIndex day of the week sunday to saturday -> 1 to 7 
@@ -552,6 +612,22 @@ public class Parser {
 		}
 		return false;
 	}
+	
+	/**
+	 *  temporary method created to search for TIME keywords. Can't use hasKeyword since 
+	 * the keyword is concatenated with the time itself, e.g. '6pm' instead of '6 pm'
+	*/
+	boolean hasTimeKeyword(String[] words, String[] keywords) {
+		for(int i = 0; i < words.length; i++){
+			for(int n = 0; n < keywords.length; n++){
+				if(words[i].contains(keywords[n])){
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+	
 
 	String[] getArgumentsForField(String commandString,
 			ArrayList<KeywordMarker> keywordMarkers, FieldType typeOfField) {

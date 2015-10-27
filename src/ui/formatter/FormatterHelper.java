@@ -42,7 +42,7 @@ public class FormatterHelper {
 	//additional space at the beginning and the end
 	private static final int ADDITIONAL_SPACE = 2;
 	
-	private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd/MM/yy HH:mm:ss");
+	private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd/MM/yy h a");
 
 	/**
 	 * Find the minimal width for each column, taking into account the content
