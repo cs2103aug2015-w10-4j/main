@@ -446,6 +446,7 @@ public class Parser {
 	}
 
 	// if time not specified, it will be parsed to 00:00 AM
+	// TIME keyword in commandString must be capitalized
 	Calendar parseDate(String[] dateArgumentsTemp) throws Exception {
 		logger.fine("parseDate: parsing date");
 		int date, month, year, hour = 0, minute = 0, AMPM = 0;
@@ -462,8 +463,6 @@ public class Parser {
 				boolean keywordFound = false;
 				for (int n = 0; n < TIME.length; n++) {
 					// low-level check if TIME keywords is present at the end of the argument e.g. 6(pm)
-					System.out.println(dateArgumentsTemp[i].lastIndexOf(TIME[n]));
-					System.out.println(dateArgumentsTemp[i].length() - 2);
 					if (dateArgumentsTemp[i].lastIndexOf(TIME[n]) >= dateArgumentsTemp[i].length() - 2) {
 						keywordFound = true;
 						try {
@@ -616,6 +615,7 @@ public class Parser {
 	/**
 	 *  temporary method created to search for TIME keywords. Can't use hasKeyword since 
 	 * the keyword is concatenated with the time itself, e.g. '6pm' instead of '6 pm'
+	 * pre-condition: TIME keywords must be capitalized
 	*/
 	boolean hasTimeKeyword(String[] words, String[] keywords) {
 		for(int i = 0; i < words.length; i++){
