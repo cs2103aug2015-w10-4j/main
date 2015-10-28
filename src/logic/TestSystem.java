@@ -81,7 +81,7 @@ public class TestSystem {
 		logicObject.executeCommand(commandObject, true,
 				true);
 
-		commandObject = parserObj.parseCommand("edit 1 homework next tuesday loc nus every 2 days for 2");
+		commandObject = parserObj.parseCommand("edit 1 homework by next tuesday loc nus");
 		
 		String executionResult = logicObject.executeCommand(commandObject, true,
 				true);
@@ -93,7 +93,7 @@ public class TestSystem {
 		resultStr = message.get(0).getAllInfo();
 		
 			
-		assertEquals("Name: homework next tuesday Starting time: null Ending Time: null Location: nus  Period Interval: null Period Repeats null", resultStr);
+		assertEquals("Name: homework Starting time: null Ending Time: null Location: nus  Period Interval: null Period Repeats null", resultStr);
 	}
 	
 	/*
@@ -158,7 +158,7 @@ public class TestSystem {
 				true);
 		
 
-		commandObject = parserObj.parseCommand("edit 1 homework next tuesday loc nus every 2 days for 2");
+		commandObject = parserObj.parseCommand("edit 1 homework by next tuesday loc nus");
 		
 		String executionResult = logicObject.executeCommand(commandObject, true,
 				true);
