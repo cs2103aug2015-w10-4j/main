@@ -9,7 +9,7 @@ import java.util.Scanner;
 import global.Task;
 
 public interface Storage {
-	static final String HELP_PATH = "Help.txt";
+	static final String HELP_PATH = "src\\storage\\Help.txt";
 	static final String LINE_SEPARATOR = System.getProperty("line.separator");
 	/**
 	 * Saves the list of tasks in the file
@@ -38,6 +38,7 @@ public interface Storage {
 	public default String getHelp()  {
 		String helpContent = "";
 		File helpfile = new File(HELP_PATH);
+		
 		Scanner sc;
 		try {
 			sc = new Scanner(helpfile);

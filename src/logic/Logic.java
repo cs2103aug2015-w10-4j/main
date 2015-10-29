@@ -72,6 +72,7 @@ public class Logic {
 	private static final String MESSAGE_SUCCESS_CHANGE_FILE_PATH = "File path successfully changed.";
 	private static final String MESSAGE_SUCCESS_NO_CHANGE_FILE_PATH = "File path not changed. Entered file path is the same as current one used.";
 	private static final String MESSAGE_DISPLAY_EMPTY = "No items to display.";
+	private static final String MESSAGE_SUCCESS_HELP = "help message shown";
 	private static final String SEPARATOR_ITEM_LIST = ", ";
 	private static final String IDENTIFIER_DELETE_ALL = "all";
 	private static final String ERROR_WRITING_FILE = "Error: Unable to write file.";
@@ -285,7 +286,7 @@ public class Logic {
 					logger.info("SEARCH command detected");
 					return searchFilter(userTasks);
 				case HELP:
-					return storageObject.getHelp();
+					return MESSAGE_SUCCESS_HELP;
 				default :
 					logger.warning("Command type cannot be identified!");
 					return ERROR_NO_COMMAND_HANDLER;
@@ -611,7 +612,7 @@ public class Logic {
 		ArrayList<String> finalArgumentList = new ArrayList<>();
 		if (argumentList.size() == 1 && argumentList.get(0).equalsIgnoreCase(IDENTIFIER_DELETE_ALL)) {
 			argumentList.clear();
-			for (int i = 0; i < listOfShownTasks.size(); i++) {
+			for (int i = 0; i < listOfTasks.size(); i++) {
 				finalArgumentList.add(String.valueOf(i + 1));
 			}
 		} else {
