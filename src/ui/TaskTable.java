@@ -9,6 +9,7 @@ import javax.swing.JTable;
 import javax.swing.SwingConstants;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableColumn;
 
 import ui.tasktable.TaskTableModel;
 
@@ -50,7 +51,20 @@ public class TaskTable extends JTable {
 	
 	public Component prepareRenderer(TableCellRenderer renderer, int row, int column) {
 		Component c = super.prepareRenderer(renderer, row, column);
+		
+		giveColour(c, row, column);
+		packColumns(c, row, column);
 
+		return c;
+	}
+	
+	private void packColumns(Component c, int row, int column) {
+		int rendererWidth = c.getPreferredSize().width;
+        TableColumn tableColumn = getColumnModel().getColumn(column);
+        tableColumn.setPreferredWidth(Math.max(rendererWidth + getIntercellSpacing().width, tableColumn.getPreferredWidth()));
+	}
+
+	private void giveColour(Component c, int row, int column) {
 		if (row % 2 == 0) {
 			c.setBackground(DEFAULT_ROW_COLOR);
 		} else {
@@ -61,7 +75,5 @@ public class TaskTable extends JTable {
 		if (model.isTaskDone(row).equals(Boolean.TRUE)) {
 			c.setBackground(DONE_COLOR);
 		}
-
-		return c;
 	}
 }
