@@ -60,8 +60,8 @@ public class TaskTable extends JTable {
 	
 	private void packColumns(Component c, int row, int column) {
 		int rendererWidth = c.getPreferredSize().width;
-        TableColumn tableColumn = getColumnModel().getColumn(column);
-        tableColumn.setPreferredWidth(Math.max(rendererWidth + getIntercellSpacing().width, tableColumn.getPreferredWidth()));
+		TableColumn tableColumn = getColumnModel().getColumn(column);
+		tableColumn.setPreferredWidth(Math.max(rendererWidth + getIntercellSpacing().width, tableColumn.getPreferredWidth()));
 	}
 
 	private void giveColour(Component c, int row, int column) {
