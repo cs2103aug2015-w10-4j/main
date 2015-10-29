@@ -216,7 +216,7 @@ public class Task implements Comparable<Task> {
 		newTask.setLocation(this.getLocation());
 		newTask.setPeriodicInterval(this.getPeriodicInterval());
 		newTask.setPeriodicRepeats(this.getPeriodicRepeats());
-		newTask.isDone = this.isDone();
+		newTask.setDone(this.isDone());
 		return newTask;
 	}
 	

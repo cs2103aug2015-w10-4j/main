@@ -45,6 +45,7 @@ public class Logic {
 	ArrayList<Task> listFilter = new ArrayList<Task>();
 	private static final int ID_RANGE = 1000;
 	private static final int RECURRING_MAX = 100;
+	private static final Level LOG_LEVEL = Level.FINER;
 	
 	// date format converter
 	static SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM yyyy");
@@ -61,12 +62,12 @@ public class Logic {
 	private static final String MESSAGE_SUCCESS_HISTORY_MARK = "Item(s) successfully marked.";
 	private static final String MESSAGE_SUCCESS_HISTORY_UNMARK = "Item(s) successfully unmarked.";
 	private static final String MESSAGE_SUCCESS_HISTORY_EDIT = "Reverted edits.";
-	private static final String MESSAGE_SUCCESS_ADD = "Item(s) %s successfully added.";
-	private static final String MESSAGE_SUCCESS_DELETE = "Item(s) %s successfully deleted.";
-	private static final String MESSAGE_SUCCESS_MARK = "Item(s) %s successfully marked.";
-	private static final String MESSAGE_SUCCESS_UNMARK = "Item(s) %s successfully unmarked.";
+	private static final String MESSAGE_SUCCESS_ADD = "Item(s) successfully added.";
+	private static final String MESSAGE_SUCCESS_DELETE = "Item(s) successfully deleted.";
+	private static final String MESSAGE_SUCCESS_MARK = "Item(s) successfully marked.";
+	private static final String MESSAGE_SUCCESS_UNMARK = "Item(s) successfully unmarked.";
 	private static final String MESSAGE_SUCCESS_SEARCH = "Search results.";// for '%s'";
-	private static final String MESSAGE_SUCCESS_EDIT = "Item(s) %s successfully edited.";
+	private static final String MESSAGE_SUCCESS_EDIT = "Item(s) successfully edited.";
 	private static final String MESSAGE_SUCCESS_EXIT = "Exiting program...";
 	private static final String MESSAGE_SUCCESS_DISPLAY = "Displaying items.";
 	private static final String MESSAGE_SUCCESS_CHANGE_FILE_PATH = "File path successfully changed.";
@@ -120,7 +121,7 @@ public class Logic {
 															// human-readable
 															// log format
 			logger.addHandler(logHandler);
-			logger.setLevel(Level.FINER); // setting of log level
+			logger.setLevel(LOG_LEVEL); // setting of log level
 			
 			updateListOfTasks();
 		} catch (FileNotFoundException e) {
@@ -156,10 +157,10 @@ public class Logic {
 				String executionResult = executeCommand(commandObject, true,
 						true);
 				UIObject.showStatusToUser(executionResult);
-				if(commandObject.getCommandType() == Command.Type.HELP){
+				if (commandObject.getCommandType() == Command.Type.HELP) {
 					showHelpMSG();
 				} else {
-				showUpdatedItems();
+					showUpdatedItems();
 				}
 				
 				storageObject.writeItemList(listOfTasks);
@@ -418,7 +419,6 @@ public class Logic {
 			}
 
 			String historyStatus = pushToHistory(Command.Type.ADD, new Command(Command.Type.DELETE, argumentListForReverse), shouldClearHistory, isUndoHistory);
-			historyStatus = statusItemFormatting(historyStatus, parsedIntList);
 			if (hasClashes) {
 				return WARNING_TIMING_CLASH;
 			}
@@ -511,7 +511,6 @@ public class Logic {
 
 		Command commandToPush = new Command(Command.Type.ADD, argumentListForReverse, tasksRemoved);
 		String historyStatus = pushToHistory(Command.Type.DELETE, commandToPush, shouldClearHistory, isUndoHistory);
-		historyStatus = statusItemFormatting(historyStatus, indexList);
 		return historyStatus;
 
 	}
@@ -595,7 +594,6 @@ public class Logic {
 		}
 		Command commandToPush = new Command(reversedCommandType, argumentListForReverse);
 		String historyStatus = pushToHistory(commandType, commandToPush, shouldClearHistory, isUndoHistory);
-		historyStatus = statusItemFormatting(historyStatus, indexList);
 		return historyStatus;
 	}
 
@@ -612,7 +610,7 @@ public class Logic {
 		ArrayList<String> finalArgumentList = new ArrayList<>();
 		if (argumentList.size() == 1 && argumentList.get(0).equalsIgnoreCase(IDENTIFIER_DELETE_ALL)) {
 			argumentList.clear();
-			for (int i = 0; i < listOfTasks.size(); i++) {
+			for (int i = 0; i < listOfShownTasks.size(); i++) {
 				finalArgumentList.add(String.valueOf(i + 1));
 			}
 		} else {
@@ -702,7 +700,6 @@ public class Logic {
 				String[] indexString = { Integer.toString(index) };
 				String historyStatus = pushToHistory(Command.Type.EDIT, new Command(Command.Type.EDIT,
 						indexString, taskEdited), shouldClearHistory, isUndoHistory);
-				historyStatus = statusItemFormatting(historyStatus, indexList);
 				if (hasClashes) {
 					return WARNING_TIMING_CLASH;
 				}
@@ -848,12 +845,32 @@ public class Logic {
 				listOfShownTasks.addAll(listOfFloating);
 			}
 			// default view
-			//TODO: CHANGE THIS
-			List<String> x = new ArrayList<String>();
-			x.add("Nearest tasks");
-			x.add("Second nearest tasks");
-			x.add("Floating tasks");
-			return UIObject.showTasks(listOfShownTasks, DisplayType.DEFAULT, x);
+			List<String> listOfTitles = new ArrayList<String>();
+			if(listOfFirstDate.size() != 0){
+					if(listOfFirstDate.get(0).hasStartingTime()){
+						listOfTitles.add(listOfFirstDate.get(0).getStartingTime().get(Calendar.DATE) + "/" + (listOfFirstDate.get(0).getStartingTime().get(Calendar.MONTH) + 1));
+					} else {
+						listOfTitles.add(listOfFirstDate.get(0).getEndingTime().get(Calendar.DATE) + "/" + (listOfFirstDate.get(0).getEndingTime().get(Calendar.MONTH) + 1));
+					}
+			} else {
+				listOfTitles.add("No upcoming tasks.");
+			}
+			if(listOfSecondDate.size() != 0){
+				if(listOfSecondDate.get(0).hasStartingTime()){
+					listOfTitles.add(listOfSecondDate.get(0).getStartingTime().get(Calendar.DATE) + "/" + (listOfSecondDate.get(0).getStartingTime().get(Calendar.MONTH) + 1));
+				} else {
+					listOfTitles.add(listOfSecondDate.get(0).getEndingTime().get(Calendar.DATE) + "/" + (listOfSecondDate.get(0).getEndingTime().get(Calendar.MONTH) + 1));
+				}
+			} else {
+				listOfTitles.add("No upcoming tasks.");
+			}
+			if(listOfFloating.size() != 0){
+				listOfTitles.add("Other tasks");
+			} else {
+				listOfTitles.add("No other tasks.");
+			}
+			
+			return UIObject.showTasks(listOfShownTasks, DisplayType.DEFAULT, listOfTitles);
 		} else {
 			listOfShownTasks = new ArrayList<Task>();
 			for (int i = 0; i < listOfTasks.size(); i++) {
@@ -891,10 +908,11 @@ public class Logic {
 					}
 				}
 			}
-			//TODO: CHANGE THIS
-			List<String> x = new ArrayList<String>();
-			x.add("Filtered tables");
-			return UIObject.showTasks(listOfShownTasks, DisplayType.FILTERED, x);
+			List<String> searchStrings = new ArrayList<String>();
+			for(int i = 0; i < listFilter.size(); i++){
+				searchStrings.add(listFilter.get(0).getName());
+			}
+			return UIObject.showTasks(listOfShownTasks, DisplayType.FILTERED, searchStrings);
 		}
 		
 		
@@ -1053,31 +1071,6 @@ public class Logic {
 		parsedIntArgumentList.clear();
 		parsedIntArgumentList.addAll(hs);
 		return parsedIntArgumentList;
-	}
-
-	/**
-	 * Given a string & a list of integers,
-	 * concatenate the integers nicely into the form "1,2,3,..." and
-	 * use it to format the given string. At the end of the method,
-	 * the resulting string is returned
-	 * 
-	 * This is mainly used for status formatting
-	 * 
-	 * @param string
-	 * @param parsedIntList
-	 * @return resultingString
-	 */
-	String statusItemFormatting(String string,
-			ArrayList<Integer> parsedIntList) {
-		Collections.sort(parsedIntList);
-		String combinedNumberStrings = "";
-		for (int i = 0; i < parsedIntList.size(); i++) {
-			combinedNumberStrings += (parsedIntList.get(i) + 1);
-			if (i != parsedIntList.size() - 1) {
-				combinedNumberStrings += SEPARATOR_ITEM_LIST;
-			}
-		}
-		return String.format(string, combinedNumberStrings);
 	}
 	
 	/**
