@@ -474,8 +474,9 @@ public class Parser {
 							} else {	// am/pm: 12 hour time format
 								AMPM = n == 1 ? 0 : 1;
 								if (tempTime.contains(TIME_SEPERATOR)) { // check if minutes is specified
-									minute = Integer.parseInt(tempTime.split(TIME_SEPERATOR)[1]);
-									hour = Integer.parseInt(tempTime.split(TIME_SEPERATOR)[0]);
+									String[] tempTimeSplit = tempTime.split("\\" + TIME_SEPERATOR);
+									minute = Integer.parseInt(tempTimeSplit[1]);
+									hour = Integer.parseInt(tempTimeSplit[0]);
 								} else {
 									hour = Integer.parseInt(tempTime);
 								}
