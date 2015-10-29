@@ -611,7 +611,7 @@ public class Logic {
 		ArrayList<String> finalArgumentList = new ArrayList<>();
 		if (argumentList.size() == 1 && argumentList.get(0).equalsIgnoreCase(IDENTIFIER_DELETE_ALL)) {
 			argumentList.clear();
-			for (int i = 0; i < listOfTasks.size(); i++) {
+			for (int i = 0; i < listOfShownTasks.size(); i++) {
 				finalArgumentList.add(String.valueOf(i + 1));
 			}
 		} else {
