@@ -1,0 +1,10 @@
+Commands  Example usage
+add       add task123 date 11 sep 2015
+display   display
+edit      edit 1 task456 date 12 sep 2015
+delete    delete 1
+undo      undo
+redo      redo
+savepath  savepath new_file.txt
+exit      exit
+
