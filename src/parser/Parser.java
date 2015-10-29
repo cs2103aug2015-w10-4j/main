@@ -59,6 +59,7 @@ public class Parser {
 	static final String[] COMMAND_DISPLAY = { "display" };
 	static final String[] COMMAND_SEARCH = { "search" };
 	static final String[] COMMAND_SAVETO = { "saveto" };
+	static final String[] COMMAND_HELP = { "help" };
 
 	static final String[] DATE_SPECIAL = { "this", "next", "today", "tomorrow"
 			 };
@@ -296,6 +297,8 @@ public class Parser {
 				return Command.Type.UNMARK;
 			} else if (isCommandKeyword(firstWord, COMMAND_SEARCH)) {
 				return Command.Type.SEARCH;
+			} else if(isCommandKeyword(firstWord, COMMAND_HELP)){
+				return Command.Type.HELP;
 			} else {
 				logger.info("identifyType: invalid command");
 				throw new Exception(ERROR_INVALID_COMMAND_SPECIFIED);

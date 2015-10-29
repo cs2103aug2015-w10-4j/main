@@ -155,7 +155,12 @@ public class Logic {
 				String executionResult = executeCommand(commandObject, true,
 						true);
 				UIObject.showStatusToUser(executionResult);
+				if(commandObject.getCommandType() == Command.Type.HELP){
+					showHelpMSG();
+				} else {
 				showUpdatedItems();
+				}
+				
 				storageObject.writeItemList(listOfTasks);
 			} catch (InterruptedException e) {
 				// something interrupted the UI's wait for user input
@@ -279,6 +284,8 @@ public class Logic {
 				case SEARCH:
 					logger.info("SEARCH command detected");
 					return searchFilter(userTasks);
+				case HELP:
+					return storageObject.getHelp();
 				default :
 					logger.warning("Command type cannot be identified!");
 					return ERROR_NO_COMMAND_HANDLER;
@@ -755,6 +762,16 @@ public class Logic {
 		return listOfTasksInDay;
 	}
 	
+	
+	
+	/*
+	 * show help message to UI
+	 * 
+	 */
+	boolean showHelpMSG() {
+		UIObject.showToUser(storageObject.getHelp());
+		return true;
+	}
 	/**
 	 * This method filters the list of tasks to be shown to the user,
 	 * based on the current list of filter keywords
