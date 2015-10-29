@@ -11,6 +11,7 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.GregorianCalendar;
 import java.util.HashSet;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.LogManager;
@@ -829,7 +830,12 @@ public class Logic {
 				listOfShownTasks.addAll(listOfFloating);
 			}
 			// default view
-			return UIObject.showTasks(listOfShownTasks, DisplayType.DEFAULT);
+			//TODO: CHANGE THIS
+			List<String> x = new ArrayList<String>();
+			x.add("Nearest tasks");
+			x.add("Second nearest tasks");
+			x.add("Floating tasks");
+			return UIObject.showTasks(listOfShownTasks, DisplayType.DEFAULT, x);
 		} else {
 			listOfShownTasks = new ArrayList<Task>();
 			for (int i = 0; i < listOfTasks.size(); i++) {
@@ -867,7 +873,10 @@ public class Logic {
 					}
 				}
 			}
-			return UIObject.showTasks(listOfShownTasks, DisplayType.FILTERED);
+			//TODO: CHANGE THIS
+			List<String> x = new ArrayList<String>();
+			x.add("Filtered tables");
+			return UIObject.showTasks(listOfShownTasks, DisplayType.FILTERED, x);
 		}
 		
 		

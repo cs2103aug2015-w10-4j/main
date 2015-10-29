@@ -17,8 +17,6 @@ public class FormatterHelper {
 															  "startingTime",
 															  "endingTime",
 															  "location",
-															  "periodicInterval",
-															  "periodicRepeats",
 															  "isDone"
 															  };
 	
@@ -29,12 +27,10 @@ public class FormatterHelper {
 																	  "Starting Time",
 																	  "Ending Time",
 																	  "Location",
-																	  "Every",
-																	  "Repeats",
 																	  "Status"
 																	  };
 	
-	public static final int COLUMN_COUNT = 8;
+	public static final int COLUMN_COUNT = 6;
 
 	private static final String TASK_DONE = "Done.";
 	private static final String TASK_NOT_DONE = "Not done yet.";

@@ -13,8 +13,6 @@ public class TaskTableModel extends AbstractTableModel {
 			"Starting Time",
 			" Ending Time ",
 			"Location",
-			"Every",
-			"Repeat"
 	};
 	private final TableModelFormatter formatter = new TableModelFormatter();
 	

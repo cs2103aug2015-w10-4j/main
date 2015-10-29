@@ -395,16 +395,49 @@ public class UI {
 		return true;
 	}
 	
-	private boolean showToUser(TaskTableModel[] tableModels) {
+	private boolean showToUserFilteredTable(TaskTableModel[] tableModels, List<String> filters) {
 		displayAreaPanel.removeAll();
 
 		VerticalLayout displayAreaPanelLayout = (VerticalLayout) displayAreaPanel.getLayout();
 		displayAreaPanelLayout.resetLayout();
 		
-		for (TaskTableModel tableModel : tableModels) {
-			TaskTable currentTable = new TaskTable(tableModel);
+		for (String filter : filters) {
+			JLabel label = new JLabel(filter);
+			displayAreaPanel.add(label);
+		}
+		
+		for (int i = 0; i < tableModels.length; i++) {
+			TaskTable currentTable = new TaskTable(tableModels[i]);
 			currentTable.setFocusable(false);
 			currentTable.setRowSelectionAllowed(false);
+			
+			displayAreaPanel.add(currentTable.getTableHeader());
+			displayAreaPanel.add(currentTable);
+			displayAreaPanel.add(createInvisibleJPanel(INVISIBLE_JPANEL_WIDTH,
+					INVISIBLE_JPANEL_HEIGHT));
+		}
+		
+		displayAreaPanel.revalidate();
+		displayAreaPanel.repaint();
+
+		return true;
+	}
+	
+	private boolean showToUserDefaultTable(TaskTableModel[] tableModels, List<String> titles) {
+		assert tableModels.length <= titles.size();
+		displayAreaPanel.removeAll();
+
+		VerticalLayout displayAreaPanelLayout = (VerticalLayout) displayAreaPanel.getLayout();
+		displayAreaPanelLayout.resetLayout();
+		
+		for (int i = 0; i < tableModels.length; i++) {
+			TaskTable currentTable = new TaskTable(tableModels[i]);
+			currentTable.setFocusable(false);
+			currentTable.setRowSelectionAllowed(false);
+			
+			JLabel titleLabel = new JLabel(titles.get(i));
+
+			displayAreaPanel.add(titleLabel);
 			displayAreaPanel.add(currentTable.getTableHeader());
 			displayAreaPanel.add(currentTable);
 			displayAreaPanel.add(createInvisibleJPanel(INVISIBLE_JPANEL_WIDTH,
@@ -436,11 +469,12 @@ public class UI {
 	 * @param tasks
 	 * @return true if successful
 	 */
-	public boolean showTasks(List<Task> tasks, DisplayType displayType) {
+	public boolean showTasks(List<Task> tasks, DisplayType displayType, List<String> titles) {
 		Object[][][] taskListsData = FormatterHelper.getTaskListData(tasks,
 				displayType == DisplayType.DEFAULT);
 		assert taskListsData != null;
 		if (!useJTable) {
+			//TODO: fix set of strings
 			String formattedTaskList = taskListFormatter.formatTaskList(taskListsData,
 					MAXIMUM_COLUMN_WIDTH);
 			return showToUser(formattedTaskList);
@@ -452,7 +486,11 @@ public class UI {
 				tableModels[taskListIndex] = new TaskTableModel(currentTaskListData);
 			}
 
-			return showToUser(tableModels);
+			if (displayType == DisplayType.FILTERED) {
+				return showToUserFilteredTable(tableModels, titles);
+			} else {
+				return showToUserDefaultTable(tableModels, titles);
+			}
 		}
 	}
 	

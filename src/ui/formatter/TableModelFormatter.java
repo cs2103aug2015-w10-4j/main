@@ -9,7 +9,7 @@ public class TableModelFormatter {
 	
 	private static boolean USE_STRIKE_HTML_TAG = false;
 	
-	private static final int IS_DONE_FIELD_NUMBER = 7;
+	private static final int IS_DONE_FIELD_NUMBER = 5;
 	//minus one since we do not want the last field (isDone field)
 	private static final int COLUMN_COUNT = FormatterHelper.COLUMN_COUNT - 1;
 	
