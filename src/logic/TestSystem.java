@@ -70,6 +70,77 @@ public class TestSystem {
 	}
 	
 	/*
+	 * pass string from parser to logic and than save in storage, test undo a task
+	 * followed by passing the result task to storage and test whether the result stored is correct or not
+	 * add task1 before testing
+	 */
+	@Test
+	public void testLogicParserStorageSimpleUndo() throws Exception {
+        Command commandObject = parserObj.parseCommand("add task1");
+		
+		logicObject.executeCommand(commandObject, true,
+				true);
+
+		commandObject = parserObj.parseCommand("delete 1");
+        logicObject.showUpdatedItems();
+		logicObject.executeCommand(commandObject, true,
+				true);
+		
+		commandObject = parserObj.parseCommand("undo");
+        logicObject.showUpdatedItems();
+		logicObject.executeCommand(commandObject, true,
+				true);
+		
+		ArrayList<Task> listOfTasks = logicObject.listOfTasks;
+		storageObj.writeItemList(listOfTasks);
+		ArrayList<Task> message = storageObj.getItemList();
+		String resultStr = "";
+		
+		resultStr = message.get(0).getAllInfo();
+		assertEquals("Name: task1 Starting time: null Ending Time: null Location: null Period Interval: null Period Repeats null",resultStr);
+	}
+	
+	/*
+	 * pass string from parser to logic , test redo a task
+	 * followed by passing the result task to storage and test whether the result stored is correct or not
+	 * add task1, task2 before testing
+	 */
+	@Test
+	public void testLogicParserStorageSimpleRedo() throws Exception {
+        Command commandObject = parserObj.parseCommand("add task1");
+		
+		logicObject.executeCommand(commandObject, true,
+				true);
+		
+		  commandObject = parserObj.parseCommand("add task2");
+			
+			logicObject.executeCommand(commandObject, true,
+					true);
+
+		commandObject = parserObj.parseCommand("delete 1");
+        logicObject.showUpdatedItems();
+		logicObject.executeCommand(commandObject, true,
+				true);
+		
+		commandObject = parserObj.parseCommand("undo");
+        logicObject.showUpdatedItems();
+		logicObject.executeCommand(commandObject, true,
+				true);
+		commandObject = parserObj.parseCommand("redo");
+        logicObject.showUpdatedItems();
+		logicObject.executeCommand(commandObject, true,
+				true);
+		
+		ArrayList<Task> listOfTasks = logicObject.listOfTasks;
+		storageObj.writeItemList(listOfTasks);
+		ArrayList<Task> message = storageObj.getItemList();
+		String resultStr = "";
+		
+		resultStr = message.get(0).getAllInfo();
+		assertEquals("Name: task2 Starting time: null Ending Time: null Location: null Period Interval: null Period Repeats null",resultStr);
+	}
+	
+	/*
 	 * pass string from parser to logic, test deleting a task
 	 * followed by passing the result task to storage and test whether the result stored is correct or not
 	 * add task1 before testing
