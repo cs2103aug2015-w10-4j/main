@@ -191,20 +191,23 @@ public class Task implements Comparable<Task> {
 		this.periodicInterval = periodicInterval;
 		return true;
 	}
+
 	public boolean setPeriodicRepeats(String periodicInstances) {
 		this.periodicRepeats = periodicInstances;
 		return true;
 	}
-	public boolean setDone(boolean status){
+
+	public boolean setDone(boolean status) {
 		this.isDone = status;
 		return true;
 	}
-	public boolean setId(int index){
+
+	public boolean setId(int index) {
 		this.id = index;
 		return true;
 	}
 	
-	public Task clone(){
+	public Task clone() {
 		Task newTask = new Task();
 		newTask.setName(this.getName());
 		if (this.hasStartingTime()) {
@@ -220,33 +223,33 @@ public class Task implements Comparable<Task> {
 		return newTask;
 	}
 	
-	public int compareTo(Task taskObj){
+	public int compareTo(Task taskObj) {
 		Calendar thisTime;
 		Calendar objTime;
-		if(this.hasStartingTime()){
+		if (this.hasStartingTime()) {
 			thisTime = this.getStartingTime();
-		}else{
+		} else {
 			thisTime = this.getEndingTime();
 		}
-		
-		if(taskObj.hasStartingTime()){
+
+		if (taskObj.hasStartingTime()) {
 			objTime = taskObj.getStartingTime();
-		}else{
+		} else {
 			objTime = taskObj.getEndingTime();
 		}
-		
-		if(thisTime == null && objTime == null){
+
+		if (thisTime == null && objTime == null) {
 			return 0;
-		}else if(thisTime == null){
+		} else if (thisTime == null) {
 			return -1;
-		}else if(objTime == null){
+		} else if (objTime == null) {
 			return 1;
-		}else{
-			if(thisTime.before(objTime)){
+		} else {
+			if (thisTime.before(objTime)) {
 				return -1;
-			}else if(thisTime.after(objTime)){
+			} else if (thisTime.after(objTime)) {
 				return 1;
-			}else{
+			} else {
 				return 0;
 			}
 		}

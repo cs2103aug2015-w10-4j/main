@@ -585,22 +585,23 @@ public class Parser {
 	 * @param givenDayIndex day of the week sunday to saturday -> 1 to 7 
 	 * @return date of the nearest day
 	 */
-	int getNearestDate(int givenDayIndex){
+	int getNearestDate(int givenDayIndex) {
 		Calendar dateHelper = Calendar.getInstance();
 		int curDayIndex = dateHelper.get(Calendar.DAY_OF_WEEK);
 		logger.fine("getNearestDate: given day is " + givenDayIndex);
 		logger.fine("getNearestDate: today is " + curDayIndex);
 		int todayDate = dateHelper.get(Calendar.DATE);
-		
-		int difference = (givenDayIndex - curDayIndex) % DAYS.length;
+
+		int difference = ((givenDayIndex - curDayIndex) % DAYS.length + DAYS.length)
+				% DAYS.length;
 		logger.fine("getNearestDate: difference is " + difference);
 		int newDate = todayDate + difference;
 		return newDate;
 	}
 	
-	boolean hasKeyword(String word, String[] keywords){
-		for(int i = 0; i < keywords.length; i++){
-			if(word.equalsIgnoreCase(keywords[i])){
+	boolean hasKeyword(String word, String[] keywords) {
+		for (int i = 0; i < keywords.length; i++) {
+			if (word.equalsIgnoreCase(keywords[i])) {
 				return true;
 			}
 		}

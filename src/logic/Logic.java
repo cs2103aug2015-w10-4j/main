@@ -183,7 +183,7 @@ public class Logic {
 	 * 
 	 * 
 	 * @param commandObject
-	 * @param shouldClearHistory
+	 * @param isUserInput
 	 *            false if command is called from redo
 	 * @param isUndoHistory
 	 *            true if command is called from undo false if command is called
@@ -191,7 +191,7 @@ public class Logic {
 	 * 
 	 * @return status string to be shown to user
 	 */
-	String executeCommand(Command commandObject, boolean shouldClearHistory,
+	String executeCommand(Command commandObject, boolean isUserInput,
 			boolean isUndoHistory) {
 		if (commandObject == null) {
 			return ERROR_INVALID_COMMAND;
@@ -209,12 +209,12 @@ public class Logic {
 					argumentList = removeDuplicates(argumentList);
 					indexList = parseIntList(argumentList);
 					logger.info("ADD command detected");
-					return addItem(userTasks, indexList, shouldClearHistory,
+					return addItem(userTasks, indexList, isUserInput,
 							isUndoHistory);
 				case DELETE :
 					argumentList = preprocessDeleteArgument(argumentList);
 					argumentList = removeDuplicates(argumentList);
-					if (shouldClearHistory) {
+					if (isUserInput) {
 						try {
 							indexList = remapArguments(argumentList);
 						} catch (Exception e) {
@@ -224,11 +224,11 @@ public class Logic {
 						indexList = parseIntList(argumentList);
 					}
 					logger.info("DELETE command detected");
-					return deleteItem(indexList, shouldClearHistory, isUndoHistory);
+					return deleteItem(indexList, isUserInput, isUndoHistory);
 				case EDIT :
 					argumentList = preprocessDeleteArgument(argumentList);
 					argumentList = removeDuplicates(argumentList);
-					if (shouldClearHistory) {
+					if (isUserInput) {
 						try {
 							indexList = remapArguments(argumentList);
 						} catch (Exception e) {
@@ -238,7 +238,7 @@ public class Logic {
 						indexList = parseIntList(argumentList);
 					}
 					logger.info("EDIT command detected");
-					return editItem(userTasks, indexList, shouldClearHistory,
+					return editItem(userTasks, indexList, isUserInput,
 							isUndoHistory);
 				case DISPLAY :
 					logger.info("DISPLAY command detected");
@@ -259,7 +259,7 @@ public class Logic {
 					logger.info("MARK command detected");
 					argumentList = preprocessDeleteArgument(argumentList);
 					argumentList = removeDuplicates(argumentList);
-					if (shouldClearHistory) {
+					if (isUserInput) {
 						try {
 							indexList = remapArguments(argumentList);
 						} catch (Exception e) {
@@ -268,12 +268,12 @@ public class Logic {
 					} else {
 						indexList = parseIntList(argumentList);
 					}
-					return markDoneStatus(indexList, shouldClearHistory, isUndoHistory, true);
+					return markDoneStatus(indexList, isUserInput, isUndoHistory, true);
 				case UNMARK:
 					logger.info("UNMARK command detected");
 					argumentList = preprocessDeleteArgument(argumentList);
 					argumentList = removeDuplicates(argumentList);
-					if (shouldClearHistory) {
+					if (isUserInput) {
 						try {
 							indexList = remapArguments(argumentList);
 						} catch (Exception e) {
@@ -282,7 +282,7 @@ public class Logic {
 					} else {
 						indexList = parseIntList(argumentList);
 					}
-					return markDoneStatus(indexList, shouldClearHistory, isUndoHistory, false);
+					return markDoneStatus(indexList, isUserInput, isUndoHistory, false);
 				case SEARCH:
 					logger.info("SEARCH command detected");
 					return searchFilter(userTasks);
@@ -308,11 +308,11 @@ public class Logic {
 	 * respective status message
 	 * @param commandType
 	 * @param commandToPush
-	 * @param shouldClearHistory
+	 * @param isUserInput
 	 * @param isUndoHistory
 	 * @return
 	 */
-	String pushToHistory(Command.Type commandType, Command commandToPush, boolean shouldClearHistory, boolean isUndoHistory) {
+	String pushToHistory(Command.Type commandType, Command commandToPush, boolean isUserInput, boolean isUndoHistory) {
 		String normalStatus;
 		String undoStatus;
 		switch (commandType) {
@@ -341,7 +341,7 @@ public class Logic {
 		}
 		
 		logger.fine("Checking if history should be cleared.");
-		if (shouldClearHistory) {
+		if (isUserInput) {
 			historyObject.clearUndoHistoryList();
 		}
 		logger.finer("Checking if command is called by undo.");
@@ -374,13 +374,13 @@ public class Logic {
 	 *            order given in userTasks else should contain the same number
 	 *            of elements as userTasks, to determine the positions the tasks
 	 *            are to be inserted at
-	 * @param shouldClearHistory
+	 * @param isUserInput
 	 * @param isUndoHistory
 	 * 
 	 * @return status string
 	 */
 	String addItem(ArrayList<Task> userTasks, ArrayList<Integer> indexList,
-			boolean shouldClearHistory, boolean isUndoHistory) {
+			boolean isUserInput, boolean isUndoHistory) {
 		try {
 			logger.fine("Attempting to determine index.");
 			ArrayList<Integer> parsedIntList = new ArrayList<Integer>();
@@ -418,7 +418,7 @@ public class Logic {
 				argumentListForReverse[i] = String.valueOf(integerArr[i]);
 			}
 
-			String historyStatus = pushToHistory(Command.Type.ADD, new Command(Command.Type.DELETE, argumentListForReverse), shouldClearHistory, isUndoHistory);
+			String historyStatus = pushToHistory(Command.Type.ADD, new Command(Command.Type.DELETE, argumentListForReverse), isUserInput, isUndoHistory);
 			if (hasClashes) {
 				return WARNING_TIMING_CLASH;
 			}
@@ -472,13 +472,13 @@ public class Logic {
 	 *            all elements in this array should be integer strings elements
 	 *            the array will first have its duplicates removed, then sorted
 	 *            in an increasing order
-	 * @param shouldClearHistory
+	 * @param isUserInput
 	 * @param isUndoHistory
 	 * 
 	 * @return status string
 	 */
 	String deleteItem(ArrayList<Integer> indexList,
-			boolean shouldClearHistory, boolean isUndoHistory) {
+			boolean isUserInput, boolean isUndoHistory) {
 		String[] argumentListForReverse;
 		if (isEmptyIndexList(indexList)) {
 			return ERROR_INVALID_ARGUMENT;
@@ -510,7 +510,7 @@ public class Logic {
 		}
 
 		Command commandToPush = new Command(Command.Type.ADD, argumentListForReverse, tasksRemoved);
-		String historyStatus = pushToHistory(Command.Type.DELETE, commandToPush, shouldClearHistory, isUndoHistory);
+		String historyStatus = pushToHistory(Command.Type.DELETE, commandToPush, isUserInput, isUndoHistory);
 		return historyStatus;
 
 	}
@@ -547,13 +547,13 @@ public class Logic {
 	/**
 	 * Marks or unmarks a task as done based on the isDone parameter
 	 * @param indexList
-	 * @param shouldClearHistory
+	 * @param isUserInput
 	 * @param isUndoHistory
 	 * @param isDone
 	 * @return
 	 */
 	String markDoneStatus(ArrayList<Integer> indexList,
-			boolean shouldClearHistory, boolean isUndoHistory, boolean isDone) {
+			boolean isUserInput, boolean isUndoHistory, boolean isDone) {
 		String[] argumentListForReverse;
 		if (isEmptyIndexList(indexList)) {
 			return ERROR_INVALID_ARGUMENT;
@@ -593,7 +593,7 @@ public class Logic {
 			reversedCommandType = Command.Type.MARK;
 		}
 		Command commandToPush = new Command(reversedCommandType, argumentListForReverse);
-		String historyStatus = pushToHistory(commandType, commandToPush, shouldClearHistory, isUndoHistory);
+		String historyStatus = pushToHistory(commandType, commandToPush, isUserInput, isUndoHistory);
 		return historyStatus;
 	}
 
@@ -663,13 +663,13 @@ public class Logic {
 	 * @param indexList
 	 *            a number string, which contains the index position of the task
 	 *            to edit
-	 * @param shouldClearHistory
+	 * @param isUserInput
 	 * @param isUndoHistory
 	 * 
 	 * @return status string
 	 */
 	String editItem(ArrayList<Task> userTasks, ArrayList<Integer> indexList,
-			boolean shouldClearHistory, boolean isUndoHistory) {
+			boolean isUserInput, boolean isUndoHistory) {
 		if (isEmptyIndexList(indexList)) {
 			return ERROR_INVALID_ARGUMENT;
 		}
@@ -686,20 +686,29 @@ public class Logic {
 					hasClashes = true;
 				}
 
-				Task newTask = taskEdited.clone();
-				String statusOfSpecialEdit = editSpecialField(userTask, newTask);
-				if (statusOfSpecialEdit != null) {
-					return statusOfSpecialEdit;
+				if (isUserInput) {
+					Task newTask = taskEdited.clone();
+					String statusOfSpecialEdit = editSpecialField(userTask,
+							newTask);
+					if (statusOfSpecialEdit != null) {
+						return statusOfSpecialEdit;
+					}
+					listOfTasks.remove(index);
+					logger.fine("Old task removed from list.");
+
+					listOfTasks.add(index, newTask);
+					logger.fine("New task added to list.");
+				} else {
+					listOfTasks.remove(index);
+					logger.fine("Old task removed from list.");
+
+					listOfTasks.add(index, userTask);
+					logger.fine("New task added to list.");
 				}
-				listOfTasks.remove(index);
-				logger.fine("Old task removed from list.");
-				
-				listOfTasks.add(index, newTask);
-				logger.fine("New task added to list.");
 				
 				String[] indexString = { Integer.toString(index) };
 				String historyStatus = pushToHistory(Command.Type.EDIT, new Command(Command.Type.EDIT,
-						indexString, taskEdited), shouldClearHistory, isUndoHistory);
+						indexString, taskEdited), isUserInput, isUndoHistory);
 				if (hasClashes) {
 					return WARNING_TIMING_CLASH;
 				}
@@ -914,10 +923,6 @@ public class Logic {
 			}
 			return UIObject.showTasks(listOfShownTasks, DisplayType.FILTERED, searchStrings);
 		}
-		
-		
-
-		
 	}
 
 	/**
