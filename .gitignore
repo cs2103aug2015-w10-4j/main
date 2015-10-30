@@ -2,3 +2,4 @@
 *.txt
 Tasky.jar
 *.log*
+config.properties

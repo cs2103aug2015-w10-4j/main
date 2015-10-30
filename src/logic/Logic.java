@@ -3,7 +3,12 @@ package logic;
 import global.Command;
 import global.Task;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -12,6 +17,7 @@ import java.util.Collections;
 import java.util.GregorianCalendar;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.LogManager;
@@ -32,6 +38,12 @@ import ui.UI.DisplayType;
  *
  */
 public class Logic {
+	private static final String LOG_FILE_NAME = "tasky.log";
+	private static final String CONFIG_FILE_NAME = "config.properties";
+	private static final String DEFAULT_LOGGING_LEVEL_STRING = "info";
+	private static final String DEFAULT_SAVE_FILE_PATH = "save.txt";
+	private static final String PROPERTY_KEY_LOGGING_LEVEL = "loggingLevel";
+	private static final String PROPERTY_KEY_SAVE_FILE = "saveFile";
 	/*
 	 * Declaration of object variables
 	 */
@@ -40,12 +52,13 @@ public class Logic {
 	Parser parserObject;
 	Storage storageObject;
 	History historyObject;
+	Properties propObject;
 	ArrayList<Task> listOfTasks = new ArrayList<Task>();
 	ArrayList<Task> listOfShownTasks = new ArrayList<Task>();
 	ArrayList<Task> listFilter = new ArrayList<Task>();
 	private static final int ID_RANGE = 1000;
 	private static final int RECURRING_MAX = 100;
-	private static final Level LOG_LEVEL = Level.FINER;
+	private static final Level DEFAULT_LEVEL = Level.INFO;
 	
 	// date format converter
 	static SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM yyyy");
@@ -113,17 +126,51 @@ public class Logic {
 		parserObject = new Parser();
 		storageObject = new JsonFormatStorage(true);
 		historyObject = new History();
+		propObject = new Properties();
 		try {
-			FileHandler logHandler = new FileHandler("tasky.log");
+			FileHandler logHandler = new FileHandler(LOG_FILE_NAME);
 			LogManager.getLogManager().reset(); // removes printout to console
 												// aka root handler
 			logHandler.setFormatter(new SimpleFormatter()); // set output to a
 															// human-readable
 															// log format
 			logger.addHandler(logHandler);
-			logger.setLevel(LOG_LEVEL); // setting of log level
 			
 			updateListOfTasks();
+			
+			File configFile = new File(CONFIG_FILE_NAME);
+			if(configFile.exists()){
+				BufferedReader bufReader = new BufferedReader(new FileReader(new File(CONFIG_FILE_NAME)));
+				propObject.load(bufReader);
+				bufReader.close();
+			} else {
+				configFile.createNewFile();
+				propObject.setProperty(PROPERTY_KEY_SAVE_FILE, DEFAULT_SAVE_FILE_PATH);
+				propObject.setProperty(PROPERTY_KEY_LOGGING_LEVEL, DEFAULT_LOGGING_LEVEL_STRING);
+				writeProperties();
+			}
+			storageObject.saveFileToPath(propObject.getProperty(PROPERTY_KEY_SAVE_FILE));
+			String logLevelString = propObject.getProperty(PROPERTY_KEY_LOGGING_LEVEL);
+			switch (logLevelString) {
+				case "WARNING":
+					logger.setLevel(Level.WARNING);
+					break;
+				case "INFO":
+					logger.setLevel(Level.INFO);
+					break;
+				case "FINE":
+					logger.setLevel(Level.FINE);
+					break;
+				case "FINER":
+					logger.setLevel(Level.FINER);
+					break;
+				case "FINEST":
+					logger.setLevel(Level.FINEST);
+					break;
+				default:
+					logger.setLevel(DEFAULT_LEVEL);
+			}
+			
 		} catch (FileNotFoundException e) {
 			UIObject.showToUser(ERROR_FILE_NOT_FOUND);
 		} catch (SecurityException | IOException e) {
@@ -981,6 +1028,9 @@ public class Logic {
 		String filePath = argumentList.get(0);
 		try {
 			boolean locationChanged = storageObject.saveFileToPath(filePath);
+			if (locationChanged) {
+				updateProperties(PROPERTY_KEY_SAVE_FILE, filePath);
+			}
 			updateListOfTasks();
 			if (locationChanged) {
 				return MESSAGE_SUCCESS_CHANGE_FILE_PATH;
@@ -1189,6 +1239,19 @@ public class Logic {
 			}
 		}
 		return -1; // all ids are used up!
+	}
+	
+	boolean updateProperties(String key, String value) throws IOException{
+		propObject.setProperty(key, value);
+		writeProperties();
+		return true;
+	}
+	
+	boolean writeProperties() throws IOException{
+		BufferedWriter bufWriter = new BufferedWriter(new FileWriter(new File(CONFIG_FILE_NAME)));
+		propObject.store(bufWriter, null);
+		bufWriter.close();
+		return true;
 	}
 
 	String exitProgram() {
