@@ -332,7 +332,6 @@ public class Logic {
 					logger.info("SEARCH command detected");
 					return addSearchFilter(userTasks);
 				case HELP:
-					logger.info("HELP command detected"); // simply return status message
 					return MESSAGE_SUCCESS_HELP;
 				default :
 					logger.warning("Command type cannot be identified!");
@@ -416,6 +415,7 @@ public class Logic {
 			} else {
 				return redoStatus;
 			}
+			
 		} else {
 			logger.finer("Command is called by undo.");
 
@@ -968,21 +968,41 @@ public class Logic {
 	private void addTitleForDate(ArrayList<Task> listOfItemsInDate,
 			List<String> listOfTitles) {
 		if (listOfItemsInDate.size() != 0) {
-			if (listOfItemsInDate.get(0).hasStartingTime()) {
-				listOfTitles.add(listOfItemsInDate.get(0).getStartingTime()
-						.get(Calendar.DATE)
-						+ "/"
-						+ (listOfItemsInDate.get(0).getStartingTime()
-								.get(Calendar.MONTH) + 1));
+			Calendar curTime = Calendar.getInstance();
+			int curDate = curTime.get(Calendar.DATE);
+			int curMonth = curTime.get(Calendar.MONTH) + 1;
+			Task curItem = listOfItemsInDate.get(0);
+			
+			if (curItem.hasStartingTime()) {
+				Calendar curItemTime = curItem.getStartingTime();
+				int curItemDate = curItemTime.get(Calendar.DATE);
+				int curItemMonth = curItemTime.get(Calendar.MONTH) + 1;
+				addTitleForDateHelper(listOfTitles, curDate, curMonth,
+						curItemDate, curItemMonth);
 			} else {
-				listOfTitles.add(listOfItemsInDate.get(0).getEndingTime()
-						.get(Calendar.DATE)
-						+ "/"
-						+ (listOfItemsInDate.get(0).getEndingTime()
-								.get(Calendar.MONTH) + 1));
+				Calendar curItemTime = curItem.getEndingTime();
+				int curItemDate = curItemTime.get(Calendar.DATE);
+				int curItemMonth = curItemTime.get(Calendar.MONTH) + 1;
+				addTitleForDateHelper(listOfTitles, curDate, curMonth,
+						curItemDate, curItemMonth);
 			}
 		} else {
 			listOfTitles.add("No upcoming tasks.");
+		}
+	}
+
+	private void addTitleForDateHelper(List<String> listOfTitles, int curDate,
+			int curMonth, int curItemDate, int curItemMonth) {
+		if (curMonth == curItemMonth) {
+			if (curDate == curItemDate) {
+				listOfTitles.add("Today");
+			} else if (curDate == curItemDate - 1) {
+				listOfTitles.add("Tomorrow");
+			} else {
+				listOfTitles.add(curItemDate + "/" + curItemMonth);
+			}
+		} else {
+			listOfTitles.add(curItemDate + "/" + curItemMonth);
 		}
 	}
 
