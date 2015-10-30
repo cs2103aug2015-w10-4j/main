@@ -864,10 +864,12 @@ public class Logic {
 			ArrayList<Task> listOfEventsDeadlines = new ArrayList<Task>();
 			for (int i = 0; i < listOfTasks.size(); i++) {
 				Task curTask = listOfTasks.get(i);
-				if (curTask.hasEndingTime()) {
-					listOfEventsDeadlines.add(curTask);
-				} else {
-					listOfFloating.add(curTask);
+				if (!curTask.isDone()) {
+					if (curTask.hasEndingTime()) {
+						listOfEventsDeadlines.add(curTask);
+					} else {
+						listOfFloating.add(curTask);
+					}
 				}
 			}
 			Collections.sort(listOfEventsDeadlines);
@@ -926,6 +928,8 @@ public class Logic {
 				listOfShownTasks.add(listOfTasks.get(i));
 			}
 
+			
+			// Filter by name
 			for (int j = 0; j < listFilter.size(); j++) {
 				Task curFilter = listFilter.get(j);
 				String searchTaskName = curFilter.getName();
@@ -933,7 +937,7 @@ public class Logic {
 				if (searchTaskName != null) {
 					while (i < listOfShownTasks.size()) {
 						Task curTask = listOfShownTasks.get(i);
-						if (!curTask.getName().contains(searchTaskName)) {
+						if (!curTask.getName().toLowerCase().contains(searchTaskName)) {
 							listOfShownTasks.remove(i);
 						} else {
 							i++;
@@ -942,6 +946,7 @@ public class Logic {
 				}
 			}
 			
+			// Filter by location
 			for (int j = 0; j < listFilter.size(); j++) {
 				Task curFilter = listFilter.get(j);
 				String searchLocation = curFilter.getLocation();
@@ -949,7 +954,7 @@ public class Logic {
 				if (searchLocation != null) {
 					while (i < listOfShownTasks.size()) {
 						Task curTask = listOfShownTasks.get(i);
-						if (curTask.getLocation() == null || !curTask.getLocation().contains(searchLocation)) {
+						if (curTask.getLocation() == null || !curTask.getLocation().toLowerCase().contains(searchLocation)) {
 							listOfShownTasks.remove(i);
 						} else {
 							i++;
@@ -957,6 +962,7 @@ public class Logic {
 					}
 				}
 			}
+			
 			List<String> searchStrings = new ArrayList<String>();
 			for(int i = 0; i < listFilter.size(); i++){
 				searchStrings.add(listFilter.get(0).getName());
