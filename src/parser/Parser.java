@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.GregorianCalendar;
+import java.util.List;
 import java.util.logging.Logger;
 
 import logic.Logic;
@@ -513,7 +514,7 @@ public class Parser {
 			} catch (NumberFormatException e) {
 				throw new Exception(ERROR_INVALID_DATE_SPECIFIED);
 			}
-			month = Arrays.asList(MONTHS).indexOf(dateArguments[1]);
+			month = getIndexOfList(dateArguments[1], Arrays.asList(MONTHS));
 			if (month == -1) {
 				throw new Exception(ERROR_INVALID_MONTH_SPECIFIED);
 			}
@@ -535,7 +536,7 @@ public class Parser {
 			String secondWord = dateArguments[1];
 
 			if (hasKeyword(secondWord, DAYS)) {
-				int dayIndex = Arrays.asList(DAYS).indexOf(secondWord) + 1;
+				int dayIndex = getIndexOfList(secondWord, Arrays.asList(MONTHS)) + 1;
 				assert (firstWord.equalsIgnoreCase(DATE_SPECIAL[0]) || firstWord
 						.equalsIgnoreCase(DATE_SPECIAL[1]));
 				if (firstWord.equalsIgnoreCase(DATE_SPECIAL[0])) {// this
@@ -577,6 +578,22 @@ public class Parser {
 		}
 		helperDate.set(Calendar.MINUTE, minute);
 		return helperDate;
+	}
+	
+	/**
+	 * Functions similarly to <List>.indexOf(<String>), but is not case-sensitive
+	 * 
+	 * @param word
+	 * @param listOfWords
+	 * @return index of word in list if found, else -1
+	 */
+	private int getIndexOfList(String word, List<String> listOfWords) {
+		for(int i = 0; i < listOfWords.size(); i++){
+			if(listOfWords.get(i).equalsIgnoreCase(word)){
+				return i;
+			}
+		}
+		return -1;
 	}
 	
 
