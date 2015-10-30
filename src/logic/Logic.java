@@ -87,8 +87,7 @@ public class Logic {
 	private static final String MESSAGE_SUCCESS_NO_CHANGE_FILE_PATH = "File path not changed. Entered file path is the same as current one used.";
 	private static final String MESSAGE_DISPLAY_EMPTY = "No items to display.";
 	private static final String MESSAGE_SUCCESS_HELP = "Showing help message";
-	private static final String SEPARATOR_ITEM_LIST = ", ";
-	private static final String IDENTIFIER_DELETE_ALL = "all";
+	private static final String IDENTIFIER_ALL = "all";
 	private static final String ERROR_WRITING_FILE = "Error: Unable to write file.";
 	private static final String ERROR_CREATING_FILE = "Error: Unable to create file.";
 	private static final String ERROR_FILE_NOT_FOUND = "Error: Data file not found.";
@@ -136,8 +135,6 @@ public class Logic {
 															// log format
 			logger.addHandler(logHandler);
 			
-			updateListOfTasks();
-			
 			File configFile = new File(CONFIG_FILE_NAME);
 			if(configFile.exists()){
 				BufferedReader bufReader = new BufferedReader(new FileReader(new File(CONFIG_FILE_NAME)));
@@ -170,6 +167,7 @@ public class Logic {
 				default:
 					logger.setLevel(DEFAULT_LEVEL);
 			}
+			updateListOfTasks();
 			
 		} catch (FileNotFoundException e) {
 			UIObject.showToUser(ERROR_FILE_NOT_FOUND);
@@ -334,6 +332,7 @@ public class Logic {
 					logger.info("SEARCH command detected");
 					return addSearchFilter(userTasks);
 				case HELP:
+					logger.info("HELP command detected"); // simply return status message
 					return MESSAGE_SUCCESS_HELP;
 				default :
 					logger.warning("Command type cannot be identified!");
@@ -369,26 +368,32 @@ public class Logic {
 	String pushToHistory(Command.Type commandType, Command commandToPush, boolean isUserInput, boolean isUndoHistory) {
 		String normalStatus;
 		String undoStatus;
+		String redoStatus;
 		switch (commandType) {
 			case ADD:
 				normalStatus = MESSAGE_SUCCESS_ADD;
 				undoStatus = MESSAGE_UNDO + MESSAGE_SUCCESS_HISTORY_ADD;
+				redoStatus = MESSAGE_REDO + MESSAGE_SUCCESS_HISTORY_ADD;
 				break;
 			case DELETE:
 				normalStatus = MESSAGE_SUCCESS_DELETE;
 				undoStatus = MESSAGE_UNDO + MESSAGE_SUCCESS_HISTORY_DELETE;
+				redoStatus = MESSAGE_REDO + MESSAGE_SUCCESS_HISTORY_DELETE;
 				break;
 			case EDIT:
 				normalStatus = MESSAGE_SUCCESS_EDIT;
 				undoStatus = MESSAGE_UNDO + MESSAGE_SUCCESS_HISTORY_EDIT;
+				redoStatus = MESSAGE_REDO + MESSAGE_SUCCESS_HISTORY_EDIT;
 				break;
 			case MARK:
 				normalStatus = MESSAGE_SUCCESS_MARK;
 				undoStatus = MESSAGE_UNDO + MESSAGE_SUCCESS_HISTORY_MARK;
+				redoStatus = MESSAGE_REDO + MESSAGE_SUCCESS_HISTORY_MARK;
 				break;
 			case UNMARK:
 				normalStatus = MESSAGE_SUCCESS_UNMARK;
 				undoStatus = MESSAGE_UNDO + MESSAGE_SUCCESS_HISTORY_UNMARK;
+				redoStatus = MESSAGE_REDO + MESSAGE_SUCCESS_HISTORY_UNMARK;
 				break;
 			default:
 				return ERROR_HISTORY_NO_COMMAND_HANDLER;
@@ -406,7 +411,11 @@ public class Logic {
 			if (!historyObject.pushCommand(commandToPush, true)) {
 				return ERROR_CANNOT_WRITE_TO_HISTORY;
 			}
-			return normalStatus;
+			if (isUserInput) {
+				return normalStatus;
+			} else {
+				return redoStatus;
+			}
 		} else {
 			logger.finer("Command is called by undo.");
 
@@ -668,7 +677,7 @@ public class Logic {
 	ArrayList<String> processIndexArguments(ArrayList<String> argumentList)
 			throws NumberFormatException, IndexOutOfBoundsException {
 		ArrayList<String> finalArgumentList = new ArrayList<>();
-		if (argumentList.size() == 1 && argumentList.get(0).equalsIgnoreCase(IDENTIFIER_DELETE_ALL)) {
+		if (argumentList.size() == 1 && argumentList.get(0).equalsIgnoreCase(IDENTIFIER_ALL)) {
 			argumentList.clear();
 			for (int i = 0; i < listOfShownTasks.size(); i++) {
 				finalArgumentList.add(String.valueOf(i + 1));
@@ -1010,7 +1019,7 @@ public class Logic {
 		if (previousCommand == null) {
 			return ERROR_NO_HISTORY;
 		}
-		return MESSAGE_REDO + executeCommand(previousCommand, false, true);
+		return executeCommand(previousCommand, false, true);
 	}
 
 	/**
