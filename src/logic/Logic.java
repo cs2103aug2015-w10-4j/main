@@ -73,7 +73,7 @@ public class Logic {
 	private static final String MESSAGE_SUCCESS_CHANGE_FILE_PATH = "File path successfully changed.";
 	private static final String MESSAGE_SUCCESS_NO_CHANGE_FILE_PATH = "File path not changed. Entered file path is the same as current one used.";
 	private static final String MESSAGE_DISPLAY_EMPTY = "No items to display.";
-	private static final String MESSAGE_SUCCESS_HELP = "help message shown";
+	private static final String MESSAGE_SUCCESS_HELP = "Showing help message";
 	private static final String SEPARATOR_ITEM_LIST = ", ";
 	private static final String IDENTIFIER_DELETE_ALL = "all";
 	private static final String ERROR_WRITING_FILE = "Error: Unable to write file.";
@@ -158,7 +158,7 @@ public class Logic {
 						true);
 				UIObject.showStatusToUser(executionResult);
 				if (commandObject.getCommandType() == Command.Type.HELP) {
-					showHelpMSG();
+					showHelpMsg();
 				} else {
 					showUpdatedItems();
 				}
@@ -212,7 +212,7 @@ public class Logic {
 					return addItem(userTasks, indexList, isUserInput,
 							isUndoHistory);
 				case DELETE :
-					argumentList = preprocessDeleteArgument(argumentList);
+					argumentList = processIndexArguments(argumentList);
 					argumentList = removeDuplicates(argumentList);
 					if (isUserInput) {
 						try {
@@ -226,7 +226,7 @@ public class Logic {
 					logger.info("DELETE command detected");
 					return deleteItem(indexList, isUserInput, isUndoHistory);
 				case EDIT :
-					argumentList = preprocessDeleteArgument(argumentList);
+					argumentList = processIndexArguments(argumentList);
 					argumentList = removeDuplicates(argumentList);
 					if (isUserInput) {
 						try {
@@ -257,7 +257,7 @@ public class Logic {
 					return exitProgram();
 				case MARK:
 					logger.info("MARK command detected");
-					argumentList = preprocessDeleteArgument(argumentList);
+					argumentList = processIndexArguments(argumentList);
 					argumentList = removeDuplicates(argumentList);
 					if (isUserInput) {
 						try {
@@ -271,7 +271,7 @@ public class Logic {
 					return markDoneStatus(indexList, isUserInput, isUndoHistory, true);
 				case UNMARK:
 					logger.info("UNMARK command detected");
-					argumentList = preprocessDeleteArgument(argumentList);
+					argumentList = processIndexArguments(argumentList);
 					argumentList = removeDuplicates(argumentList);
 					if (isUserInput) {
 						try {
@@ -285,7 +285,7 @@ public class Logic {
 					return markDoneStatus(indexList, isUserInput, isUndoHistory, false);
 				case SEARCH:
 					logger.info("SEARCH command detected");
-					return searchFilter(userTasks);
+					return addSearchFilter(userTasks);
 				case HELP:
 					return MESSAGE_SUCCESS_HELP;
 				default :
@@ -295,9 +295,16 @@ public class Logic {
 		}
 	}
 	
-	ArrayList<Integer> parseIntList(ArrayList<String> argumentList){
+	/**
+	 * Converts a list of integer that have been parsed from the list integer
+	 * strings
+	 * 
+	 * @param argumentList
+	 * @return
+	 */
+	ArrayList<Integer> parseIntList(ArrayList<String> argumentList) {
 		ArrayList<Integer> intList = new ArrayList<Integer>();
-		for(int i = 0; i < argumentList.size(); i++){
+		for (int i = 0; i < argumentList.size(); i++) {
 			intList.add(Integer.parseInt(argumentList.get(i)));
 		}
 		return intList;
@@ -512,9 +519,15 @@ public class Logic {
 		Command commandToPush = new Command(Command.Type.ADD, argumentListForReverse, tasksRemoved);
 		String historyStatus = pushToHistory(Command.Type.DELETE, commandToPush, isUserInput, isUndoHistory);
 		return historyStatus;
-
 	}
 
+	/**
+	 * Remaps index based on UI list to the index based on the list in memory,
+	 * and at the same time, converting it to integer type list
+	 * @param argumentList
+	 * @return
+	 * @throws Exception
+	 */
 	private ArrayList<Integer> remapArguments(
 			ArrayList<String> argumentList) throws Exception {
 		ArrayList<Integer> remappedArgumentList = new ArrayList<Integer>();
@@ -531,7 +544,7 @@ public class Logic {
 		return remappedArgumentList;
 	}
 	
-	String searchFilter(ArrayList<Task> userTasks) {
+	String addSearchFilter(ArrayList<Task> userTasks) {
 		if (userTasks.size() == 0) {
 			return ERROR_NO_FILTER;
 		} else {
@@ -605,7 +618,7 @@ public class Logic {
 	 * @throws NumberFormatException
 	 * @throws IndexOutOfBoundsException
 	 */
-	ArrayList<String> preprocessDeleteArgument(ArrayList<String> argumentList)
+	ArrayList<String> processIndexArguments(ArrayList<String> argumentList)
 			throws NumberFormatException, IndexOutOfBoundsException {
 		ArrayList<String> finalArgumentList = new ArrayList<>();
 		if (argumentList.size() == 1 && argumentList.get(0).equalsIgnoreCase(IDENTIFIER_DELETE_ALL)) {
@@ -738,7 +751,7 @@ public class Logic {
 	 * Else the ending time for a task is used instead
 	 * @return
 	 */
-	boolean sortListOfTasks() { // by time
+	boolean sortListOfTasks() {
 		Collections.sort(listOfTasks);
 		return true;
 	}
@@ -775,7 +788,7 @@ public class Logic {
 	 * show help message to UI
 	 * 
 	 */
-	boolean showHelpMSG() {
+	boolean showHelpMsg() {
 		UIObject.showToUser(storageObject.getHelp());
 		return true;
 	}
@@ -835,44 +848,15 @@ public class Logic {
 							secondDate);
 				}
 			}
-			if (listOfFirstDate.size() >= 3) {
-				listOfShownTasks.addAll(listOfFirstDate.subList(0, 3));
-			} else {
-				listOfShownTasks.addAll(listOfFirstDate);
-			}
-
-			if (listOfSecondDate.size() >= 3) {
-				listOfShownTasks.addAll(listOfSecondDate.subList(0, 3));
-			} else {
-				listOfShownTasks.addAll(listOfSecondDate);
-			}
+			addThreeTasksToList(listOfFirstDate);
+			addThreeTasksToList(listOfSecondDate);
+			addThreeTasksToList(listOfFloating);
 			
-			
-			if (listOfFloating.size() >= 3) {
-				listOfShownTasks.addAll(listOfFloating.subList(0, 3));
-			} else {
-				listOfShownTasks.addAll(listOfFloating);
-			}
 			// default view
 			List<String> listOfTitles = new ArrayList<String>();
-			if(listOfFirstDate.size() != 0){
-					if(listOfFirstDate.get(0).hasStartingTime()){
-						listOfTitles.add(listOfFirstDate.get(0).getStartingTime().get(Calendar.DATE) + "/" + (listOfFirstDate.get(0).getStartingTime().get(Calendar.MONTH) + 1));
-					} else {
-						listOfTitles.add(listOfFirstDate.get(0).getEndingTime().get(Calendar.DATE) + "/" + (listOfFirstDate.get(0).getEndingTime().get(Calendar.MONTH) + 1));
-					}
-			} else {
-				listOfTitles.add("No upcoming tasks.");
-			}
-			if(listOfSecondDate.size() != 0){
-				if(listOfSecondDate.get(0).hasStartingTime()){
-					listOfTitles.add(listOfSecondDate.get(0).getStartingTime().get(Calendar.DATE) + "/" + (listOfSecondDate.get(0).getStartingTime().get(Calendar.MONTH) + 1));
-				} else {
-					listOfTitles.add(listOfSecondDate.get(0).getEndingTime().get(Calendar.DATE) + "/" + (listOfSecondDate.get(0).getEndingTime().get(Calendar.MONTH) + 1));
-				}
-			} else {
-				listOfTitles.add("No upcoming tasks.");
-			}
+			addTitleForDate(listOfFirstDate, listOfTitles);
+			addTitleForDate(listOfSecondDate, listOfTitles)
+			;
 			if(listOfFloating.size() != 0){
 				listOfTitles.add("Other tasks");
 			} else {
@@ -922,6 +906,35 @@ public class Logic {
 				searchStrings.add(listFilter.get(0).getName());
 			}
 			return UIObject.showTasks(listOfShownTasks, DisplayType.FILTERED, searchStrings);
+		}
+	}
+
+	private void addTitleForDate(ArrayList<Task> listOfItemsInDate,
+			List<String> listOfTitles) {
+		if (listOfItemsInDate.size() != 0) {
+			if (listOfItemsInDate.get(0).hasStartingTime()) {
+				listOfTitles.add(listOfItemsInDate.get(0).getStartingTime()
+						.get(Calendar.DATE)
+						+ "/"
+						+ (listOfItemsInDate.get(0).getStartingTime()
+								.get(Calendar.MONTH) + 1));
+			} else {
+				listOfTitles.add(listOfItemsInDate.get(0).getEndingTime()
+						.get(Calendar.DATE)
+						+ "/"
+						+ (listOfItemsInDate.get(0).getEndingTime()
+								.get(Calendar.MONTH) + 1));
+			}
+		} else {
+			listOfTitles.add("No upcoming tasks.");
+		}
+	}
+
+	private void addThreeTasksToList(ArrayList<Task> listOfFirstDate) {
+		if (listOfFirstDate.size() >= 3) {
+			listOfShownTasks.addAll(listOfFirstDate.subList(0, 3));
+		} else {
+			listOfShownTasks.addAll(listOfFirstDate);
 		}
 	}
 

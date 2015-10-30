@@ -210,10 +210,11 @@ public class Parser {
 		}
 		return commandObject;
 	}
+	
 	String[] getSaveToArgument(String commandString){
-		String pathString = commandString.split(WHITE_SPACE_REGEX, 2)[0];
-		return new String[]{ pathString };
+		return new String[]{ commandString };
 	}
+	
 	String[] getOneIndex(String commandString){
 		String indexString = commandString.split(WHITE_SPACE_REGEX, 2)[0];
 		return new String[]{ indexString };
