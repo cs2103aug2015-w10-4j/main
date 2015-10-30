@@ -77,7 +77,7 @@ public class Parser {
 
 	static final String[] LOCATION = { "loc", "at" };
 	static final String[] DEADLINE = { "by" };
-	static final String[] TIME = { "H", "AM", "PM" };
+	static final String[] TIME = { "H", "AM", "PM" , "am" , "pm" };
 	static final String TIME_SEPERATOR = ".";
 	static final String[] START_EVENT = { "start", "from" };
 	static final String[] END_EVENT = { "end" , "to" };
@@ -85,7 +85,7 @@ public class Parser {
 	static final String[] INSTANCES_PERIODIC = { "for" };
 
 	
-	public FieldType editPartIs(String keyword){
+	public FieldType getEditFieldType(String keyword){
 		if (hasKeyword(keyword, LOCATION)) {
 			return FieldType.LOCATION;
 		}
@@ -149,7 +149,7 @@ public class Parser {
 	public Command parseCommand(String commandString) throws Exception {
 		commandString = commandString.trim();
 		Command.Type commandType = identifyType(commandString);
-		commandString = clearFirstWord(commandString);
+		commandString = removeFirstWord(commandString);
 		Command commandObject = new Command(commandType);
 		Task taskObject = new Task();
 		String[] argumentArray;
@@ -160,19 +160,19 @@ public class Parser {
 				commandObject.addTask(taskObject);
 				break;
 			case EDIT :
-				// need to fix edit
-				if (commandString.split(" ").length ==1) {// if insufficient arguments .eg "edit"
+				if (commandString.split(" ").length == 1) {// if insufficient arguments .eg "edit"
 					throw new Exception(ERROR_INVALID_NUMBER_OF_ARGUMENTS);
-				} else {//if special editing.eg edit 1 loc nus
-					argumentArray = getOneIndex(commandString);
-					FieldType editType = editPartIs(getTwoIndex(commandString));
-					if (editType != null) {
+				} else {
+					argumentArray = getParameterOneAsArray(commandString);
+					FieldType editType = getEditFieldType(getParameterTwo(commandString));
+					if (editType != null) { // editing of a specific field
 						commandObject.setArguments(argumentArray);
-						commandString = clearFirstWord(commandString);
+						commandString = removeFirstWord(commandString);
+						
 						parseField(editType, commandString, commandObject);
-					} else {// normal editing
+					} else {// parsing of a task with a new task name
 						commandObject.setArguments(argumentArray);
-						commandString = clearFirstWord(commandString);
+						commandString = removeFirstWord(commandString);
 
 						extractTaskInformation(commandString, taskObject);
 						commandObject.addTask(taskObject);
@@ -196,11 +196,10 @@ public class Parser {
 				commandObject.setArguments(argumentArray);
 				break;
 			case SEARCH :
-				FieldType editType = editPartIs(getOneIndex(commandString)[0]);
+				FieldType editType = getEditFieldType(getParameterOneAsArray(commandString)[0]);
 				if (editType != null) {
 					parseField(editType, commandString, commandObject);
-				} else {// normal editing
-					//commandString = clearFirstWord(commandString);
+				} else {
 					extractTaskInformation(commandString, taskObject);
 					commandObject.addTask(taskObject);
 				}
@@ -215,12 +214,12 @@ public class Parser {
 		return new String[]{ commandString };
 	}
 	
-	String[] getOneIndex(String commandString){
+	String[] getParameterOneAsArray(String commandString){
 		String indexString = commandString.split(WHITE_SPACE_REGEX, 2)[0];
 		return new String[]{ indexString };
 	}
 	
-	String getTwoIndex(String commandString){
+	String getParameterTwo(String commandString){
 		return commandString.split(WHITE_SPACE_REGEX)[1];
 	}
 	
@@ -229,7 +228,7 @@ public class Parser {
 		return indexArray;
 	}
 
-	String clearFirstWord(String commandString) {
+	String removeFirstWord(String commandString) {
 		String[] splitCommand = commandString.split(WHITE_SPACE_REGEX, 2);
 		assert (splitCommand.length >= 1);
 		if (splitCommand.length == 1) {
@@ -253,17 +252,17 @@ public class Parser {
 			commandObject.addTask(editTask);
 		} else if (editType.equals(FieldType.DEADLINE)) {
 			commandString = " " + commandString;
-			ArrayList<KeywordMarker> keywordMarkers = getArrayOfKeywordIndexes(commandString);
+			ArrayList<KeywordMarker> keywordMarkers = getArrayOfKeywordMarkers(commandString);
 			extractDate(commandString, keywordMarkers, editTask);
 			commandObject.addTask(editTask);
 		} else if (editType.equals(FieldType.START_EVENT)
 				|| editType.equals(FieldType.END_EVENT)) {
-			ArrayList<KeywordMarker> keywordMarkers = getArrayOfKeywordIndexes(commandString);
+			ArrayList<KeywordMarker> keywordMarkers = getArrayOfKeywordMarkers(commandString);
 			extractDate(commandString, keywordMarkers, editTask);
 			commandObject.addTask(editTask);
 		} else if (editType.equals(FieldType.INTERVAL_PERIODIC)
 				|| editType.equals(FieldType.INSTANCES_PERIODIC)) {
-			ArrayList<KeywordMarker> keywordMarkers = getArrayOfKeywordIndexes(commandString);
+			ArrayList<KeywordMarker> keywordMarkers = getArrayOfKeywordMarkers(commandString);
 			extractPeriodic(commandString, keywordMarkers, editTask, true);
 			commandObject.addTask(editTask);
 		} else {
@@ -323,11 +322,9 @@ public class Parser {
 	boolean extractTaskInformation(String commandString, Task taskObject)
 			throws Exception {
 		logger.fine("extractTaskInformation: getting keyword markers");
-		ArrayList<KeywordMarker> keywordMarkers = getArrayOfKeywordIndexes(commandString);
+		ArrayList<KeywordMarker> keywordMarkers = getArrayOfKeywordMarkers(commandString);
 	
 		Collections.sort(keywordMarkers);
-		
-		
 		
 		logger.fine("extractedTaskInformation: extracting data from string");
 		extractName(commandString, keywordMarkers, taskObject);
@@ -366,9 +363,10 @@ public class Parser {
 			if(periodicInstancesArguments.length == 1){
 				logger.finer("extractPeriodic: periodic argument length is 1.");
 				int periodicInstancesValue;
-				try{
-					periodicInstancesValue = Integer.parseInt(periodicInstancesArguments[0]);
-				}catch(NumberFormatException e){
+				try {
+					periodicInstancesValue = Integer
+							.parseInt(periodicInstancesArguments[0]);
+				} catch (NumberFormatException e) {
 					throw new Exception(ERROR_INVALID_PERIODIC_INSTANCES);
 				}
 				taskObject.setPeriodicRepeats(periodicInstancesArguments[0]);
@@ -382,32 +380,32 @@ public class Parser {
 		return false;
 	}
 	
+	/**
+	 * Extracts the location arguments as an array, joins
+	 * them up into a location string, and set it as the location
+	 * @param commandString
+	 * @param keywordMarkers
+	 * @param taskObject
+	 * @return
+	 * @throws Exception
+	 */
 	boolean extractLocation(String commandString, ArrayList<KeywordMarker> keywordMarkers, Task taskObject) throws Exception{
 		String[] locationArguments = getArgumentsForField(commandString, keywordMarkers, FieldType.LOCATION);
 		String location = "";
-		if(locationArguments!= null){
-			for(int i =0; i < locationArguments.length; i++) {
+		if (locationArguments != null) {
+			for (int i = 0; i < locationArguments.length; i++) {
 				location += locationArguments[i] + " ";
 			}
 			taskObject.setLocation(location);
 			logger.finer("extractLocation: location added");
 			return true;
-/*	
-			if(locationArguments.length == 1){
-				logger.finer("extractLocation: argument length is 1.");
-				taskObject.setLocation(locationArguments[0]);
-				return true;
-			} else {
-				logger.info("extractLocation: invalid number of arguments");
-				throw new Exception(ERROR_INVALID_NUMBER_OF_ARGUMENTS);
-			}*/
 		}
 		return false;
 	}
 
 	boolean extractDate(String commandString,
 			ArrayList<KeywordMarker> keywordMarkers, Task taskObject) throws Exception {
-		// check deadline/start_event & end_event
+		// check deadline
 		logger.fine("extractDate: getting date arguments");
 		String[] deadlineArguments = getArgumentsForField(commandString,
 				keywordMarkers, FieldType.DEADLINE);
@@ -417,16 +415,20 @@ public class Parser {
 				logger.finer("extractDate: deadlineArguments[" + i + "] contains " +  deadlineArguments[i]);
 			}
 		}
+		
+		// check start/end event
 		String[] startEventArguments = getArgumentsForField(commandString,
 				keywordMarkers, FieldType.START_EVENT);
 		String[] endEventArguments = getArgumentsForField(commandString,
 				keywordMarkers, FieldType.END_EVENT);
 		
-		if(startEventArguments != null){
-			for(int i = 0; i < startEventArguments.length; i++){
-				logger.finer("extractDate: startEventArguments[" + i + "] contains " +  startEventArguments[i]);
+		if (startEventArguments != null) {
+			for (int i = 0; i < startEventArguments.length; i++) {
+				logger.finer("extractDate: startEventArguments[" + i
+						+ "] contains " + startEventArguments[i]);
 			}
 		}
+		
 		logger.fine("extractDate: got date arguments. attempting to parse dates");
 		if (deadlineArguments != null) {
 			Calendar argumentDate = parseDate(deadlineArguments);
@@ -450,11 +452,11 @@ public class Parser {
 		}
 	}
 
-	// if time not specified, it will be parsed to 00:00 AM
+	// if time not specified, it will be parsed to 09:00 AM
 	// TIME keyword in commandString must be capitalized
 	Calendar parseDate(String[] dateArgumentsTemp) throws Exception {
 		logger.fine("parseDate: parsing date");
-		int date, month, year, hour = 0, minute = 0, AMPM = 0;
+		int date, month, year, hour = 9, minute = 0, isAMorPM = 0;
 		Integer hourOfDay = null;
 		Calendar helperDate;
 		
@@ -477,7 +479,7 @@ public class Parser {
 								hourOfDay = Integer.parseInt(tempTime.substring(0, 2));
 								minute = Integer.parseInt(tempTime.substring(2));
 							} else {	// am/pm: 12 hour time format
-								AMPM = n == 1 ? 0 : 1;
+								isAMorPM = n == 1 ? 0 : 1;
 								if (tempTime.contains(TIME_SEPERATOR)) { // check if minutes is specified
 									String[] tempTimeSplit = tempTime.split("\\" + TIME_SEPERATOR);
 									minute = Integer.parseInt(tempTimeSplit[1]);
@@ -573,7 +575,7 @@ public class Parser {
 
 		if (hourOfDay == null) {
 			helperDate.set(Calendar.HOUR, hour);
-			helperDate.set(Calendar.AM_PM, AMPM);
+			helperDate.set(Calendar.AM_PM, isAMorPM);
 		} else {
 			helperDate.set(Calendar.HOUR_OF_DAY, hourOfDay);
 		}
@@ -599,7 +601,6 @@ public class Parser {
 	
 
 	/**
-	 * 
 	 * @param givenDayIndex day of the week sunday to saturday -> 1 to 7 
 	 * @return date of the nearest day
 	 */
@@ -636,9 +637,8 @@ public class Parser {
 	}
 	
 	/**
-	 *  temporary method created to search for TIME keywords. Can't use hasKeyword since 
+	 * Method created to search for TIME keywords. Can't use hasKeyword since 
 	 * the keyword is concatenated with the time itself, e.g. '6pm' instead of '6 pm'
-	 * pre-condition: TIME keywords must be capitalized
 	*/
 	boolean hasTimeKeyword(String[] words, String[] keywords) {
 		for(int i = 0; i < words.length; i++){
@@ -652,6 +652,14 @@ public class Parser {
 	}
 	
 
+	/**
+	 * Method to obtain arguments after a keyword and before the
+	 * next keyword
+	 * @param commandString
+	 * @param keywordMarkers
+	 * @param typeOfField
+	 * @return String array of argument words
+	 */
 	String[] getArgumentsForField(String commandString,
 			ArrayList<KeywordMarker> keywordMarkers, FieldType typeOfField) {
 		for (int i = 0; i < keywordMarkers.size(); i++) {
@@ -689,6 +697,15 @@ public class Parser {
 		return null;
 	}
 
+	/**
+	 * Extracts task name from a string
+	 * It is assumed that the start of the string is the task name
+	 * @param commandString
+	 * @param keywordMarkers
+	 * @param taskObject
+	 * @return
+	 * @throws Exception
+	 */
 	boolean extractName(String commandString,
 			ArrayList<KeywordMarker> keywordMarkers, Task taskObject)
 			throws Exception {
@@ -721,12 +738,21 @@ public class Parser {
 		return true;
 	}
 
-	ArrayList<KeywordMarker> getArrayOfKeywordIndexes(
+	/**
+	 * Attempts to mark the relevant fields of a task, and adds a marker
+	 * to mark the starting of each field's arguments
+	 * 
+	 * @param commandString
+	 * @return
+	 * @throws Exception
+	 */
+	ArrayList<KeywordMarker> getArrayOfKeywordMarkers(
 			String commandString) throws Exception {
 		ArrayList<KeywordMarker> keywordMarkerList = new ArrayList<KeywordMarker>();
 		getLocationField(keywordMarkerList, commandString);
 		getDateField(keywordMarkerList, commandString);
 		getPeriodicField(keywordMarkerList, commandString);
+		
 		return keywordMarkerList;
 	}
 	
