@@ -47,7 +47,7 @@ public class TestSystem {
 		
 		String executionResult = logicObject.executeCommand(commandObject, true,
 				true);
-		assertEquals("Item(s) 1 successfully added.",executionResult);
+		assertEquals("Item(s) successfully added.",executionResult);
 	}
 	
 	/*
@@ -63,10 +63,10 @@ public class TestSystem {
 				true);
 
 		commandObject = parserObj.parseCommand("delete 1");
-		
+        logicObject.showUpdatedItems();
 		String executionResult = logicObject.executeCommand(commandObject, true,
 				true);
-		assertEquals("Item(s) 1 successfully deleted.",executionResult);
+		assertEquals("Item(s) successfully deleted.",executionResult);
 	}
 	
 	/*
@@ -82,8 +82,8 @@ public class TestSystem {
 				true);
 
 		commandObject = parserObj.parseCommand("edit 1 homework by next tuesday loc nus");
-		
-		String executionResult = logicObject.executeCommand(commandObject, true,
+		logicObject.showUpdatedItems();
+		logicObject.executeCommand(commandObject, true,
 				true);
 		ArrayList<Task> listOfTasks = logicObject.listOfTasks;
 		storageObj.writeItemList(listOfTasks);
@@ -93,7 +93,7 @@ public class TestSystem {
 		resultStr = message.get(0).getAllInfo();
 		
 			
-		assertEquals("Name: homework Starting time: null Ending Time: null Location: nus  Period Interval: null Period Repeats null", resultStr);
+		assertEquals("Name: homework Starting time: null Ending Time: java.util.GregorianCalendar[time=?,areFieldsSet=false,areAllFieldsSet=false,lenient=true,zone=sun.util.calendar.ZoneInfo[id=\"Asia/Singapore\",offset=28800000,dstSavings=0,useDaylight=false,transitions=9,lastRule=null],firstDayOfWeek=1,minimalDaysInFirstWeek=1,ERA=?,YEAR=2015,MONTH=10,WEEK_OF_YEAR=?,WEEK_OF_MONTH=?,DAY_OF_MONTH=7,DAY_OF_YEAR=?,DAY_OF_WEEK=?,DAY_OF_WEEK_IN_MONTH=?,AM_PM=0,HOUR=0,HOUR_OF_DAY=0,MINUTE=0,SECOND=0,MILLISECOND=?,ZONE_OFFSET=?,DST_OFFSET=?] Location: nus  Period Interval: null Period Repeats null", resultStr);
 	}
 	
 	/*
@@ -114,18 +114,16 @@ public class TestSystem {
 		commandObject = parserObj.parseCommand("add task3");
 		logicObject.executeCommand(commandObject, true,
 						true);	
-
+		
+		logicObject.showUpdatedItems();
 		commandObject = parserObj.parseCommand("edit 1 homework next tuesday loc nus every 2 days for 2");
 		logicObject.executeCommand(commandObject, true,
 				true);
 		
-        commandObject = parserObj.parseCommand("edit 1 loc nus");
-		logicObject.executeCommand(commandObject, true,
-				true);
-		
-		 commandObject = parserObj.parseCommand("edit 3 every 2 days for 2");
+		 commandObject = parserObj.parseCommand("edit 1 loc nus");
 			logicObject.executeCommand(commandObject, true,
 					true);
+		
 		
 		ArrayList<Task> listOfTasks = logicObject.listOfTasks;
 		storageObj.writeItemList(listOfTasks);
@@ -159,9 +157,10 @@ public class TestSystem {
 		
 
 		commandObject = parserObj.parseCommand("edit 1 homework by next tuesday loc nus");
-		
-		String executionResult = logicObject.executeCommand(commandObject, true,
+		logicObject.showUpdatedItems();
+		logicObject.executeCommand(commandObject, true,
 				true);
+	
 		ArrayList<Task> listOfTasks = logicObject.listOfTasks;
 		storageObj.writeItemList(listOfTasks);
 		ArrayList<Task> message = storageObj.getItemList();
@@ -170,7 +169,7 @@ public class TestSystem {
 		resultStr += message.get(i).getAllInfo() +" ";
 		}
 			
-		assertEquals("Name: homework next tuesday Starting time: null Ending Time: null Location: nus  Period Interval: null Period Repeats null Name: task2 Starting time: null Ending Time: null Location: null Period Interval: null Period Repeats null Name: task3 Starting time: null Ending Time: null Location: null Period Interval: null Period Repeats null ", resultStr);
+		assertEquals("Name: homework Starting time: null Ending Time: java.util.GregorianCalendar[time=?,areFieldsSet=false,areAllFieldsSet=false,lenient=true,zone=sun.util.calendar.ZoneInfo[id=\"Asia/Singapore\",offset=28800000,dstSavings=0,useDaylight=false,transitions=9,lastRule=null],firstDayOfWeek=1,minimalDaysInFirstWeek=1,ERA=?,YEAR=2015,MONTH=10,WEEK_OF_YEAR=?,WEEK_OF_MONTH=?,DAY_OF_MONTH=7,DAY_OF_YEAR=?,DAY_OF_WEEK=?,DAY_OF_WEEK_IN_MONTH=?,AM_PM=0,HOUR=0,HOUR_OF_DAY=0,MINUTE=0,SECOND=0,MILLISECOND=?,ZONE_OFFSET=?,DST_OFFSET=?] Location: nus  Period Interval: null Period Repeats null Name: task2 Starting time: null Ending Time: null Location: null Period Interval: null Period Repeats null Name: task3 Starting time: null Ending Time: null Location: null Period Interval: null Period Repeats null ", resultStr);
 	}
 	
 	/*
