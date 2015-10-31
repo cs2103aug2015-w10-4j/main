@@ -53,6 +53,18 @@ public class TaskTable extends JTable {
 		prepareTable();
 	}
 	
+	public TaskTable(TaskTableModel dm, TableColumnModel cm) {
+		super(dm, cm);
+		setBorder(new LineBorder(Color.LIGHT_GRAY));
+		
+		assert COLUMN_ALIGNMENTS.length == FormatterHelper.COLUMN_COUNT;
+		assert SET_MAX_WIDTH.length == FormatterHelper.COLUMN_COUNT;
+
+		this.model = dm;
+		
+		prepareTable();
+	}
+	
 	private void prepareTable() {
 		prepareTableHeader();
 		prepareTableAlignment();

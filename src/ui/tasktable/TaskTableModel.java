@@ -14,6 +14,7 @@ public class TaskTableModel extends AbstractTableModel {
 			"Ending Time",
 			"Location",
 	};
+
 	private final TableModelFormatter formatter = new TableModelFormatter();
 	
 	private Object[][] data = null;
@@ -33,7 +34,7 @@ public class TaskTableModel extends AbstractTableModel {
 	public String getColumnName(int column) {
 		return columnNames[column];
 	}
-
+	
 	@Override
 	public int getRowCount() {
 		return data.length;

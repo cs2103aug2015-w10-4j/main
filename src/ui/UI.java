@@ -27,6 +27,7 @@ import javax.swing.JTextField;
 import javax.swing.JViewport;
 import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
+import javax.swing.table.TableColumnModel;
 
 import global.Task;
 import ui.formatter.FormatterHelper;
@@ -433,18 +434,29 @@ public class UI {
 		VerticalLayout displayAreaPanelLayout = (VerticalLayout) displayAreaPanel.getLayout();
 		displayAreaPanelLayout.resetLayout();
 		
+		TableColumnModel commonColumnModel = null;
 		
 		for (int i = 0; i < tableModels.length; i++) {
-			TaskTable currentTable = new TaskTable(tableModels[i]);
+			TaskTable currentTable = null;
+
+			if (commonColumnModel == null) {
+				currentTable = new TaskTable(tableModels[i]);
+			} else {
+				currentTable = new TaskTable(tableModels[i], commonColumnModel);
+			}
+
 			currentTable.setFocusable(false);
 			currentTable.setRowSelectionAllowed(false);
 			
 			JLabel titleLabel = new JLabel(titles.get(i));
 
 			displayAreaPanel.add(titleLabel);
-			if(i == 0) {
-			displayAreaPanel.add(currentTable.getTableHeader());
+			
+			if (commonColumnModel == null) {
+				displayAreaPanel.add(currentTable.getTableHeader());
+				commonColumnModel = currentTable.getColumnModel();
 			}
+
 			displayAreaPanel.add(currentTable);
 			displayAreaPanel.add(createInvisibleJPanel(INVISIBLE_JPANEL_WIDTH,
 					INVISIBLE_JPANEL_HEIGHT));
@@ -455,7 +467,7 @@ public class UI {
 
 		return true;
 	}
-	
+
 	private JPanel createInvisibleJPanel(int width, int height) {
 		JPanel invisiblePanel = new JPanel();
 		invisiblePanel.setSize(new Dimension(width, height));
