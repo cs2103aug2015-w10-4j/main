@@ -15,6 +15,7 @@ import javax.swing.table.TableColumnModel;
 
 import ui.formatter.FormatterHelper;
 import ui.tasktable.TaskTableModel;
+import javax.swing.border.LineBorder;
 
 @SuppressWarnings("serial")
 public class TaskTable extends JTable {
@@ -42,6 +43,7 @@ public class TaskTable extends JTable {
 	
 	public TaskTable(TaskTableModel dm) {
 		super(dm);
+		setBorder(new LineBorder(Color.LIGHT_GRAY));
 		
 		assert COLUMN_ALIGNMENTS.length == FormatterHelper.COLUMN_COUNT;
 		assert SET_MAX_WIDTH.length == FormatterHelper.COLUMN_COUNT;
@@ -119,6 +121,7 @@ public class TaskTable extends JTable {
 		tableHeader.setFont(new Font(HEADER_FONT_NAME, HEADER_FONT_STYLE, HEADER_FONT_SIZE));
 		tableHeader.setBackground(HEADER_COLOR);
 		tableHeader.setForeground(Color.WHITE);
+		
 	}
 	
 	private void prepareTableGrid() {

@@ -433,6 +433,7 @@ public class UI {
 		VerticalLayout displayAreaPanelLayout = (VerticalLayout) displayAreaPanel.getLayout();
 		displayAreaPanelLayout.resetLayout();
 		
+		
 		for (int i = 0; i < tableModels.length; i++) {
 			TaskTable currentTable = new TaskTable(tableModels[i]);
 			currentTable.setFocusable(false);
@@ -441,12 +442,14 @@ public class UI {
 			JLabel titleLabel = new JLabel(titles.get(i));
 
 			displayAreaPanel.add(titleLabel);
+			if(i == 0) {
 			displayAreaPanel.add(currentTable.getTableHeader());
+			}
 			displayAreaPanel.add(currentTable);
 			displayAreaPanel.add(createInvisibleJPanel(INVISIBLE_JPANEL_WIDTH,
 					INVISIBLE_JPANEL_HEIGHT));
 		}
-		
+	
 		displayAreaPanel.revalidate();
 		displayAreaPanel.repaint();
 
