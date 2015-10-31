@@ -539,7 +539,7 @@ public class Parser {
 			String secondWord = dateArguments[1];
 
 			if (hasKeyword(secondWord, DAYS)) {
-				int dayIndex = getIndexOfList(secondWord, Arrays.asList(MONTHS)) + 1;
+				int dayIndex = getIndexOfList(secondWord, Arrays.asList(DAYS)) + 1;
 				assert (firstWord.equalsIgnoreCase(DATE_SPECIAL[0]) || firstWord
 						.equalsIgnoreCase(DATE_SPECIAL[1]));
 				if (firstWord.equalsIgnoreCase(DATE_SPECIAL[0])) {// this

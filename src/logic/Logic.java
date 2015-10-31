@@ -40,7 +40,7 @@ import ui.UI.DisplayType;
 public class Logic {
 	private static final String LOG_FILE_NAME = "tasky.log";
 	private static final String CONFIG_FILE_NAME = "config.properties";
-	private static final String DEFAULT_LOGGING_LEVEL_STRING = "info";
+	private static final String DEFAULT_LOGGING_LEVEL_STRING = "INFO";
 	private static final String DEFAULT_SAVE_FILE_PATH = "save.txt";
 	private static final String PROPERTY_KEY_LOGGING_LEVEL = "loggingLevel";
 	private static final String PROPERTY_KEY_SAVE_FILE = "saveFile";
