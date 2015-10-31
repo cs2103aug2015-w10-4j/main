@@ -96,6 +96,9 @@ public class UI {
 	
 	private static final String EMPTY_STRING = "";
 	
+	private static final int DEFAULT_DISPLAY_MIN_ROW = 3;
+	private static final int FILTERED_DISPLAY_MIN_ROW = 1;
+	
 	private static final int SCROLL_SPEED = 10;
 	
 	public enum DisplayType {
@@ -472,9 +475,11 @@ public class UI {
 	public boolean showTasks(List<Task> tasks, DisplayType displayType, List<String> titles) {
 		int minRowCount = -1;
 		if (displayType == DisplayType.DEFAULT) {
-			minRowCount = 3;
+			minRowCount = DEFAULT_DISPLAY_MIN_ROW;
+		} else if (displayType == DisplayType.FILTERED) {
+			minRowCount = FILTERED_DISPLAY_MIN_ROW;
 		} else {
-			minRowCount = 1;
+			assert false : "DisplayType = ?";
 		}
 
 		Object[][][] taskListsData = FormatterHelper.getTaskListData(tasks,
