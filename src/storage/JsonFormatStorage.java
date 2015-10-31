@@ -2,6 +2,7 @@ package storage;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -101,6 +102,7 @@ public class JsonFormatStorage implements Storage {
 		if (!newFile.exists()) {
 			//file is not yet created, try to create one
 			newFile.createNewFile();
+			copyFile(path, currentFilePath);
 			currentFilePath = path;
 			isFilePathChanged = true;
 			logger.info("JsonFormat save file to new path: "+path);
@@ -108,6 +110,7 @@ public class JsonFormatStorage implements Storage {
 			//exist already, check whether it is the same file
 			//with the current one
 			if (!currentFilePath.equals(path)) {
+				copyFile(path, currentFilePath);
 				currentFilePath = path;
 				isFilePathChanged = true;
 				logger.info("JsonFormat save file to new path: "+path);
@@ -115,6 +118,21 @@ public class JsonFormatStorage implements Storage {
 		}
 	
 		return isFilePathChanged;
+	}
+	
+	
+	private void copyFile(String oldPath, String newPath) throws IOException {
+		
+            FileReader fr = new FileReader(oldPath);
+            FileWriter fw = new FileWriter(newPath);
+            int c=fr.read();
+            while(c!=-1)
+            {
+                fw.write(c);
+                c = fr.read(); // Add this line
+            }
+       fr.close();
+            fw.close();
 	}
 
 	/**
