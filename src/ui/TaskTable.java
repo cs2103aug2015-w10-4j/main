@@ -7,11 +7,13 @@ import java.awt.Font;
 import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 
+import ui.formatter.FormatterHelper;
 import ui.tasktable.TaskTableModel;
 
 @SuppressWarnings("serial")
@@ -26,11 +28,24 @@ public class TaskTable extends JTable {
 	private static final int HEADER_FONT_STYLE = Font.BOLD;
 	private static final int HEADER_FONT_SIZE = 12;
 	
+	private static final int[] COLUMN_ALIGNMENTS = { SwingConstants.LEFT,
+			SwingConstants.LEFT,
+			SwingConstants.CENTER,
+			SwingConstants.CENTER,
+			SwingConstants.CENTER,
+			SwingConstants.CENTER
+	};
+	
+	private static final boolean[] SET_MAX_WIDTH = {true, false, false, false, false, false};
+	
 	private TaskTableModel model = null;
 	
 	public TaskTable(TaskTableModel dm) {
 		super(dm);
 		
+		assert COLUMN_ALIGNMENTS.length == FormatterHelper.COLUMN_COUNT;
+		assert SET_MAX_WIDTH.length == FormatterHelper.COLUMN_COUNT;
+
 		this.model = dm;
 		
 		prepareTable();
@@ -55,7 +70,11 @@ public class TaskTable extends JTable {
 	
 	private void setColumnWidth(int columnIndex, int columnWidth) {
 		TableColumn tableColumn = getColumnModel().getColumn(columnIndex);
-		tableColumn.setMinWidth(columnWidth);
+		tableColumn.setPreferredWidth(columnWidth);
+		
+		if (SET_MAX_WIDTH[columnIndex]) {
+			tableColumn.setMaxWidth(columnWidth);
+		}
 	}
 	
 	private int getColumnWidth(int columnIndex) {
@@ -112,9 +131,18 @@ public class TaskTable extends JTable {
 		prepareContentAlignment();
 	}
 	
-	//TODO: First column should be right-aligned, second should be left-aligned,
-	//      and the rest should be center-aligned
 	private void prepareContentAlignment() {
+		TableColumnModel tableColumnModel = getColumnModel();
+		int columnCount = tableColumnModel.getColumnCount();
+		
+		for (int i = 0; i < columnCount; i++) {
+			TableColumn currentTableColumn = tableColumnModel.getColumn(i);
+			
+			DefaultTableCellRenderer renderer = new DefaultTableCellRenderer();
+			renderer.setHorizontalAlignment(COLUMN_ALIGNMENTS[i]);
+			
+			currentTableColumn.setCellRenderer(renderer);
+		}
 	}
 	
 	private void prepareHeaderAlignment() {
