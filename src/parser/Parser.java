@@ -76,7 +76,7 @@ public class Parser {
 	}
 
 	static final String[] LOCATION = { "loc", "at" };
-	static final String[] DEADLINE = { "by" , "before" };
+	static final String[] DEADLINE = { "by" , "before" , "on" };
 	static final String[] TIME = { "H", "AM", "PM" , "am" , "pm" };
 	static final String TIME_SEPARATOR = ".";
 	static final String[] START_EVENT = { "start" , "from" , "starts" , "starting" };
@@ -384,6 +384,7 @@ public class Parser {
 			for (int i = 0; i < locationArguments.length; i++) {
 				location += locationArguments[i] + " ";
 			}
+			location = location.trim();
 			taskObject.setLocation(location);
 			logger.finer("extractLocation: location added");
 			return true;

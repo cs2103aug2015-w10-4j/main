@@ -341,8 +341,7 @@ public class Logic {
 	}
 	
 	/**
-	 * Converts a list of integer that have been parsed from the list integer
-	 * strings
+	 * Converts a list of integer strings into list of integers
 	 * 
 	 * @param argumentList
 	 * @return
@@ -604,8 +603,6 @@ public class Logic {
 		if (userTasks.size() == 0) {
 			return ERROR_NO_FILTER;
 		} else {
-			listFilter.clear();
-			
 			Task taskObject = userTasks.get(0);
 			listFilter.add(taskObject);
 
@@ -724,11 +721,12 @@ public class Logic {
 	}
 	
 	/**
-	 * Replaces an item from the list of tasks in memory with the new userTask
+	 * Updates the non-null fields in the given task object to the task in memory list
+	 * at the given index
 	 * 
 	 * @param userTasks
-	 *            this should be of size 1 which contains the new task to
-	 *            replaced with. all other tasks will be ignored
+	 *            this should be of size 1 which contains the new task information
+	 *            of the relevant fields
 	 * @param indexList
 	 *            a number string, which contains the index position of the task
 	 *            to edit
@@ -965,7 +963,7 @@ public class Logic {
 			
 			List<String> searchStrings = new ArrayList<String>();
 			for(int i = 0; i < listFilter.size(); i++){
-				searchStrings.add(listFilter.get(0).getName());
+				searchStrings.add(listFilter.get(i).getName()); // to be changed based on existing field
 			}
 			return UIObject.showTasks(listOfShownTasks, DisplayType.FILTERED, searchStrings);
 		}
