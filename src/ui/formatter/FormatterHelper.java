@@ -10,7 +10,7 @@ import global.Task;
 
 public class FormatterHelper {
 	
-	private static final String EMPTY_STRING_SUBSTITUTE = "-";
+	private static final String EMPTY_STRING_SUBSTITUTE = " ";
 	
 	public static final String[] FIELD_NAMES = new String[] { "UNUSED",
 															  "name",
@@ -131,7 +131,8 @@ public class FormatterHelper {
 		return resultArray;
 	}
 	
-	public static Object[][][] getTaskListData(List<Task> tasks, boolean needTaskSplit) {
+	public static Object[][][] getTaskListData(List<Task> tasks, boolean needTaskSplit,
+			int minRowCount) {
 		List<List<Task>> taskLists = new ArrayList<List<Task>>();
 		if (needTaskSplit) {
 			taskLists = splitTask(tasks);
@@ -139,21 +140,22 @@ public class FormatterHelper {
 			taskLists.add(tasks);
 		}
 
-		Object[][][] result = new Object[taskLists.size()][][];
+		List<Object[][]> result = new ArrayList<Object[][]>();
 		//we want the numberings for all taskLists synchronized
 		int numberCounter = 0;
 		for (int taskListIndex = 0; taskListIndex < taskLists.size(); taskListIndex++) {
 			List<Task> currentTaskList = taskLists.get(taskListIndex);
 
 			//including the number column
-			Object[][] currentTaskListData = new Object[currentTaskList.size()][COLUMN_COUNT];
+			List<Object[]> currentTaskListData = new ArrayList<Object[]>();
 
 			for (int i = 0; i < currentTaskList.size(); i++) {
 				Task currentTask = currentTaskList.get(i);
+				Object[] currentTaskData = new Object[COLUMN_COUNT];
 				
 				for (int j = 0; j < COLUMN_COUNT; j++) {
 					if (j == 0) {
-						currentTaskListData[i][j] = String.valueOf(numberCounter + 1);
+						currentTaskData[j] = String.valueOf(numberCounter + 1);
 						numberCounter++;
 					} else {
 						Field currentField = null;
@@ -164,19 +166,37 @@ public class FormatterHelper {
 							
 							Object objectInField = currentField.get(currentTask);
 							
-							currentTaskListData[i][j] = objectInField;
+							currentTaskData[j] = objectInField;
 						} catch (SecurityException | NoSuchFieldException | IllegalAccessException e) {
 							assert currentField != null;
 							assert false; //should not happen
 						}
 					}
 				}
+				
+				currentTaskListData.add(currentTaskData);
 			}
 			
-			result[taskListIndex] = currentTaskListData;
+			while (currentTaskListData.size() < minRowCount) {
+				currentTaskListData.add(createEmptyTaskData());
+			}
+			
+			result.add(currentTaskListData.toArray(new Object[1][1]));
 		}
 		
-		return result;
+		return result.toArray(new Object[1][1][1]);
+	}
+
+	private static Object[] createEmptyTaskData() {
+		Object[] emptyTaskData = new Object[COLUMN_COUNT];
+
+		//since the last field that represents whether a task has been done or not
+		//must be a boolean...
+		//empty task can't be done
+		
+		emptyTaskData[COLUMN_COUNT - 1] = new Boolean(false);
+		
+		return emptyTaskData;
 	}
 
 	private static List<List<Task>> splitTask(List<Task> tasks) {

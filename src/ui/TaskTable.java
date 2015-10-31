@@ -10,6 +10,7 @@ import javax.swing.SwingConstants;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
+import javax.swing.table.TableColumnModel;
 
 import ui.tasktable.TaskTableModel;
 
@@ -36,34 +37,98 @@ public class TaskTable extends JTable {
 	}
 	
 	private void prepareTable() {
+		prepareTableHeader();
+		prepareTableAlignment();
+		prepareTableGrid();
+		fixColumnWidth();
+	}
+	
+	private void fixColumnWidth() {
+		TableColumnModel columnModel = getColumnModel();
+		int columnCount = columnModel.getColumnCount();
+		
+		for (int i = 0; i < columnCount; i++) {
+			int columnWidth = getColumnWidth(i);
+			setColumnWidth(i, columnWidth);
+		}
+	}
+	
+	private void setColumnWidth(int columnIndex, int columnWidth) {
+		TableColumn tableColumn = getColumnModel().getColumn(columnIndex);
+		tableColumn.setMinWidth(columnWidth);
+	}
+	
+	private int getColumnWidth(int columnIndex) {
+		int headerWidth = getHeaderWidth(columnIndex);
+		int contentWidth = getContentWidth(columnIndex);
+		int resultingWidth = Math.max(headerWidth, contentWidth);
+		
+		return resultingWidth;
+	}
+	
+	private int getContentWidth(int columnIndex) {
+		int rowCount = getRowCount();
+		
+		int maxContentWidth = 0;
+		for (int i = 0; i < rowCount; i++) {
+			TableCellRenderer tableCellRenderer = getCellRenderer(i, columnIndex);
+			Component component = prepareRenderer(tableCellRenderer, i, columnIndex);
+			
+			int cellPreferredWidth = component.getPreferredSize().width + getIntercellSpacing().width;
+			
+			maxContentWidth = Math.max(maxContentWidth, cellPreferredWidth);
+		}
+		
+		return maxContentWidth;
+	}
+	
+	private int getHeaderWidth(int columnIndex) {
+		TableColumn tableColumn = getColumnModel().getColumn(columnIndex);
+		TableCellRenderer renderer = tableColumn.getHeaderRenderer();
+		if (renderer == null) {
+			renderer = getTableHeader().getDefaultRenderer();
+		}
+		
+		Component component = renderer.getTableCellRendererComponent(this,
+				tableColumn.getHeaderValue(), false, false, -1, columnIndex);
+		
+		return component.getPreferredSize().width;
+	}
+	
+	private void prepareTableHeader() {
 		JTableHeader tableHeader = getTableHeader();
 		tableHeader.setFont(new Font(HEADER_FONT_NAME, HEADER_FONT_STYLE, HEADER_FONT_SIZE));
 		tableHeader.setBackground(HEADER_COLOR);
 		tableHeader.setForeground(Color.WHITE);
-		
-		TableCellRenderer headerRenderer = tableHeader.getDefaultRenderer();
-		JLabel headerLabel = (JLabel) headerRenderer;
-		headerLabel.setHorizontalAlignment(SwingConstants.CENTER);
-		
+	}
+	
+	private void prepareTableGrid() {
 		setShowGrid(true);
 		setGridColor(Color.LIGHT_GRAY);
 	}
 	
+	private void prepareTableAlignment() {
+		prepareHeaderAlignment();
+		prepareContentAlignment();
+	}
+	
+	//TODO: First column should be right-aligned, second should be left-aligned,
+	//      and the rest should be center-aligned
+	private void prepareContentAlignment() {
+	}
+	
+	private void prepareHeaderAlignment() {
+		TableCellRenderer headerRenderer = tableHeader.getDefaultRenderer();
+		JLabel headerLabel = (JLabel) headerRenderer;
+		headerLabel.setHorizontalAlignment(SwingConstants.CENTER);
+	}
+	
 	public Component prepareRenderer(TableCellRenderer renderer, int row, int column) {
 		Component c = super.prepareRenderer(renderer, row, column);
-		
 		giveColour(c, row, column);
-		packColumns(c, row, column);
-
 		return c;
 	}
 	
-	private void packColumns(Component c, int row, int column) {
-		int rendererWidth = c.getPreferredSize().width;
-		TableColumn tableColumn = getColumnModel().getColumn(column);
-		tableColumn.setPreferredWidth(Math.max(rendererWidth + getIntercellSpacing().width, tableColumn.getPreferredWidth()));
-	}
-
 	private void giveColour(Component c, int row, int column) {
 		if (row % 2 == 0) {
 			c.setBackground(DEFAULT_ROW_COLOR);

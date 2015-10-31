@@ -470,8 +470,15 @@ public class UI {
 	 * @return true if successful
 	 */
 	public boolean showTasks(List<Task> tasks, DisplayType displayType, List<String> titles) {
+		int minRowCount = -1;
+		if (displayType == DisplayType.DEFAULT) {
+			minRowCount = 3;
+		} else {
+			minRowCount = 1;
+		}
+
 		Object[][][] taskListsData = FormatterHelper.getTaskListData(tasks,
-				displayType == DisplayType.DEFAULT);
+				displayType == DisplayType.DEFAULT, minRowCount);
 		assert taskListsData != null;
 		if (!useJTable) {
 			//TODO: fix set of strings
