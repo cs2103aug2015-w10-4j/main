@@ -295,8 +295,14 @@ public class Parser {
 		return false;
 	}
 	
-	
-
+	/**
+	 * Extracts data from the command string and puts them into the relevant field in the 
+	 * task object
+	 * @param commandString
+	 * @param taskObject
+	 * @return
+	 * @throws Exception
+	 */
 	boolean extractTaskInformation(String commandString, Task taskObject)
 			throws Exception {
 		logger.fine("extractTaskInformation: getting keyword markers");
@@ -315,30 +321,33 @@ public class Parser {
 	boolean extractPeriodic(String commandString, ArrayList<KeywordMarker> keywordMarkers, Task taskObject, boolean hasDate) throws Exception{
 		String[] periodicIntervalArguments = getArgumentsForField(commandString, keywordMarkers, FieldType.INTERVAL_PERIODIC);
 		String[] periodicInstancesArguments = getArgumentsForField(commandString, keywordMarkers, FieldType.INSTANCES_PERIODIC);
-		if(hasDate && periodicIntervalArguments!= null && periodicInstancesArguments != null){
-			if(periodicIntervalArguments.length == 2){
+		if (hasDate && periodicIntervalArguments != null
+				&& periodicInstancesArguments != null) {
+			if (periodicIntervalArguments.length == 2) {
 				logger.finer("extractPeriodic: interval argument length is 2.");
 				int periodicIntervalValue;
-				try{
-					periodicIntervalValue = Integer.parseInt(periodicIntervalArguments[0]);
-				}catch(NumberFormatException e){
+				try {
+					periodicIntervalValue = Integer
+							.parseInt(periodicIntervalArguments[0]);
+				} catch (NumberFormatException e) {
 					throw new Exception(ERROR_INVALID_PERIODIC_INTERVAL_VALUE);
 				}
-				
+
 				String periodicIntervalUnit = periodicIntervalArguments[1];
-				if(hasKeyword(periodicIntervalUnit, PERIODIC)){
-					taskObject.setPeriodicInterval(periodicIntervalValue + " " + periodicIntervalUnit);
+				if (hasKeyword(periodicIntervalUnit, PERIODIC)) {
+					taskObject.setPeriodicInterval(periodicIntervalValue + " "
+							+ periodicIntervalUnit);
 				} else {
 					logger.info("extractPeriodic: invalid period interval");
 					throw new Exception(ERROR_INVALID_PERIODIC_INTERVAL);
 				}
-				//return true;
 			} else {
-				logger.info("extractPeriodic: invalid number of interval arguments - " + periodicIntervalArguments.length);
+				logger.info("extractPeriodic: invalid number of interval arguments - "
+						+ periodicIntervalArguments.length);
 				throw new Exception(ERROR_INVALID_NUMBER_OF_ARGUMENTS);
 			}
-			
-			if(periodicInstancesArguments.length == 1){
+
+			if (periodicInstancesArguments.length == 1) {
 				logger.finer("extractPeriodic: periodic argument length is 1.");
 				int periodicInstancesValue;
 				try {
@@ -349,7 +358,8 @@ public class Parser {
 				}
 				taskObject.setPeriodicRepeats(periodicInstancesArguments[0]);
 			} else {
-				logger.info("extractPeriodic: invalid number of instance arguments - " + periodicInstancesArguments.length);
+				logger.info("extractPeriodic: invalid number of instance arguments - "
+						+ periodicInstancesArguments.length);
 				throw new Exception(ERROR_INVALID_NUMBER_OF_ARGUMENTS);
 			}
 
@@ -807,13 +817,26 @@ public class Parser {
 		}
 	}
 
+	/**
+	 * Marks the index 2 positions after the found word. 
+	 * This index is supposed to indicate the start of the field's arguments
+	 * @param commandString
+	 * @param listOfKeywords
+	 * @return
+	 */
 	KeywordMarker getKeywordMarker(String commandString,
 			String[] listOfKeywords) {
 		for (int i = 0; i < listOfKeywords.length; i++) {
 			String curKeyword = String.format(" %s ", listOfKeywords[i]);
+			String curKeywordStart = String.format("%s ", listOfKeywords[i]);
 			int keywordIndex = commandString.indexOf(curKeyword);
-			if (commandString.indexOf(curKeyword) != -1) {
-				int indexOfArgument = keywordIndex + curKeyword.length();
+			if (keywordIndex != -1 || commandString.startsWith(curKeywordStart)) {
+				int indexOfArgument;
+				if(keywordIndex != -1) {
+					indexOfArgument = keywordIndex + curKeyword.length();
+				} else {
+					indexOfArgument = -1 + curKeyword.length();
+				}
 				int lengthOfCommandString = commandString.length();
 				logger.finer("getKeywordMarker: Attempting to check " + curKeyword);
 				logger.finer("getKeywordMarker: found at " + keywordIndex + " and argument is at " + indexOfArgument);
