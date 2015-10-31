@@ -37,7 +37,7 @@ public class TestTaskListFormatter {
 		taskList.add(new Task("Task with only description"));
 		taskList.add(new Task("Task with 2 dates", timeForTesting, timeForTesting));
 		
-		Object[][][] taskListData = FormatterHelper.getTaskListData(taskList, false, 0);
+		Object[][][] taskListData = FormatterHelper.getTaskListData(taskList, false, 1, 0);
 
 		String result = formatter.formatTaskList(taskListData, ONE_BILLION);
 		String expected = "+-----+--------------------------+---------------+-------------+----------+-------+---------+-------------+" + NEW_LINE
@@ -63,7 +63,7 @@ public class TestTaskListFormatter {
 		taskList.add(new Task("Task with a very long long long long description with location and date",
 				timeForTesting, "NUS SoC"));
 		
-		Object[][][] taskListData = FormatterHelper.getTaskListData(taskList, false, 0);
+		Object[][][] taskListData = FormatterHelper.getTaskListData(taskList, false, 1, 0);
 
 		String result = formatter.formatTaskList(taskListData, 30);
 		String expected = "+-----+------------------------------+---------------+-------------+----------+-------+---------+-------------+" + NEW_LINE

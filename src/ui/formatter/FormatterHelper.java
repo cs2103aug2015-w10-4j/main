@@ -132,7 +132,7 @@ public class FormatterHelper {
 	}
 	
 	public static Object[][][] getTaskListData(List<Task> tasks, boolean needTaskSplit,
-			int minRowCount) {
+			int minTable, int minRowCountPerTable) {
 		List<List<Task>> taskLists = new ArrayList<List<Task>>();
 		if (needTaskSplit) {
 			taskLists = splitTask(tasks);
@@ -177,11 +177,21 @@ public class FormatterHelper {
 				currentTaskListData.add(currentTaskData);
 			}
 			
-			while (currentTaskListData.size() < minRowCount) {
+			while (currentTaskListData.size() < minRowCountPerTable) {
 				currentTaskListData.add(createEmptyTaskData());
 			}
 			
 			result.add(currentTaskListData.toArray(new Object[1][1]));
+		}
+		
+		while (result.size() < minTable) {
+			Object[][] emptyTaskList = new Object[minRowCountPerTable][];
+			
+			for (int i = 0; i < minRowCountPerTable; i++) {
+				emptyTaskList[i] = createEmptyTaskData();
+			}
+			
+			result.add(emptyTaskList);
 		}
 		
 		return result.toArray(new Object[1][1][1]);
@@ -225,11 +235,22 @@ public class FormatterHelper {
 		if (currentTask.hasEndingTime() != previousTask.hasEndingTime()) {
 			return false;
 		}
-		if (currentTask.hasEndingTime() && previousTask.hasEndingTime() &&
-				!currentTask.getEndingTime().equals(previousTask.getEndingTime())) {
-			return false;
+		
+		if (!currentTask.hasEndingTime()) {
+			return true;
+		} else {
+			Calendar currentTaskDate = currentTask.hasStartingTime() ? currentTask.getStartingTime() :
+				currentTask.getEndingTime();
+			Calendar previousTaskDate = previousTask.hasStartingTime() ? previousTask.getStartingTime() :
+				previousTask.getEndingTime();
+			
+			return areOnSameDay(currentTaskDate, previousTaskDate);
 		}
-		return true;
+	}
+
+	private static boolean areOnSameDay(Calendar currentTaskDate, Calendar previousTaskDate) {
+		return currentTaskDate.get(Calendar.YEAR) == previousTaskDate.get(Calendar.YEAR) &&
+				currentTaskDate.get(Calendar.DAY_OF_YEAR) == previousTaskDate.get(Calendar.DAY_OF_YEAR);
 	}
 	
 }

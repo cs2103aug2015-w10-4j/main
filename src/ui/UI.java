@@ -473,17 +473,20 @@ public class UI {
 	 * @return true if successful
 	 */
 	public boolean showTasks(List<Task> tasks, DisplayType displayType, List<String> titles) {
-		int minRowCount = -1;
+		int minTable = -1;
+		int minRowCountPerTable = -1;
 		if (displayType == DisplayType.DEFAULT) {
-			minRowCount = DEFAULT_DISPLAY_MIN_ROW;
+			minTable = 3;
+			minRowCountPerTable = DEFAULT_DISPLAY_MIN_ROW;
 		} else if (displayType == DisplayType.FILTERED) {
-			minRowCount = FILTERED_DISPLAY_MIN_ROW;
+			minTable = 1;
+			minRowCountPerTable = FILTERED_DISPLAY_MIN_ROW;
 		} else {
 			assert false : "DisplayType = ?";
 		}
 
 		Object[][][] taskListsData = FormatterHelper.getTaskListData(tasks,
-				displayType == DisplayType.DEFAULT, minRowCount);
+				displayType == DisplayType.DEFAULT, minTable, minRowCountPerTable);
 		assert taskListsData != null;
 		if (!useJTable) {
 			//TODO: fix set of strings
