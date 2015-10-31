@@ -13,22 +13,22 @@ public class FormatterHelper {
 	private static final String EMPTY_STRING_SUBSTITUTE = " ";
 	
 	public static final String[] FIELD_NAMES = new String[] { "UNUSED",
-															  "name",
-															  "startingTime",
-															  "endingTime",
-															  "location",
-															  "isDone"
-															  };
+			"name",
+			"startingTime",
+			"endingTime",
+			"location",
+			"isDone"
+			};
 	
 
 	//TODO: automate this?
 	public static final String[] TABLE_COLUMN_NAMES = new String[] { "No.",
-																	  "Description",
-																	  "Starting Time",
-																	  "Ending Time",
-																	  "Location",
-																	  "Status"
-																	  };
+			"Description",
+			"Starting Time",
+			"Ending Time",
+			"Location",
+			"Status"
+			};
 	
 	public static final int COLUMN_COUNT = 6;
 
