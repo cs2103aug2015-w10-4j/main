@@ -122,7 +122,7 @@ public class JsonFormatStorage implements Storage {
 	}
 	
 	
-	private void copyFile(String oldPath, String newPath) throws IOException {
+	private void copyFile(String newPath, String oldPath) throws IOException {
 		FileReader fr = new FileReader(oldPath);
 		FileWriter fw = new FileWriter(newPath);
 		int c = fr.read();
