@@ -38,6 +38,7 @@ public class Parser {
 	static final String ERROR_INVALID_PERIODIC_INTERVAL = "Error: Invalid periodic interval specified";
 	static final String ERROR_MISSING_START_TIME = "Error: An end time has been entered without start time!";
 	static final String ERROR_MISSING_END_TIME = "Error: A start time has been entered without end time!";
+	static final String ERROR_MISSING_START_OR_END_TIME = "Error: Start time or end time missing.";
 	static final String ERROR_INVALID_DAY_SPECIFIED = "Error: Invalid day specified!";
 	static final String ERROR_INVALID_NUMBER_OF_ARGUMENTS = "Error: Invalid number of arguments";
 	static final String ERROR_INVALID_COMMAND_SPECIFIED = "Error: Invalid command specified!";
@@ -218,7 +219,7 @@ public class Parser {
 		
 		logger.fine("extractedFieldInformation: extracting data from string");
 		extractName(commandString, keywordMarkers, taskObject, false);
-		extractDate(commandString, keywordMarkers, taskObject);
+		extractDate(commandString, keywordMarkers, taskObject, false);
 		extractLocation(commandString, keywordMarkers, taskObject);
 		return true;
 	}
@@ -287,7 +288,7 @@ public class Parser {
 		
 		logger.fine("extractedTaskInformation: extracting data from string");
 		extractName(commandString, keywordMarkers, taskObject, true);
-		boolean hasDate = extractDate(commandString, keywordMarkers, taskObject);
+		boolean hasDate = extractDate(commandString, keywordMarkers, taskObject, true);
 		extractLocation(commandString, keywordMarkers, taskObject);
 		extractPeriodic(commandString, keywordMarkers, taskObject, hasDate); // valid only if date is specified
 		return true;
@@ -368,7 +369,7 @@ public class Parser {
 	}
 
 	boolean extractDate(String commandString,
-			ArrayList<KeywordMarker> keywordMarkers, Task taskObject) throws Exception {
+			ArrayList<KeywordMarker> keywordMarkers, Task taskObject, boolean isNewTask) throws Exception {
 		// check deadline
 		logger.fine("extractDate: getting date arguments");
 		String[] deadlineArguments = getArgumentsForField(commandString,
@@ -400,7 +401,7 @@ public class Parser {
 			taskObject.setEndingTime(argumentDate);
 			logger.fine("extractDate: deadline set");
 			return true;
-		} else if (startEventArguments != null && startEventArguments != null) {
+		} else if (startEventArguments != null && endEventArguments != null) {
 			Calendar argumentStartDate = parseDate(startEventArguments);
 			Calendar argumentEndDate = parseDate(endEventArguments);
 
@@ -411,6 +412,17 @@ public class Parser {
 				taskObject.setStartingTime(argumentEndDate);
 				taskObject.setEndingTime(argumentStartDate);
 			}
+			return true;
+		} else if ((startEventArguments != null || endEventArguments != null)
+				&& isNewTask) {
+			throw new Exception(ERROR_MISSING_START_OR_END_TIME);
+		} else if (startEventArguments != null) {
+			Calendar argumentStartDate = parseDate(startEventArguments);
+			taskObject.setStartingTime(argumentStartDate);
+			return true;
+		} else if (endEventArguments != null) {
+			Calendar argumentEndDate = parseDate(endEventArguments);
+			taskObject.setEndingTime(argumentEndDate);
 			return true;
 		} else {
 			return false;
@@ -775,23 +787,15 @@ public class Parser {
 				START_EVENT);
 		KeywordMarker markerForEndEvent = getKeywordMarker(commandString,
 				END_EVENT);
-		if (markerForStartEvent != null && markerForEndEvent != null) {
+		if (markerForStartEvent != null) {
 			markerForStartEvent.setFieldType(FieldType.START_EVENT);
-			markerForEndEvent.setFieldType(FieldType.END_EVENT);
 			curMarkerList.add(markerForStartEvent);
-			curMarkerList.add(markerForEndEvent);
-			return true;
-		} else if (markerForStartEvent != null) {
-			logger.info("getDateField: start time without end time detected");
-			throw new Exception(
-					ERROR_MISSING_END_TIME);
-		} else if (markerForEndEvent != null) {
-			logger.info("getDateField: end time without start time detected");
-			throw new Exception(
-					ERROR_MISSING_START_TIME);
-		} else {
-			return false;
 		}
+		if (markerForEndEvent != null) {
+			markerForEndEvent.setFieldType(FieldType.END_EVENT);
+			curMarkerList.add(markerForEndEvent);
+		}
+		return true;
 	}
 
 	/**

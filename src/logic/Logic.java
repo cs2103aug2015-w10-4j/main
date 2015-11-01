@@ -39,6 +39,8 @@ import ui.UI.DisplayType;
  *
  */
 public class Logic {
+	private static final String ERROR_START_TIME_WITHOUT_END_TIME = "Error: Cannot add start time without end time!";
+	private static final String ERROR_START_TIME_BEFORE_END_TIME = "Error: Starting time cannot be after ending time.";
 	private static final String FILTER_TITLE_LOCATION = "Location: ";
 	private static final String FILTER_TITLE_TASK_NAME = "Task: ";
 	private static final String TITLE_TOP_3 = "Top 3 Items for ";
@@ -111,7 +113,7 @@ public class Logic {
 	private static final String ERROR_EDIT_CANNOT_RECURRING = "Error: Cannot convert a normal task to recurring";
 	
 
-	private static final String WARNING_TIMING_CLASH = "Warning: There are clashing timings between tasks.";
+	private static final String WARNING_TIMING_CLASH = "WARNING: There are clashing timings between tasks.";
 	
 	private static final String WHITE_SPACE_REGEX = "\\s+";
 
@@ -712,12 +714,30 @@ public class Logic {
 		if (newTask.hasLocation()) {
 			clonedTask.setLocation(newTask.getLocation());
 		}
-		if (newTask.hasStartingTime()) {
+		if (newTask.hasStartingTime() && newTask.hasEndingTime()) {
 			clonedTask.setStartingTime(newTask.getStartingTime());
 			clonedTask.setEndingTime(newTask.getEndingTime());
 		}
+		if (newTask.hasStartingTime() && !newTask.hasEndingTime()) {
+			Calendar newStartingTime = newTask.getStartingTime();
+			if (!clonedTask.hasEndingTime()) {
+				return ERROR_START_TIME_WITHOUT_END_TIME;
+			}
+			Calendar endingTime = clonedTask.getEndingTime();
+			if (!newStartingTime.after(endingTime)) {
+				clonedTask.setStartingTime(newTask.getStartingTime());
+			} else {
+				return ERROR_START_TIME_BEFORE_END_TIME;
+			}
+		}
 		if (newTask.hasEndingTime() && !newTask.hasStartingTime()) {
-			clonedTask.setEndingTime(newTask.getEndingTime());
+			Calendar newEndingTime = newTask.getEndingTime();
+			Calendar startingTime = clonedTask.getStartingTime();
+			if (!newEndingTime.before(startingTime)) {
+				clonedTask.setEndingTime(newTask.getEndingTime());
+			} else {
+				return ERROR_START_TIME_BEFORE_END_TIME;
+			}
 		}
 		if (newTask.hasPeriodicInterval() || newTask.hasPeriodicRepeats()) {
 			return ERROR_EDIT_CANNOT_RECURRING;
@@ -754,9 +774,7 @@ public class Logic {
 			if (isValidIndex(index)) {
 				// for history
 				Task taskEdited = listOfTasks.get(index);
-				if (hasClashes(userTask)) {
-					hasClashes = true;
-				}
+				
 
 				if (isUserInput) {
 					Task newTask = taskEdited.clone();
@@ -767,13 +785,19 @@ public class Logic {
 					}
 					listOfTasks.remove(index);
 					logger.fine("Old task removed from list.");
-
+					
+					if (hasClashes(newTask)) {
+						hasClashes = true;
+					}
 					listOfTasks.add(index, newTask);
 					logger.fine("New task added to list.");
 				} else {
 					listOfTasks.remove(index);
 					logger.fine("Old task removed from list.");
 
+					if (hasClashes(userTask)) {
+						hasClashes = true;
+					}
 					listOfTasks.add(index, userTask);
 					logger.fine("New task added to list.");
 				}
