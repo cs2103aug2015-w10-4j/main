@@ -14,6 +14,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashSet;
 import java.util.List;
@@ -38,6 +39,9 @@ import ui.UI.DisplayType;
  *
  */
 public class Logic {
+	private static final String TITLE_TOP_3 = "Top 3 Items for ";
+	private static final String TITLE_TOMORROW = "Tomorrow";
+	private static final String TITLE_TODAY = "Today";
 	private static final String LOG_FILE_NAME = "tasky.log";
 	private static final String CONFIG_FILE_NAME = "config.properties";
 	private static final String DEFAULT_LOGGING_LEVEL_STRING = "INFO";
@@ -61,7 +65,7 @@ public class Logic {
 	private static final Level DEFAULT_LEVEL = Level.INFO;
 	
 	// date format converter
-	static SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM yyyy");
+	static SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM");
 
 	/*
 	 * Static strings - errors and messages
@@ -846,6 +850,7 @@ public class Logic {
 		UIObject.showToUser(storageObject.getHelp());
 		return true;
 	}
+	
 	/**
 	 * This method filters the list of tasks to be shown to the user,
 	 * based on the current list of filter keywords
@@ -997,16 +1002,22 @@ public class Logic {
 
 	private void addTitleForDateHelper(List<String> listOfTitles, int curDate,
 			int curMonth, int curItemDate, int curItemMonth) {
+		Calendar itemDate = new GregorianCalendar();
+		itemDate.set(Calendar.DATE, curItemDate);
+		itemDate.set(Calendar.MONTH, curItemMonth);
+		String itemDateString = dateFormat.format(itemDate.getTime());
+		
 		if (curMonth == curItemMonth) {
 			if (curDate == curItemDate) {
-				listOfTitles.add("Today");
+				listOfTitles.add(TITLE_TOP_3 + TITLE_TODAY);
 			} else if (curDate == curItemDate - 1) {
-				listOfTitles.add("Tomorrow");
+				listOfTitles.add(TITLE_TOP_3 + TITLE_TOMORROW);
 			} else {
-				listOfTitles.add(curItemDate + "/" + curItemMonth);
+				
+				listOfTitles.add(TITLE_TOP_3 + itemDateString);
 			}
 		} else {
-			listOfTitles.add(curItemDate + "/" + curItemMonth);
+			listOfTitles.add(TITLE_TOP_3 + itemDateString);
 		}
 	}
 

@@ -468,7 +468,7 @@ public class Parser {
 								hourOfDay = Integer.parseInt(tempTime.substring(0, 2));
 								minute = Integer.parseInt(tempTime.substring(2));
 							} else {	// am/pm: 12 hour time format
-								isAMorPM = n == 1 ? 0 : 1;
+								isAMorPM = (n == 1 || n == 3) ? 0 : 1;
 								if (tempTime.contains(TIME_SEPARATOR)) { // check if minutes is specified
 									String[] tempTimeSplit = tempTime.split("\\" + TIME_SEPARATOR);
 									minute = Integer.parseInt(tempTimeSplit[1]);
