@@ -63,7 +63,7 @@ public class JsonFormatStorage implements Storage {
 		outputFileWriter.write(LINE_SEPARATOR);
 		
 		outputFileWriter.close();
-		logger.info("JsonFormat write tasks of "+ 	StoreInfo(tasks) + " into file: "+ currentFilePath);
+		logger.info("JsonFormat write tasks of "+ 	storeInfo(tasks) + " into file: "+ currentFilePath);
 		return true;
 	}
 
@@ -123,17 +123,15 @@ public class JsonFormatStorage implements Storage {
 	
 	
 	private void copyFile(String oldPath, String newPath) throws IOException {
-		
-            FileReader fr = new FileReader(oldPath);
-            FileWriter fw = new FileWriter(newPath);
-            int c=fr.read();
-            while(c!=-1)
-            {
-                fw.write(c);
-                c = fr.read(); // Add this line
-            }
-       fr.close();
-            fw.close();
+		FileReader fr = new FileReader(oldPath);
+		FileWriter fw = new FileWriter(newPath);
+		int c = fr.read();
+		while (c != -1) {
+			fw.write(c);
+			c = fr.read(); // Add this line
+		}
+		fr.close();
+		fw.close();
 	}
 
 	/**
@@ -163,13 +161,13 @@ public class JsonFormatStorage implements Storage {
 		return result;
 	}
 	
-	private String StoreInfo(ArrayList<Task>list){
+	private String storeInfo(ArrayList<Task> list) {
 		String loggerMsg = "";
-		for(int i = 0; i < list.size(); i++ ) {
+		for (int i = 0; i < list.size(); i++) {
 			loggerMsg += list.get(i).getAllInfo() + " ";
 		}
 		return loggerMsg;
-		
+
 	}
 
 }

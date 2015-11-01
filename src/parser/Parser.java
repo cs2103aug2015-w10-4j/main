@@ -62,8 +62,7 @@ public class Parser {
 	static final String[] COMMAND_SAVETO = { "saveto" };
 	static final String[] COMMAND_HELP = { "help" };
 
-	static final String[] DATE_SPECIAL = { "this", "next", "today", "tomorrow"
-			 };
+	static final String[] DATE_SPECIAL = { "this", "next", "today", "tomorrow" };
 	static final String[] MONTHS = { "jan", "feb", "mar", "apr", "may",
 			"jun", "jul", "aug", "sep", "oct", "nov", "dec" };
 	static final String[] DAYS = { "sunday" , "monday" , "tuesday" , "wednesday" , "thursday" ,"friday", "saturday" };
@@ -83,29 +82,6 @@ public class Parser {
 	static final String[] END_EVENT = { "end" , "to" , "ends" , "until" , "ending" };
 	static final String[] INTERVAL_PERIODIC = { "every" , "repeats" };
 	static final String[] INSTANCES_PERIODIC = { "for" };
-
-	
-	public FieldType getEditFieldType(String keyword){
-		if (hasKeyword(keyword, LOCATION)) {
-			return FieldType.LOCATION;
-		}
-		if (hasKeyword(keyword, DEADLINE)) {
-			return FieldType.DEADLINE;
-		}
-		if (hasKeyword(keyword, START_EVENT)) {
-			return FieldType.START_EVENT;
-		}
-		if (hasKeyword(keyword, END_EVENT)) {
-			return FieldType.END_EVENT;
-		}
-		if (hasKeyword(keyword, INTERVAL_PERIODIC)) {
-			return FieldType.INTERVAL_PERIODIC;
-		}
-		if (hasKeyword(keyword, INSTANCES_PERIODIC)) {
-			return FieldType.INSTANCES_PERIODIC;
-		}
-		return null;
-	}
 	
 	class KeywordMarker implements Comparable<KeywordMarker> {
 		int index;
@@ -197,20 +173,20 @@ public class Parser {
 		return commandObject;
 	}
 	
-	String[] getSaveToArgument(String commandString){
-		return new String[]{ commandString };
+	String[] getSaveToArgument(String commandString) {
+		return new String[] { commandString };
 	}
 	
-	String[] getParameterOneAsArray(String commandString){
+	String[] getParameterOneAsArray(String commandString) {
 		String indexString = commandString.split(WHITE_SPACE_REGEX, 2)[0];
-		return new String[]{ indexString };
+		return new String[] { indexString };
 	}
 	
-	String getParameterTwo(String commandString){
+	String getParameterTwo(String commandString) {
 		return commandString.split(WHITE_SPACE_REGEX)[1];
 	}
-	
-	String[] getMultipleIndexes(String commandString){
+
+	String[] getMultipleIndexes(String commandString) {
 		String[] indexArray = commandString.split(WHITE_SPACE_REGEX);
 		return indexArray;
 	}
@@ -242,9 +218,8 @@ public class Parser {
 		
 		logger.fine("extractedFieldInformation: extracting data from string");
 		extractName(commandString, keywordMarkers, taskObject, false);
-		boolean hasDate = extractDate(commandString, keywordMarkers, taskObject);
+		extractDate(commandString, keywordMarkers, taskObject);
 		extractLocation(commandString, keywordMarkers, taskObject);
-		extractPeriodic(commandString, keywordMarkers, taskObject, hasDate); // valid only if date is specified
 		return true;
 	}
 
@@ -276,7 +251,7 @@ public class Parser {
 				return Command.Type.UNMARK;
 			} else if (isCommandKeyword(firstWord, COMMAND_SEARCH)) {
 				return Command.Type.SEARCH;
-			} else if(isCommandKeyword(firstWord, COMMAND_HELP)){
+			} else if (isCommandKeyword(firstWord, COMMAND_HELP)) {
 				return Command.Type.HELP;
 			} else {
 				logger.info("identifyType: invalid command");
@@ -400,8 +375,9 @@ public class Parser {
 				keywordMarkers, FieldType.DEADLINE);
 
 		if (deadlineArguments != null) {
-			for(int i = 0; i < deadlineArguments.length; i++){
-				logger.finer("extractDate: deadlineArguments[" + i + "] contains " +  deadlineArguments[i]);
+			for (int i = 0; i < deadlineArguments.length; i++) {
+				logger.finer("extractDate: deadlineArguments[" + i
+						+ "] contains " + deadlineArguments[i]);
 			}
 		}
 		
@@ -499,9 +475,9 @@ public class Parser {
 			dateArguments = dateArgumentsTemp;
 		}
 		
-		if(dateArguments.length == 0){
+		if (dateArguments.length == 0) {
 			throw new Exception(ERROR_INVALID_NUMBER_OF_ARGUMENTS);
-		}else if(!hasKeyword(dateArguments, DATE_SPECIAL)
+		} else if(!hasKeyword(dateArguments, DATE_SPECIAL)
 				&& dateArguments.length != 1) {
 			try {
 				date = Integer.parseInt(dateArguments[0]);
@@ -582,8 +558,8 @@ public class Parser {
 	 * @return index of word in list if found, else -1
 	 */
 	private int getIndexOfList(String word, List<String> listOfWords) {
-		for(int i = 0; i < listOfWords.size(); i++){
-			if(listOfWords.get(i).equalsIgnoreCase(word)){
+		for (int i = 0; i < listOfWords.size(); i++) {
+			if (listOfWords.get(i).equalsIgnoreCase(word)) {
 				return i;
 			}
 		}
@@ -618,8 +594,8 @@ public class Parser {
 		return false;
 	}
 	
-	boolean hasKeyword(String[] words, String[] keywords){
-		for(int i = 0; i < words.length; i++){
+	boolean hasKeyword(String[] words, String[] keywords) {
+		for (int i = 0; i < words.length; i++) {
 			if (hasKeyword(words[i], keywords)) {
 				return true;
 			}
@@ -632,9 +608,9 @@ public class Parser {
 	 * the keyword is concatenated with the time itself, e.g. '6pm' instead of '6 pm'
 	*/
 	boolean hasTimeKeyword(String[] words, String[] keywords) {
-		for(int i = 0; i < words.length; i++){
-			for(int n = 0; n < keywords.length; n++){
-				if(words[i].contains(keywords[n])){
+		for (int i = 0; i < words.length; i++) {
+			for (int n = 0; n < keywords.length; n++) {
+				if (words[i].contains(keywords[n])) {
 					return true;
 				}
 			}
@@ -720,10 +696,10 @@ public class Parser {
 			}
 			
 			logger.finer("extractName: past next command word at " + searchIndex);
-			if(searchIndex >= 0){
+			if (searchIndex >= 0) {
 				taskName = commandString.substring(0, searchIndex);
 			} else {
-				if(isNewTask){
+				if (isNewTask) {
 					throw new Exception(ERROR_EMPTY_TASK_NAME);
 				}
 			}

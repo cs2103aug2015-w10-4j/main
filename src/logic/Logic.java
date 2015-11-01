@@ -451,11 +451,9 @@ public class Logic {
 	String addItem(ArrayList<Task> userTasks, ArrayList<Integer> indexList,
 			boolean isUserInput, boolean isUndoHistory) {
 		try {
-			logger.fine("Attempting to determine index.");
 			ArrayList<Integer> parsedIntList = new ArrayList<Integer>();
 			
 			boolean hasClashes = false;
-
 			logger.fine("Checking for clashes.");
 			if (haveClashes(userTasks)) {
 				logger.finer("Clash in timing detected.");
@@ -982,7 +980,7 @@ public class Logic {
 			int curMonth, int curItemDate, int curItemMonth) {
 		Calendar itemDate = new GregorianCalendar();
 		itemDate.set(Calendar.DATE, curItemDate);
-		itemDate.set(Calendar.MONTH, curItemMonth);
+		itemDate.set(Calendar.MONTH, curItemMonth - 1);
 		String itemDateString = dateFormat.format(itemDate.getTime());
 		
 		if (curMonth == curItemMonth) {
@@ -1153,7 +1151,7 @@ public class Logic {
 
 	// Create an array with all unique elements
 	ArrayList<String> removeDuplicates(ArrayList<String> parsedIntArgumentList) {
-		if(parsedIntArgumentList == null){
+		if (parsedIntArgumentList == null) {
 			return new ArrayList<String>();
 		}
 		HashSet<String> hs = new HashSet<>();
@@ -1185,7 +1183,7 @@ public class Logic {
 	 * @return
 	 * @throws Exception
 	 */
-	ArrayList<Task> splitPeriodic(Task recurringTask) throws Exception{
+	ArrayList<Task> splitPeriodic(Task recurringTask) throws Exception {
 		if (!recurringTask.hasPeriodicInterval() || !recurringTask.hasPeriodicRepeats()) {
 			return null; // no periodic to split
 		} else {
@@ -1211,7 +1209,8 @@ public class Logic {
 	 * @param periodicIntervalString a time interval in the form <integer> <days/weeks/months>
 	 * 
 	 */
-	boolean addInterval(Task curTask, String periodicIntervalString) throws Exception{
+	boolean addInterval(Task curTask, String periodicIntervalString)
+			throws Exception {
 		String[] periodicIntervalWords = periodicIntervalString.split(
 				WHITE_SPACE_REGEX, 2);
 		String periodicIntervalUnit = periodicIntervalWords[1];
