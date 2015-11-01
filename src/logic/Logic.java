@@ -611,8 +611,7 @@ public class Logic {
 			return ERROR_NO_FILTER;
 		} else {
 			Task taskObject = userTasks.get(0);
-			listFilter.add(taskObject);
-
+				listFilter.add(taskObject);
 			return MESSAGE_SUCCESS_SEARCH;
 		}
 	}
