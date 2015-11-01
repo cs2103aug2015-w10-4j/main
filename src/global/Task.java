@@ -88,6 +88,22 @@ public class Task implements Comparable<Task> {
 	public Calendar getStartingTime() {
 		return this.startingTime;
 	}
+	
+	/**
+	 * Returns starting time if it not null,
+	 * else returns ending time (which may still be null)
+	 * 
+	 * This is mainly used to return the date this item is to be classified in
+	 * 
+	 * @return
+	 */
+	public Calendar getTime() {
+		if (hasStartingTime()) {
+			return this.startingTime;
+		} else {
+			return this.endingTime;
+		}
+	}
 
 	public String getLocation() {
 		return this.location;

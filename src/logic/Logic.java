@@ -39,6 +39,8 @@ import ui.UI.DisplayType;
  *
  */
 public class Logic {
+	private static final String FILTER_TITLE_LOCATION = "Location: ";
+	private static final String FILTER_TITLE_TASK_NAME = "Task: ";
 	private static final String TITLE_TOP_3 = "Top 3 Items for ";
 	private static final String TITLE_TOMORROW = "Tomorrow";
 	private static final String TITLE_TODAY = "Today";
@@ -705,7 +707,7 @@ public class Logic {
 		return finalArgumentList;
 	}
 	
-	String editSpecialField(Task newTask, Task clonedTask) {
+	String editFields(Task newTask, Task clonedTask) {
 		if (newTask.hasName()) {
 			clonedTask.setName(newTask.getName());
 		}
@@ -760,7 +762,7 @@ public class Logic {
 
 				if (isUserInput) {
 					Task newTask = taskEdited.clone();
-					String statusOfSpecialEdit = editSpecialField(userTask,
+					String statusOfSpecialEdit = editFields(userTask,
 							newTask);
 					if (statusOfSpecialEdit != null) {
 						return statusOfSpecialEdit;
@@ -825,16 +827,9 @@ public class Logic {
 		ArrayList<Task> listOfTasksInDay = new ArrayList<Task>();
 		for (int i = 0; i < listOfEventsDeadlines.size(); i++) {
 			Task curTask = listOfEventsDeadlines.get(i);
-			if (curTask.hasStartingTime()) {
-				Calendar startTime = curTask.getStartingTime();
-				if (isTimingInDay(startTime, date)) {
-					listOfTasksInDay.add(curTask);
-				}
-			} else {
-				Calendar endTime = curTask.getEndingTime();
-				if (isTimingInDay(endTime, date)) {
-					listOfTasksInDay.add(curTask);
-				}
+			Calendar itemTime = curTask.getTime();
+			if (isTimingInDay(itemTime, date)) {
+				listOfTasksInDay.add(curTask);
 			}
 		}
 
@@ -883,25 +878,16 @@ public class Logic {
 			if (listOfEventsDeadlines.size() != 0) {
 				Task firstTask = listOfEventsDeadlines.get(0);
 				Calendar firstDate, secondDate = null;
-				if (firstTask.hasStartingTime()) {
-					firstDate = firstTask.getStartingTime();
-				} else {
-					firstDate = firstTask.getEndingTime();
-				}
+				firstDate = firstTask.getTime();
 				listOfFirstDate = getTasksInDay(listOfEventsDeadlines,
 						firstDate);
 
 				int i = 1;
 				while (i < listOfEventsDeadlines.size() && secondDate == null) {
 					Task curTask = listOfEventsDeadlines.get(i);
-					if (curTask.hasStartingTime()) {
-						if (!isTimingInDay(curTask.getStartingTime(), firstDate)) {
-							secondDate = curTask.getStartingTime();
-						}
-					} else {
-						if (!isTimingInDay(curTask.getEndingTime(), firstDate)) {
-							secondDate = curTask.getEndingTime();
-						}
+					Calendar curDate = curTask.getTime();
+					if (!isTimingInDay(curDate, firstDate)) {
+							secondDate = curDate;
 					}
 					i++;
 				}
@@ -940,7 +926,7 @@ public class Logic {
 				String searchTaskName = curFilter.getName();
 				int i = 0;
 				if (searchTaskName != null) {
-					searchStrings.add("Task: " + searchTaskName);
+					searchStrings.add(FILTER_TITLE_TASK_NAME + searchTaskName);
 					while (i < listOfShownTasks.size()) {
 						Task curTask = listOfShownTasks.get(i);
 						if (!curTask.getName().toLowerCase().contains(searchTaskName)) {
@@ -958,7 +944,7 @@ public class Logic {
 				String searchLocation = curFilter.getLocation();
 				int i = 0;
 				if (searchLocation != null) {
-					searchStrings.add("Location: " + searchLocation);
+					searchStrings.add(FILTER_TITLE_LOCATION + searchLocation);
 					while (i < listOfShownTasks.size()) {
 						Task curTask = listOfShownTasks.get(i);
 						if (curTask.getLocation() == null || !curTask.getLocation().toLowerCase().contains(searchLocation)) {
@@ -982,19 +968,11 @@ public class Logic {
 			int curMonth = curTime.get(Calendar.MONTH) + 1;
 			Task curItem = listOfItemsInDate.get(0);
 			
-			if (curItem.hasStartingTime()) {
-				Calendar curItemTime = curItem.getStartingTime();
-				int curItemDate = curItemTime.get(Calendar.DATE);
-				int curItemMonth = curItemTime.get(Calendar.MONTH) + 1;
-				addTitleForDateHelper(listOfTitles, curDate, curMonth,
-						curItemDate, curItemMonth);
-			} else {
-				Calendar curItemTime = curItem.getEndingTime();
-				int curItemDate = curItemTime.get(Calendar.DATE);
-				int curItemMonth = curItemTime.get(Calendar.MONTH) + 1;
-				addTitleForDateHelper(listOfTitles, curDate, curMonth,
-						curItemDate, curItemMonth);
-			}
+			Calendar curItemTime = curItem.getTime();
+			int curItemDate = curItemTime.get(Calendar.DATE);
+			int curItemMonth = curItemTime.get(Calendar.MONTH) + 1;
+			addTitleForDateHelper(listOfTitles, curDate, curMonth,
+					curItemDate, curItemMonth);
 		} else {
 			listOfTitles.add("No upcoming tasks.");
 		}
