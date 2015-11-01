@@ -29,21 +29,24 @@ public class Parser {
 	
 	//status messages
 	
-	static final String ERROR_INVALID_PERIODIC_INSTANCES = "Error: Invalid periodic instances";
-	static final String ERROR_INVALID_PERIODIC_INTERVAL_VALUE = "Error: Invalid periodic interval value";
-	static final String ERROR_INVALID_MONTH_SPECIFIED = "Error: Invalid date specified!";
+	static final String ERROR_MISSING_INTERVAL = "Error: Missing repeat interval.";
+	static final String ERROR_MISSING_REPEATS = "Error: Missing number of repeats.";
+	static final String ERROR_INVALID_DATE_ARGUMENTS = "Error: Invalid arguments for date.";
+	static final String ERROR_INVALID_PERIODIC_INSTANCES = "Error: Invalid periodic instances.";
+	static final String ERROR_INVALID_PERIODIC_INTERVAL_VALUE = "Error: Invalid periodic interval value.";
+	static final String ERROR_INVALID_MONTH_SPECIFIED = "Error: Invalid month specified!";
 	static final String ERROR_INVALID_DATE_SPECIFIED = "Error: Invalid date specified!";
 	static final String ERROR_INVALID_TIME = "Error: Invalid time!";
 	static final String ERROR_INVALID_TIME_FORMAT = "Error: Invalid time format specified!";
-	static final String ERROR_INVALID_PERIODIC_INTERVAL = "Error: Invalid periodic interval specified";
+	static final String ERROR_INVALID_PERIODIC_INTERVAL = "Error: Invalid periodic interval specified.";
 	static final String ERROR_MISSING_START_TIME = "Error: An end time has been entered without start time!";
 	static final String ERROR_MISSING_END_TIME = "Error: A start time has been entered without end time!";
 	static final String ERROR_MISSING_START_OR_END_TIME = "Error: Start time or end time missing.";
 	static final String ERROR_INVALID_DAY_SPECIFIED = "Error: Invalid day specified!";
-	static final String ERROR_INVALID_NUMBER_OF_ARGUMENTS = "Error: Invalid number of arguments";
+	static final String ERROR_INVALID_NUMBER_OF_ARGUMENTS = "Error: Invalid number of arguments.";
 	static final String ERROR_INVALID_COMMAND_SPECIFIED = "Error: Invalid command specified!";
-	static final String ERROR_EMPTY_COMMAND_STRING = "Error: Command string is empty";
-	static final String ERROR_EMPTY_TASK_NAME = "Error: Task name is empty";
+	static final String ERROR_EMPTY_COMMAND_STRING = "Error: Command string is empty.";
+	static final String ERROR_EMPTY_TASK_NAME = "Error: Task name is empty.";
 
 	
 	static final String WHITE_SPACE_REGEX = "\\s+";
@@ -447,7 +450,7 @@ public class Parser {
 				boolean keywordFound = false;
 				for (int n = 0; n < TIME.length; n++) {
 					// low-level check if TIME keywords is present at the end of the argument e.g. 6(pm)
-					if (dateArgumentsTemp[i].lastIndexOf(TIME[n]) >= dateArgumentsTemp[i].length() - 2) {
+					if (dateArgumentsTemp[i].endsWith(TIME[n])) {
 						keywordFound = true;
 						try {
 							String tempTime = dateArgumentsTemp[i];
@@ -549,7 +552,7 @@ public class Parser {
 			}
 		} else {
 			logger.info("parseDate: unknown date arguments");
-			throw new Exception("Error: Invalid arguments for date");
+			throw new Exception(ERROR_INVALID_DATE_ARGUMENTS);
 		}
 
 		if (hourOfDay == null) {
@@ -753,9 +756,9 @@ public class Parser {
 			curMarkerList.add(markerForInstancesPeriodic);
 			return true;
 		} else if (markerForIntervalPeriodic != null) {
-			throw new Exception("Error: Missing number of repeats");
+			throw new Exception(ERROR_MISSING_REPEATS);
 		} else if (markerForInstancesPeriodic != null) {
-			throw new Exception("Error: Missing repeat interval");
+			throw new Exception(ERROR_MISSING_INTERVAL);
 		} else {
 			return false;
 		}
