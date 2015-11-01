@@ -609,7 +609,8 @@ public class Logic {
 			return ERROR_NO_FILTER;
 		} else {
 			Task taskObject = userTasks.get(0);
-			if(listFilter.size()!=0 && !listFilter.get(listFilter.size()-1).getAllInfo().equals(taskObject.getAllInfo())) {			
+			if(listFilter.size()!=0 && !listFilter.get(listFilter.size()-1).getAllInfo().equals(taskObject.getAllInfo())) {		
+			listFilter.remove(0);
 			listFilter.add(taskObject);
 }
 			if(listFilter.size()==0 ) {
