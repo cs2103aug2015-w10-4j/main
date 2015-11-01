@@ -550,6 +550,16 @@ public class Parser {
 				helperDate = new GregorianCalendar();
 				helperDate.add(Calendar.DATE, 1);
 			}
+		} else if (hasKeyword(dateArguments, DAYS) && dateArguments.length == 1) {
+			int dayIndex = getIndexOfList(dateArguments[0], Arrays.asList(DAYS)) + 1;
+			date = getNearestDate(dayIndex);
+			
+			month = Calendar.getInstance().get(Calendar.MONTH);
+			year = Calendar.getInstance().get(Calendar.YEAR);
+
+			helperDate = new GregorianCalendar();
+			helperDate.clear();
+			helperDate.set(year, month, date);
 		} else {
 			logger.info("parseDate: unknown date arguments");
 			throw new Exception(ERROR_INVALID_DATE_ARGUMENTS);

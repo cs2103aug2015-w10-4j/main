@@ -18,8 +18,6 @@ public class Task implements Comparable<Task> {
 	private String periodicInterval = null;
 	private String periodicRepeats = null;
 	private boolean isDone = false;
-	private boolean isClashing = false;
-	private boolean isCancelled = false;
 	private int id = -1;
 
 	/*
@@ -170,24 +168,6 @@ public class Task implements Comparable<Task> {
 		} else {
 			return true;
 		}
-	}
-	
-	public boolean isClashing(){
-		return this.isClashing;
-	}
-	
-	public boolean isCancelled(){
-		return this.isCancelled;
-	}
-	
-	public boolean setClashing(){
-		this.isClashing = true;
-		return true;
-	}
-	
-	public boolean setCancelled(){
-		this.isCancelled = true;
-		return true;
 	}
 	
 	public boolean hasId() {
