@@ -83,7 +83,7 @@ public class Logic {
 	private static final String MESSAGE_SUCCESS_DELETE = "Item(s) successfully deleted.";
 	private static final String MESSAGE_SUCCESS_MARK = "Item(s) successfully marked.";
 	private static final String MESSAGE_SUCCESS_UNMARK = "Item(s) successfully unmarked.";
-	private static final String MESSAGE_SUCCESS_SEARCH = "Search results.";// for '%s'";
+	private static final String MESSAGE_SUCCESS_SEARCH = "Search results.";
 	private static final String MESSAGE_SUCCESS_EDIT = "Item(s) successfully edited.";
 	private static final String MESSAGE_SUCCESS_EXIT = "Exiting program...";
 	private static final String MESSAGE_SUCCESS_DISPLAY = "Displaying items.";
@@ -140,8 +140,9 @@ public class Logic {
 			logger.addHandler(logHandler);
 			
 			File configFile = new File(CONFIG_FILE_NAME);
-			if(configFile.exists()){
-				BufferedReader bufReader = new BufferedReader(new FileReader(new File(CONFIG_FILE_NAME)));
+			if (configFile.exists()) { // assumes that the config file has not been incorrectly modified
+				BufferedReader bufReader = new BufferedReader(new FileReader(
+						new File(CONFIG_FILE_NAME)));
 				propObject.load(bufReader);
 				bufReader.close();
 			} else {
@@ -916,9 +917,9 @@ public class Logic {
 			// default view
 			List<String> listOfTitles = new ArrayList<String>();
 			addTitleForDate(listOfFirstDate, listOfTitles);
-			addTitleForDate(listOfSecondDate, listOfTitles)
-			;
-			if(listOfFloating.size() != 0){
+			addTitleForDate(listOfSecondDate, listOfTitles);
+			
+			if (listOfFloating.size() != 0) {
 				listOfTitles.add("Other tasks");
 			} else {
 				listOfTitles.add("No other tasks.");
@@ -927,10 +928,11 @@ public class Logic {
 			return UIObject.showTasks(listOfShownTasks, DisplayType.DEFAULT, listOfTitles);
 		} else {
 			listOfShownTasks = new ArrayList<Task>();
+			List<String> searchStrings = new ArrayList<String>();
+			
 			for (int i = 0; i < listOfTasks.size(); i++) {
 				listOfShownTasks.add(listOfTasks.get(i));
 			}
-
 			
 			// Filter by name
 			for (int j = 0; j < listFilter.size(); j++) {
@@ -938,6 +940,7 @@ public class Logic {
 				String searchTaskName = curFilter.getName();
 				int i = 0;
 				if (searchTaskName != null) {
+					searchStrings.add("Task: " + searchTaskName);
 					while (i < listOfShownTasks.size()) {
 						Task curTask = listOfShownTasks.get(i);
 						if (!curTask.getName().toLowerCase().contains(searchTaskName)) {
@@ -955,6 +958,7 @@ public class Logic {
 				String searchLocation = curFilter.getLocation();
 				int i = 0;
 				if (searchLocation != null) {
+					searchStrings.add("Location: " + searchLocation);
 					while (i < listOfShownTasks.size()) {
 						Task curTask = listOfShownTasks.get(i);
 						if (curTask.getLocation() == null || !curTask.getLocation().toLowerCase().contains(searchLocation)) {
@@ -966,10 +970,6 @@ public class Logic {
 				}
 			}
 			
-			List<String> searchStrings = new ArrayList<String>();
-			for(int i = 0; i < listFilter.size(); i++){
-				searchStrings.add(listFilter.get(i).getName()); // to be changed based on existing field
-			}
 			return UIObject.showTasks(listOfShownTasks, DisplayType.FILTERED, searchStrings);
 		}
 	}

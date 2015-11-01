@@ -110,7 +110,8 @@ public class JsonFormatStorage implements Storage {
 			//exist already, check whether it is the same file
 			//with the current one
 			if (!currentFilePath.equals(path)) {
-				copyFile(path, currentFilePath);
+				//copyFile(path, currentFilePath);
+				// removed because the user might want to open an already existing data file
 				currentFilePath = path;
 				isFilePathChanged = true;
 				logger.info("JsonFormat save file to new path: "+path);
