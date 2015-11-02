@@ -163,6 +163,9 @@ public class Parser {
 				argumentArray = getMultipleIndexes(commandString);
 				commandObject.setArguments(argumentArray);
 				break;
+			case DISPLAY :
+				argumentArray = getSaveToArgument(commandString);
+				commandObject.setArguments(argumentArray);
 			case UNMARK :
 				argumentArray = getMultipleIndexes(commandString);
 				commandObject.setArguments(argumentArray);
@@ -731,8 +734,10 @@ public class Parser {
 		} else {
 			taskName = commandString;
 		}
-		taskName = taskName.replaceAll("\\\\", "");
-		taskObject.setName(taskName);
+		if (taskName != null) {
+			taskName = taskName.replaceAll("\\\\", "");
+			taskObject.setName(taskName);
+		}
 		return true;
 	}
 

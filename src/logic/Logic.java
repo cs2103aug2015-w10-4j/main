@@ -66,6 +66,8 @@ public class Logic {
 	ArrayList<Task> listOfTasks = new ArrayList<Task>();
 	ArrayList<Task> listOfShownTasks = new ArrayList<Task>();
 	ArrayList<Task> listFilter = new ArrayList<Task>();
+	boolean shouldShowDone = true;
+	boolean shouldShowUndone = true;
 	private static final int ID_RANGE = 1000;
 	private static final int RECURRING_MAX = 100;
 	private static final Level DEFAULT_LEVEL = Level.INFO;
@@ -296,7 +298,7 @@ public class Logic {
 							isUndoHistory);
 				case DISPLAY :
 					logger.info("DISPLAY command detected");
-					return displayItems();
+					return displayItems(argumentList);
 				case UNDO :
 					logger.info("UNDO command detected");
 					return undoCommand();
@@ -611,7 +613,7 @@ public class Logic {
 			return ERROR_NO_FILTER;
 		} else {
 			Task taskObject = userTasks.get(0);
-				listFilter.add(taskObject);
+			listFilter.add(taskObject);
 			return MESSAGE_SUCCESS_SEARCH;
 		}
 	}
@@ -818,13 +820,32 @@ public class Logic {
 		}
 	}
 
-	String displayItems() {
-		listFilter.clear();
+	String displayItems(ArrayList<String> argumentList) {
 		if (listOfTasks.isEmpty()) {
 			return MESSAGE_DISPLAY_EMPTY;
-		} else {
-			return MESSAGE_SUCCESS_DISPLAY;
 		}
+		if (argumentList.size() == 1 && argumentList.get(0).equals("all")) {
+			shouldShowUndone = true;
+			shouldShowDone = true;
+			listFilter.clear();
+			listFilter.add(new Task());
+		} else if (argumentList.size() == 1
+				&& argumentList.get(0).equals("done")) {
+			shouldShowUndone = false;
+			shouldShowDone = true;
+			listFilter.clear();
+			listFilter.add(new Task());
+		} else if (argumentList.size() == 1 && argumentList.get(0).equals("undone")) {
+			shouldShowDone = false;
+			shouldShowUndone = true;
+			listFilter.clear();
+			listFilter.add(new Task());
+		} else {
+			shouldShowUndone = true;
+			shouldShowDone = true;
+			listFilter.clear();
+		}
+		return MESSAGE_SUCCESS_DISPLAY;
 	}
 
 	/**
@@ -938,7 +959,13 @@ public class Logic {
 			List<String> searchStrings = new ArrayList<String>();
 			
 			for (int i = 0; i < listOfTasks.size(); i++) {
-				listOfShownTasks.add(listOfTasks.get(i));
+				Task curTask = listOfTasks.get(i);
+				if (curTask.isDone() && shouldShowDone) {
+					listOfShownTasks.add(curTask);
+				}
+				if (!curTask.isDone() && shouldShowUndone) {
+					listOfShownTasks.add(curTask);
+				}
 			}
 			
 			searchStrings.add(FILTER_TITLE_TASK_NAME);
