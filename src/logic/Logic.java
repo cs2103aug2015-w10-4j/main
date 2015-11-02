@@ -971,6 +971,7 @@ public class Logic {
 			searchStrings.add(FILTER_TITLE_TASK_NAME);
 			searchStrings.add(FILTER_TITLE_TIME);
 			searchStrings.add(FILTER_TITLE_LOCATION);
+			
 			boolean isEmptyName = true;
 			boolean isEmptyTime = true;
 			boolean isEmptyLocation = true;
@@ -996,6 +997,43 @@ public class Logic {
 						}
 					}
 				}
+			}
+			
+			// Filter by time
+			for (int j = 0; j < listFilter.size(); j++) {
+				Task curFilter = listFilter.get(j);
+				Calendar filterTime = curFilter.getTime();
+				if (filterTime != null) {
+					Calendar filterTimeStart = (Calendar) filterTime.clone();
+					filterTimeStart.set(Calendar.HOUR_OF_DAY, 0);
+					filterTimeStart.set(Calendar.MINUTE, 0);
+					Calendar filterTimeEnd = (Calendar) filterTime.clone();
+					filterTimeEnd.set(Calendar.HOUR_OF_DAY, 23);
+					filterTimeEnd.set(Calendar.MINUTE, 59);
+					if (!isEmptyTime) {
+						searchStrings.set(
+								1,
+								searchStrings.get(1).concat(
+										FILTER_SEARCH_SEPARATOR));
+					}
+					isEmptyTime = false;
+					searchStrings.set(
+							1,
+							searchStrings.get(1).concat(
+									dateFormat.format(filterTime.getTime())));
+					int i = 0;
+					while (i < listOfShownTasks.size()) {
+						Task curTask = listOfShownTasks.get(i);
+						if (curTask.getTime() == null
+								|| curTask.getTime().before(filterTimeStart)
+								|| curTask.getTime().after(filterTimeEnd)) {
+							listOfShownTasks.remove(i);
+						} else {
+							i++;
+						}
+					}
+				}
+				
 			}
 			
 			// Filter by location
