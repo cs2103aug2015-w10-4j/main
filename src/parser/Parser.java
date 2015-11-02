@@ -469,6 +469,8 @@ public class Parser {
 									minute = Integer.parseInt(tempTimeSplit[1]);
 									hour = Integer.parseInt(tempTimeSplit[0]);
 								} else {
+									// if no minutes is specified, then set to 0 (e.g. '8PM' = 8:00PM)
+									minute = 0;
 									hour = Integer.parseInt(tempTime);
 								}
 								// for 12 hour time format, 12am/pm means hour = 0
