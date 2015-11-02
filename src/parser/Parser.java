@@ -70,6 +70,7 @@ public class Parser {
 	static final String[] MONTHS = { "jan", "feb", "mar", "apr", "may",
 			"jun", "jul", "aug", "sep", "oct", "nov", "dec" };
 	static final String[] DAYS = { "sunday" , "monday" , "tuesday" , "wednesday" , "thursday" ,"friday", "saturday" };
+	static final String[] DAYS_COMPACT = { "sun" , "mon" , "tue" , "wed" , "thu" ,"fri", "sat" };
 	
 
 	static final String[] PERIODIC = { "days", "weeks" , "months" };
@@ -435,11 +436,11 @@ public class Parser {
 		}
 	}
 
-	// if time not specified, it will be parsed to 09:00 AM
+	// if time not specified, it will be parsed to 11:59 PM
 	// TIME keyword in commandString must be capitalized
 	Calendar parseDate(String[] dateArgumentsTemp) throws Exception {
 		logger.fine("parseDate: parsing date");
-		int date, month, year, hour = 9, minute = 0, isAMorPM = 0;
+		int date, month, year, hour = 23, minute = 59, isAMorPM = 0;
 		Integer hourOfDay = null;
 		Calendar helperDate;
 		
@@ -522,9 +523,17 @@ public class Parser {
 					+ dateArguments[1]);
 			String firstWord = dateArguments[0];
 			String secondWord = dateArguments[1];
-
-			if (hasKeyword(secondWord, DAYS)) {
-				int dayIndex = getIndexOfList(secondWord, Arrays.asList(DAYS)) + 1;
+			
+			boolean hasDaysKeyword = hasKeyword(secondWord, DAYS);
+			boolean hasDaysCompactKeyword = hasKeyword(secondWord, DAYS_COMPACT);
+			if (hasDaysKeyword || hasDaysCompactKeyword) {
+				int dayIndex;
+				if (hasDaysKeyword) {
+					dayIndex = getIndexOfList(secondWord, Arrays.asList(DAYS)) + 1;
+				} else {
+					dayIndex = getIndexOfList(secondWord,
+							Arrays.asList(DAYS_COMPACT)) + 1;
+				}
 				assert (firstWord.equalsIgnoreCase(DATE_SPECIAL[0]) || firstWord
 						.equalsIgnoreCase(DATE_SPECIAL[1]));
 				if (firstWord.equalsIgnoreCase(DATE_SPECIAL[0])) {// this
@@ -553,8 +562,14 @@ public class Parser {
 				helperDate = new GregorianCalendar();
 				helperDate.add(Calendar.DATE, 1);
 			}
-		} else if (hasKeyword(dateArguments, DAYS) && dateArguments.length == 1) {
-			int dayIndex = getIndexOfList(dateArguments[0], Arrays.asList(DAYS)) + 1;
+		} else if ((hasKeyword(dateArguments, DAYS) || hasKeyword(dateArguments, DAYS_COMPACT)) && dateArguments.length == 1) {
+			int dayIndex;
+			if (hasKeyword(dateArguments, DAYS)) {
+				dayIndex = getIndexOfList(dateArguments[0], Arrays.asList(DAYS)) + 1;
+			} else {
+				dayIndex = getIndexOfList(dateArguments[0],
+						Arrays.asList(DAYS_COMPACT)) + 1;
+			}
 			date = getNearestDate(dayIndex);
 			
 			month = Calendar.getInstance().get(Calendar.MONTH);
