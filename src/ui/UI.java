@@ -375,6 +375,7 @@ public class UI {
 	}
 
 	private void waitForUserInput() throws InterruptedException {
+		userInputField.getCaret().setVisible(true);
 		synchronized (userInputField) {
 			while (userInputField.getText().isEmpty()) {
 				userInputField.wait();

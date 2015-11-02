@@ -25,7 +25,7 @@ public class TestTaskListFormatter {
 	public void setup(){
 		formatter = new TextFormatter();
 		timeForTesting = new GregorianCalendar();
-		timeForTesting.set(2020, 11, 3);
+		timeForTesting.set(2020, 11, 3, 9, 0);
 	}
 	
 	/*
@@ -40,16 +40,15 @@ public class TestTaskListFormatter {
 		Object[][][] taskListData = FormatterHelper.getTaskListData(taskList, false, 1, 0);
 
 		String result = formatter.formatTaskList(taskListData, ONE_BILLION);
-		String expected = "+-----+--------------------------+---------------+-------------+----------+-------+---------+-------------+" + NEW_LINE
-				        + "| No. |       Description        | Starting Time | Ending Time | Location | Every | Repeats |   Status    |" + NEW_LINE
-				        + "+-----+--------------------------+---------------+-------------+----------+-------+---------+-------------+" + NEW_LINE
-				        + "|1    |Task with only description|-              |-            |-         |-      |-        |Not done yet.|" + NEW_LINE
-				        + "+-----+--------------------------+---------------+-------------+----------+-------+---------+-------------+" + NEW_LINE
-				        + "|2    |Task with 2 dates         |03 Dec 2020    |03 Dec 2020  |-         |-      |-        |Not done yet.|" + NEW_LINE
-				        + "+-----+--------------------------+---------------+-------------+----------+-------+---------+-------------+" + NEW_LINE
+		String expected = "+-----+--------------------------+----------------+----------------+----------+-------------+" + NEW_LINE
+				        + "| No. |       Description        | Starting Time  |  Ending Time   | Location |   Status    |" + NEW_LINE
+				        + "+-----+--------------------------+----------------+----------------+----------+-------------+" + NEW_LINE
+				        + "|1    |Task with only description|                |                |          |Not done yet.|" + NEW_LINE
+				        + "+-----+--------------------------+----------------+----------------+----------+-------------+" + NEW_LINE
+				        + "|2    |Task with 2 dates         |03/12/20 9:00 AM|03/12/20 9:00 AM|          |Not done yet.|" + NEW_LINE
+				        + "+-----+--------------------------+----------------+----------------+----------+-------------+" + NEW_LINE
 				        + NEW_LINE;
-		//TODO: Fix tests
-		//assertEquals(expected, result);
+		assertEquals(expected, result);
 	}
 	
 	/*
@@ -66,20 +65,19 @@ public class TestTaskListFormatter {
 		Object[][][] taskListData = FormatterHelper.getTaskListData(taskList, false, 1, 0);
 
 		String result = formatter.formatTaskList(taskListData, 30);
-		String expected = "+-----+------------------------------+---------------+-------------+----------+-------+---------+-------------+" + NEW_LINE
-				        + "| No. |         Description          | Starting Time | Ending Time | Location | Every | Repeats |   Status    |" + NEW_LINE
-				        + "+-----+------------------------------+---------------+-------------+----------+-------+---------+-------------+" + NEW_LINE
-				        + "|1    |Task with only description    |-              |-            |-         |-      |-        |Not done yet.|" + NEW_LINE
-				        + "+-----+------------------------------+---------------+-------------+----------+-------+---------+-------------+" + NEW_LINE
-				        + "|2    |Task with 2 dates             |03 Dec 2020    |03 Dec 2020  |-         |-      |-        |Not done yet.|" + NEW_LINE
-				        + "+-----+------------------------------+---------------+-------------+----------+-------+---------+-------------+" + NEW_LINE
-				        + "|3    |Task with a very long long lon|-              |03 Dec 2020  |NUS SoC   |-      |-        |Not done yet.|" + NEW_LINE
-				        + "|     |g long description with locati|               |             |          |       |         |             |" + NEW_LINE
-				        + "|     |on and date                   |               |             |          |       |         |             |" + NEW_LINE
-				        + "+-----+------------------------------+---------------+-------------+----------+-------+---------+-------------+" + NEW_LINE
+		String expected = "+-----+------------------------------+----------------+----------------+----------+-------------+" + NEW_LINE
+				        + "| No. |         Description          | Starting Time  |  Ending Time   | Location |   Status    |" + NEW_LINE
+				        + "+-----+------------------------------+----------------+----------------+----------+-------------+" + NEW_LINE
+				        + "|1    |Task with only description    |                |                |          |Not done yet.|" + NEW_LINE
+				        + "+-----+------------------------------+----------------+----------------+----------+-------------+" + NEW_LINE
+				        + "|2    |Task with 2 dates             |03/12/20 9:00 AM|03/12/20 9:00 AM|          |Not done yet.|" + NEW_LINE
+				        + "+-----+------------------------------+----------------+----------------+----------+-------------+" + NEW_LINE
+				        + "|3    |Task with a very long long lon|                |03/12/20 9:00 AM|NUS SoC   |Not done yet.|" + NEW_LINE
+				        + "|     |g long description with locati|                |                |          |             |" + NEW_LINE
+				        + "|     |on and date                   |                |                |          |             |" + NEW_LINE
+				        + "+-----+------------------------------+----------------+----------------+----------+-------------+" + NEW_LINE
 				        + NEW_LINE;
-		//TODO: Fix tests
-		//assertEquals(expected, result);
+		assertEquals(expected, result);
 	}
 	
 	@After
