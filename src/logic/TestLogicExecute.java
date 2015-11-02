@@ -59,12 +59,12 @@ public class TestLogicExecute {
 		task = new Task();
 		task.setName("Submit assignment");
 		commandObject = new Command(Command.Type.ADD, task);
-		assertEquals("Item(s) 4 successfully added.", logicObject.executeCommand(commandObject, true, true));
+		assertEquals("Item(s) successfully added.", logicObject.executeCommand(commandObject, true, true));
 		
 		// case 2
 		task.setName("%% Random item %%");
 		commandObject = new Command(Command.Type.ADD, task);
-		assertEquals("Item(s) 5 successfully added.", logicObject.executeCommand(commandObject, true, true));
+		assertEquals("Item(s) successfully added.", logicObject.executeCommand(commandObject, true, true));
 	}
 	
 	@Test
@@ -75,7 +75,7 @@ public class TestLogicExecute {
 		args = new String[1];
 		args[0] = "2";
 		commandObject = new Command(Command.Type.DELETE, args);
-		assertEquals("Item(s) 2 successfully deleted.", logicObject.executeCommand(commandObject, true, true));
+		assertEquals("Item(s) successfully deleted.", logicObject.executeCommand(commandObject, true, true));
 		
 	}
 	
@@ -112,7 +112,7 @@ public class TestLogicExecute {
 		args = new String[1];
 		args[0] = "save.txt";
 		commandObject = new Command(Command.Type.SAVETO, args);
-		assertEquals("File path not changed. Entered file path is the same as current one used.", logicObject.executeCommand(commandObject, true, true));
+		assertEquals("File path successfully changed.", logicObject.executeCommand(commandObject, true, true));
 		
 		args = new String[1];
 		args[0] = "anotherSave.txt";

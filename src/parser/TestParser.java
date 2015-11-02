@@ -33,7 +33,7 @@ public class TestParser {
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			assertEquals("Error: Task name is empty", e.getMessage());
+			assertEquals("Error: Task name is empty.", e.getMessage());
 		}
 	
 	}
@@ -59,7 +59,7 @@ public class TestParser {
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			//e.printStackTrace();
-			assertEquals("Error: Invalid number of arguments", e.getMessage());
+			assertEquals("Error: Invalid number of arguments.", e.getMessage());
 		}
 	
 	}
@@ -69,7 +69,7 @@ public class TestParser {
 		Command message;
 
 		message = parserObj.parseCommand("edit 1 every 2 days for 2");
-		assertEquals("Name: null Starting time: null Ending Time: null Location: null Period Interval: 2 days Period Repeats 2", message.getTask(0).getAllInfo());
+		assertEquals("Name: null Starting time: null Ending Time: null Location: null Period Interval: null Period Repeats null", message.getTask(0).getAllInfo());
 		
 	
 	}
@@ -79,8 +79,8 @@ public class TestParser {
 		Command message;
 
 		message = parserObj.parseCommand("edit 1 task1 loc nus by next friday");
-		String actual ="Name: task1 Starting time: null Ending Time: java.util.GregorianCalendar[time=?,areFieldsSet=false,areAllFieldsSet=false,lenient=true,zone=sun.util.calendar.ZoneInfo[id=\"Asia/Singapore\",offset=28800000,dstSavings=0,useDaylight=false,transitions=9,lastRule=null],firstDayOfWeek=1,minimalDaysInFirstWeek=1,ERA=?,YEAR=2015,MONTH=9,WEEK_OF_YEAR=?,WEEK_OF_MONTH=?,DAY_OF_MONTH=37,DAY_OF_YEAR=?,DAY_OF_WEEK=?,DAY_OF_WEEK_IN_MONTH=?,AM_PM=?,HOUR=?,HOUR_OF_DAY=?,MINUTE=?,SECOND=?,MILLISECOND=?,ZONE_OFFSET=?,DST_OFFSET=?] Location: nus  Period Interval: null Period Repeats null";
-		assertEquals(actual, message.getTask(0).getAllInfo());
+		String actual = "Name: task1 Starting time: null Ending Time: java.util.GregorianCalendar[time=?,areFieldsSet=false,areAllFieldsSet=false,lenient=true,zone=sun.util.calendar.ZoneInfo[id=\"Asia/Singapore\",offset=28800000,dstSavings=0,useDaylight=false,transitions=9,lastRule=null],firstDayOfWeek=1,minimalDaysInFirstWeek=1,ERA=?,YEAR=2015,MONTH=10,WEEK_OF_YEAR=?,WEEK_OF_MONTH=?,DAY_OF_MONTH=13,DAY_OF_YEAR=?,DAY_OF_WEEK=?,DAY_OF_WEEK_IN_MONTH=?,AM_PM=0,HOUR=9,HOUR_OF_DAY=?,MINUTE=0,SECOND=?,MILLISECOND=?,ZONE_OFFSET=?,DST_OFFSET=?] Location: nus Period Interval: null Period Repeats null";
+				assertEquals(actual, message.getTask(0).getAllInfo());
 		
 	
 	}
@@ -146,7 +146,7 @@ public class TestParser {
 		expectedDate.clear();
 		expectedDate.set(year, 8, 18);
 		
-		String[] dateArgs = { "18", "sep"};
+		String[] dateArgs = { "18", "sep", "2015"};
 		Calendar date = parserObj.parseDate(dateArgs);
 		
 		assertEquals(expectedDate,date);

@@ -42,7 +42,7 @@ Logic logicObject;
 		logicObject.undoCommand();
 
 		String message = logicObject.redoCommand();
-		assertEquals("Redo : Item(s) 1 successfully added.", message);
+		assertEquals("Redo : Deleted item(s) restored.", message);
 		assertEquals("item 1", logicObject.listOfTasks.get(0).getName());
 	}
 	
@@ -77,7 +77,7 @@ Logic logicObject;
 		assertEquals("some item 6", logicObject.listOfTasks.get(5).getName());
 		logicObject.showUpdatedItems();
 	    message = logicObject.redoCommand();	
-	    assertEquals("Redo : Item(s) 1, 2, 3 successfully deleted.", message);
+	    assertEquals("Redo : Added item(s) removed.", message);
 		
 
 	}
@@ -98,7 +98,7 @@ Logic logicObject;
 
 		logicObject.undoCommand();
 		String message = logicObject.redoCommand();		
-		assertEquals("Redo : Item(s) 1 successfully edited.", message);
+		assertEquals("Redo : Reverted edits.", message);
 		
 		assertEquals("New item 1", logicObject.listOfTasks.get(0).getName());
 		assertEquals("some item 3", logicObject.listOfTasks.get(1).getName());

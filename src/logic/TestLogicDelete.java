@@ -74,7 +74,7 @@ public class TestLogicDelete {
 		indexList.add(1);
 		
 		String message = logicObject.deleteItem(indexList, true, true);
-		assertEquals("Item(s) 1, 2, 3 successfully deleted.", message);
+		assertEquals("Item(s) successfully deleted.", message);
 	}
 	
 	@Test
@@ -95,7 +95,7 @@ public class TestLogicDelete {
 		indexList.add(1);
 		
 		String message = logicObject.deleteItem(indexList, true, true);
-		assertEquals("Item(s) 1, 2, 3 successfully deleted.", message);
+		assertEquals("Item(s) successfully deleted.", message);
 	}
 	
 	@Test
@@ -145,7 +145,7 @@ public class TestLogicDelete {
 		indexList.add(25);
 		
 		message = logicObject.deleteItem(indexList, true, true);
-		assertEquals("Item(s) 2, 3, 4, 5, 6, 25, 26 successfully deleted.", message);
+		assertEquals("Item(s) successfully deleted.", message);
 		assertEquals(logicObject.listOfTasks.size(), 19);
 	}
 	

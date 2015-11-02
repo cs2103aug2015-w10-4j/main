@@ -87,7 +87,7 @@ Logic logicObject;
 		logicObject.editItem(listToEdit, indexList, true, true);
 
 		String message = logicObject.undoCommand();		
-		assertEquals("Undo : Reverted edits.", message);
+		assertEquals("Undo : Added item(s) removed.", message);
 		
 		assertEquals("Old item 1", logicObject.listOfTasks.get(0).getName());
 		/*assertEquals("some item 2", logicObject.listOfTasks.get(1).getName());
