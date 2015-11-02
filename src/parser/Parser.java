@@ -61,7 +61,7 @@ public class Parser {
 	static final String[] COMMAND_MARK = { "mark" };
 	static final String[] COMMAND_UNMARK = { "unmark" };
 	static final String[] COMMAND_EXIT = { "exit" };
-	static final String[] COMMAND_DISPLAY = { "display" };
+	static final String[] COMMAND_DISPLAY = { "display" , "clear" };
 	static final String[] COMMAND_SEARCH = { "search" };
 	static final String[] COMMAND_SAVETO = { "saveto" };
 	static final String[] COMMAND_HELP = { "help" };

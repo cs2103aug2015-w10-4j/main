@@ -45,15 +45,17 @@ public class Logic {
 	private static final String FILTER_TITLE_TASK_NAME = "Task: ";
 	private static final String FILTER_TITLE_TIME = "Time: ";
 	private static final String FILTER_SEARCH_SEPARATOR = ", ";
-	private static final String TITLE_TOP_3 = "Top 3 Items for ";
+	private static final String TITLE_TOP_DISPLAY = "Top %d Items for ";
 	private static final String TITLE_TOMORROW = "Tomorrow";
 	private static final String TITLE_TODAY = "Today";
 	private static final String LOG_FILE_NAME = "tasky.log";
-	private static final String CONFIG_FILE_NAME = "config.properties";
+	private static final String CONFIG_FILE_NAME = "config.txt";
 	private static final String DEFAULT_LOGGING_LEVEL_STRING = "INFO";
 	private static final String DEFAULT_SAVE_FILE_PATH = "save.txt";
+	private static final int DEFAULT_DISPLAY_SIZE = 3;
 	private static final String PROPERTY_KEY_LOGGING_LEVEL = "loggingLevel";
 	private static final String PROPERTY_KEY_SAVE_FILE = "saveFile";
+	private static final String PROPERTY_KEY_DISPLAY_SIZE = "defaultDisplaySize";
 	/*
 	 * Declaration of object variables
 	 */
@@ -68,6 +70,7 @@ public class Logic {
 	ArrayList<Task> listFilter = new ArrayList<Task>();
 	boolean shouldShowDone = true;
 	boolean shouldShowUndone = true;
+	int displaySize = DEFAULT_DISPLAY_SIZE;
 	private static final int ID_RANGE = 1000;
 	private static final int RECURRING_MAX = 100;
 	private static final Level DEFAULT_LEVEL = Level.INFO;
@@ -155,10 +158,12 @@ public class Logic {
 				configFile.createNewFile();
 				propObject.setProperty(PROPERTY_KEY_SAVE_FILE, DEFAULT_SAVE_FILE_PATH);
 				propObject.setProperty(PROPERTY_KEY_LOGGING_LEVEL, DEFAULT_LOGGING_LEVEL_STRING);
+				propObject.setProperty(PROPERTY_KEY_DISPLAY_SIZE, Integer.toString(DEFAULT_DISPLAY_SIZE));
 				writeProperties();
 			}
 			storageObject.saveFileToPath(propObject.getProperty(PROPERTY_KEY_SAVE_FILE));
 			String logLevelString = propObject.getProperty(PROPERTY_KEY_LOGGING_LEVEL);
+			displaySize = Integer.parseInt(propObject.getProperty(PROPERTY_KEY_DISPLAY_SIZE));
 			switch (logLevelString) {
 				case "WARNING":
 					logger.setLevel(Level.WARNING);
@@ -182,7 +187,7 @@ public class Logic {
 			
 		} catch (FileNotFoundException e) {
 			UIObject.showToUser(ERROR_FILE_NOT_FOUND);
-		} catch (SecurityException | IOException e) {
+		} catch (SecurityException | IOException | NumberFormatException e) {
 			UIObject.showToUser(ERROR_LOG_FILE_INITIALIZE);
 		} catch (Exception e) {
 			UIObject.showToUser(e.getMessage());
@@ -938,9 +943,9 @@ public class Logic {
 							secondDate);
 				}
 			}
-			addThreeTasksToList(listOfFirstDate);
-			addThreeTasksToList(listOfSecondDate);
-			addThreeTasksToList(listOfFloating);
+			addTasksToList(listOfFirstDate);
+			addTasksToList(listOfSecondDate);
+			addTasksToList(listOfFloating);
 			
 			// default view
 			List<String> listOfTitles = new ArrayList<String>();
@@ -1087,24 +1092,23 @@ public class Logic {
 		itemDate.set(Calendar.DATE, curItemDate);
 		itemDate.set(Calendar.MONTH, curItemMonth - 1);
 		String itemDateString = dateFormat.format(itemDate.getTime());
-		
+		String titleTop = String.format(TITLE_TOP_DISPLAY, displaySize);
 		if (curMonth == curItemMonth) {
 			if (curDate == curItemDate) {
-				listOfTitles.add(TITLE_TOP_3 + TITLE_TODAY);
+				listOfTitles.add(titleTop + TITLE_TODAY);
 			} else if (curDate == curItemDate - 1) {
-				listOfTitles.add(TITLE_TOP_3 + TITLE_TOMORROW);
+				listOfTitles.add(titleTop + TITLE_TOMORROW);
 			} else {
-				
-				listOfTitles.add(TITLE_TOP_3 + itemDateString);
+				listOfTitles.add(titleTop + itemDateString);
 			}
 		} else {
-			listOfTitles.add(TITLE_TOP_3 + itemDateString);
+			listOfTitles.add(titleTop + itemDateString);
 		}
 	}
 
-	private void addThreeTasksToList(ArrayList<Task> listOfFirstDate) {
-		if (listOfFirstDate.size() >= 3) {
-			listOfShownTasks.addAll(listOfFirstDate.subList(0, 3));
+	private void addTasksToList(ArrayList<Task> listOfFirstDate) {
+		if (listOfFirstDate.size() >= displaySize) {
+			listOfShownTasks.addAll(listOfFirstDate.subList(0, displaySize));
 		} else {
 			listOfShownTasks.addAll(listOfFirstDate);
 		}
