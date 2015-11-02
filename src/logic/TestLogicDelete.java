@@ -16,7 +16,7 @@ public class TestLogicDelete {
 	
 	@Before
 	public void setup(){
-		File saveFile = new File("save.txt");
+		File saveFile = new File("save1.txt");
 		saveFile.delete();
 		logicObject = new Logic();
 	}	
@@ -57,7 +57,7 @@ public class TestLogicDelete {
 		argumentList.clear();
 		argumentList.add(2);
 		message = logicObject.deleteItem(argumentList, true, true);
-		assertEquals("Item(s) 3 successfully deleted.", message);
+		assertEquals("Item(s) successfully deleted.", message);
 	}
 	
 	@Test

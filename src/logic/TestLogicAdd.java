@@ -125,10 +125,10 @@ public class TestLogicAdd {
 		String result2 = addItem("item 2", startingDate2, endingDate2);
 		
 		assertEquals(2, logicObject.listOfTasks.size());
-		assertEquals("Item(s) 1 successfully added.", result);
+		assertEquals("Item(s) successfully added.", result);
 		assertEquals(startingDate, logicObject.listOfTasks.get(0).getStartingTime());
 		assertEquals(endingDate, logicObject.listOfTasks.get(0).getEndingTime());
-		assertEquals("Warning: There are clashing timings between tasks.", result2);
+		assertEquals("WARNING: There are clashing timings between tasks.", result2);
 		assertEquals(startingDate2, logicObject.listOfTasks.get(1).getStartingTime());
 		assertEquals(endingDate2, logicObject.listOfTasks.get(1).getEndingTime());
 	}

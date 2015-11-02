@@ -45,7 +45,7 @@ public class TestLogicEdit {
 		indexList.clear();
 		indexList.add(2);
 		message = logicObject.editItem(listToEdit, indexList, true, true);
-		assertEquals("Item(s) 3 successfully edited.", message);
+		assertEquals("Item(s) successfully edited.", message);
 		assertEquals("Item 1", logicObject.listOfTasks.get(0).getName());
 		assertEquals("Item 2", logicObject.listOfTasks.get(1).getName());
 		assertEquals("New item 99", logicObject.listOfTasks.get(2).getName());
@@ -79,7 +79,7 @@ public class TestLogicEdit {
 		indexList.add(0);
 		listToEdit.add(new Task("New item 1"));
 		message = logicObject.editItem(listToEdit, indexList, true, true);
-		assertEquals("Item(s) 1 successfully edited.", message);
+		assertEquals("Item(s) successfully edited.", message);
 		assertEquals("New item 1", logicObject.listOfTasks.get(0).getName());
 		assertEquals("Item 2", logicObject.listOfTasks.get(1).getName());
 		assertEquals("Item 3", logicObject.listOfTasks.get(2).getName());
@@ -89,7 +89,7 @@ public class TestLogicEdit {
 		indexList.add(1);
 		listToEdit.add(new Task("New item 2"));
 		message = logicObject.editItem(listToEdit, indexList, true, true);
-		assertEquals("Item(s) 2 successfully edited.", message);
+		assertEquals("Item(s) successfully edited.", message);
 		assertEquals("New item 1", logicObject.listOfTasks.get(0).getName());
 		assertEquals("New item 2", logicObject.listOfTasks.get(1).getName());
 		assertEquals("Item 3", logicObject.listOfTasks.get(2).getName());
@@ -99,7 +99,7 @@ public class TestLogicEdit {
 		indexList.add(2);
 		listToEdit.add(new Task("New item 3"));
 		message = logicObject.editItem(listToEdit, indexList, true, true);
-		assertEquals("Item(s) 3 successfully edited.", message);
+		assertEquals("Item(s) successfully edited.", message);
 		assertEquals("New item 1", logicObject.listOfTasks.get(0).getName());
 		assertEquals("New item 2", logicObject.listOfTasks.get(1).getName());
 		assertEquals("New item 3", logicObject.listOfTasks.get(2).getName());
@@ -110,7 +110,7 @@ public class TestLogicEdit {
 		indexList.add(1);
 		listToEdit.add(new Task("item 2 changed again!"));
 		message = logicObject.editItem(listToEdit, indexList, true, true);
-		assertEquals("Item(s) 2 successfully edited.", message);
+		assertEquals("Item(s) successfully edited.", message);
 		assertEquals("New item 1", logicObject.listOfTasks.get(0).getName());
 		assertEquals("item 2 changed again!", logicObject.listOfTasks.get(1).getName());
 		assertEquals("New item 3", logicObject.listOfTasks.get(2).getName());
