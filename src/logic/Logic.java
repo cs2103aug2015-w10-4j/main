@@ -80,13 +80,11 @@ public class Logic {
 	private static final String MESSAGE_REDO = "Redo : ";
 	private static final String MESSAGE_SUCCESS_HISTORY_ADD = "Deleted item(s) restored.";
 	private static final String MESSAGE_SUCCESS_HISTORY_DELETE = "Added item(s) removed.";
-	private static final String MESSAGE_SUCCESS_HISTORY_MARK = "Item(s) successfully marked.";
-	private static final String MESSAGE_SUCCESS_HISTORY_UNMARK = "Item(s) successfully unmarked.";
 	private static final String MESSAGE_SUCCESS_HISTORY_EDIT = "Reverted edits.";
 	private static final String MESSAGE_SUCCESS_ADD = "Item(s) successfully added.";
 	private static final String MESSAGE_SUCCESS_DELETE = "Item(s) successfully deleted.";
-	private static final String MESSAGE_SUCCESS_MARK = "Item(s) successfully marked.";
-	private static final String MESSAGE_SUCCESS_UNMARK = "Item(s) successfully unmarked.";
+	private static final String MESSAGE_SUCCESS_MARK = "Item(s) successfully marked as done.";
+	private static final String MESSAGE_SUCCESS_UNMARK = "Item(s) successfully marked as undone.";
 	private static final String MESSAGE_SUCCESS_SEARCH = "Search results.";
 	private static final String MESSAGE_SUCCESS_EDIT = "Item(s) successfully edited.";
 	private static final String MESSAGE_SUCCESS_EXIT = "Exiting program...";
@@ -394,13 +392,13 @@ public class Logic {
 				break;
 			case MARK:
 				normalStatus = MESSAGE_SUCCESS_MARK;
-				undoStatus = MESSAGE_UNDO + MESSAGE_SUCCESS_HISTORY_MARK;
-				redoStatus = MESSAGE_REDO + MESSAGE_SUCCESS_HISTORY_MARK;
+				undoStatus = MESSAGE_UNDO + MESSAGE_SUCCESS_MARK;
+				redoStatus = MESSAGE_REDO + MESSAGE_SUCCESS_MARK;
 				break;
 			case UNMARK:
 				normalStatus = MESSAGE_SUCCESS_UNMARK;
-				undoStatus = MESSAGE_UNDO + MESSAGE_SUCCESS_HISTORY_UNMARK;
-				redoStatus = MESSAGE_REDO + MESSAGE_SUCCESS_HISTORY_UNMARK;
+				undoStatus = MESSAGE_UNDO + MESSAGE_SUCCESS_UNMARK;
+				redoStatus = MESSAGE_REDO + MESSAGE_SUCCESS_UNMARK;
 				break;
 			default:
 				return ERROR_HISTORY_NO_COMMAND_HANDLER;
