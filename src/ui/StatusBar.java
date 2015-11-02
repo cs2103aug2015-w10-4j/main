@@ -1,5 +1,6 @@
 package ui;
 
+import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.util.logging.Logger;
@@ -13,7 +14,7 @@ import javax.swing.border.BevelBorder;
 public class StatusBar extends JPanel {
 	
 	private Logger logger = Logger.getGlobal();
-	
+	private static final Color THEME_COLOR = new Color(0x443266);
 	private static final String DEFAULT_STATUS_BAR_TEXT = "Tasky is ready.";
 	private JLabel statusLabel;
 	
@@ -33,6 +34,7 @@ public class StatusBar extends JPanel {
 		statusLabel = new JLabel(DEFAULT_STATUS_BAR_TEXT);
 		statusLabel.setHorizontalAlignment(SwingConstants.LEFT);
 		statusLabel.setFont(new Font(statusLabel.getFont().getName(), Font.PLAIN, 11));
+		statusLabel.setForeground(THEME_COLOR);
 	}
 	
 	public void setText(String text) {

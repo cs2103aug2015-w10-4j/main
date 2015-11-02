@@ -9,9 +9,12 @@ import java.awt.GridBagLayout;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.geom.RoundRectangle2D;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -27,6 +30,7 @@ import javax.swing.JTextField;
 import javax.swing.JViewport;
 import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
+import javax.swing.border.LineBorder;
 import javax.swing.table.TableColumnModel;
 
 import global.Task;
@@ -94,6 +98,7 @@ public class UI {
 	private static final int DISPLAY_AREA_FONT_SIZE = 12;
 	
 	private static final int MAXIMUM_COLUMN_WIDTH = 30;
+	private static final Color THEME_COLOR = new Color(0x443266);
 	
 	private static final String EMPTY_STRING = "";
 	
@@ -149,7 +154,7 @@ public class UI {
 		logger.log(Level.CONFIG, String.format("%s: fill = %s, gridx = %d, gridy = %d, "
 				+ "gridheight = %d, gridwidth = %d", "STATUS_BAR", "GridBagConstraints.HORIZONTAL",
 				STATUS_BAR_POS_X, STATUS_BAR_POS_Y, STATUS_BAR_LEN_Y, STATUS_BAR_LEN_X));
-	
+	    statusBar.setBorder(new RoundedBorder(THEME_COLOR, 10));
 		contentPane.add(statusBar, constraint);
 	}
 
@@ -158,14 +163,15 @@ public class UI {
 		
 		constraint.fill = GridBagConstraints.HORIZONTAL;
 		constraint.gridx = USER_INPUT_FIELD_POS_X;
-		constraint.gridy = USER_INPUT_FIELD_POS_Y;
-		constraint.gridheight = USER_INPUT_FIELD_LEN_Y;
+		constraint.gridy = 2;
 		constraint.gridwidth = USER_INPUT_FIELD_LEN_X;
 		
 		logger.log(Level.CONFIG, String.format("%s: fill = %s, gridx = %d, gridy = %d, "
 				+ "gridheight = %d, gridwidth = %d", "USER_INPUT_FIELD", "GridBagConstraints.HORIZONTAL",
 				USER_INPUT_FIELD_POS_X, USER_INPUT_FIELD_POS_Y,
 				USER_INPUT_FIELD_LEN_Y, USER_INPUT_FIELD_LEN_X));
+		userInputField.setForeground(Color.BLACK);
+		userInputField.setBorder(new RoundedBorder(THEME_COLOR, 10));
 		
 		contentPane.add(userInputField, constraint);
 	}
@@ -182,6 +188,7 @@ public class UI {
 		logger.log(Level.CONFIG, String.format("%s: fill = %s, gridx = %d, gridy = %d, "
 				+ "gridheight = %d, gridwidth = %d", "PROMPT_LABEL", "GridBagConstraints.HORIZONTAL",
 				PROMPT_LABEL_POS_X, PROMPT_LABEL_POS_Y, PROMPT_LABEL_LEN_Y, PROMPT_LABEL_LEN_X));
+		promptLabel.setForeground(THEME_COLOR);
 		
 		contentPane.add(promptLabel, constraint);
 	}
@@ -230,6 +237,7 @@ public class UI {
 	private void prepareDisplayAreaPanel() {
 		displayAreaPanel.setLayout(new VerticalLayout());
 		displayAreaPanel.setBackground(Color.WHITE);
+		displayAreaPanel.setBorder(new RoundedBorder(THEME_COLOR, 10));
 	}
 
 	private void prepareUserInput() {
@@ -319,7 +327,7 @@ public class UI {
 
 	private void prepareFrame() {
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setLayout(new GridBagLayout());
+		frame.getContentPane().setLayout(new GridBagLayout());
 		
 		/*
 		 * Focus given to userInputField when window is activated
