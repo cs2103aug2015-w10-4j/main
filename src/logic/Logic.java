@@ -43,6 +43,8 @@ public class Logic {
 	private static final String ERROR_START_TIME_BEFORE_END_TIME = "Error: Starting time cannot be after ending time.";
 	private static final String FILTER_TITLE_LOCATION = "Location: ";
 	private static final String FILTER_TITLE_TASK_NAME = "Task: ";
+	private static final String FILTER_TITLE_TIME = "Time: ";
+	private static final String FILTER_SEARCH_SEPARATOR = ", ";
 	private static final String TITLE_TOP_3 = "Top 3 Items for ";
 	private static final String TITLE_TOMORROW = "Tomorrow";
 	private static final String TITLE_TODAY = "Today";
@@ -224,7 +226,7 @@ public class Logic {
 				UIObject.showStatusToUser(ERROR_WRITING_FILE);
 			} catch (Exception e) {
 				// warning from parsing user command
-				//e.printStackTrace();
+				e.printStackTrace();
 				UIObject.showStatusToUser(e.getMessage());
 			}
 		}
@@ -939,13 +941,25 @@ public class Logic {
 				listOfShownTasks.add(listOfTasks.get(i));
 			}
 			
+			searchStrings.add(FILTER_TITLE_TASK_NAME);
+			searchStrings.add(FILTER_TITLE_TIME);
+			searchStrings.add(FILTER_TITLE_LOCATION);
+			boolean isEmptyName = true;
+			boolean isEmptyTime = true;
+			boolean isEmptyLocation = true;
+			
 			// Filter by name
 			for (int j = 0; j < listFilter.size(); j++) {
 				Task curFilter = listFilter.get(j);
 				String searchTaskName = curFilter.getName();
 				int i = 0;
 				if (searchTaskName != null) {
-					searchStrings.add(FILTER_TITLE_TASK_NAME + searchTaskName);
+					if (!isEmptyName) {
+						searchStrings.set(0,
+								searchStrings.get(0).concat(FILTER_SEARCH_SEPARATOR));
+					}
+					isEmptyName = false;
+					searchStrings.set(0, searchStrings.get(0).concat(searchTaskName));
 					while (i < listOfShownTasks.size()) {
 						Task curTask = listOfShownTasks.get(i);
 						if (!curTask.getName().toLowerCase().contains(searchTaskName)) {
@@ -963,7 +977,12 @@ public class Logic {
 				String searchLocation = curFilter.getLocation();
 				int i = 0;
 				if (searchLocation != null) {
-					searchStrings.add(FILTER_TITLE_LOCATION + searchLocation);
+					if (!isEmptyLocation) {
+						searchStrings.set(2,
+								searchStrings.get(2).concat(FILTER_SEARCH_SEPARATOR));
+					}
+					isEmptyLocation = false;
+					searchStrings.set(2, searchStrings.get(2).concat(searchLocation));
 					while (i < listOfShownTasks.size()) {
 						Task curTask = listOfShownTasks.get(i);
 						if (curTask.getLocation() == null || !curTask.getLocation().toLowerCase().contains(searchLocation)) {

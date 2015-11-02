@@ -681,7 +681,7 @@ public class Parser {
 				logger.finer("getArgumentsForField: curIndex is " + curIndex);
 				logger.finer("getArgumentsForField: indexSearch is " + indexSearch);
 				String argumentString = commandString.substring(curIndex,
-						indexSearch);
+						indexSearch).replaceAll("\\\\", "");
 				String[] argumentWords = argumentString.split(WHITE_SPACE_REGEX);
 				return argumentWords;
 			}
@@ -731,6 +731,7 @@ public class Parser {
 		} else {
 			taskName = commandString;
 		}
+		taskName = taskName.replaceAll("\\\\", "");
 		taskObject.setName(taskName);
 		return true;
 	}
