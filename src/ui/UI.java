@@ -9,12 +9,9 @@ import java.awt.GridBagLayout;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.awt.geom.RoundRectangle2D;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -30,7 +27,6 @@ import javax.swing.JTextField;
 import javax.swing.JViewport;
 import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
-import javax.swing.border.LineBorder;
 import javax.swing.table.TableColumnModel;
 
 import global.Task;
@@ -102,8 +98,10 @@ public class UI {
 	
 	private static final String EMPTY_STRING = "";
 	
+	private static final int DEFAULT_DISPLAY_MIN_TABLE = 3;
 	private static final int DEFAULT_DISPLAY_MIN_ROW = 3;
 	private static final int FILTERED_DISPLAY_MIN_ROW = 1;
+	private static final int FILTERED_DISPLAY_MIN_TABLE = 1;
 	
 	private static final int SCROLL_SPEED = 10;
 	
@@ -129,12 +127,14 @@ public class UI {
 	/*
 	 * Constructor
 	 */
+	//@@author A0134155M
 	public UI() {
 		prepareComponents();
 		addComponentsToPane(frame.getContentPane());
 		displayFrame();
 	}
 	
+	//@@author A0134155M
 	private void addComponentsToPane(Container contentPane) {
 		addDisplayAreaScrollPane(contentPane);
 		addPromptLabel(contentPane);
@@ -142,6 +142,7 @@ public class UI {
 		addStatusBar(contentPane);
 	}
 
+	//@@author A0134155M
 	private void addStatusBar(Container contentPane) {
 		GridBagConstraints constraint = new GridBagConstraints();
 		
@@ -158,6 +159,7 @@ public class UI {
 		contentPane.add(statusBar, constraint);
 	}
 
+	//@@author A0134155M
 	private void addUserInputField(Container contentPane) {
 		GridBagConstraints constraint = new GridBagConstraints();
 		
@@ -176,6 +178,7 @@ public class UI {
 		contentPane.add(userInputField, constraint);
 	}
 
+	//@@author A0134155M
 	private void addPromptLabel(Container contentPane) {
 		GridBagConstraints constraint = new GridBagConstraints();
 		
@@ -193,6 +196,7 @@ public class UI {
 		contentPane.add(promptLabel, constraint);
 	}
 
+	//@@author A0134155M
 	private void addDisplayAreaScrollPane(Container contentPane) {
 		GridBagConstraints constraint = new GridBagConstraints();
 		
@@ -212,12 +216,14 @@ public class UI {
 		contentPane.add(displayAreaScrollPane, constraint);
 	}
 
+	//@@author A0134155M
 	private void displayFrame() {
 		frame.pack();
 		frame.setLocationRelativeTo(null);
 		frame.setVisible(true);
 	}
 
+	//@@author A0134155M
 	private void prepareComponents() {
 		prepareFrame();
 		prepareUserInput();
@@ -226,20 +232,24 @@ public class UI {
 		preparePromptLabel();
 	}
 	
+	//@@author A0134155M
 	private void preparePromptLabel() {
 		promptLabel.setHorizontalAlignment(SwingConstants.CENTER);
 	}
 
+	//@@author A0134155M
 	private void prepareDisplayAreaScrollPane() {
 		displayAreaScrollPane.setPreferredSize(new Dimension(DEFAULT_WIDTH, DEFAULT_HEIGHT));
 	}
 	
+	//@@author A0134155M
 	private void prepareDisplayAreaPanel() {
 		displayAreaPanel.setLayout(new VerticalLayout());
 		displayAreaPanel.setBackground(Color.WHITE);
 		displayAreaPanel.setBorder(new RoundedBorder(THEME_COLOR, 10));
 	}
 
+	//@@author A0134155M
 	private void prepareUserInput() {
 		userInputField.setEditable(false);
 		userInputField.setColumns(USER_INPUT_FIELD_CHAR_COUNT);
@@ -306,6 +316,7 @@ public class UI {
 		
 	}
 	
+	//@@author A0134155M
 	private void movePosition(JViewport viewPort, Point position, int dx, int dy) {
 		position.x += dx;
 		position.y += dy;
@@ -317,14 +328,17 @@ public class UI {
 		position.y = Math.min(position.y, getViewPortMaxY(viewPort));
 	}
 	
+	//@@author A0134155M
 	private int getViewPortMaxX(JViewport viewPort) {
 		return viewPort.getView().getWidth() - viewPort.getWidth();
 	}
 	
+	//@@author A0134155M
 	private int getViewPortMaxY(JViewport viewPort) {
 		return viewPort.getView().getHeight() - viewPort.getHeight();
 	}
 
+	//@@author A0134155M
 	private void prepareFrame() {
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(new GridBagLayout());
@@ -345,6 +359,7 @@ public class UI {
 	 * @return userInput
 	 * @throws InterruptedException
 	 */
+	//@@author A0134155M
 	public String promptUser(String prompt) throws InterruptedException {
 		logger.info("Entering promptUser(prompt = " + prompt + ")");
 		
@@ -362,26 +377,31 @@ public class UI {
 		return userInput;
 	}
 
+	//@@author A0134155M
 	private void cleanUserInputField() {
 		userInputField.setText(EMPTY_STRING);
 	}
 
+	//@@author A0134155M
 	private String getUserInput() {
 		return userInputField.getText();
 	}
 	
+	//@@author A0134155M
 	private void sanitizeUserInput() {
 		String userInput = userInputField.getText();
 		userInput = userInput.replaceAll("\t", " ");
 		userInputField.setText(userInput);
 	}
 
+	//@@author A0134155M
 	private void prepareComponentForUserInput(String prompt) {
 		promptLabel.setText(prompt);
 		userInputField.setEditable(true);
 		userInputField.grabFocus();
 	}
 
+	//@@author A0134155M
 	private void waitForUserInput() throws InterruptedException {
 		userInputField.getCaret().setVisible(true);
 		synchronized (userInputField) {
@@ -391,6 +411,7 @@ public class UI {
 		}
 	}
 	
+	//@@author A0134155M
 	/**
 	 * Asks the UI to display content to user
 	 * @param stringToShow
@@ -408,6 +429,7 @@ public class UI {
 		return true;
 	}
 	
+	//@@author A0134155M
 	private boolean showToUserFilteredTable(TaskTableModel[] tableModels, List<String> filters) {
 		displayAreaPanel.removeAll();
 
@@ -436,6 +458,7 @@ public class UI {
 		return true;
 	}
 	
+	//@@author A0134155M
 	private boolean showToUserDefaultTable(TaskTableModel[] tableModels, List<String> titles) {
 		assert tableModels.length <= titles.size();
 		displayAreaPanel.removeAll();
@@ -477,6 +500,7 @@ public class UI {
 		return true;
 	}
 
+	//@@author A0134155M
 	private JPanel createInvisibleJPanel(int width, int height) {
 		JPanel invisiblePanel = new JPanel();
 		invisiblePanel.setSize(new Dimension(width, height));
@@ -484,6 +508,7 @@ public class UI {
 		return invisiblePanel;
 	}
 
+	//@@author A0134155M
 	private JTextArea createJTextAreaWithMonospaceFont() {
 		JTextArea textArea = new JTextArea();
 		textArea.setFont(new Font(DISPLAY_AREA_FONT_NAME, DISPLAY_AREA_FONT_STYLE,
@@ -491,6 +516,7 @@ public class UI {
 		return textArea;
 	}
 
+	//@@author A0134155M
 	/**
 	 * Asks the UI to display the list of tasks
 	 * @param tasks
@@ -500,10 +526,10 @@ public class UI {
 		int minTable = -1;
 		int minRowCountPerTable = -1;
 		if (displayType == DisplayType.DEFAULT) {
-			minTable = 3;
+			minTable = DEFAULT_DISPLAY_MIN_TABLE;
 			minRowCountPerTable = DEFAULT_DISPLAY_MIN_ROW;
 		} else if (displayType == DisplayType.FILTERED) {
-			minTable = 1;
+			minTable = FILTERED_DISPLAY_MIN_TABLE;
 			minRowCountPerTable = FILTERED_DISPLAY_MIN_ROW;
 		} else {
 			assert false : "DisplayType = ?";
@@ -533,6 +559,7 @@ public class UI {
 		}
 	}
 	
+	//@@author A0134155M
 	/**
 	 * Asks the UI to display content to user in the status bar
 	 * @param stringToShow

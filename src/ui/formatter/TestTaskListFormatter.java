@@ -21,6 +21,7 @@ public class TestTaskListFormatter {
 	private TextFormatter formatter;
 	private Calendar timeForTesting;
 
+	//@@author A0134155M
 	@Before
 	public void setup(){
 		formatter = new TextFormatter();
@@ -28,6 +29,7 @@ public class TestTaskListFormatter {
 		timeForTesting.set(2020, 11, 3, 9, 0);
 	}
 	
+	//@@author A0134155M
 	/*
 	 * Test formatter with infinite width available
 	 */
@@ -51,6 +53,7 @@ public class TestTaskListFormatter {
 		assertEquals(expected, result);
 	}
 	
+	//@@author A0134155M
 	/*
 	 * Test formatter with limited width (30 characters per line)
 	 */
@@ -80,6 +83,7 @@ public class TestTaskListFormatter {
 		assertEquals(expected, result);
 	}
 	
+	//@@author A0134155M
 	@After
 	public void cleanup() {
 	

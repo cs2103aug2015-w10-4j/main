@@ -40,6 +40,7 @@ public class FormatterHelper {
 	
 	private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd/MM/yy h:mm a");
 
+	//@@author A0134155M
 	/**
 	 * Find the minimal width for each column, taking into account the content
 	 * of the column and char limit for each line.
@@ -74,6 +75,7 @@ public class FormatterHelper {
 		return columnInfo;
 	}
 
+	//@@author A0134155M
 	/**
 	 * Convert every field in Task class to its string representation
 	 * @param objectInField
@@ -97,6 +99,7 @@ public class FormatterHelper {
 		return null;
 	}
 
+	//@@author A0134155M
 	/**
 	 * Split string to multiple lines according to character limit for a line as
 	 * specified in lineCharLimit
@@ -131,6 +134,20 @@ public class FormatterHelper {
 		return resultArray;
 	}
 	
+	//@@author A0134155M
+	/**
+	 * Extract the data in a List<Task> to 3D object array so that it will be easier
+	 * to put them into a table. The first dimension of the resulting Object array
+	 * denotes the index of the table (since different type of tasks will be displayed
+	 * on a different table, the second dimension denotes the task number for each
+	 * table, and the last dimension denotes the fields that are in the Task data
+	 * structure.
+	 * @param tasks list of tasks to be extracted
+	 * @param needTaskSplit whether we need to group the tasks according to its type
+	 * @param minTable minimum number of table needed (empty if unused)
+	 * @param minRowCountPerTable minimum number of row for each table
+	 * @return
+	 */
 	public static Object[][][] getTaskListData(List<Task> tasks, boolean needTaskSplit,
 			int minTable, int minRowCountPerTable) {
 		List<List<Task>> taskLists = new ArrayList<List<Task>>();
@@ -197,6 +214,7 @@ public class FormatterHelper {
 		return result.toArray(new Object[1][1][1]);
 	}
 
+	//@@author A0134155M
 	private static Object[] createEmptyTaskData() {
 		Object[] emptyTaskData = new Object[COLUMN_COUNT];
 
@@ -209,6 +227,7 @@ public class FormatterHelper {
 		return emptyTaskData;
 	}
 
+	//@@author A0134155M
 	private static List<List<Task>> splitTask(List<Task> tasks) {
 		List<List<Task>> taskLists = new ArrayList<List<Task>>();
 
@@ -227,6 +246,7 @@ public class FormatterHelper {
 		return taskLists;
 	}
 
+	//@@author A0134155M
 	private static boolean areInSameList(Task currentTask, Task previousTask) {
 		assert currentTask != null;
 		if (previousTask == null) {
@@ -248,6 +268,7 @@ public class FormatterHelper {
 		}
 	}
 
+	//@@author A0134155M
 	private static boolean areOnSameDay(Calendar currentTaskDate, Calendar previousTaskDate) {
 		return currentTaskDate.get(Calendar.YEAR) == previousTaskDate.get(Calendar.YEAR) &&
 				currentTaskDate.get(Calendar.DAY_OF_YEAR) == previousTaskDate.get(Calendar.DAY_OF_YEAR);

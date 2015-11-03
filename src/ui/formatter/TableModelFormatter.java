@@ -13,6 +13,14 @@ public class TableModelFormatter {
 	//minus one since we do not want the last field (isDone field)
 	private static final int COLUMN_COUNT = FormatterHelper.COLUMN_COUNT - 1;
 	
+	//@@author A0134155M
+	/**
+	 * Converts each field of the task in a task list data in a table produced by
+	 * FormatterHelper.getTaskListData() to their string representation. Also returns
+	 * a Boolean[] array denoting whether a task has been done or not.
+	 * @param taskList 2D object array denoting a task list.
+	 * @return
+	 */
 	public Pair<Object[][], Boolean[]> formatTaskList(Object[][] taskList) {
 		Object[][] tableModelData = new Object[taskList.length][COLUMN_COUNT];
 		Boolean[] isDone = new Boolean[taskList.length];

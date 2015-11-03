@@ -6,6 +6,7 @@ import org.junit.Test;
 
 public class TestStringFormatter {
 
+	//@@author A0134155M
 	/*
 	 * Test for align left, success.
 	 */
@@ -16,6 +17,7 @@ public class TestStringFormatter {
 		assertEquals("haha      ", result);
 	}
 
+	//@@author A0134155M
 	/*
 	 * Test for align left, fail.
 	 */
@@ -26,6 +28,7 @@ public class TestStringFormatter {
 		assertNull(result);
 	}
 	
+	//@@author A0134155M
 	/*
 	 * Test for align center, success. Space can be distributed evenly
 	 * between the left part and the right part.
@@ -37,6 +40,7 @@ public class TestStringFormatter {
 		assertEquals(result, "  pencil  ");
 	}
 	
+	//@@author A0134155M
 	/*
 	 * Test for align center, success. Space can't be distributed evenly
 	 * between the left part and the right part. The space on the
@@ -49,6 +53,7 @@ public class TestStringFormatter {
 		assertEquals(result, " mattress  ");
 	}
 	
+	//@@author A0134155M
 	/*
 	 * Test for align center, fail.
 	 */
@@ -59,6 +64,7 @@ public class TestStringFormatter {
 		assertNull(result);
 	}
 	
+	//@@author A0134155M
 	/*
 	 * Test for align right, success.
 	 */
@@ -69,6 +75,7 @@ public class TestStringFormatter {
 		assertEquals(result, "  cable");
 	}
 	
+	//@@author A0134155M
 	/*
 	 * Test for align right, fail.
 	 */

@@ -20,10 +20,12 @@ public class VerticalLayout extends GridBagLayout {
 	private Component lastComponent = null;
 	private GridBagConstraints lastComponentConstraint = null;
 	
+	//@@author A0134155M
 	public VerticalLayout() {
 		super();
 	}
 	
+	//@@author A0134155M
 	@Override
 	public void addLayoutComponent(Component comp, Object constraint) {
 		assert comp != null : "Cannot add null Component";
@@ -50,6 +52,7 @@ public class VerticalLayout extends GridBagLayout {
 		lastComponentConstraint = newComponentConstraint;
 	}
 	
+	//@@author A0134155M
 	private void resetLastComponentWeightY() {
 		if (lastComponent != null) {
 			lastComponentConstraint.weighty = NEUTRAL_WEIGHT;
@@ -57,6 +60,7 @@ public class VerticalLayout extends GridBagLayout {
 		}
 	}
 	
+	//@@author A0134155M
 	public void resetLayout() {
 		componentCount = 0;
 		lastComponent = null;

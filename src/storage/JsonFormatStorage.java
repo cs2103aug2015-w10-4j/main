@@ -10,8 +10,6 @@ import java.util.Arrays;
 import java.util.Scanner;
 import java.util.logging.Logger;
 
-import parser.Parser;
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -30,6 +28,7 @@ public class JsonFormatStorage implements Storage {
 	/**
 	 * Default constructor for JsonFormatStorage. Does not use pretty formatting for JSON.
 	 */
+	//@@author A0134155M
 	public JsonFormatStorage() {
 		gson = new GsonBuilder().serializeNulls().create();
 	}
@@ -39,6 +38,7 @@ public class JsonFormatStorage implements Storage {
 	 * JSON or not.
 	 * @param usePrettyJson whether to format the JSON with pretty format or not
 	 */
+	//@@author A0134155M
 	public JsonFormatStorage(boolean usePrettyJson) {
 		if (usePrettyJson) {
 			gson = new GsonBuilder().serializeNulls().setPrettyPrinting().create();
@@ -52,6 +52,7 @@ public class JsonFormatStorage implements Storage {
 	 * 
 	 * It saves the data in JSON format.
 	 */
+	//@@author A0134155M
 	@Override
 	public boolean writeItemList(ArrayList<Task> tasks) throws IOException {
 		String jsonFormat = convertToJsonFormat(tasks);
@@ -67,6 +68,7 @@ public class JsonFormatStorage implements Storage {
 		return true;
 	}
 
+	//@@author A0134155M
 	private String convertToJsonFormat(ArrayList<Task> tasks) {
 		Task[] tasksArray = new Task[tasks.size()];
 		tasksArray = tasks.toArray(tasksArray);
@@ -139,7 +141,7 @@ public class JsonFormatStorage implements Storage {
 	 * {@inheritDoc}
 	 * @throws IllegalStateException if the file does not contain a valid JSON.
 	 */
-	//@author A0108355H
+	//@@author A0134155M
 	@Override	
 	public ArrayList<Task> getItemList() throws FileNotFoundException, IllegalStateException {
 		File inputFile = new File(currentFilePath);

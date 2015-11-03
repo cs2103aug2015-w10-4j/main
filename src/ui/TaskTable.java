@@ -41,6 +41,7 @@ public class TaskTable extends JTable {
 	
 	private TaskTableModel model = null;
 	
+	//@@author A0134155M
 	public TaskTable(TaskTableModel dm) {
 		super(dm);
 		setBorder(new LineBorder(Color.LIGHT_GRAY));
@@ -53,6 +54,7 @@ public class TaskTable extends JTable {
 		prepareTable();
 	}
 	
+	//@@author A0134155M
 	public TaskTable(TaskTableModel dm, TableColumnModel cm) {
 		super(dm, cm);
 		setBorder(new LineBorder(Color.LIGHT_GRAY));
@@ -65,6 +67,7 @@ public class TaskTable extends JTable {
 		prepareTable();
 	}
 	
+	//@@author A0134155M
 	private void prepareTable() {
 		prepareTableHeader();
 		prepareTableAlignment();
@@ -72,6 +75,7 @@ public class TaskTable extends JTable {
 		fixColumnWidth();
 	}
 	
+	//@@author A0134155M
 	private void fixColumnWidth() {
 		TableColumnModel columnModel = getColumnModel();
 		int columnCount = columnModel.getColumnCount();
@@ -82,6 +86,7 @@ public class TaskTable extends JTable {
 		}
 	}
 	
+	//@@author A0134155M
 	private void setColumnWidth(int columnIndex, int columnWidth) {
 		TableColumn tableColumn = getColumnModel().getColumn(columnIndex);
 		tableColumn.setPreferredWidth(columnWidth);
@@ -91,6 +96,7 @@ public class TaskTable extends JTable {
 		}
 	}
 	
+	//@@author A0134155M
 	private int getColumnWidth(int columnIndex) {
 		int headerWidth = getHeaderWidth(columnIndex);
 		int contentWidth = getContentWidth(columnIndex);
@@ -99,6 +105,7 @@ public class TaskTable extends JTable {
 		return resultingWidth;
 	}
 	
+	//@@author A0134155M
 	private int getContentWidth(int columnIndex) {
 		int rowCount = getRowCount();
 		
@@ -115,6 +122,7 @@ public class TaskTable extends JTable {
 		return maxContentWidth;
 	}
 	
+	//@@author A0134155M
 	private int getHeaderWidth(int columnIndex) {
 		TableColumn tableColumn = getColumnModel().getColumn(columnIndex);
 		TableCellRenderer renderer = tableColumn.getHeaderRenderer();
@@ -128,6 +136,7 @@ public class TaskTable extends JTable {
 		return component.getPreferredSize().width;
 	}
 	
+	//@@author A0134155M
 	private void prepareTableHeader() {
 		JTableHeader tableHeader = getTableHeader();
 		tableHeader.setFont(new Font(HEADER_FONT_NAME, HEADER_FONT_STYLE, HEADER_FONT_SIZE));
@@ -136,16 +145,19 @@ public class TaskTable extends JTable {
 		
 	}
 	
+	//@@author A0134155M
 	private void prepareTableGrid() {
 		setShowGrid(true);
 		setGridColor(Color.LIGHT_GRAY);
 	}
 	
+	//@@author A0134155M
 	private void prepareTableAlignment() {
 		prepareHeaderAlignment();
 		prepareContentAlignment();
 	}
 	
+	//@@author A0134155M
 	private void prepareContentAlignment() {
 		TableColumnModel tableColumnModel = getColumnModel();
 		int columnCount = tableColumnModel.getColumnCount();
@@ -160,18 +172,21 @@ public class TaskTable extends JTable {
 		}
 	}
 	
+	//@@author A0134155M
 	private void prepareHeaderAlignment() {
 		TableCellRenderer headerRenderer = tableHeader.getDefaultRenderer();
 		JLabel headerLabel = (JLabel) headerRenderer;
 		headerLabel.setHorizontalAlignment(SwingConstants.CENTER);
 	}
 	
+	//@@author A0134155M
 	public Component prepareRenderer(TableCellRenderer renderer, int row, int column) {
 		Component c = super.prepareRenderer(renderer, row, column);
 		giveColour(c, row, column);
 		return c;
 	}
 	
+	//@@author A0134155M
 	private void giveColour(Component c, int row, int column) {
 		if (row % 2 == 0) {
 			c.setBackground(DEFAULT_ROW_COLOR);

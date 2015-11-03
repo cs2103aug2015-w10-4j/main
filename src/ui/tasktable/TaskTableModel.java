@@ -20,6 +20,7 @@ public class TaskTableModel extends AbstractTableModel {
 	private Object[][] data = null;
 	private Boolean[] isDone;
 	
+	//@@author A0134155M
 	public TaskTableModel(Object[][] taskListData) {
 		super();
 
@@ -30,26 +31,31 @@ public class TaskTableModel extends AbstractTableModel {
 		isDone = formattedData.getSecond();
 	}
 	
+	//@@author A0134155M
 	@Override
 	public String getColumnName(int column) {
 		return columnNames[column];
 	}
 	
+	//@@author A0134155M
 	@Override
 	public int getRowCount() {
 		return data.length;
 	}
 
+	//@@author A0134155M
 	@Override
 	public int getColumnCount() {
 		return columnNames.length;
 	}
 
+	//@@author A0134155M
 	@Override
 	public Object getValueAt(int rowIndex, int columnIndex) {
 		return data[rowIndex][columnIndex];
 	}
 	
+	//@@author A0134155M
 	public Boolean isTaskDone(int taskIndex) {
 		assert isDone[taskIndex] != null;
 		return isDone[taskIndex];
