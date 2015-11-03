@@ -31,11 +31,17 @@ Note that the keyword to specify the end date field here is 'by'. We can also us
 
 	add task 123 start 11 sep end 15 sep
 
-Usage of natural language date filters are also accepted:
+Use of natural language date filters are also accepted:
 
 	add task 123 by next monday
 	add task 456 by tomorrow
-	
+
+
+To specify a timing for the task, simply add a time arugment after the date arguments, for e.g.
+
+	add task 123 by today 8PM
+	add task 123 start 11 sep 9AM end 11 sep 2PM
+
 This will also store the task to a text file, which could be retrieved later by using other commands or opening the text file manually.
 
 You can also omit the year which will then interpreted by the program as the current year, or you can omit the date entirely as well, to store the task without any date information.
