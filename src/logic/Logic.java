@@ -14,7 +14,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
-import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashSet;
 import java.util.List;
@@ -604,7 +603,13 @@ public class Logic {
 			ArrayList<String> argumentList) throws Exception {
 		ArrayList<Integer> remappedArgumentList = new ArrayList<Integer>();
 		for (String oldIndexString : argumentList) {
-			int oldIndex = Integer.parseInt(oldIndexString) - 1;
+			int oldIndex;
+			try {
+				// if oldIndex cannot be parsed, handle exception properly 
+				oldIndex = Integer.parseInt(oldIndexString) - 1;
+			} catch (NumberFormatException e) {
+				throw new Exception(ERROR_INVALID_ARGUMENT);
+			}
 			if (oldIndex < listOfShownTasks.size() && oldIndex >= 0) {
 				Task task = listOfShownTasks.get(oldIndex);
 				int newIndex = listOfTasks.indexOf(task);
@@ -688,36 +693,40 @@ public class Logic {
 	 * @throws IndexOutOfBoundsException
 	 */
 	ArrayList<String> processIndexArguments(ArrayList<String> argumentList)
-			throws NumberFormatException, IndexOutOfBoundsException {
-		ArrayList<String> finalArgumentList = new ArrayList<>();
-		if (argumentList == null) {
-			System.out.println("Null...");
-			return null;
-		}
-		if (argumentList.size() == 1 && argumentList.get(0).equalsIgnoreCase(IDENTIFIER_ALL)) {
-			argumentList.clear();
-			for (int i = 0; i < listOfShownTasks.size(); i++) {
-				finalArgumentList.add(String.valueOf(i + 1));
+			throws IndexOutOfBoundsException, NumberFormatException {
+		try {
+			ArrayList<String> finalArgumentList = new ArrayList<>();
+			if (argumentList == null) {
+				System.out.println("Null...");
+				return null;
 			}
-		} else {
-			for (String argument : argumentList) {
-				if (argument.indexOf('-', 1) != -1) {
-					int dashPosition = argument.indexOf('-', 1);
-					String leftPart = argument.substring(0, dashPosition);
-					String rightPart = argument.substring(dashPosition + 1, argument.length());
+			if (argumentList.size() == 1 && argumentList.get(0).equalsIgnoreCase(IDENTIFIER_ALL)) {
+				argumentList.clear();
+				for (int i = 0; i < listOfShownTasks.size(); i++) {
+					finalArgumentList.add(String.valueOf(i + 1));
+				}
+			} else {
+				for (String argument : argumentList) {
+					if (argument.indexOf('-', 1) != -1) {
+						int dashPosition = argument.indexOf('-', 1);
+						String leftPart = argument.substring(0, dashPosition);
+						String rightPart = argument.substring(dashPosition + 1, argument.length());
 
-					int fromInclusive = Integer.parseInt(leftPart);
-					int toInclusive = Integer.parseInt(rightPart);
-					for (int index = fromInclusive; index <= toInclusive; index++) {
-						finalArgumentList.add(String.valueOf(index));
+						int fromInclusive = Integer.parseInt(leftPart);
+						int toInclusive = Integer.parseInt(rightPart);
+						for (int index = fromInclusive; index <= toInclusive; index++) {
+							finalArgumentList.add(String.valueOf(index));
+						}
+					} else {
+						//unchecked
+						finalArgumentList.add(argument);
 					}
-				} else {
-					//unchecked
-					finalArgumentList.add(argument);
 				}
 			}
+			return finalArgumentList;
+		} catch (NumberFormatException e) {
+			throw new NumberFormatException(ERROR_INVALID_ARGUMENT);
 		}
-		return finalArgumentList;
 	}
 	
 	String editFields(Task newTask, Task clonedTask) {
