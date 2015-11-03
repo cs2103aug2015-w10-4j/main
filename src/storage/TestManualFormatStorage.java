@@ -18,7 +18,8 @@ public class TestManualFormatStorage {
 	Storage storageObject;
 	ArrayList<Task> result ;
 	String TEST_ITEMS = "item1\nitem2\nitem3\n";
-
+	
+	//@author A0108355H
 	@Before
 	public void setup(){
 		try {
@@ -43,20 +44,22 @@ public class TestManualFormatStorage {
 	//File saveFile = new File("save.txt");
 	//saveFile.delete();
 	}
-
+	
+	//@author A0108355H
 	@Test
 	public void testWriteItemList() throws IOException{
 	//Task newTask = new Task("item 1");
 		boolean message = storageObject.writeItemList(result);
 		assertEquals(true, message);
 	}
-
+	//@author A0108355H
 	@Test
 	public void testSaveFileToPath() throws IOException{
 		boolean message = storageObject.saveFileToPath("newsave.txt");
 		assertEquals(false, message);
 	}
-
+	
+	//@author A0108355H
 	@Test
 	public void testGetItemList() throws IOException{
 	
@@ -68,7 +71,8 @@ public class TestManualFormatStorage {
 			
 		assertEquals(TEST_ITEMS, result);
 	}
-
+    
+	//@author A0108355H
 	@After
 	public void cleanup(){
 		File saveFile = new File("save.txt");

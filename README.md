@@ -23,9 +23,26 @@ After compiling, execute the following command to launch Tasky!
 
 ## Adding a task
 
-	add task123 date 11 sep 2015
+	add task123 by 11 sep 2015
 
-This is an example to add a task using the *add* keyword with description "task123" and date 11 sep 2015. This will also store the task to a text file, which could be retrieved later by using other commands or opening the text file manually.
+This is an example to add a task using the *add* keyword with description "task123" and date 11 sep 2015. It is optional to specify the year of the task, i.e. the year will be defaulted to the current year if not indicated by the user (as shown below). 
+
+Note that the keyword to specify the end date field here is 'by'. We can also use the keyword pairs 'start... end' or 'from... to' to specify the starting and ending date-time for the event:
+
+	add task 123 start 11 sep end 15 sep
+
+Use of natural language date filters are also accepted:
+
+	add task 123 by next monday
+	add task 456 by tomorrow
+
+
+To specify a timing for the task, simply add a time arugment after the date arguments, for e.g.
+
+	add task 123 by today 8PM
+	add task 123 start 11 sep 9AM end 11 sep 2PM
+
+This will also store the task to a text file, which could be retrieved later by using other commands or opening the text file manually.
 
 You can also omit the year which will then interpreted by the program as the current year, or you can omit the date entirely as well, to store the task without any date information.
 
@@ -37,7 +54,7 @@ This is an example to display all tasks currently stored in memory (and file). T
 
 ## Editing a task
 
-	edit 1 task456 date 12 sep 2015
+	edit 1 task456 by 12 sep 2015
 
 This is an example to edit the task number 1 from the [display](#displaying-tasks) to task456 and change the date to 12 sep 2015
 

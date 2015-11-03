@@ -13,12 +13,14 @@ public class RoundedBorder extends AbstractBorder {
 
     private final Color color;
     private final int gap;
-
+    
+	//@author A0108355H
     public RoundedBorder(Color c, int g) {
         color = c;
         gap = g;
     }
 
+	//@author A0108355H
     @Override
     public void paintBorder(Component c, Graphics g, int x, int y, int width, int height) {
         Graphics2D g2d = (Graphics2D) g.create();
@@ -26,18 +28,21 @@ public class RoundedBorder extends AbstractBorder {
         g2d.draw(new RoundRectangle2D.Double(x, y, width - 1, height - 1, gap, gap));
         g2d.dispose();
     }
-
+    
+	//@author A0108355H
     @Override
     public Insets getBorderInsets(Component c) {
         return (getBorderInsets(c, new Insets(gap, gap, gap, gap)));
     }
-
+    
+	//@author A0108355H
     @Override
     public Insets getBorderInsets(Component c, Insets insets) {
         insets.left = insets.top = insets.right = insets.bottom = gap / 2;
         return insets;
     }
-
+    
+	//@author A0108355H
     @Override
     public boolean isBorderOpaque() {
         return false;
