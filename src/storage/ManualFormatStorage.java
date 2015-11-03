@@ -35,6 +35,7 @@ public class ManualFormatStorage implements Storage {
 	 * 
 	 * Task data is saved in the following format: "[task name];[date]" on each line. To be improved
 	 */
+	//@author A0108355H
 	@Override
 	public boolean writeItemList(ArrayList<Task> task) throws IOException {
 		String content = "";
@@ -60,6 +61,7 @@ public class ManualFormatStorage implements Storage {
 	/* (non-Javadoc)
 	 * @see storage.Storage#saveFileToPath(java.lang.String)
 	 */
+	//@author A0108355H
 	@Override
 	public boolean saveFileToPath(String path) throws IOException {
 		File file = new File(path);
@@ -89,6 +91,7 @@ public class ManualFormatStorage implements Storage {
 	/* (non-Javadoc)
 	 * @see storage.Storage#getItemList()
 	 */
+	//@author A0108355H
 	@Override
 	public ArrayList<Task> getItemList() throws FileNotFoundException {
 		File file = new File(FILE_PATH);
@@ -108,7 +111,7 @@ public class ManualFormatStorage implements Storage {
 		sc.close();
 		return taskList;
 	}
-
+	//@author A0108355H
 	public void extractDate(String arg, Task taskObj) { // might want to store the date differently, up to you
 		String[] newArgs = arg.split(ARGUMENTS_DATE);
 		Calendar calendarRead = new GregorianCalendar();
