@@ -269,6 +269,8 @@ public class Logic {
 				case ADD :
 					argumentList = removeDuplicates(argumentList);
 					indexList = parseIntList(argumentList);
+					// argumentList's order gets messed up after going through HashSet. So apply sort again
+					Collections.sort(indexList);
 					logger.info("ADD command detected");
 					return addItem(userTasks, indexList, isUserInput,
 							isUndoHistory);
