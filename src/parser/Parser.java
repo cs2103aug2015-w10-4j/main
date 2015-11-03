@@ -73,7 +73,7 @@ public class Parser {
 	static final String[] DAYS_COMPACT = { "sun" , "mon" , "tue" , "wed" , "thu" ,"fri", "sat" };
 	
 
-	static final String[] PERIODIC = { "days", "weeks" , "months" };
+	static final String[] PERIODIC = { "days" , "day" , "week" , "weeks" , "month" , "months" , "year" , "years" };
 
 	enum FieldType {
 		START_EVENT, END_EVENT, DEADLINE, LOCATION, INTERVAL_PERIODIC, INSTANCES_PERIODIC
@@ -176,7 +176,6 @@ public class Parser {
 				commandObject.addTask(taskObject);
 				break;
 			default:
-			
 		}
 		return commandObject;
 	}
@@ -195,8 +194,12 @@ public class Parser {
 	}
 
 	String[] getMultipleIndexes(String commandString) {
-		String[] indexArray = commandString.split(WHITE_SPACE_REGEX);
-		return indexArray;
+		if(commandString.length() > 0){
+			String[] indexArray = commandString.split(WHITE_SPACE_REGEX);
+			return indexArray;
+		} else {
+			return new String[0];
+		}
 	}
 
 	String removeFirstWord(String commandString) {
@@ -330,7 +333,7 @@ public class Parser {
 				throw new Exception(ERROR_INVALID_NUMBER_OF_ARGUMENTS);
 			}
 
-			if (periodicInstancesArguments.length == 1) {
+			if (periodicInstancesArguments.length >= 1) {
 				logger.finer("extractPeriodic: periodic argument length is 1.");
 				int periodicInstancesValue;
 				try {

@@ -687,6 +687,10 @@ public class Logic {
 	ArrayList<String> processIndexArguments(ArrayList<String> argumentList)
 			throws NumberFormatException, IndexOutOfBoundsException {
 		ArrayList<String> finalArgumentList = new ArrayList<>();
+		if (argumentList == null) {
+			System.out.println("Null...");
+			return null;
+		}
 		if (argumentList.size() == 1 && argumentList.get(0).equalsIgnoreCase(IDENTIFIER_ALL)) {
 			argumentList.clear();
 			for (int i = 0; i < listOfShownTasks.size(); i++) {
@@ -1320,6 +1324,7 @@ public class Logic {
 	 */
 	boolean addInterval(Task curTask, String periodicIntervalString)
 			throws Exception {
+		System.out.println(periodicIntervalString);
 		String[] periodicIntervalWords = periodicIntervalString.split(
 				WHITE_SPACE_REGEX, 2);
 		String periodicIntervalUnit = periodicIntervalWords[1];
@@ -1332,18 +1337,24 @@ public class Logic {
 		}
 		
 		int calendarUnit;
-		if (periodicIntervalUnit.equalsIgnoreCase("days")) {
+		System.out.println(periodicIntervalUnit);
+		if (periodicIntervalUnit.equalsIgnoreCase("days") || periodicIntervalUnit.equalsIgnoreCase("day")) {
 			calendarUnit = Calendar.DATE;
-		} else if (periodicIntervalUnit.equalsIgnoreCase("weeks")) {
+		} else if (periodicIntervalUnit.equalsIgnoreCase("weeks") || periodicIntervalUnit.equalsIgnoreCase("week")) {
 			calendarUnit = Calendar.WEEK_OF_YEAR;
+		} else if (periodicIntervalUnit.equalsIgnoreCase("months") || periodicIntervalUnit.equalsIgnoreCase("month")){
+			calendarUnit = Calendar.MONTH;
 		} else {
 			calendarUnit = Calendar.YEAR;
 		}
 		
-		if(curTask.hasStartingTime()) {
+		if (curTask.hasStartingTime()) {
 			curTask.getStartingTime().add(calendarUnit, periodicInterval);
 		}
-		curTask.getEndingTime().add(calendarUnit, periodicInterval);
+		if (curTask.hasEndingTime()) {
+			curTask.getEndingTime().add(calendarUnit, periodicInterval);
+		}
+		
 		return true;
 	}
 	
