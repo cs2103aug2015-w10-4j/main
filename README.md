@@ -21,7 +21,7 @@ After compiling, execute the following command to launch Tasky!
 
 	java -cp bin logic.Logic
 
-## Adding a task
+## Adding a task (command: add)
 
 	add task123 by 11 sep 2015
 
@@ -46,25 +46,56 @@ This will also store the task to a text file, which could be retrieved later by 
 
 You can also omit the year which will then interpreted by the program as the current year, or you can omit the date entirely as well, to store the task without any date information.
 
-## Displaying tasks
+To spcficy a location for the task, simply add "loc" or "at" followed by the location, for e.g.
+
+	add task 123 by today 8PM loc nus
+	add task 123 start 11 sep 9AM end 11 sep 2PM loc my home
+	
+To add  periodic tasks, use every [index] day(s)/week(s)/month(s)/year(s) for [index]. for e.g
+       
+       add task from today to tomorrow every 2 days for 2
+       add task from today to tomorrow every 1 month for 5
+       
+noted that a starting time and a ending time is required when adding periodic task.   
+	
+Noted that we allowed adding task by eiher entering the location, time or periodic field first.
+ 
+## Displaying tasks (command: display/clear)
 
 	display
 
 This is an example to display all tasks currently stored in memory (and file). Tasky will then display a numbered list of tasks.
 
-## Editing a task
+## Editing a task (command: edit/change)
 
 	edit 1 task456 by 12 sep 2015
 
 This is an example to edit the task number 1 from the [display](#displaying-tasks) to task456 and change the date to 12 sep 2015
 
-## Deleting a task
 
-	delete 1
+	change 1 loc school
+	
+This is an example to edit the task number 1 from the [display](#displaying-tasks) to task456 and change the location to school	
 
-This is an example to remove the task that is currently number one in the list. To get the list of tasks, you can issue a display command. This command will also delete the task in the storage file. It is possible to revert the command by issuing an undo command. For more info, please take a look at [display](#displaying-tasks) and [undo](#undoing-commands)
+## Deleting a task (command: delete/del)
 
-## Undoing commands
+	delete 1  
+
+This is an example to remove the task that is currently number one in the list. 
+
+	del 1 2 4 6
+	
+This is an example to remove the task that is currently number one, two, four, six in the list. 
+
+
+	del 1-6
+	
+This is an example to remove the task that is currently from number one to number six in the list.
+
+To get the list of tasks, you can issue a display command. This command will also delete the task in the storage file. It is possible to revert the command by issuing an undo command. For more info, please take a look at [display](#displaying-tasks) and [undo](#undoing-commands)
+
+
+## Undoing commands (command: undo)
 
 	undo
 
@@ -78,8 +109,49 @@ Note that only add, edit and delete commands are supported.
 
 This is an example to change the path to the save file to new_file.txt. After this command, any changes made will be saved to the new file.
 
+## mark task as completed  (command: mark)
+
+       mark 1
+       
+This is an example to mark task 1 that is showing on the screen completed, to view that tasks that marked completed, key in " search done".       
+
+## unmark task as completed  (command: unmark)
+
+       unmark 1
+       
+This is an example to mark task 1 that is showing on the screen completed, to view that tasks that marked completed, key in " search done".       
+
+## search tasks (command: search/find)
+
+       search task
+       
+This is an example to search any tasks that contain "task" in their name.
+
+noted we allowed multiple level of searching. for e.g. after the first search
+
+1. task1 loc nus
+2. task2 loc home
+3. task3 loc school
+
+is displaying on the screen
+
+key in "search loc home"
+
+1.task2 loc home 
+
+will be shown on the screen
+
+we also allowed user to search according to time. for e.g.
+
+        search by today
+        
+tasks that due by today will be shown on the screen
+
+
 ## Exiting the program
 You can exit the program by issuing the command
 
 	exit
+	
+	
 
