@@ -28,7 +28,6 @@ import javax.swing.JTextField;
 import javax.swing.JViewport;
 import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
-import javax.swing.table.JTableHeader;
 import javax.swing.table.TableColumnModel;
 
 import global.Task;
@@ -136,7 +135,7 @@ public class UI {
 	private TextFormatter taskListFormatter = new TextFormatter();
 	private UserInputHistory userInputHistory = new UserInputHistory();
 	
-	private boolean isTableHeaderVisible = true;
+	private boolean isTableTitleVisible = true;
 
 	private final boolean useJTable = true;
 	
@@ -333,7 +332,7 @@ public class UI {
 		@SuppressWarnings("serial")
 		Action toggleHeaderVisibility = new AbstractAction() {
 			public void actionPerformed(ActionEvent e) {
-				isTableHeaderVisible ^= true;
+				isTableTitleVisible ^= true;
 				redrawDisplayAreaPanel();
 			}
 		};
@@ -353,8 +352,8 @@ public class UI {
 		Component[] currentComponents = displayAreaPanel.getComponents();
 		
 		for (Component component : currentComponents) {
-			if (component instanceof JTableHeader) {
-				component.setVisible(isTableHeaderVisible);
+			if (component instanceof JLabel) {
+				component.setVisible(isTableTitleVisible);
 			}
 		}
 		
@@ -527,13 +526,13 @@ public class UI {
 			currentTable.setRowSelectionAllowed(false);
 			
 			JLabel titleLabel = new JLabel(titles.get(i));
+			titleLabel.setVisible(isTableTitleVisible);
 
 			displayAreaPanel.add(titleLabel);
 			
 			if (commonColumnModel == null) {
 				commonColumnModel = currentTable.getColumnModel();
 				displayAreaPanel.add(currentTable.getTableHeader());
-				currentTable.getTableHeader().setVisible(isTableHeaderVisible);
 			}
 
 			displayAreaPanel.add(currentTable);
