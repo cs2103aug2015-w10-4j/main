@@ -514,6 +514,10 @@ public class Parser {
 			}
 			if (dateArguments.length == 3) {
 				year = Integer.parseInt(dateArguments[2]);
+				if (year < 100) { // is 2 digits, assume shortform for year
+					int curYear = Calendar.getInstance().get(Calendar.YEAR);
+					year = year + (curYear - curYear % 100);
+				}
 			} else {
 				year = Calendar.getInstance().get(Calendar.YEAR);
 			}

@@ -75,7 +75,7 @@ public class Logic {
 	private static final Level DEFAULT_LEVEL = Level.INFO;
 	
 	// date format converter
-	static SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM");
+	static SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM YY");
 
 	/*
 	 * Static strings - errors and messages
@@ -1049,6 +1049,7 @@ public class Logic {
 					filterTimeEnd.add(Calendar.DATE, 1);
 					filterTimeEnd.set(Calendar.HOUR_OF_DAY, 0);
 					filterTimeEnd.set(Calendar.MINUTE, 0);
+					
 					if (!isEmptyTime) {
 						searchStrings.set(
 								1,
@@ -1108,26 +1109,29 @@ public class Logic {
 			Calendar curTime = Calendar.getInstance();
 			int curDate = curTime.get(Calendar.DATE);
 			int curMonth = curTime.get(Calendar.MONTH) + 1;
+			int curYear = curTime.get(Calendar.YEAR);
 			Task curItem = listOfItemsInDate.get(0);
 			
 			Calendar curItemTime = curItem.getTime();
 			int curItemDate = curItemTime.get(Calendar.DATE);
 			int curItemMonth = curItemTime.get(Calendar.MONTH) + 1;
-			addTitleForDateHelper(listOfTitles, curDate, curMonth,
-					curItemDate, curItemMonth);
+			int curItemYear = curItemTime.get(Calendar.YEAR);
+			addTitleForDateHelper(listOfTitles, curDate, curMonth, curYear,
+					curItemDate, curItemMonth, curItemYear);
 		} else {
-			listOfTitles.add("No upcoming tasks.");
+			listOfTitles.add("No upcoming tasks");
 		}
 	}
 
 	private void addTitleForDateHelper(List<String> listOfTitles, int curDate,
-			int curMonth, int curItemDate, int curItemMonth) {
+			int curMonth, int curYear, int curItemDate, int curItemMonth, int curItemYear) {
 		Calendar itemDate = new GregorianCalendar();
 		itemDate.set(Calendar.DATE, curItemDate);
 		itemDate.set(Calendar.MONTH, curItemMonth - 1);
+		itemDate.set(Calendar.YEAR, curItemYear);
 		String itemDateString = dateFormat.format(itemDate.getTime());
 		String titleTop = String.format(TITLE_TOP_DISPLAY, displaySize);
-		if (curMonth == curItemMonth) {
+		if (curMonth == curItemMonth && curYear == curItemYear) {
 			if (curDate == curItemDate) {
 				listOfTitles.add(titleTop + TITLE_TODAY);
 			} else if (curDate == curItemDate - 1) {
