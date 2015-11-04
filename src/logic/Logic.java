@@ -939,24 +939,41 @@ public class Logic {
 			ArrayList<Task> listOfFirstDate = new ArrayList<Task>();
 			ArrayList<Task> listOfSecondDate = new ArrayList<Task>();
 			if (listOfEventsDeadlines.size() != 0) {
-				Task firstTask = listOfEventsDeadlines.get(0);
-				Calendar firstDate, secondDate = null;
-				firstDate = firstTask.getTime();
-				listOfFirstDate = getTasksInDay(listOfEventsDeadlines,
-						firstDate);
-
-				int i = 1;
-				while (i < listOfEventsDeadlines.size() && secondDate == null) {
-					Task curTask = listOfEventsDeadlines.get(i);
-					Calendar curDate = curTask.getTime();
-					if (!isTimingInDay(curDate, firstDate)) {
-							secondDate = curDate;
+				Task firstTask;
+				Calendar todayDate = new GregorianCalendar();
+				Calendar firstDate = null, secondDate = null;
+				int n = 0, i = 1;
+				while (n < listOfEventsDeadlines.size()) {
+					// prepare first task in the list for comparison
+					firstTask = listOfEventsDeadlines.get(n);
+					firstDate = firstTask.getTime();
+					// compare to see if the task is before today's date. We only want tasks after/same as today's date
+					if (todayDate.getTimeInMillis() - firstDate.getTimeInMillis() > 0) {
+						// yes, so iterate to next task and set firstDate to null to satisfy next if nest
+						n++;
+						firstDate = null;
+					} else {
+						// we want this, so break loop and continue with operation
+						i = n > 0 ? n : 1;
+						n += listOfEventsDeadlines.size();
 					}
-					i++;
 				}
-				if (secondDate != null) {
-					listOfSecondDate = getTasksInDay(listOfEventsDeadlines,
-							secondDate);
+				
+				if (firstDate != null) {
+					listOfFirstDate = getTasksInDay(listOfEventsDeadlines,
+							firstDate);
+					while (i < listOfEventsDeadlines.size() && secondDate == null) {
+						Task curTask = listOfEventsDeadlines.get(i);
+						Calendar curDate = curTask.getTime();
+						if (!isTimingInDay(curDate, firstDate)) {
+							secondDate = curDate;
+						}
+						i++;
+					}
+					if (secondDate != null) {
+						listOfSecondDate = getTasksInDay(listOfEventsDeadlines,
+								secondDate);
+					}
 				}
 			}
 			addTasksToList(listOfFirstDate);
