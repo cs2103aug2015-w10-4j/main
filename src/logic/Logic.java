@@ -1029,8 +1029,9 @@ public class Logic {
 					filterTimeStart.set(Calendar.HOUR_OF_DAY, 0);
 					filterTimeStart.set(Calendar.MINUTE, 0);
 					Calendar filterTimeEnd = (Calendar) filterTime.clone();
-					filterTimeEnd.set(Calendar.HOUR_OF_DAY, 23);
-					filterTimeEnd.set(Calendar.MINUTE, 59);
+					filterTimeEnd.add(Calendar.DATE, 1);
+					filterTimeEnd.set(Calendar.HOUR_OF_DAY, 0);
+					filterTimeEnd.set(Calendar.MINUTE, 0);
 					if (!isEmptyTime) {
 						searchStrings.set(
 								1,
@@ -1047,7 +1048,7 @@ public class Logic {
 						Task curTask = listOfShownTasks.get(i);
 						if (curTask.getTime() == null
 								|| curTask.getTime().before(filterTimeStart)
-								|| curTask.getTime().after(filterTimeEnd)) {
+								|| !curTask.getTime().before(filterTimeEnd)) {
 							listOfShownTasks.remove(i);
 						} else {
 							i++;
@@ -1336,7 +1337,6 @@ public class Logic {
 	 */
 	boolean addInterval(Task curTask, String periodicIntervalString)
 			throws Exception {
-		System.out.println(periodicIntervalString);
 		String[] periodicIntervalWords = periodicIntervalString.split(
 				WHITE_SPACE_REGEX, 2);
 		String periodicIntervalUnit = periodicIntervalWords[1];
