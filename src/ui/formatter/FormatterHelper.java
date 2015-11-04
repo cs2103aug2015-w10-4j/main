@@ -148,6 +148,7 @@ public class FormatterHelper {
 	 * @param minRowCountPerTable minimum number of row for each table
 	 * @return
 	 */
+	//TODO: refine this, Object[][][] doesn't look good
 	public static Object[][][] getTaskListData(List<Task> tasks, boolean needTaskSplit,
 			int minTable, int minRowCountPerTable) {
 		List<List<Task>> taskLists = new ArrayList<List<Task>>();

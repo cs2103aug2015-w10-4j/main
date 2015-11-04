@@ -107,6 +107,18 @@ public class UI {
 	
 	private static final int SCROLL_SPEED = 10;
 	
+	private static final String HELP_MESSAGE = "" +
+		"Commands  Example usage\n" +
+		"add       add task123 date 11 sep 2015\n" +
+		"display   display\n" +
+		"edit      edit 1 task456 date 12 sep 2015\n" +
+		"delete    delete 1\n" +
+		"undo      undo\n" +
+		"redo      redo\n" +
+		"saveto    saveto new_file.txt\n" +
+		"exit      exit\n";
+
+	
 	public enum DisplayType {
 		DEFAULT, FILTERED
 	}
@@ -327,6 +339,14 @@ public class UI {
 		};
 		userInputField.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_F2, 0), 
 				toggleHeaderVisibility);
+		
+		@SuppressWarnings("serial")
+		Action displayHelp = new AbstractAction() {
+			public void actionPerformed(ActionEvent e) {
+				showToUser(HELP_MESSAGE);
+			}
+		};
+		userInputField.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_F1, 0), displayHelp);
 	}
 	
 	private void redrawDisplayAreaPanel() {
@@ -511,8 +531,9 @@ public class UI {
 			displayAreaPanel.add(titleLabel);
 			
 			if (commonColumnModel == null) {
-				displayAreaPanel.add(currentTable.getTableHeader());
 				commonColumnModel = currentTable.getColumnModel();
+				displayAreaPanel.add(currentTable.getTableHeader());
+				currentTable.getTableHeader().setVisible(isTableHeaderVisible);
 			}
 
 			displayAreaPanel.add(currentTable);
