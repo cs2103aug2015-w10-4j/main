@@ -1366,7 +1366,6 @@ public class Logic {
 		}
 		
 		int calendarUnit;
-		System.out.println(periodicIntervalUnit);
 		if (periodicIntervalUnit.equalsIgnoreCase("days") || periodicIntervalUnit.equalsIgnoreCase("day")) {
 			calendarUnit = Calendar.DATE;
 		} else if (periodicIntervalUnit.equalsIgnoreCase("weeks") || periodicIntervalUnit.equalsIgnoreCase("week")) {

@@ -165,7 +165,6 @@ public class FormatterHelper {
 
 			//including the number column
 			List<Object[]> currentTaskListData = new ArrayList<Object[]>();
-
 			for (int i = 0; i < currentTaskList.size(); i++) {
 				Task currentTask = currentTaskList.get(i);
 				Object[] currentTaskData = new Object[COLUMN_COUNT];
@@ -236,7 +235,14 @@ public class FormatterHelper {
 			Task previousTask = i == 0 ? null : tasks.get(i - 1);
 			
 			if (!areInSameList(currentTask, previousTask)) {
-				taskLists.add(new ArrayList<Task>());
+				if (currentTask.getTime() == null) {//temp workaround to display floating tasks properly (for live demo)
+					int curTaskListSize = taskLists.size();
+					for (int j = 0; j < 3 - curTaskListSize; j++) {
+						taskLists.add(new ArrayList<Task>());
+					}
+				} else {
+					taskLists.add(new ArrayList<Task>());
+				}
 			}
 
 			int lastTaskListIndex = taskLists.size() - 1;
