@@ -1,6 +1,7 @@
 package ui;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -27,6 +28,7 @@ import javax.swing.JTextField;
 import javax.swing.JViewport;
 import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
+import javax.swing.table.JTableHeader;
 import javax.swing.table.TableColumnModel;
 
 import global.Task;
@@ -105,6 +107,18 @@ public class UI {
 	
 	private static final int SCROLL_SPEED = 10;
 	
+	private static final String HELP_MESSAGE = "" +
+		"Commands  Example usage\n" +
+		"add       add task123 date 11 sep 2015\n" +
+		"display   display\n" +
+		"edit      edit 1 task456 date 12 sep 2015\n" +
+		"delete    delete 1\n" +
+		"undo      undo\n" +
+		"redo      redo\n" +
+		"saveto    saveto new_file.txt\n" +
+		"exit      exit\n";
+
+	
 	public enum DisplayType {
 		DEFAULT, FILTERED
 	}
@@ -122,7 +136,9 @@ public class UI {
 	private TextFormatter taskListFormatter = new TextFormatter();
 	private UserInputHistory userInputHistory = new UserInputHistory();
 	
-	private static final boolean useJTable = true;
+	private boolean isTableHeaderVisible = true;
+
+	private final boolean useJTable = true;
 	
 	/*
 	 * Constructor
@@ -314,6 +330,36 @@ public class UI {
 		};
 		userInputField.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_PAGE_UP, 0), scrollUp);
 		
+		@SuppressWarnings("serial")
+		Action toggleHeaderVisibility = new AbstractAction() {
+			public void actionPerformed(ActionEvent e) {
+				isTableHeaderVisible ^= true;
+				redrawDisplayAreaPanel();
+			}
+		};
+		userInputField.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_F2, 0), 
+				toggleHeaderVisibility);
+		
+		@SuppressWarnings("serial")
+		Action displayHelp = new AbstractAction() {
+			public void actionPerformed(ActionEvent e) {
+				showToUser(HELP_MESSAGE);
+			}
+		};
+		userInputField.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_F1, 0), displayHelp);
+	}
+	
+	private void redrawDisplayAreaPanel() {
+		Component[] currentComponents = displayAreaPanel.getComponents();
+		
+		for (Component component : currentComponents) {
+			if (component instanceof JTableHeader) {
+				component.setVisible(isTableHeaderVisible);
+			}
+		}
+		
+		displayAreaPanel.revalidate();
+		displayAreaPanel.repaint();
 	}
 	
 	//@@author A0134155M
@@ -485,8 +531,9 @@ public class UI {
 			displayAreaPanel.add(titleLabel);
 			
 			if (commonColumnModel == null) {
-				displayAreaPanel.add(currentTable.getTableHeader());
 				commonColumnModel = currentTable.getColumnModel();
+				displayAreaPanel.add(currentTable.getTableHeader());
+				currentTable.getTableHeader().setVisible(isTableHeaderVisible);
 			}
 
 			displayAreaPanel.add(currentTable);
