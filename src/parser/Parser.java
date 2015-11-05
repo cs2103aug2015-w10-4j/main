@@ -65,6 +65,23 @@ public class Parser {
 	static final String[] COMMAND_SEARCH = { "search" };
 	static final String[] COMMAND_SAVETO = { "saveto" };
 	static final String[] COMMAND_HELP = { "help" };
+	static final String[] COMMAND_ALIAS = { "alias" };
+	
+	ArrayList<String> addKeywords = new ArrayList<String>();
+	ArrayList<String> editKeywords = new ArrayList<String>();
+	ArrayList<String> deleteKeywords = new ArrayList<String>();
+	ArrayList<String> undoKeywords = new ArrayList<String>();
+	ArrayList<String> redoKeywords = new ArrayList<String>();
+	ArrayList<String> markKeywords = new ArrayList<String>();
+	ArrayList<String> unmarkKeywords = new ArrayList<String>();
+	ArrayList<String> exitKeywords = new ArrayList<String>();
+	ArrayList<String> displayKeywords = new ArrayList<String>();
+	ArrayList<String> searchKeywords = new ArrayList<String>();
+	ArrayList<String> savetoKeywords = new ArrayList<String>();
+	ArrayList<String> helpKeywords = new ArrayList<String>();
+	ArrayList<String> aliasKeywords = new ArrayList<String>();
+	ArrayList<ArrayList<String>> differentLists = new ArrayList<ArrayList<String>>();
+	
 
 	static final String[] DATE_SPECIAL = { "this", "next", "today", "tomorrow" };
 	static final String[] MONTHS = { "jan", "feb", "mar", "apr", "may",
@@ -119,7 +136,51 @@ public class Parser {
 			}
 		}
 	}
-
+	
+	public Parser(){
+		initialiseKeywordLists();
+		addAllDefaultKeywords();
+	}
+	
+	boolean initialiseKeywordLists(){
+		differentLists.add(addKeywords);
+		differentLists.add(editKeywords);
+		differentLists.add(deleteKeywords);
+		differentLists.add(undoKeywords);
+		differentLists.add(redoKeywords);
+		differentLists.add(markKeywords);
+		differentLists.add(unmarkKeywords);
+		differentLists.add(exitKeywords);
+		differentLists.add(displayKeywords);
+		differentLists.add(searchKeywords);
+		differentLists.add(savetoKeywords);
+		differentLists.add(helpKeywords);
+		return true;
+	}
+	
+	boolean addAllDefaultKeywords(){ // can refactor
+		addDefaultKeywordsToList(COMMAND_ADD, addKeywords);
+		addDefaultKeywordsToList(COMMAND_EDIT, editKeywords);
+		addDefaultKeywordsToList(COMMAND_DELETE, deleteKeywords);
+		addDefaultKeywordsToList(COMMAND_UNDO, undoKeywords);
+		addDefaultKeywordsToList(COMMAND_REDO, redoKeywords);
+		addDefaultKeywordsToList(COMMAND_MARK, markKeywords);
+		addDefaultKeywordsToList(COMMAND_UNMARK, unmarkKeywords);
+		addDefaultKeywordsToList(COMMAND_EXIT, exitKeywords);
+		addDefaultKeywordsToList(COMMAND_DISPLAY, displayKeywords);
+		addDefaultKeywordsToList(COMMAND_SEARCH, searchKeywords);
+		addDefaultKeywordsToList(COMMAND_SAVETO, savetoKeywords);
+		addDefaultKeywordsToList(COMMAND_HELP, helpKeywords);
+		addDefaultKeywordsToList(COMMAND_ALIAS, aliasKeywords);
+		return true;
+	}
+	
+	boolean addDefaultKeywordsToList(String[] listOfKeywords, ArrayList<String> listInMemory){
+		for (int i = 0; i < listOfKeywords.length; i++) {
+			listInMemory.add(listOfKeywords[i]);
+		}
+		return true;
+	}
 	
 	/**
 	 * Parses the command string based on keyword
@@ -175,9 +236,17 @@ public class Parser {
 				extractFieldInformation(commandString, taskObject);
 				commandObject.addTask(taskObject);
 				break;
+			case ALIAS :
+				argumentArray = getAliasArgument(commandString);
+				commandObject.setArguments(argumentArray);
+				break;
 			default:
 		}
 		return commandObject;
+	}
+	
+	String[] getAliasArgument(String commandString) {
+		return commandString.split(WHITE_SPACE_REGEX, 2);
 	}
 	
 	String[] getSaveToArgument(String commandString) {
@@ -240,30 +309,32 @@ public class Parser {
 			throw new Exception(ERROR_EMPTY_COMMAND_STRING);
 		} else {
 			String firstWord = commandString.split(WHITE_SPACE_REGEX, 2)[0];
-			if (isCommandKeyword(firstWord, COMMAND_ADD)) {
+			if (isCommandKeyword(firstWord, addKeywords)) {
 				return Command.Type.ADD;
-			} else if (isCommandKeyword(firstWord, COMMAND_EDIT)) {
+			} else if (isCommandKeyword(firstWord, editKeywords)) {
 				return Command.Type.EDIT;
-			} else if (isCommandKeyword(firstWord, COMMAND_DELETE)) {
+			} else if (isCommandKeyword(firstWord, deleteKeywords)) {
 				return Command.Type.DELETE;
-			} else if (isCommandKeyword(firstWord, COMMAND_UNDO)) {
+			} else if (isCommandKeyword(firstWord, undoKeywords)) {
 				return Command.Type.UNDO;
-			} else if (isCommandKeyword(firstWord, COMMAND_REDO)) {
+			} else if (isCommandKeyword(firstWord, redoKeywords)) {
 				return Command.Type.REDO;
-			} else if (isCommandKeyword(firstWord, COMMAND_SAVETO)) {
+			} else if (isCommandKeyword(firstWord, savetoKeywords)) {
 				return Command.Type.SAVETO;
-			} else if (isCommandKeyword(firstWord, COMMAND_DISPLAY)) {
+			} else if (isCommandKeyword(firstWord, displayKeywords)) {
 				return Command.Type.DISPLAY;
-			} else if (isCommandKeyword(firstWord, COMMAND_EXIT)) {
+			} else if (isCommandKeyword(firstWord, exitKeywords)) {
 				return Command.Type.EXIT;
-			} else if (isCommandKeyword(firstWord, COMMAND_MARK)) {
+			} else if (isCommandKeyword(firstWord, markKeywords)) {
 				return Command.Type.MARK;
-			} else if (isCommandKeyword(firstWord, COMMAND_UNMARK)) {
+			} else if (isCommandKeyword(firstWord, unmarkKeywords)) {
 				return Command.Type.UNMARK;
-			} else if (isCommandKeyword(firstWord, COMMAND_SEARCH)) {
+			} else if (isCommandKeyword(firstWord, searchKeywords)) {
 				return Command.Type.SEARCH;
-			} else if (isCommandKeyword(firstWord, COMMAND_HELP)) {
+			} else if (isCommandKeyword(firstWord, helpKeywords)) {
 				return Command.Type.HELP;
+			} else if (isCommandKeyword(firstWord, aliasKeywords)) {
+				return Command.Type.ALIAS;
 			} else {
 				logger.info("identifyType: invalid command");
 				throw new Exception(ERROR_INVALID_COMMAND_SPECIFIED);
@@ -275,6 +346,16 @@ public class Parser {
 			String[] keywords) {
 		for (int i = 0; i < keywords.length; i++) {
 			if (firstWordInCommandString.equalsIgnoreCase(keywords[i])) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	boolean isCommandKeyword(String firstWordInCommandString,
+			ArrayList<String> keywords) {
+		for (int i = 0; i < keywords.size(); i++) {
+			if (firstWordInCommandString.equalsIgnoreCase(keywords.get(i))) {
 				return true;
 			}
 		}
@@ -874,5 +955,18 @@ public class Parser {
 			}
 		}
 		return null;
+	}
+	
+	public boolean addAlias(String existingCommandKeyword, String newCommandKeyword){
+		int i = 0;
+		while(i < differentLists.size()){
+			ArrayList<String> curList = differentLists.get(i);
+			if(curList.contains(existingCommandKeyword)){
+				curList.add(newCommandKeyword);
+				return true;
+			}
+			i++;
+		}
+		return false;
 	}
 }

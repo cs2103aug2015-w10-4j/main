@@ -55,6 +55,19 @@ public class Logic {
 	private static final String PROPERTY_KEY_LOGGING_LEVEL = "loggingLevel";
 	private static final String PROPERTY_KEY_SAVE_FILE = "saveFile";
 	private static final String PROPERTY_KEY_DISPLAY_SIZE = "defaultDisplaySize";
+
+	private static final String PROPERTY_KEY_ALIAS_ADD = "addAlias";
+	private static final String PROPERTY_KEY_ALIAS_EDIT = "editAlias";
+	private static final String PROPERTY_KEY_ALIAS_DELETE = "deleteAlias";
+	private static final String PROPERTY_KEY_ALIAS_UNDO = "undoAlias";
+	private static final String PROPERTY_KEY_ALIAS_REDO = "redoAlias";
+	private static final String PROPERTY_KEY_ALIAS_MARK = "markAlias";
+	private static final String PROPERTY_KEY_ALIAS_UNMARK = "unmarkAlias";
+	private static final String PROPERTY_KEY_ALIAS_EXIT = "exitAlias";
+	private static final String PROPERTY_KEY_ALIAS_DISPLAY = "displayAlias";
+	private static final String PROPERTY_KEY_ALIAS_SEARCH = "searchAlias";
+	private static final String PROPERTY_KEY_ALIAS_SAVETO = "savetoAlias";
+	private static final String PROPERTY_KEY_ALIAS_HELP = "helpAlias";
 	/*
 	 * Declaration of object variables
 	 */
@@ -95,6 +108,7 @@ public class Logic {
 	private static final String MESSAGE_SUCCESS_EDIT = "Item(s) successfully edited.";
 	private static final String MESSAGE_SUCCESS_EXIT = "Exiting program...";
 	private static final String MESSAGE_SUCCESS_DISPLAY = "Displaying items.";
+	private static final String MESSAGE_SUCCESS_ALIAS = "Alias '%s' added for %s!";
 	private static final String MESSAGE_SUCCESS_CHANGE_FILE_PATH = "File path successfully changed.";
 	private static final String MESSAGE_SUCCESS_NO_CHANGE_FILE_PATH = "File path not changed. Entered file path is the same as current one used.";
 	private static final String MESSAGE_DISPLAY_EMPTY = "No items to display.";
@@ -158,11 +172,13 @@ public class Logic {
 				propObject.setProperty(PROPERTY_KEY_SAVE_FILE, DEFAULT_SAVE_FILE_PATH);
 				propObject.setProperty(PROPERTY_KEY_LOGGING_LEVEL, DEFAULT_LOGGING_LEVEL_STRING);
 				propObject.setProperty(PROPERTY_KEY_DISPLAY_SIZE, Integer.toString(DEFAULT_DISPLAY_SIZE));
+				setAllConfigAlias();
 				writeProperties();
 			}
 			storageObject.saveFileToPath(propObject.getProperty(PROPERTY_KEY_SAVE_FILE));
 			String logLevelString = propObject.getProperty(PROPERTY_KEY_LOGGING_LEVEL);
 			displaySize = Integer.parseInt(propObject.getProperty(PROPERTY_KEY_DISPLAY_SIZE));
+			addAllConfigAlias(); 
 			switch (logLevelString) {
 				case "WARNING":
 					logger.setLevel(Level.WARNING);
@@ -191,6 +207,50 @@ public class Logic {
 		} catch (Exception e) {
 			UIObject.showToUser(e.getMessage());
 		}
+	}
+	
+	boolean setAllConfigAlias(){
+		propObject.setProperty(PROPERTY_KEY_ALIAS_ADD, "");
+		propObject.setProperty(PROPERTY_KEY_ALIAS_EDIT, "");
+		propObject.setProperty(PROPERTY_KEY_ALIAS_DELETE, "");
+		propObject.setProperty(PROPERTY_KEY_ALIAS_MARK, "");
+		propObject.setProperty(PROPERTY_KEY_ALIAS_UNMARK, "");
+		propObject.setProperty(PROPERTY_KEY_ALIAS_UNDO, "");
+		propObject.setProperty(PROPERTY_KEY_ALIAS_REDO, "");
+		propObject.setProperty(PROPERTY_KEY_ALIAS_EXIT, "");
+		propObject.setProperty(PROPERTY_KEY_ALIAS_DISPLAY, "");
+		propObject.setProperty(PROPERTY_KEY_ALIAS_SEARCH, "");
+		propObject.setProperty(PROPERTY_KEY_ALIAS_SAVETO, "");
+		propObject.setProperty(PROPERTY_KEY_ALIAS_HELP, "");
+		return true;
+	}
+	
+	boolean addAllConfigAlias(){
+		addConfigAlias("add", propObject.getProperty(PROPERTY_KEY_ALIAS_ADD));
+		addConfigAlias("edit", propObject.getProperty(PROPERTY_KEY_ALIAS_EDIT));
+		addConfigAlias("delete", propObject.getProperty(PROPERTY_KEY_ALIAS_DELETE));
+		addConfigAlias("mark", propObject.getProperty(PROPERTY_KEY_ALIAS_MARK));
+		addConfigAlias("unmark", propObject.getProperty(PROPERTY_KEY_ALIAS_UNMARK));
+		addConfigAlias("undo", propObject.getProperty(PROPERTY_KEY_ALIAS_UNDO));
+		addConfigAlias("redo", propObject.getProperty(PROPERTY_KEY_ALIAS_REDO));
+		addConfigAlias("exit", propObject.getProperty(PROPERTY_KEY_ALIAS_EXIT));
+		addConfigAlias("display", propObject.getProperty(PROPERTY_KEY_ALIAS_DISPLAY));
+		addConfigAlias("search", propObject.getProperty(PROPERTY_KEY_ALIAS_SEARCH));
+		addConfigAlias("saveto", propObject.getProperty(PROPERTY_KEY_ALIAS_SAVETO));
+		addConfigAlias("help", propObject.getProperty(PROPERTY_KEY_ALIAS_HELP));
+		
+		return true;//to be changed if there is error reading
+	}
+	
+	boolean addConfigAlias(String existingKeyword, String aliasString){
+		String[] aliasWords = aliasString.split(",");
+		boolean hasError = false;
+		for (int i = 0; i < aliasWords.length; i++) {
+			if (!parserObject.addAlias(existingKeyword, aliasWords[i])){
+				hasError = true;
+			}
+		}
+		return hasError;
 	}
 
 	void start() {
@@ -250,6 +310,7 @@ public class Logic {
 	 *            by user directly
 	 * 
 	 * @return status string to be shown to user
+	 * @throws IOException 
 	 */
 	String executeCommand(Command commandObject, boolean isUserInput,
 			boolean isUndoHistory) {
@@ -351,10 +412,68 @@ public class Logic {
 					return addSearchFilter(userTasks);
 				case HELP:
 					return MESSAGE_SUCCESS_HELP;
+				case ALIAS:
+					logger.info("ALIAS command detected");
+					return addAlias(argumentList);
 				default :
 					logger.warning("Command type cannot be identified!");
 					return ERROR_NO_COMMAND_HANDLER;
 			}
+		}
+	}
+	
+	String addAlias(ArrayList<String> argumentList) {
+		if(argumentList.size() < 2){
+			return ERROR_INVALID_ARGUMENT;
+		}
+		if (parserObject.addAlias(argumentList.get(0), argumentList.get(1))) {
+			switch (argumentList.get(0)) {
+				case "add" :
+					propObject.setProperty(PROPERTY_KEY_ALIAS_ADD, propObject.getProperty(PROPERTY_KEY_ALIAS_ADD) + argumentList.get(1));
+					break;
+				case "edit" :
+					propObject.setProperty(PROPERTY_KEY_ALIAS_EDIT, propObject.getProperty(PROPERTY_KEY_ALIAS_EDIT) + argumentList.get(1));
+					break;
+				case "delete" :
+					propObject.setProperty(PROPERTY_KEY_ALIAS_DELETE, propObject.getProperty(PROPERTY_KEY_ALIAS_DELETE) + argumentList.get(1));
+					break;
+				case "mark" :
+					propObject.setProperty(PROPERTY_KEY_ALIAS_MARK, propObject.getProperty(PROPERTY_KEY_ALIAS_MARK) + argumentList.get(1));
+					break;
+				case "unmark" :
+					propObject.setProperty(PROPERTY_KEY_ALIAS_UNMARK, propObject.getProperty(PROPERTY_KEY_ALIAS_UNMARK) + argumentList.get(1));
+					break;
+				case "search" :
+					propObject.setProperty(PROPERTY_KEY_ALIAS_SEARCH, propObject.getProperty(PROPERTY_KEY_ALIAS_SEARCH) + argumentList.get(1));
+					break;
+				case "saveto" :
+					propObject.setProperty(PROPERTY_KEY_ALIAS_SAVETO, propObject.getProperty(PROPERTY_KEY_ALIAS_SAVETO) + argumentList.get(1));
+					break;
+				case "undo" :
+					propObject.setProperty(PROPERTY_KEY_ALIAS_UNDO, propObject.getProperty(PROPERTY_KEY_ALIAS_UNDO) + argumentList.get(1));
+					break;
+				case "redo" :
+					propObject.setProperty(PROPERTY_KEY_ALIAS_REDO, propObject.getProperty(PROPERTY_KEY_ALIAS_REDO) + argumentList.get(1));
+					break;
+				case "exit" :
+					propObject.setProperty(PROPERTY_KEY_ALIAS_EXIT, propObject.getProperty(PROPERTY_KEY_ALIAS_EXIT) + argumentList.get(1));
+					break;
+				case "display" :
+					propObject.setProperty(PROPERTY_KEY_ALIAS_DISPLAY, propObject.getProperty(PROPERTY_KEY_ALIAS_DISPLAY) + argumentList.get(1));
+					break;
+				case "help" :
+					propObject.setProperty(PROPERTY_KEY_ALIAS_HELP, propObject.getProperty(PROPERTY_KEY_ALIAS_HELP) + argumentList.get(1));
+					break;
+			}
+			
+			try {
+				writeProperties();
+			} catch (IOException e) {
+				return e.getMessage();
+			}
+			return String.format(MESSAGE_SUCCESS_ALIAS, argumentList.get(1), argumentList.get(0));
+		} else {
+			return ERROR_INVALID_ARGUMENT;
 		}
 	}
 	
