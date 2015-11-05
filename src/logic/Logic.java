@@ -43,7 +43,7 @@ public class Logic {
 	private static final String FILTER_TITLE_LOCATION = "Location: ";
 	private static final String FILTER_TITLE_TASK_NAME = "Task: ";
 	private static final String FILTER_TITLE_TIME = "Time: ";
-	private static final String FILTER_SEARCH_SEPARATOR = ", ";
+	private static final String SEPARATOR = ", ";
 	private static final String TITLE_TOP_DISPLAY = "Top %d Items for ";
 	private static final String TITLE_TOMORROW = "Tomorrow";
 	private static final String TITLE_TODAY = "Today";
@@ -243,7 +243,7 @@ public class Logic {
 	}
 	
 	boolean addConfigAlias(String existingKeyword, String aliasString){
-		String[] aliasWords = aliasString.split(",");
+		String[] aliasWords = aliasString.split(SEPARATOR);
 		boolean hasError = false;
 		for (int i = 0; i < aliasWords.length; i++) {
 			if (!parserObject.addAlias(existingKeyword, aliasWords[i])){
@@ -422,6 +422,16 @@ public class Logic {
 		}
 	}
 	
+	boolean addKeywordToAliasList(String propertyType, String newAlias) {
+		String curProperty = propObject.getProperty(propertyType);
+		if(curProperty.equals("")){
+			propObject.setProperty(propertyType, newAlias);
+		} else {
+			propObject.setProperty(propertyType, curProperty + SEPARATOR + newAlias);
+		}
+		return true;
+	}
+	
 	String addAlias(ArrayList<String> argumentList) {
 		if(argumentList.size() < 2){
 			return ERROR_INVALID_ARGUMENT;
@@ -429,40 +439,40 @@ public class Logic {
 		if (parserObject.addAlias(argumentList.get(0), argumentList.get(1))) {
 			switch (argumentList.get(0)) {
 				case "add" :
-					propObject.setProperty(PROPERTY_KEY_ALIAS_ADD, propObject.getProperty(PROPERTY_KEY_ALIAS_ADD) + argumentList.get(1));
+					addKeywordToAliasList(PROPERTY_KEY_ALIAS_ADD, argumentList.get(1));
 					break;
 				case "edit" :
-					propObject.setProperty(PROPERTY_KEY_ALIAS_EDIT, propObject.getProperty(PROPERTY_KEY_ALIAS_EDIT) + argumentList.get(1));
+					addKeywordToAliasList(PROPERTY_KEY_ALIAS_EDIT, argumentList.get(1));
 					break;
 				case "delete" :
-					propObject.setProperty(PROPERTY_KEY_ALIAS_DELETE, propObject.getProperty(PROPERTY_KEY_ALIAS_DELETE) + argumentList.get(1));
+					addKeywordToAliasList(PROPERTY_KEY_ALIAS_DELETE, argumentList.get(1));
 					break;
 				case "mark" :
-					propObject.setProperty(PROPERTY_KEY_ALIAS_MARK, propObject.getProperty(PROPERTY_KEY_ALIAS_MARK) + argumentList.get(1));
+					addKeywordToAliasList(PROPERTY_KEY_ALIAS_MARK, argumentList.get(1));
 					break;
 				case "unmark" :
-					propObject.setProperty(PROPERTY_KEY_ALIAS_UNMARK, propObject.getProperty(PROPERTY_KEY_ALIAS_UNMARK) + argumentList.get(1));
+					addKeywordToAliasList(PROPERTY_KEY_ALIAS_UNMARK, argumentList.get(1));
 					break;
 				case "search" :
-					propObject.setProperty(PROPERTY_KEY_ALIAS_SEARCH, propObject.getProperty(PROPERTY_KEY_ALIAS_SEARCH) + argumentList.get(1));
+					addKeywordToAliasList(PROPERTY_KEY_ALIAS_SEARCH, argumentList.get(1));
 					break;
 				case "saveto" :
-					propObject.setProperty(PROPERTY_KEY_ALIAS_SAVETO, propObject.getProperty(PROPERTY_KEY_ALIAS_SAVETO) + argumentList.get(1));
+					addKeywordToAliasList(PROPERTY_KEY_ALIAS_SAVETO, argumentList.get(1));
 					break;
 				case "undo" :
-					propObject.setProperty(PROPERTY_KEY_ALIAS_UNDO, propObject.getProperty(PROPERTY_KEY_ALIAS_UNDO) + argumentList.get(1));
+					addKeywordToAliasList(PROPERTY_KEY_ALIAS_UNDO, argumentList.get(1));
 					break;
 				case "redo" :
-					propObject.setProperty(PROPERTY_KEY_ALIAS_REDO, propObject.getProperty(PROPERTY_KEY_ALIAS_REDO) + argumentList.get(1));
+					addKeywordToAliasList(PROPERTY_KEY_ALIAS_REDO, argumentList.get(1));
 					break;
 				case "exit" :
-					propObject.setProperty(PROPERTY_KEY_ALIAS_EXIT, propObject.getProperty(PROPERTY_KEY_ALIAS_EXIT) + argumentList.get(1));
+					addKeywordToAliasList(PROPERTY_KEY_ALIAS_EXIT, argumentList.get(1));
 					break;
 				case "display" :
-					propObject.setProperty(PROPERTY_KEY_ALIAS_DISPLAY, propObject.getProperty(PROPERTY_KEY_ALIAS_DISPLAY) + argumentList.get(1));
+					addKeywordToAliasList(PROPERTY_KEY_ALIAS_DISPLAY, argumentList.get(1));
 					break;
 				case "help" :
-					propObject.setProperty(PROPERTY_KEY_ALIAS_HELP, propObject.getProperty(PROPERTY_KEY_ALIAS_HELP) + argumentList.get(1));
+					addKeywordToAliasList(PROPERTY_KEY_ALIAS_HELP, argumentList.get(1));
 					break;
 			}
 			
@@ -1141,7 +1151,7 @@ public class Logic {
 				if (searchTaskName != null) {
 					if (!isEmptyName) {
 						searchStrings.set(0,
-								searchStrings.get(0).concat(FILTER_SEARCH_SEPARATOR));
+								searchStrings.get(0).concat(SEPARATOR));
 					}
 					isEmptyName = false;
 					searchStrings.set(0, searchStrings.get(0).concat(searchTaskName));
@@ -1173,7 +1183,7 @@ public class Logic {
 						searchStrings.set(
 								1,
 								searchStrings.get(1).concat(
-										FILTER_SEARCH_SEPARATOR));
+										SEPARATOR));
 					}
 					isEmptyTime = false;
 					searchStrings.set(
@@ -1203,7 +1213,7 @@ public class Logic {
 				if (searchLocation != null) {
 					if (!isEmptyLocation) {
 						searchStrings.set(2,
-								searchStrings.get(2).concat(FILTER_SEARCH_SEPARATOR));
+								searchStrings.get(2).concat(SEPARATOR));
 					}
 					isEmptyLocation = false;
 					searchStrings.set(2, searchStrings.get(2).concat(searchLocation));
