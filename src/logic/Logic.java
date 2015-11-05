@@ -697,7 +697,6 @@ public class Logic {
 		try {
 			ArrayList<String> finalArgumentList = new ArrayList<>();
 			if (argumentList == null) {
-				System.out.println("Null...");
 				return null;
 			}
 			if (argumentList.size() == 1 && argumentList.get(0).equalsIgnoreCase(IDENTIFIER_ALL)) {
@@ -842,9 +841,6 @@ public class Logic {
 	}
 
 	String displayItems(ArrayList<String> argumentList) {
-		if (listOfTasks.isEmpty()) {
-			return MESSAGE_DISPLAY_EMPTY;
-		}
 		if (argumentList.size() == 1 && argumentList.get(0).equals("all")) {
 			shouldShowUndone = true;
 			shouldShowDone = true;
@@ -866,7 +862,11 @@ public class Logic {
 			shouldShowDone = true;
 			listFilter.clear();
 		}
-		return MESSAGE_SUCCESS_DISPLAY;
+		if (listOfTasks.isEmpty()) {
+			return MESSAGE_DISPLAY_EMPTY;
+		} else {
+			return MESSAGE_SUCCESS_DISPLAY;
+		}
 	}
 
 	/**
