@@ -9,8 +9,17 @@ import java.util.Scanner;
 import global.Task;
 
 public interface Storage {
-	static final String HELP_PATH = "src/storage/Help";
 	static final String LINE_SEPARATOR = System.getProperty("line.separator");
+	static final String HELP_MESSAGE = "" +
+			"Commands  Example usage\n" +
+			"add       add task123 date 11 sep 2015\n" +
+			"display   display\n" +
+			"edit      edit 1 task456 date 12 sep 2015\n" +
+			"delete    delete 1\n" +
+			"undo      undo\n" +
+			"redo      redo\n" +
+			"saveto    saveto new_file.txt\n" +
+			"exit      exit\n";
 	/**
 	 * Saves the list of tasks in the file
 	 * @param ArrayList<Task> ArrayList that stores the RAW tasks as Strings in text file
@@ -36,21 +45,7 @@ public interface Storage {
 	public ArrayList<Task> getItemList() throws FileNotFoundException;
 	
 	public default String getHelp()  {
-		String helpContent = "";
-		File helpfile = new File(HELP_PATH);
-		
-		Scanner sc;
-		try {
-			sc = new Scanner(helpfile);
-		
-		while (sc.hasNextLine()) {
-			helpContent += sc.nextLine()+ LINE_SEPARATOR;
-		}
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return helpContent;
+		return HELP_MESSAGE;
 	}
 	
 }
