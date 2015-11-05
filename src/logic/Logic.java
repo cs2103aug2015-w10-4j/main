@@ -68,6 +68,17 @@ public class Logic {
 	private static final String PROPERTY_KEY_ALIAS_SEARCH = "searchAlias";
 	private static final String PROPERTY_KEY_ALIAS_SAVETO = "savetoAlias";
 	private static final String PROPERTY_KEY_ALIAS_HELP = "helpAlias";
+	private static final String[] PROPERTY_KEY_ALIAS_LIST = {
+			PROPERTY_KEY_ALIAS_ADD, PROPERTY_KEY_ALIAS_EDIT,
+			PROPERTY_KEY_ALIAS_DELETE, PROPERTY_KEY_ALIAS_UNDO,
+			PROPERTY_KEY_ALIAS_REDO, PROPERTY_KEY_ALIAS_MARK,
+			PROPERTY_KEY_ALIAS_UNMARK, PROPERTY_KEY_ALIAS_EXIT,
+			PROPERTY_KEY_ALIAS_DISPLAY, PROPERTY_KEY_ALIAS_SEARCH,
+			PROPERTY_KEY_ALIAS_SAVETO, PROPERTY_KEY_ALIAS_HELP };
+	private static final String[] listOfDefaultKeywords = { "add", "edit", "delete", "mark",
+			"unmark", "undo", "redo", "exit", "display", "search",
+			"saveto", "help" }; // must be in same order as PROPERTY_KEY_ALIAS_LIST
+	
 	/*
 	 * Declaration of object variables
 	 */
@@ -208,37 +219,25 @@ public class Logic {
 			UIObject.showToUser(e.getMessage());
 		}
 	}
-	
+	 /**
+	  * Sets the empty string for all the alias properties
+	  * @return
+	  */
 	boolean setAllConfigAlias(){
-		propObject.setProperty(PROPERTY_KEY_ALIAS_ADD, "");
-		propObject.setProperty(PROPERTY_KEY_ALIAS_EDIT, "");
-		propObject.setProperty(PROPERTY_KEY_ALIAS_DELETE, "");
-		propObject.setProperty(PROPERTY_KEY_ALIAS_MARK, "");
-		propObject.setProperty(PROPERTY_KEY_ALIAS_UNMARK, "");
-		propObject.setProperty(PROPERTY_KEY_ALIAS_UNDO, "");
-		propObject.setProperty(PROPERTY_KEY_ALIAS_REDO, "");
-		propObject.setProperty(PROPERTY_KEY_ALIAS_EXIT, "");
-		propObject.setProperty(PROPERTY_KEY_ALIAS_DISPLAY, "");
-		propObject.setProperty(PROPERTY_KEY_ALIAS_SEARCH, "");
-		propObject.setProperty(PROPERTY_KEY_ALIAS_SAVETO, "");
-		propObject.setProperty(PROPERTY_KEY_ALIAS_HELP, "");
+		for(int i = 0; i < PROPERTY_KEY_ALIAS_LIST.length; i++){
+			propObject.setProperty(PROPERTY_KEY_ALIAS_LIST[i], "");
+		}
 		return true;
 	}
 	
+	/**
+	 * Add the alias list read from the config file to the parser
+	 * @return
+	 */
 	boolean addAllConfigAlias(){
-		addConfigAlias("add", propObject.getProperty(PROPERTY_KEY_ALIAS_ADD));
-		addConfigAlias("edit", propObject.getProperty(PROPERTY_KEY_ALIAS_EDIT));
-		addConfigAlias("delete", propObject.getProperty(PROPERTY_KEY_ALIAS_DELETE));
-		addConfigAlias("mark", propObject.getProperty(PROPERTY_KEY_ALIAS_MARK));
-		addConfigAlias("unmark", propObject.getProperty(PROPERTY_KEY_ALIAS_UNMARK));
-		addConfigAlias("undo", propObject.getProperty(PROPERTY_KEY_ALIAS_UNDO));
-		addConfigAlias("redo", propObject.getProperty(PROPERTY_KEY_ALIAS_REDO));
-		addConfigAlias("exit", propObject.getProperty(PROPERTY_KEY_ALIAS_EXIT));
-		addConfigAlias("display", propObject.getProperty(PROPERTY_KEY_ALIAS_DISPLAY));
-		addConfigAlias("search", propObject.getProperty(PROPERTY_KEY_ALIAS_SEARCH));
-		addConfigAlias("saveto", propObject.getProperty(PROPERTY_KEY_ALIAS_SAVETO));
-		addConfigAlias("help", propObject.getProperty(PROPERTY_KEY_ALIAS_HELP));
-		
+		for(int i = 0; i < listOfDefaultKeywords.length && i < PROPERTY_KEY_ALIAS_LIST.length; i++){
+			addConfigAlias(listOfDefaultKeywords[i], propObject.getProperty(PROPERTY_KEY_ALIAS_LIST[i]));
+		}
 		return true;//to be changed if there is error reading
 	}
 	
@@ -437,43 +436,10 @@ public class Logic {
 			return ERROR_INVALID_ARGUMENT;
 		}
 		if (parserObject.addAlias(argumentList.get(0), argumentList.get(1))) {
-			switch (argumentList.get(0)) {
-				case "add" :
-					addKeywordToAliasList(PROPERTY_KEY_ALIAS_ADD, argumentList.get(1));
-					break;
-				case "edit" :
-					addKeywordToAliasList(PROPERTY_KEY_ALIAS_EDIT, argumentList.get(1));
-					break;
-				case "delete" :
-					addKeywordToAliasList(PROPERTY_KEY_ALIAS_DELETE, argumentList.get(1));
-					break;
-				case "mark" :
-					addKeywordToAliasList(PROPERTY_KEY_ALIAS_MARK, argumentList.get(1));
-					break;
-				case "unmark" :
-					addKeywordToAliasList(PROPERTY_KEY_ALIAS_UNMARK, argumentList.get(1));
-					break;
-				case "search" :
-					addKeywordToAliasList(PROPERTY_KEY_ALIAS_SEARCH, argumentList.get(1));
-					break;
-				case "saveto" :
-					addKeywordToAliasList(PROPERTY_KEY_ALIAS_SAVETO, argumentList.get(1));
-					break;
-				case "undo" :
-					addKeywordToAliasList(PROPERTY_KEY_ALIAS_UNDO, argumentList.get(1));
-					break;
-				case "redo" :
-					addKeywordToAliasList(PROPERTY_KEY_ALIAS_REDO, argumentList.get(1));
-					break;
-				case "exit" :
-					addKeywordToAliasList(PROPERTY_KEY_ALIAS_EXIT, argumentList.get(1));
-					break;
-				case "display" :
-					addKeywordToAliasList(PROPERTY_KEY_ALIAS_DISPLAY, argumentList.get(1));
-					break;
-				case "help" :
-					addKeywordToAliasList(PROPERTY_KEY_ALIAS_HELP, argumentList.get(1));
-					break;
+			for(int i = 0; i < listOfDefaultKeywords.length && i < PROPERTY_KEY_ALIAS_LIST.length; i++){
+				if(argumentList.get(0).equals(listOfDefaultKeywords[i])){
+					addKeywordToAliasList(PROPERTY_KEY_ALIAS_LIST[i], argumentList.get(1));
+				}
 			}
 			
 			try {
