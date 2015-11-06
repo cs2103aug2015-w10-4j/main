@@ -587,10 +587,27 @@ public class Parser {
 			} catch (NumberFormatException e) {
 				throw new Exception(ERROR_INVALID_DATE_SPECIFIED);
 			}
-			month = getIndexOfList(dateArguments[1], Arrays.asList(MONTHS));
-			if (month == -1) {
-				throw new Exception(ERROR_INVALID_MONTH_SPECIFIED);
+			boolean integerMonth;
+			// attempt to check if month is in the short form e.g. "jan"
+			int monthOne = getIndexOfList(dateArguments[1], Arrays.asList(MONTHS));
+			
+			// attempt to check if month is in integer form 0-12
+			int monthTwo = -1;
+			try {
+				monthTwo = Integer.parseInt(dateArguments[1]) - 1;
+				integerMonth = (monthTwo >= 0 && monthTwo <= 11);
+			} catch (NumberFormatException e) {
+				integerMonth = false;
 			}
+
+			if (monthOne == -1 && integerMonth == false) {
+				throw new Exception(ERROR_INVALID_MONTH_SPECIFIED);
+			} else if (monthTwo != -1) {
+				month = monthTwo;
+			} else {
+				month = monthOne;
+			}
+			
 			if (dateArguments.length == 3) {
 				year = Integer.parseInt(dateArguments[2]);
 				if (year < 100) { // is 2 digits, assume shortform for year
@@ -666,6 +683,33 @@ public class Parser {
 			helperDate = new GregorianCalendar();
 			helperDate.clear();
 			helperDate.set(year, month, date);
+		} else if (dateArguments.length == 1) {
+			try {
+				int enteredDate = Integer.parseInt(dateArguments[0]);
+				if (enteredDate <  100 || enteredDate >= 320000) {
+					throw new Exception(ERROR_INVALID_DATE_ARGUMENTS);
+				} else {
+					if (enteredDate < 10000) {
+						date = enteredDate/100;
+						month = enteredDate % 100 - 1;
+						year = Calendar.getInstance().get(Calendar.YEAR);
+						
+						helperDate = new GregorianCalendar();
+						helperDate.clear();
+						helperDate.set(year, month, date);
+					} else {
+						date = enteredDate/10000;
+						month = (enteredDate % 10000) / 100 - 1;
+						year = enteredDate % 100;
+						
+						helperDate = new GregorianCalendar();
+						helperDate.clear();
+						helperDate.set(year, month, date);
+					}
+				}
+			} catch (NumberFormatException e) {
+				throw new Exception(ERROR_INVALID_DATE_ARGUMENTS);
+			}
 		} else {
 			logger.info("parseDate: unknown date arguments");
 			throw new Exception(ERROR_INVALID_DATE_ARGUMENTS);
