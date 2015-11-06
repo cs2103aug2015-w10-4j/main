@@ -583,7 +583,12 @@ public class Parser {
 		if (dateArguments.length == 0) {
 			throw new Exception(ERROR_INVALID_NUMBER_OF_ARGUMENTS);
 		} else if(!hasKeyword(dateArguments, DATE_SPECIAL)
-				&& dateArguments.length != 1) { // 2+ words without special keywords
+				&& dateArguments.length != 1) {
+			// 2+ words without special keywords
+			// attempt to parse dates in the format 'date month year'
+			// month can be either in the number range 1 - 12 or 3-char format
+			// date and month positions can be swapped, if the month is in 3-char format
+			logger.info("Date format: ii ii ii");
 			try {
 				date = extractDate(dateArguments[0]);
 				month = extractMonth(dateArguments[1]);
@@ -609,11 +614,9 @@ public class Parser {
 			helperDate = new GregorianCalendar();
 			helperDate.clear();
 			helperDate.set(year, month, date);
-		} else if (dateArguments.length == 2) { // this/next <day>
-			logger.finer("parseDate: dateArguments[0] contains "
-					+ dateArguments[0]);
-			logger.finer("parseDate: dateArguments[1] contains "
-					+ dateArguments[1]);
+		} else if (dateArguments.length == 2) {
+			// attempt to parse dates in the format 'this/next <day>'
+			logger.info("Date format: 'this/next <day>'");
 			String firstWord = dateArguments[0];
 			String secondWord = dateArguments[1];
 			
@@ -648,7 +651,9 @@ public class Parser {
 			helperDate.clear();
 			helperDate.set(year, month, date);
 		} else if (hasKeyword(dateArguments, DATE_SPECIAL)
-				&& dateArguments.length == 1) { // today/tomorrow
+				&& dateArguments.length == 1) {
+			// attempt to parse 'today'/'tomorrow'
+			logger.info("Date format: 'today/tomorrow'");
 			if (dateArguments[0].equalsIgnoreCase(DATE_SPECIAL[2])) {
 				helperDate = new GregorianCalendar();
 			} else {
@@ -656,6 +661,8 @@ public class Parser {
 				helperDate.add(Calendar.DATE, 1);
 			}
 		} else if ((hasKeyword(dateArguments, DAYS) || hasKeyword(dateArguments, DAYS_COMPACT)) && dateArguments.length == 1) {
+			// attempt to parse dates in the format <day> e.g. 'mon' or 'monday'
+			logger.info("Date format: '<day>'");
 			int dayIndex;
 			if (hasKeyword(dateArguments, DAYS)) {
 				dayIndex = getIndexOfList(dateArguments[0], Arrays.asList(DAYS)) + 1;
@@ -672,6 +679,8 @@ public class Parser {
 			helperDate.clear();
 			helperDate.set(year, month, date);
 		} else if (dateArguments.length == 1) {
+			// attempt to parse dates in the form 'ddmm<yy>' or 'dd/mm</yy>' 
+			logger.info("Date format: 'ddmm<yy>' or 'dd/mm</yy>'");
 			try {
 				int enteredDate = Integer.parseInt(dateArguments[0]);
 				if (enteredDate <  100 || enteredDate >= 320000) {
