@@ -147,7 +147,7 @@ public class TestParser {
 		expectedDate.set(year, 8, 18);
 		
 		String[] dateArgs = { "18", "sep", "2015"};
-		Calendar date = parserObj.parseDate(dateArgs);
+		Calendar date = parserObj.parseTime(dateArgs);
 		
 		assertEquals(expectedDate,date);
 		

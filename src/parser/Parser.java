@@ -486,13 +486,13 @@ public class Parser {
 		
 		logger.fine("extractDate: got date arguments. attempting to parse dates");
 		if (deadlineArguments != null) {
-			Calendar argumentDate = parseDate(deadlineArguments);
+			Calendar argumentDate = parseTime(deadlineArguments);
 			taskObject.setEndingTime(argumentDate);
 			logger.fine("extractDate: deadline set");
 			return true;
 		} else if (startEventArguments != null && endEventArguments != null) {
-			Calendar argumentStartDate = parseDate(startEventArguments);
-			Calendar argumentEndDate = parseDate(endEventArguments);
+			Calendar argumentStartDate = parseTime(startEventArguments);
+			Calendar argumentEndDate = parseTime(endEventArguments);
 
 			if (argumentStartDate.before(argumentEndDate)) {
 				taskObject.setStartingTime(argumentStartDate);
@@ -506,11 +506,11 @@ public class Parser {
 				&& isNewTask) {
 			throw new Exception(ERROR_MISSING_START_OR_END_TIME);
 		} else if (startEventArguments != null) {
-			Calendar argumentStartDate = parseDate(startEventArguments);
+			Calendar argumentStartDate = parseTime(startEventArguments);
 			taskObject.setStartingTime(argumentStartDate);
 			return true;
 		} else if (endEventArguments != null) {
-			Calendar argumentEndDate = parseDate(endEventArguments);
+			Calendar argumentEndDate = parseTime(endEventArguments);
 			taskObject.setEndingTime(argumentEndDate);
 			return true;
 		} else {
@@ -520,7 +520,7 @@ public class Parser {
 
 	// if time not specified, it will be parsed to 11:59 PM
 	// TIME keyword in commandString must be capitalized
-	Calendar parseDate(String[] dateArgumentsTemp) throws Exception {
+	Calendar parseTime(String[] dateArgumentsTemp) throws Exception {
 		logger.fine("parseDate: parsing date");
 		int date, month, year, hour = 23, minute = 59, isAMorPM = 0;
 		Integer hourOfDay = null;
@@ -578,34 +578,22 @@ public class Parser {
 			dateArguments = dateArgumentsTemp;
 		}
 		
+		
+		// start parsing of date
 		if (dateArguments.length == 0) {
 			throw new Exception(ERROR_INVALID_NUMBER_OF_ARGUMENTS);
 		} else if(!hasKeyword(dateArguments, DATE_SPECIAL)
-				&& dateArguments.length != 1) {
+				&& dateArguments.length != 1) { // 2+ words without special keywords
 			try {
-				date = Integer.parseInt(dateArguments[0]);
+				date = extractDate(dateArguments[0]);
+				month = extractMonth(dateArguments[1]);
 			} catch (NumberFormatException e) {
-				throw new Exception(ERROR_INVALID_DATE_SPECIFIED);
-			}
-			boolean integerMonth;
-			// attempt to check if month is in the short form e.g. "jan"
-			int monthOne = getIndexOfList(dateArguments[1], Arrays.asList(MONTHS));
-			
-			// attempt to check if month is in integer form 0-12
-			int monthTwo = -1;
-			try {
-				monthTwo = Integer.parseInt(dateArguments[1]) - 1;
-				integerMonth = (monthTwo >= 0 && monthTwo <= 11);
-			} catch (NumberFormatException e) {
-				integerMonth = false;
-			}
-
-			if (monthOne == -1 && integerMonth == false) {
-				throw new Exception(ERROR_INVALID_MONTH_SPECIFIED);
-			} else if (monthTwo != -1) {
-				month = monthTwo;
-			} else {
-				month = monthOne;
+				try {
+					date = extractDate(dateArguments[1]);
+					month = extractMonth(dateArguments[0]);
+				} catch (NumberFormatException e2) {
+					throw new Exception(ERROR_INVALID_DATE_ARGUMENTS);
+				}
 			}
 			
 			if (dateArguments.length == 3) {
@@ -723,6 +711,37 @@ public class Parser {
 		}
 		helperDate.set(Calendar.MINUTE, minute);
 		return helperDate;
+	}
+
+	private int extractDate(String dateArgument) throws Exception {
+		int date = Integer.parseInt(dateArgument);
+		if (date < 0 || date > 31){
+			throw new Exception(ERROR_INVALID_DATE_ARGUMENTS);
+		}
+		return date;
+	}
+
+	private int extractMonth(String dateArgument)
+			throws Exception {
+		boolean integerMonth;
+		int monthOne = getIndexOfList(dateArgument, Arrays.asList(MONTHS));
+		
+		// attempt to check if month is in integer from 1-12
+		int monthTwo = -1;
+		try {
+			monthTwo = Integer.parseInt(dateArgument) - 1;
+			integerMonth = (monthTwo >= 0 && monthTwo <= 11);
+		} catch (NumberFormatException e) {
+			integerMonth = false;
+		}
+
+		if (monthOne == -1 && integerMonth == false) {
+			throw new Exception(ERROR_INVALID_MONTH_SPECIFIED); // not in 3-char word or int
+		} else if (monthTwo != -1) {
+			return monthTwo;
+		} else {
+			return monthOne;
+		}
 	}
 	
 	/**
