@@ -66,6 +66,13 @@ public class Parser {
 	static final String[] COMMAND_SAVETO = { "saveto" };
 	static final String[] COMMAND_HELP = { "help" };
 	static final String[] COMMAND_ALIAS = { "alias" };
+	static final String[][] COMMAND_LISTS = {
+		COMMAND_ADD, COMMAND_EDIT, COMMAND_DELETE,
+		COMMAND_UNDO, COMMAND_REDO, COMMAND_MARK,
+		COMMAND_UNMARK, COMMAND_EXIT, COMMAND_DISPLAY,
+		COMMAND_SEARCH, COMMAND_SAVETO, COMMAND_HELP,
+		COMMAND_ALIAS
+	};
 	
 	ArrayList<String> addKeywords = new ArrayList<String>();
 	ArrayList<String> editKeywords = new ArrayList<String>();
@@ -80,7 +87,7 @@ public class Parser {
 	ArrayList<String> savetoKeywords = new ArrayList<String>();
 	ArrayList<String> helpKeywords = new ArrayList<String>();
 	ArrayList<String> aliasKeywords = new ArrayList<String>();
-	ArrayList<ArrayList<String>> differentLists = new ArrayList<ArrayList<String>>();
+	ArrayList<ArrayList<String>> keywordLists;
 	
 
 	static final String[] DATE_SPECIAL = { "this", "next", "today", "tomorrow" };
@@ -143,35 +150,26 @@ public class Parser {
 	}
 	
 	boolean initialiseKeywordLists(){
-		differentLists.add(addKeywords);
-		differentLists.add(editKeywords);
-		differentLists.add(deleteKeywords);
-		differentLists.add(undoKeywords);
-		differentLists.add(redoKeywords);
-		differentLists.add(markKeywords);
-		differentLists.add(unmarkKeywords);
-		differentLists.add(exitKeywords);
-		differentLists.add(displayKeywords);
-		differentLists.add(searchKeywords);
-		differentLists.add(savetoKeywords);
-		differentLists.add(helpKeywords);
+		keywordLists = new ArrayList<ArrayList<String>>();
+		keywordLists.add(addKeywords);
+		keywordLists.add(editKeywords);
+		keywordLists.add(deleteKeywords);
+		keywordLists.add(undoKeywords);
+		keywordLists.add(redoKeywords);
+		keywordLists.add(markKeywords);
+		keywordLists.add(unmarkKeywords);
+		keywordLists.add(exitKeywords);
+		keywordLists.add(displayKeywords);
+		keywordLists.add(searchKeywords);
+		keywordLists.add(savetoKeywords);
+		keywordLists.add(helpKeywords);
 		return true;
 	}
 	
-	boolean addAllDefaultKeywords(){ // can refactor
-		addDefaultKeywordsToList(COMMAND_ADD, addKeywords);
-		addDefaultKeywordsToList(COMMAND_EDIT, editKeywords);
-		addDefaultKeywordsToList(COMMAND_DELETE, deleteKeywords);
-		addDefaultKeywordsToList(COMMAND_UNDO, undoKeywords);
-		addDefaultKeywordsToList(COMMAND_REDO, redoKeywords);
-		addDefaultKeywordsToList(COMMAND_MARK, markKeywords);
-		addDefaultKeywordsToList(COMMAND_UNMARK, unmarkKeywords);
-		addDefaultKeywordsToList(COMMAND_EXIT, exitKeywords);
-		addDefaultKeywordsToList(COMMAND_DISPLAY, displayKeywords);
-		addDefaultKeywordsToList(COMMAND_SEARCH, searchKeywords);
-		addDefaultKeywordsToList(COMMAND_SAVETO, savetoKeywords);
-		addDefaultKeywordsToList(COMMAND_HELP, helpKeywords);
-		addDefaultKeywordsToList(COMMAND_ALIAS, aliasKeywords);
+	boolean addAllDefaultKeywords(){
+		for(int i = 0; i < COMMAND_LISTS.length && i < keywordLists.size(); i++){
+			addDefaultKeywordsToList(COMMAND_LISTS[i], keywordLists.get(i));
+		}
 		return true;
 	}
 	
@@ -959,8 +957,8 @@ public class Parser {
 	
 	public boolean addAlias(String existingCommandKeyword, String newCommandKeyword){
 		int i = 0;
-		while(i < differentLists.size()){
-			ArrayList<String> curList = differentLists.get(i);
+		while(i < keywordLists.size()){
+			ArrayList<String> curList = keywordLists.get(i);
 			if(curList.contains(existingCommandKeyword)){
 				curList.add(newCommandKeyword);
 				return true;
