@@ -696,7 +696,27 @@ public class Parser {
 					}
 				}
 			} catch (NumberFormatException e) {
-				throw new Exception(ERROR_INVALID_DATE_ARGUMENTS);
+				dateArguments = dateArguments[0].split("/");
+				if (dateArguments.length >= 2 && dateArguments.length <= 3) {
+					date = extractDate(dateArguments[0]);
+					month = extractMonth(dateArguments[1]);
+					
+					try {
+						if (dateArguments.length == 3) {
+							year = Integer.parseInt(dateArguments[2]);
+						} else {
+							year = Calendar.getInstance().get(Calendar.YEAR);
+						}
+					} catch (NumberFormatException e2) {
+						throw new Exception(ERROR_INVALID_DATE_ARGUMENTS);
+					}
+					
+					helperDate = new GregorianCalendar();
+					helperDate.clear();
+					helperDate.set(year, month, date);
+				} else {
+					throw new Exception(ERROR_INVALID_DATE_ARGUMENTS);
+				}
 			}
 		} else {
 			logger.info("parseDate: unknown date arguments");
