@@ -102,7 +102,7 @@ public class Logic {
 	/*
 	 * Static strings - errors and messages
 	 */
-	private static final String MESSAGE_WELCOME = "Welcome to Tasky! This is an open source project";
+	private static final String MESSAGE_WELCOME = "Welcome to Tasky! This is an open source project.";
 	private static final String MESSAGE_PROMPT_COMMAND = "command :";
 	private static final String MESSAGE_UNDO = "Undo : ";
 	private static final String MESSAGE_REDO = "Redo : ";
@@ -121,7 +121,7 @@ public class Logic {
 	private static final String MESSAGE_SUCCESS_CHANGE_FILE_PATH = "File path successfully changed.";
 	private static final String MESSAGE_SUCCESS_NO_CHANGE_FILE_PATH = "File path not changed. Entered file path is the same as current one used.";
 	private static final String MESSAGE_DISPLAY_EMPTY = "No items to display.";
-	private static final String MESSAGE_SUCCESS_HELP = "Showing help message";
+	private static final String MESSAGE_SUCCESS_HELP = "Showing help message.";
 	private static final String IDENTIFIER_ALL = "all";
 	private static final String ERROR_WRITING_FILE = "Error: Unable to write file.";
 	private static final String ERROR_CREATING_FILE = "Error: Unable to create file.";
@@ -135,9 +135,9 @@ public class Logic {
 	private static final String ERROR_UI_INTERRUPTED = "Error: UI prompt has been interrupted.";
 	private static final String ERROR_NO_HISTORY = "Error: No history found.";
 	private static final String ERROR_CANNOT_WRITE_TO_HISTORY = "Error: Unable to store command in history.";
-	private static final String ERROR_CANNOT_PARSE_PERIODIC_VALUES = "Error: Unable to parse values for periodic";
-	private static final String ERROR_NO_FILTER = "Error: No filter detected for search";
-	private static final String ERROR_EDIT_CANNOT_RECURRING = "Error: Cannot convert a normal task to recurring";
+	private static final String ERROR_CANNOT_PARSE_PERIODIC_VALUES = "Error: Unable to parse values for periodic.";
+	private static final String ERROR_NO_FILTER = "Error: No filter detected for search.";
+	private static final String ERROR_EDIT_CANNOT_RECURRING = "Error: Cannot convert a normal task to recurring.";
 	
 
 	private static final String WARNING_TIMING_CLASH = "WARNING: There are clashing timings between tasks.";
@@ -1517,7 +1517,7 @@ public class Logic {
 	/**
 	 * Reads the task list from the data file
 	 * @return
-	 * @throws Exception
+	 * @throws Exception status message if data file cannot be found
 	 */
 	boolean updateListOfTasks() throws Exception {
 		try {
@@ -1582,8 +1582,10 @@ public class Logic {
 			calendarUnit = Calendar.WEEK_OF_YEAR;
 		} else if (periodicIntervalUnit.equalsIgnoreCase("months") || periodicIntervalUnit.equalsIgnoreCase("month")){
 			calendarUnit = Calendar.MONTH;
-		} else {
+		} else if (periodicIntervalUnit.equalsIgnoreCase("years") || periodicIntervalUnit.equalsIgnoreCase("year")){
 			calendarUnit = Calendar.YEAR;
+		} else {
+			return false;
 		}
 		
 		if (curTask.hasStartingTime()) {
