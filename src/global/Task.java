@@ -18,7 +18,6 @@ public class Task implements Comparable<Task> {
 	private String periodicInterval = null;
 	private String periodicRepeats = null;
 	private boolean isDone = false;
-	private int id = -1;
 
 	/*
 	 * Constructor
@@ -118,12 +117,10 @@ public class Task implements Comparable<Task> {
 	}
 	
 	public String getAllInfo() {
-		return "Name: "+ name + " Starting time: " + this.startingTime + " Ending Time: "+ this.getEndingTime() +
-				" Location: " +this.location + " Period Interval: "+ this.periodicInterval + " Period Repeats " + this.periodicRepeats;
-	}
-	
-	public Integer getId(){
-		return this.id;
+		return "Name: " + name + " Starting time: " + this.startingTime
+				+ " Ending Time: " + this.getEndingTime() + " Location: "
+				+ this.location + " Period Interval: " + this.periodicInterval
+				+ " Period Repeats " + this.periodicRepeats;
 	}
 
 	public boolean hasStartingTime() {
@@ -170,13 +167,6 @@ public class Task implements Comparable<Task> {
 		}
 	}
 	
-	public boolean hasId() {
-		if (this.id == -1) {
-			return false;
-		} else {
-			return true;
-		}
-	}
 	
 	public boolean isDone(){
 		return this.isDone;
@@ -215,11 +205,6 @@ public class Task implements Comparable<Task> {
 
 	public boolean setDone(boolean status) {
 		this.isDone = status;
-		return true;
-	}
-
-	public boolean setId(int index) {
-		this.id = index;
 		return true;
 	}
 	

@@ -94,8 +94,6 @@ public class Logic {
 	boolean shouldShowDone = true;
 	boolean shouldShowUndone = true;
 	int displaySize = DEFAULT_DISPLAY_SIZE;
-	private static final int ID_RANGE = 1000;
-	private static final int RECURRING_MAX = 100;
 	private static final Level DEFAULT_LEVEL = Level.INFO;
 	
 	// date format converter
@@ -448,8 +446,10 @@ public class Logic {
 	
 	
 	/**
-	 * Identifies the appropriate list to add the new alias to,
-	 * Then concatenates the new alias to the list
+	 * Attempts to add the new alias to the parser
+	 * 
+	 * If successful, it identifies the appropriate list to add the new alias to,
+	 * Then concatenates the new alias to the list in property object
 	 * 
 	 * The configuration file is then written with the updated properties
 	 * 
@@ -467,9 +467,9 @@ public class Logic {
 		if (parserObject.addAlias(commandTypeIdentifier, newAlias)) {
 			for (int i = 0; i < listOfDefaultKeywords.length
 					&& i < PROPERTY_KEY_ALIAS_LIST.length; i++) {
-				if (argumentList.get(0).equals(listOfDefaultKeywords[i])) {
+				if (commandTypeIdentifier.equals(listOfDefaultKeywords[i])) {
 					addKeywordToAliasList(PROPERTY_KEY_ALIAS_LIST[i],
-							argumentList.get(1));
+							newAlias);
 				}
 			}
 			
@@ -642,34 +642,29 @@ public class Logic {
 	 * same time, it helps to keep track of the index the items are
 	 * added at so that the reversed command can be created
 	 * @param userTasks
-	 * @param parsedIntList
-	 * @param i
-	 * @param index
+	 * @param parsedIntList index list
+	 * @param i the position of the relevant task & argument index
+	 * @param index the position in the main list the task is to be added to
 	 * @throws Exception
 	 */
 	private void addHelper(ArrayList<Task> userTasks,
 			ArrayList<Integer> parsedIntList, int i, int index)
 			throws Exception {
 		Task curTask = userTasks.get(i);
-		int newIdPrefix = getNewIdPrefix();
 		if (curTask.hasPeriodicInterval()) {
 			ArrayList<Task> splitTasks = splitPeriodic(curTask);
-			for (int j = 0; j < splitTasks.size(); j++) {
-				splitTasks.get(j).setId(newIdPrefix * RECURRING_MAX + j);
-			}
 			listOfTasks.addAll(index, splitTasks);
 			for (int j = 0; j < splitTasks.size(); j++) {
 				parsedIntList.add(index + j);
 			}
 		} else {
-			curTask.setId(newIdPrefix * RECURRING_MAX);
 			listOfTasks.add(index, curTask);
 			parsedIntList.add(index);
 		}
 	}
 
 	/**
-	 * Deletes item from the list of tasks in memory
+	 * Deletes item(s) from the list of tasks in memory
 	 * This method will also push a reversed version of the command to history
 	 * 
 	 * @param argumentList
@@ -930,7 +925,6 @@ public class Logic {
 				// for history
 				Task taskEdited = listOfTasks.get(index);
 				
-
 				if (isUserInput) {
 					Task newTask = taskEdited.clone();
 					String statusOfSpecialEdit = editFields(userTask,
@@ -1054,7 +1048,7 @@ public class Logic {
 	 * 
 	 */
 	boolean showHelpMsg() {
-		UIObject.showToUser(storageObject.getHelp());
+		UIObject.showToUser(storageObject.getHelpMessage());
 		return true;
 	}
 	
@@ -1553,30 +1547,6 @@ public class Logic {
 		}
 		
 		return true;
-	}
-	
-	int getNewIdPrefix() {
-		int[] idList = new int[listOfTasks.size()];
-
-		for (int i = 0; i < listOfTasks.size(); i++) {
-			Task curTask = listOfTasks.get(i);
-			idList[i] = curTask.getId();
-		}
-		for (int i = 0; i < ID_RANGE; i++) {
-			boolean isUsed = false;
-			// check if id is used
-			for (int j = 0; j < listOfTasks.size(); j++) {
-				Task curTask = listOfTasks.get(j);
-				int curId = curTask.getId();
-				if (curId / RECURRING_MAX == i) {
-					isUsed = true;
-				}
-			}
-			if (!isUsed) {
-				return i;
-			}
-		}
-		return -1; // all ids are used up!
 	}
 	
 	boolean updateProperties(String key, String value) throws IOException{

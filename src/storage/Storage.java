@@ -44,7 +44,7 @@ public interface Storage {
 	 */
 	public ArrayList<Task> getItemList() throws FileNotFoundException;
 	
-	public default String getHelp()  {
+	public default String getHelpMessage()  {
 		return HELP_MESSAGE;
 	}
 	
