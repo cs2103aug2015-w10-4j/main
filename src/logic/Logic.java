@@ -224,23 +224,31 @@ public class Logic {
 	  * @return
 	  */
 	boolean setAllConfigAlias(){
-		for(int i = 0; i < PROPERTY_KEY_ALIAS_LIST.length; i++){
+		for (int i = 0; i < PROPERTY_KEY_ALIAS_LIST.length; i++) {
 			propObject.setProperty(PROPERTY_KEY_ALIAS_LIST[i], "");
 		}
 		return true;
 	}
 	
 	/**
-	 * Add the alias list read from the config file to the parser
+	 * Add the alias lists read from the config file to the parser
 	 * @return
 	 */
 	boolean addAllConfigAlias(){
-		for(int i = 0; i < listOfDefaultKeywords.length && i < PROPERTY_KEY_ALIAS_LIST.length; i++){
-			addConfigAlias(listOfDefaultKeywords[i], propObject.getProperty(PROPERTY_KEY_ALIAS_LIST[i]));
+		for (int i = 0; i < listOfDefaultKeywords.length
+				&& i < PROPERTY_KEY_ALIAS_LIST.length; i++) {
+			addConfigAlias(listOfDefaultKeywords[i],
+					propObject.getProperty(PROPERTY_KEY_ALIAS_LIST[i]));
 		}
 		return true;//to be changed if there is error reading
 	}
 	
+	/**
+	 * Adds the new aliasString to parser's list of command keywords
+	 * @param existingKeyword
+	 * @param aliasString
+	 * @return
+	 */
 	boolean addConfigAlias(String existingKeyword, String aliasString){
 		String[] aliasWords = aliasString.split(SEPARATOR);
 		boolean hasError = false;
@@ -421,24 +429,47 @@ public class Logic {
 		}
 	}
 	
+	/**
+	 * Concatenates the newAlias to the current property of the key propertyType
+	 * @param propertyType
+	 * @param newAlias
+	 * @return
+	 */
 	boolean addKeywordToAliasList(String propertyType, String newAlias) {
 		String curProperty = propObject.getProperty(propertyType);
-		if(curProperty.equals("")){
+		if (curProperty.equals("")) {
 			propObject.setProperty(propertyType, newAlias);
 		} else {
-			propObject.setProperty(propertyType, curProperty + SEPARATOR + newAlias);
+			propObject.setProperty(propertyType, curProperty + SEPARATOR
+					+ newAlias);
 		}
 		return true;
 	}
 	
+	
+	/**
+	 * Identifies the appropriate list to add the new alias to,
+	 * Then concatenates the new alias to the list
+	 * 
+	 * The configuration file is then written with the updated properties
+	 * 
+	 * @param argumentList
+	 * the first word in the list is used to identify the appropriate list
+	 * the second word in the list is the new alias to be added
+	 * @return status message
+	 */
 	String addAlias(ArrayList<String> argumentList) {
-		if(argumentList.size() < 2){
+		if (argumentList.size() < 2) {
 			return ERROR_INVALID_ARGUMENT;
 		}
-		if (parserObject.addAlias(argumentList.get(0), argumentList.get(1))) {
-			for(int i = 0; i < listOfDefaultKeywords.length && i < PROPERTY_KEY_ALIAS_LIST.length; i++){
-				if(argumentList.get(0).equals(listOfDefaultKeywords[i])){
-					addKeywordToAliasList(PROPERTY_KEY_ALIAS_LIST[i], argumentList.get(1));
+		String commandTypeIdentifier = argumentList.get(0);
+		String newAlias = argumentList.get(1);
+		if (parserObject.addAlias(commandTypeIdentifier, newAlias)) {
+			for (int i = 0; i < listOfDefaultKeywords.length
+					&& i < PROPERTY_KEY_ALIAS_LIST.length; i++) {
+				if (argumentList.get(0).equals(listOfDefaultKeywords[i])) {
+					addKeywordToAliasList(PROPERTY_KEY_ALIAS_LIST[i],
+							argumentList.get(1));
 				}
 			}
 			
@@ -447,7 +478,7 @@ public class Logic {
 			} catch (IOException e) {
 				return e.getMessage();
 			}
-			return String.format(MESSAGE_SUCCESS_ALIAS, argumentList.get(1), argumentList.get(0));
+			return String.format(MESSAGE_SUCCESS_ALIAS, newAlias, commandTypeIdentifier);
 		} else {
 			return ERROR_INVALID_ARGUMENT;
 		}
@@ -823,6 +854,14 @@ public class Logic {
 		}
 	}
 	
+	/**
+	 * Update the each of the clonedTask fields if the newTask fields
+	 * are not null
+	 * 
+	 * @param newTask
+	 * @param clonedTask
+	 * @return status message if there are problems, if not, null
+	 */
 	String editFields(Task newTask, Task clonedTask) {
 		if (newTask.hasName()) {
 			clonedTask.setName(newTask.getName());
@@ -935,6 +974,14 @@ public class Logic {
 		}
 	}
 
+	/**
+	 * Based on the first argument,
+	 * toggles whether done & undone tasks are shown to the user,
+	 * as well as modify the list filter when required
+	 * 
+	 * @param argumentList
+	 * @return
+	 */
 	String displayItems(ArrayList<String> argumentList) {
 		if (argumentList.size() == 1 && argumentList.get(0).equals("all")) {
 			shouldShowUndone = true;
@@ -980,6 +1027,12 @@ public class Logic {
 				time.get(Calendar.DAY_OF_YEAR) == date.get(Calendar.DAY_OF_YEAR);
 	}
 	
+	/**
+	 * Get the list of tasks that start on the date or has a deadline on the date
+	 * @param listOfEventsDeadlines
+	 * @param date
+	 * @return
+	 */
 	ArrayList<Task> getTasksInDay(ArrayList<Task> listOfEventsDeadlines,
 			Calendar date) {
 		ArrayList<Task> listOfTasksInDay = new ArrayList<Task>();
@@ -1198,6 +1251,13 @@ public class Logic {
 		}
 	}
 
+	/**
+	 * Adds a new title to listOfTitles based on dd mm yy of
+	 * the first task of the listOfItemsInDate
+	 * 
+	 * @param listOfItemsInDate
+	 * @param listOfTitles
+	 */
 	private void addTitleForDate(ArrayList<Task> listOfItemsInDate,
 			List<String> listOfTitles) {
 		if (listOfItemsInDate.size() != 0) {
@@ -1218,6 +1278,16 @@ public class Logic {
 		}
 	}
 
+	/**
+	 * Generate the title based on the given the dd mm yy of the task
+	 * @param listOfTitles
+	 * @param curDate
+	 * @param curMonth
+	 * @param curYear
+	 * @param curItemDate
+	 * @param curItemMonth
+	 * @param curItemYear
+	 */
 	private void addTitleForDateHelper(List<String> listOfTitles, int curDate,
 			int curMonth, int curYear, int curItemDate, int curItemMonth, int curItemYear) {
 		Calendar itemDate = new GregorianCalendar();
