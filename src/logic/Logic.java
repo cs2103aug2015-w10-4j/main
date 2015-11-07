@@ -103,7 +103,7 @@ public class Logic {
 	 * Static strings - errors and messages
 	 */
 	private static final String MESSAGE_WELCOME = "Welcome to Tasky! This is an open source project.";
-	private static final String MESSAGE_PROMPT_COMMAND = "command :";
+	private static final String MESSAGE_PROMPT_COMMAND = "Command :";
 	private static final String MESSAGE_UNDO = "Undo : ";
 	private static final String MESSAGE_REDO = "Redo : ";
 	private static final String MESSAGE_SUCCESS_HISTORY_ADD = "Deleted item(s) restored.";
@@ -755,6 +755,7 @@ public class Logic {
 	}
 	
 	String addSearchFilter(ArrayList<Task> userTasks) {
+
 		if (userTasks.isEmpty()) {
 			return ERROR_NO_FILTER;
 		} else {
@@ -1074,7 +1075,7 @@ public class Logic {
 	boolean showUpdatedItems() {
 		listOfShownTasks.clear();
 		if (listFilter.isEmpty()) {
-			// default view - first closest date, second closests date, floating
+			// default view - first closest date, second closest date, floating
 			ArrayList<Task> listOfFloating = new ArrayList<Task>();
 			ArrayList<Task> listOfEventsDeadlines = new ArrayList<Task>();
 			
@@ -1275,9 +1276,10 @@ public class Logic {
 	 */
 	boolean filterByName(List<String> searchStrings,
 			boolean isEmptyName, Task curFilter) {
-		String searchTaskName = curFilter.getName().toLowerCase();
+		String searchTaskName = curFilter.getName();
 		int i = 0;
 		if (searchTaskName != null) {
+			searchTaskName = searchTaskName.toLowerCase();
 			if (!isEmptyName) {
 				searchStrings.set(0,
 						searchStrings.get(0).concat(SEPARATOR));
