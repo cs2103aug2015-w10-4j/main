@@ -283,7 +283,7 @@ public class Logic {
 						true);
 				UIObject.showStatusToUser(executionResult);
 				if (commandObject.getCommandType() == Command.Type.HELP) {
-					showHelpMsg();
+					showHelpMessage();
 				} else {
 					showUpdatedItems();
 				}
@@ -297,7 +297,6 @@ public class Logic {
 				UIObject.showStatusToUser(ERROR_WRITING_FILE);
 			} catch (Exception e) {
 				// warning from parsing user command
-				//e.printStackTrace();
 				UIObject.showStatusToUser(e.getMessage());
 			}
 		}
@@ -428,7 +427,8 @@ public class Logic {
 	}
 	
 	/**
-	 * Concatenates the newAlias to the current property of the key propertyType
+	 * Concatenates the newAlias to the current property value associated with
+	 * the key propertyType in propObject
 	 * @param propertyType
 	 * @param newAlias
 	 * @return
@@ -448,8 +448,8 @@ public class Logic {
 	/**
 	 * Attempts to add the new alias to the parser
 	 * 
-	 * If successful, it identifies the appropriate list to add the new alias to,
-	 * Then concatenates the new alias to the list in property object
+	 * If successful, it identifies the appropriate list in property object
+	 * to add the new alias to. Then concatenates the new alias to the list 
 	 * 
 	 * The configuration file is then written with the updated properties
 	 * 
@@ -476,7 +476,7 @@ public class Logic {
 			try {
 				writeProperties();
 			} catch (IOException e) {
-				return e.getMessage();
+				return ERROR_WRITING_FILE;
 			}
 			return String.format(MESSAGE_SUCCESS_ALIAS, newAlias, commandTypeIdentifier);
 		} else {
@@ -499,13 +499,16 @@ public class Logic {
 	}
 	
 	/**
+	 * Depending on the command type, craft a status message for return
+	 * 
 	 * Pushes a reversed command to history, and returns the
-	 * respective status message
+	 * crafted status message
 	 * @param commandType
 	 * @param commandToPush
-	 * @param isUserInput
-	 * @param isUndoHistory
-	 * @return
+	 * @param isUserInput determines whether the undo history list should be cleared,
+	 * as well as the status message
+	 * @param isUndoHistory determines which stack the reverse command is to be pushed into
+	 * @return status message
 	 */
 	String pushToHistory(Command.Type commandType, Command commandToPush, boolean isUserInput, boolean isUndoHistory) {
 		String normalStatus;
@@ -571,7 +574,10 @@ public class Logic {
 	}
 
 	/**
-	 * Adds an item to the list of tasks in memory
+	 * Adds item(s) to the list of tasks in memory
+	 * 
+	 * Creates a reversed commands with the index array of
+	 * the items that have been added, the pushes it to history
 	 * 
 	 * @param userTasks
 	 *            an arraylist of tasks to be added
@@ -597,23 +603,23 @@ public class Logic {
 				hasClashes = true;
 			}
 
+			logger.fine("Adding tasks to list.");
 			if (isEmptyIndexList(indexList)) {
+				logger.finer("No specified index. Defaulting all items to the end of list.");
 				for (int i = 0; i < userTasks.size(); i++) {
-					int index = i + listOfTasks.size();
+					int index = listOfTasks.size();
+					logger.finer("Index " + (index + 1) + " generated.");
 					addHelper(userTasks, parsedIntList, i, index);
 				}
-				logger.finer("No specified index. Defaulting all items to the end of list.");
 			} else if (indexList.size() != userTasks.size()) {
 				return ERROR_INVALID_ARGUMENT;
 			} else {
-				logger.fine("Adding tasks to list.");
 				for (int i = 0; i < userTasks.size(); i++) {
 					int index = indexList.get(i);
-					addHelper(userTasks, parsedIntList, i, index);
 					logger.finer("Index " + (index + 1) + " specified.");
+					addHelper(userTasks, parsedIntList, i, index);
 				}
 			}
-			
 
 			String[] argumentListForReverse = new String[parsedIntList.size()];
 			Integer[] integerArr = new Integer[parsedIntList.size()];
@@ -622,7 +628,9 @@ public class Logic {
 				argumentListForReverse[i] = String.valueOf(integerArr[i]);
 			}
 
-			String historyStatus = pushToHistory(Command.Type.ADD, new Command(Command.Type.DELETE, argumentListForReverse), isUserInput, isUndoHistory);
+			String historyStatus = pushToHistory(Command.Type.ADD, new Command(
+					Command.Type.DELETE, argumentListForReverse), isUserInput,
+					isUndoHistory);
 			if (hasClashes) {
 				return WARNING_TIMING_CLASH;
 			}
@@ -641,6 +649,7 @@ public class Logic {
 	 * then attempts to split the task if it is recurring. At the
 	 * same time, it helps to keep track of the index the items are
 	 * added at so that the reversed command can be created
+	 * 
 	 * @param userTasks
 	 * @param parsedIntList index list
 	 * @param i the position of the relevant task & argument index
@@ -1047,7 +1056,7 @@ public class Logic {
 	 * show help message to UI
 	 * 
 	 */
-	boolean showHelpMsg() {
+	boolean showHelpMessage() {
 		UIObject.showToUser(storageObject.getHelpMessage());
 		return true;
 	}
@@ -1327,7 +1336,6 @@ public class Logic {
 
 	/**
 	 * Retrieves the last command from undo history and attempts to execute it.
-	 * this will no longer push it to history, therefore, you can't undo a redo
 	 * 
 	 * @return status message
 	 */
@@ -1555,6 +1563,11 @@ public class Logic {
 		return true;
 	}
 	
+	/**
+	 * Writes the current property keys and values to the config file
+	 * @return 
+	 * @throws IOException if there is a problem with writing to file
+	 */
 	boolean writeProperties() throws IOException{
 		BufferedWriter bufWriter = new BufferedWriter(new FileWriter(new File(CONFIG_FILE_NAME)));
 		propObject.store(bufWriter, null);

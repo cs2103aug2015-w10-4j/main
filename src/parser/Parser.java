@@ -163,6 +163,7 @@ public class Parser {
 		keywordLists.add(searchKeywords);
 		keywordLists.add(savetoKeywords);
 		keywordLists.add(helpKeywords);
+		keywordLists.add(aliasKeywords);
 		return true;
 	}
 	
@@ -544,6 +545,7 @@ public class Parser {
 							if (n == 0) {	// h: 24 hour time format
 								hourOfDay = Integer.parseInt(tempTime.substring(0, 2));
 								minute = Integer.parseInt(tempTime.substring(2));
+
 							} else {	// am/pm: 12 hour time format
 								isAMorPM = (n == 1 || n == 3) ? 0 : 1;
 								if (tempTime.contains(TIME_SEPARATOR)) { // check if minutes is specified
@@ -560,9 +562,6 @@ public class Parser {
 							}
 							// although Calendar can parse beyond this range, it will be
 							// misleading for the user. so throw exception
-							if (hour > 12 || hour < 0 || minute > 59) {
-								throw new Exception(ERROR_INVALID_TIME);
-							}
 						} catch (ArrayIndexOutOfBoundsException|NumberFormatException e) {
 							throw new Exception(ERROR_INVALID_TIME_FORMAT);
 						} catch (Exception e) {
@@ -577,7 +576,6 @@ public class Parser {
 		} else {
 			dateArguments = dateArgumentsTemp;
 		}
-		
 		
 		// start parsing of date
 		if (dateArguments.length == 0) {
@@ -733,9 +731,15 @@ public class Parser {
 		}
 
 		if (hourOfDay == null) {
+			if (hour > 12 || hour < 0 || minute > 59) {
+				throw new Exception(ERROR_INVALID_TIME);
+			}
 			helperDate.set(Calendar.HOUR, hour);
 			helperDate.set(Calendar.AM_PM, isAMorPM);
 		} else {
+			if (hourOfDay > 23 || hour < 0 || minute > 59) {
+				throw new Exception(ERROR_INVALID_TIME);
+			}
 			helperDate.set(Calendar.HOUR_OF_DAY, hourOfDay);
 		}
 		helperDate.set(Calendar.MINUTE, minute);
