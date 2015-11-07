@@ -593,6 +593,9 @@ public class Logic {
 	 */
 	String addItem(ArrayList<Task> userTasks, ArrayList<Integer> indexList,
 			boolean isUserInput, boolean isUndoHistory) {
+		if (userTasks == null || userTasks.isEmpty()) {
+			return ERROR_INVALID_ARGUMENT;
+		}
 		try {
 			ArrayList<Integer> parsedIntList = new ArrayList<Integer>();
 			
@@ -611,7 +614,7 @@ public class Logic {
 					logger.finer("Index " + (index + 1) + " generated.");
 					addHelper(userTasks, parsedIntList, i, index);
 				}
-			} else if (indexList.size() != userTasks.size()) {
+			} else if (userTasks.size() != indexList.size()) {
 				return ERROR_INVALID_ARGUMENT;
 			} else {
 				for (int i = 0; i < userTasks.size(); i++) {
@@ -656,7 +659,7 @@ public class Logic {
 	 * @param index the position in the main list the task is to be added to
 	 * @throws Exception
 	 */
-	private void addHelper(ArrayList<Task> userTasks,
+	void addHelper(ArrayList<Task> userTasks,
 			ArrayList<Integer> parsedIntList, int i, int index)
 			throws Exception {
 		Task curTask = userTasks.get(i);
@@ -729,7 +732,7 @@ public class Logic {
 	 * @return
 	 * @throws Exception
 	 */
-	private ArrayList<Integer> remapArguments(
+	ArrayList<Integer> remapArguments(
 			ArrayList<String> argumentList) throws Exception {
 		ArrayList<Integer> remappedArgumentList = new ArrayList<Integer>();
 		for (String oldIndexString : argumentList) {
@@ -752,7 +755,7 @@ public class Logic {
 	}
 	
 	String addSearchFilter(ArrayList<Task> userTasks) {
-		if (userTasks.size() == 0) {
+		if (userTasks.isEmpty()) {
 			return ERROR_NO_FILTER;
 		} else {
 			Task taskObject = userTasks.get(0);
@@ -762,7 +765,7 @@ public class Logic {
 	}
 	
 	/**
-	 * Marks or unmarks a task as done based on the isDone parameter
+	 * Marks a task as done or undone based on the isDone parameter
 	 * @param indexList
 	 * @param isUserInput
 	 * @param isUndoHistory
@@ -786,14 +789,12 @@ public class Logic {
 			}
 		}
 		
-		ArrayList<Task> tasksRemoved = new ArrayList<Task>();
 		for (int i = indexList.size() - 1; i >= 0; i--) {
 			int index = indexList.get(i);
 			argumentListForReverse[i] = String.valueOf(index); // for undo
 
 			// add to start of list to maintain order
 			Task taskRemoved = listOfTasks.remove(index);
-			tasksRemoved.add(0, taskRemoved);
 			Task cloneOfTask = taskRemoved.clone();
 			cloneOfTask.setDone(isDone);
 			listOfTasks.add(index, cloneOfTask);
@@ -1072,7 +1073,7 @@ public class Logic {
 	 */
 	boolean showUpdatedItems() {
 		listOfShownTasks.clear();
-		if (listFilter.size() == 0) {
+		if (listFilter.isEmpty()) {
 			ArrayList<Task> listOfFloating = new ArrayList<Task>();
 			ArrayList<Task> listOfEventsDeadlines = new ArrayList<Task>();
 			for (int i = 0; i < listOfTasks.size(); i++) {
@@ -1139,7 +1140,7 @@ public class Logic {
 			if (listOfFloating.size() != 0) {
 				listOfTitles.add("Other tasks");
 			} else {
-				listOfTitles.add("No other tasks.");
+				listOfTitles.add("No other tasks");
 			}
 			
 			return UIObject.showTasks(listOfShownTasks, DisplayType.DEFAULT, listOfTitles);
@@ -1168,7 +1169,7 @@ public class Logic {
 			// Filter by name
 			for (int j = 0; j < listFilter.size(); j++) {
 				Task curFilter = listFilter.get(j);
-				String searchTaskName = curFilter.getName();
+				String searchTaskName = curFilter.getName().toLowerCase();
 				int i = 0;
 				if (searchTaskName != null) {
 					if (!isEmptyName) {
@@ -1261,7 +1262,7 @@ public class Logic {
 	 * @param listOfItemsInDate
 	 * @param listOfTitles
 	 */
-	private void addTitleForDate(ArrayList<Task> listOfItemsInDate,
+	void addTitleForDate(ArrayList<Task> listOfItemsInDate,
 			List<String> listOfTitles) {
 		if (listOfItemsInDate.size() != 0) {
 			Calendar curTime = Calendar.getInstance();
@@ -1291,7 +1292,7 @@ public class Logic {
 	 * @param curItemMonth
 	 * @param curItemYear
 	 */
-	private void addTitleForDateHelper(List<String> listOfTitles, int curDate,
+	void addTitleForDateHelper(List<String> listOfTitles, int curDate,
 			int curMonth, int curYear, int curItemDate, int curItemMonth, int curItemYear) {
 		Calendar itemDate = new GregorianCalendar();
 		itemDate.set(Calendar.DATE, curItemDate);
@@ -1312,7 +1313,7 @@ public class Logic {
 		}
 	}
 
-	private void addTasksToList(ArrayList<Task> listOfFirstDate) {
+	void addTasksToList(ArrayList<Task> listOfFirstDate) {
 		if (listOfFirstDate.size() >= displaySize) {
 			listOfShownTasks.addAll(listOfFirstDate.subList(0, displaySize));
 		} else {
