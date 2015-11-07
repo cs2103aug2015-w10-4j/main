@@ -1074,8 +1074,10 @@ public class Logic {
 	boolean showUpdatedItems() {
 		listOfShownTasks.clear();
 		if (listFilter.isEmpty()) {
+			// default view - first closest date, second closests date, floating
 			ArrayList<Task> listOfFloating = new ArrayList<Task>();
 			ArrayList<Task> listOfEventsDeadlines = new ArrayList<Task>();
+			
 			for (int i = 0; i < listOfTasks.size(); i++) {
 				Task curTask = listOfTasks.get(i);
 				if (!curTask.isDone()) {
@@ -1094,20 +1096,22 @@ public class Logic {
 				Task firstTask;
 				Calendar todayDate = new GregorianCalendar();
 				Calendar firstDate = null, secondDate = null;
-				int n = 0, i = 1;
-				while (n < listOfEventsDeadlines.size()) {
+				int i = 0;
+				
+				boolean hasFirstDate = false;
+				while (!hasFirstDate) {
 					// prepare first task in the list for comparison
-					firstTask = listOfEventsDeadlines.get(n);
+					firstTask = listOfEventsDeadlines.get(i);
 					firstDate = firstTask.getTime();
 					// compare to see if the task is before today's date. We only want tasks after/same as today's date
-					if (todayDate.getTimeInMillis() - firstDate.getTimeInMillis() > 0) {
-						// yes, so iterate to next task and set firstDate to null to satisfy next if nest
-						n++;
+					if (firstDate.before(todayDate)) {
+						// date is before today's date, continue to iterate
+						i++;
 						firstDate = null;
 					} else {
-						// we want this, so break loop and continue with operation
-						i = n > 0 ? n : 1;
-						n += listOfEventsDeadlines.size();
+						// first date is found
+						// so break loop and continue
+						hasFirstDate = true;
 					}
 				}
 				
@@ -1132,7 +1136,6 @@ public class Logic {
 			addTasksToList(listOfSecondDate);
 			addTasksToList(listOfFloating);
 			
-			// default view
 			List<String> listOfTitles = new ArrayList<String>();
 			addTitleForDate(listOfFirstDate, listOfTitles);
 			addTitleForDate(listOfSecondDate, listOfTitles);
@@ -1145,6 +1148,7 @@ public class Logic {
 			
 			return UIObject.showTasks(listOfShownTasks, DisplayType.DEFAULT, listOfTitles);
 		} else {
+			// filtered view
 			listOfShownTasks = new ArrayList<Task>();
 			List<String> searchStrings = new ArrayList<String>();
 			
@@ -1166,93 +1170,130 @@ public class Logic {
 			boolean isEmptyTime = true;
 			boolean isEmptyLocation = true;
 			
-			// Filter by name
+			// Filter by name, time, and location
 			for (int j = 0; j < listFilter.size(); j++) {
 				Task curFilter = listFilter.get(j);
-				String searchTaskName = curFilter.getName().toLowerCase();
-				int i = 0;
-				if (searchTaskName != null) {
-					if (!isEmptyName) {
-						searchStrings.set(0,
-								searchStrings.get(0).concat(SEPARATOR));
-					}
-					isEmptyName = false;
-					searchStrings.set(0, searchStrings.get(0).concat(searchTaskName));
-					while (i < listOfShownTasks.size()) {
-						Task curTask = listOfShownTasks.get(i);
-						if (!curTask.getName().toLowerCase().contains(searchTaskName)) {
-							listOfShownTasks.remove(i);
-						} else {
-							i++;
-						}
-					}
-				}
-			}
-			
-			// Filter by time
-			for (int j = 0; j < listFilter.size(); j++) {
-				Task curFilter = listFilter.get(j);
-				Calendar filterTime = curFilter.getTime();
-				if (filterTime != null) {
-					Calendar filterTimeStart = (Calendar) filterTime.clone();
-					filterTimeStart.set(Calendar.HOUR_OF_DAY, 0);
-					filterTimeStart.set(Calendar.MINUTE, 0);
-					Calendar filterTimeEnd = (Calendar) filterTime.clone();
-					filterTimeEnd.add(Calendar.DATE, 1);
-					filterTimeEnd.set(Calendar.HOUR_OF_DAY, 0);
-					filterTimeEnd.set(Calendar.MINUTE, 0);
-					
-					if (!isEmptyTime) {
-						searchStrings.set(
-								1,
-								searchStrings.get(1).concat(
-										SEPARATOR));
-					}
-					isEmptyTime = false;
-					searchStrings.set(
-							1,
-							searchStrings.get(1).concat(
-									dateFormat.format(filterTime.getTime())));
-					int i = 0;
-					while (i < listOfShownTasks.size()) {
-						Task curTask = listOfShownTasks.get(i);
-						if (curTask.getTime() == null
-								|| curTask.getTime().before(filterTimeStart)
-								|| !curTask.getTime().before(filterTimeEnd)) {
-							listOfShownTasks.remove(i);
-						} else {
-							i++;
-						}
-					}
-				}
-				
-			}
-			
-			// Filter by location
-			for (int j = 0; j < listFilter.size(); j++) {
-				Task curFilter = listFilter.get(j);
-				String searchLocation = curFilter.getLocation();
-				int i = 0;
-				if (searchLocation != null) {
-					if (!isEmptyLocation) {
-						searchStrings.set(2,
-								searchStrings.get(2).concat(SEPARATOR));
-					}
-					isEmptyLocation = false;
-					searchStrings.set(2, searchStrings.get(2).concat(searchLocation));
-					while (i < listOfShownTasks.size()) {
-						Task curTask = listOfShownTasks.get(i);
-						if (curTask.getLocation() == null || !curTask.getLocation().toLowerCase().contains(searchLocation)) {
-							listOfShownTasks.remove(i);
-						} else {
-							i++;
-						}
-					}
-				}
+				isEmptyName = filterByName(searchStrings, isEmptyName,
+						curFilter);
+				isEmptyTime = filterByTime(searchStrings, isEmptyTime,
+						curFilter);
+				isEmptyLocation = filterByLocation(searchStrings,
+						isEmptyLocation, curFilter);
 			}
 			
 			return UIObject.showTasks(listOfShownTasks, DisplayType.FILTERED, searchStrings);
 		}
+	}
+
+	/**
+	 * Goes through the current list of shown tasks, and remove it if it
+	 * doesn't fit the curFilter location
+	 * 
+	 * @param searchStrings
+	 * @param isEmptyLocation
+	 * @param curFilter
+	 * @return isEmptyLocation updated status
+	 */
+	boolean filterByLocation(List<String> searchStrings,
+			boolean isEmptyLocation, Task curFilter) {
+		String searchLocation = curFilter.getLocation();
+		int i = 0;
+		if (searchLocation != null) {
+			if (!isEmptyLocation) {
+				searchStrings.set(2,
+						searchStrings.get(2).concat(SEPARATOR));
+			}
+			isEmptyLocation = false;
+			searchStrings.set(2, searchStrings.get(2).concat(searchLocation));
+			while (i < listOfShownTasks.size()) {
+				Task curTask = listOfShownTasks.get(i);
+				if (curTask.getLocation() == null || !curTask.getLocation().toLowerCase().contains(searchLocation)) {
+					listOfShownTasks.remove(i);
+				} else {
+					i++;
+				}
+			}
+		}
+		return isEmptyLocation;
+	}
+
+	/**
+	 * Goes through the current list of shown tasks, and remove it if it
+	 * doesn't fit the curFilter time
+	 * 
+	 * @param searchStrings
+	 * @param isEmptyTime
+	 * @param curFilter
+	 * @return isEmptyTime updated status
+	 */
+	boolean filterByTime(List<String> searchStrings,
+			boolean isEmptyTime, Task curFilter) {
+		Calendar filterTime = curFilter.getTime();
+		if (filterTime != null) {
+			Calendar filterTimeStart = (Calendar) filterTime.clone();
+			filterTimeStart.set(Calendar.HOUR_OF_DAY, 0);
+			filterTimeStart.set(Calendar.MINUTE, 0);
+			Calendar filterTimeEnd = (Calendar) filterTime.clone();
+			filterTimeEnd.add(Calendar.DATE, 1);
+			filterTimeEnd.set(Calendar.HOUR_OF_DAY, 0);
+			filterTimeEnd.set(Calendar.MINUTE, 0);
+			
+			if (!isEmptyTime) {
+				searchStrings.set(
+						1,
+						searchStrings.get(1).concat(
+								SEPARATOR));
+			}
+			isEmptyTime = false;
+			searchStrings.set(
+					1,
+					searchStrings.get(1).concat(
+							dateFormat.format(filterTime.getTime())));
+			int i = 0;
+			while (i < listOfShownTasks.size()) {
+				Task curTask = listOfShownTasks.get(i);
+				if (curTask.getTime() == null
+						|| curTask.getTime().before(filterTimeStart)
+						|| !curTask.getTime().before(filterTimeEnd)) {
+					listOfShownTasks.remove(i);
+				} else {
+					i++;
+				}
+			}
+		}
+		return isEmptyTime;
+	}
+
+	/**
+	 * Goes through the current list of shown tasks, and remove it if it
+	 * doesn't fit the curFilter name
+	 * 
+	 * @param searchStrings
+	 * @param isEmptyName
+	 * @param curFilter
+	 * @return isEmptyName updated status
+	 */
+	boolean filterByName(List<String> searchStrings,
+			boolean isEmptyName, Task curFilter) {
+		String searchTaskName = curFilter.getName().toLowerCase();
+		int i = 0;
+		if (searchTaskName != null) {
+			if (!isEmptyName) {
+				searchStrings.set(0,
+						searchStrings.get(0).concat(SEPARATOR));
+			}
+			isEmptyName = false;
+			searchStrings.set(0, searchStrings.get(0).concat(searchTaskName));
+			while (i < listOfShownTasks.size()) {
+				Task curTask = listOfShownTasks.get(i);
+				if (!curTask.getName().toLowerCase().contains(searchTaskName)) {
+					listOfShownTasks.remove(i);
+				} else {
+					i++;
+				}
+			}
+		}
+		return isEmptyName;
 	}
 
 	/**
@@ -1300,14 +1341,12 @@ public class Logic {
 		itemDate.set(Calendar.YEAR, curItemYear);
 		String itemDateString = dateFormat.format(itemDate.getTime());
 		String titleTop = String.format(TITLE_TOP_DISPLAY, displaySize);
-		if (curMonth == curItemMonth && curYear == curItemYear) {
-			if (curDate == curItemDate) {
-				listOfTitles.add(titleTop + TITLE_TODAY);
-			} else if (curDate == curItemDate - 1) {
-				listOfTitles.add(titleTop + TITLE_TOMORROW);
-			} else {
-				listOfTitles.add(titleTop + itemDateString);
-			}
+		
+		boolean isSameMonthAndYear = (curMonth == curItemMonth) && (curYear == curItemYear);
+		if (isSameMonthAndYear && curDate == curItemDate) {
+			listOfTitles.add(titleTop + TITLE_TODAY);
+		} else if (isSameMonthAndYear && curDate == curItemDate - 1) {
+			listOfTitles.add(titleTop + TITLE_TOMORROW);
 		} else {
 			listOfTitles.add(titleTop + itemDateString);
 		}
@@ -1363,11 +1402,9 @@ public class Logic {
 		String filePath = argumentList.get(0);
 		try {
 			boolean locationChanged = storageObject.saveFileToPath(filePath);
-			if (locationChanged) {
-				updateProperties(PROPERTY_KEY_SAVE_FILE, filePath);
-			}
 			updateListOfTasks();
 			if (locationChanged) {
+				updateProperties(PROPERTY_KEY_SAVE_FILE, filePath);
 				return MESSAGE_SUCCESS_CHANGE_FILE_PATH;
 			} else {
 				return MESSAGE_SUCCESS_NO_CHANGE_FILE_PATH;
@@ -1375,6 +1412,7 @@ public class Logic {
 		} catch (IOException e) {
 			return ERROR_CREATING_FILE;
 		} catch (Exception e) {
+			// if file is not found when updating list of task
 			return e.getMessage();
 		}
 	}
