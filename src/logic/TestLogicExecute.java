@@ -84,7 +84,7 @@ public class TestLogicExecute {
 		Command commandObject;
 		
 		// case 1
-		commandObject = new Command(Command.Type.DISPLAY);
+		commandObject = new Command(Command.Type.DISPLAY, new String[]{});
 		assertEquals("Displaying items.", logicObject.executeCommand(commandObject, true, true));
 	}
 	

@@ -523,7 +523,7 @@ public class Parser {
 	// TIME keyword in commandString must be capitalized
 	Calendar parseTime(String[] dateArgumentsTemp) throws Exception {
 		logger.fine("parseDate: parsing date");
-		int date, month, year, hour = 23, minute = 59, isAMorPM = 0;
+		int date, month, year, hour = 11, minute = 59, isAMorPM = 1;
 		Integer hourOfDay = null;
 		Calendar helperDate;
 		
