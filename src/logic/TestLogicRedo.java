@@ -15,7 +15,7 @@ public class TestLogicRedo {
 	
 Logic logicObject;
 
-	
+     //@@author A0108355H
 	@Before
 	public void setup(){
 		logicObject = new Logic();
@@ -25,6 +25,7 @@ Logic logicObject;
 	
 
 
+	//@@author A0108355H
 	@Test
 	public void logicRedoEmpty(){
 
@@ -34,6 +35,7 @@ Logic logicObject;
 
 	}
 	
+	//@@author A0108355H
 	@Test
 	public void logicRedoadd(){
 		ArrayList<Task> newTasks = new ArrayList<Task>();
@@ -48,6 +50,7 @@ Logic logicObject;
 	
 	
 
+	//@@author A0108355H
 	@Test
 	public void logicRedoMultipleDelete(){
 
@@ -82,6 +85,7 @@ Logic logicObject;
 
 	}
 
+	//@@author A0108355H
 	@Test
 	public void logicUndoEdit(){
 		ArrayList<Task> listToEdit = new ArrayList<Task>();
@@ -105,6 +109,7 @@ Logic logicObject;
 
 	}
 	
+	//@@author A0108355H
 	@After
 	public void cleanup(){
 		File saveFile = new File("save.txt");

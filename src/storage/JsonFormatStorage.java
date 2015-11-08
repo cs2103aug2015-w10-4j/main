@@ -81,7 +81,7 @@ public class JsonFormatStorage implements Storage {
 	/* (non-Javadoc)
 	 * @see storage.Storage#saveFileToPath(java.lang.String)
 	 */
-	//@author A0108355H
+	//@@author A0108355H
 	@Override
 	public boolean saveFileToPath(String path) throws IOException {
 		boolean isFilePathChanged = false;
@@ -124,7 +124,7 @@ public class JsonFormatStorage implements Storage {
 		return isFilePathChanged;
 	}
 	
-	//@author A0108355H
+	//@@author A0108355H
 	private void copyFile(String newPath, String oldPath) throws IOException {
 		FileReader fr = new FileReader(oldPath);
 		FileWriter fw = new FileWriter(newPath);
@@ -165,7 +165,7 @@ public class JsonFormatStorage implements Storage {
 		return result;
 	}
 	
-	//@author A0108355H
+	//@@author A0108355H
 	private String storeInfo(ArrayList<Task> list) {
 		String loggerMsg = "";
 		for (int i = 0; i < list.size(); i++) {

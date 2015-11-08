@@ -22,27 +22,32 @@ public class Task implements Comparable<Task> {
 	/*
 	 * Constructor
 	 */
+	//@@author A0108355H
 	public Task(String name) {
 		this.name = name;
 	}
 
+	//@@author A0108355H
 	public Task(String name, Calendar endingTime) {
 		this.name = name;
 		this.endingTime = endingTime;
 	}
 
+	//@@author A0108355H
 	public Task(String name, Calendar endingTime, String location) {
 		this.name = name;
 		this.endingTime = endingTime;
 		this.location = location;
 	}
 
+	//@@author A0108355H
 	public Task(String name, Calendar startingTime, Calendar endingTime) {
 		this.name = name;
 		this.startingTime = startingTime;
 		this.endingTime = endingTime;
 	}
 
+	//@@author A0108355H
 	public Task(String name, Calendar startingTime, Calendar endingTime,
 			String location) {
 		this.name = name;
@@ -51,6 +56,7 @@ public class Task implements Comparable<Task> {
 		this.location = location;
 	}
 
+	//@@author A0108355H
 	public Task(String name, Calendar startingTime, Calendar endingTime,
 			String location, String periodicInterval, String periodicRepeats) {
 		this.name = name;
@@ -61,6 +67,7 @@ public class Task implements Comparable<Task> {
 		this.periodicRepeats = periodicRepeats;
 	}
 
+	//@@author A0108355H
 	public Task() {
 
 	}
@@ -69,6 +76,7 @@ public class Task implements Comparable<Task> {
 	 * Public methods
 	 */
 
+	//@@author A0108355H
 	// returns the name of the task
 	public String getName() {
 		return name;
@@ -80,10 +88,12 @@ public class Task implements Comparable<Task> {
 	 * @return time, format : year month Time hour minute (2014 06 04 24 24)
 	 * @SuppressWarnings("deprecation")
 	 */
+	//@@author A0108355H
 	public Calendar getEndingTime() {
 		return this.endingTime;
 	}
 
+	//@@author A0108355H
 	public Calendar getStartingTime() {
 		return this.startingTime;
 	}
@@ -96,6 +106,7 @@ public class Task implements Comparable<Task> {
 	 * 
 	 * @return
 	 */
+	//@@author A0108355H
 	public Calendar getTime() {
 		if (hasStartingTime()) {
 			return this.startingTime;
@@ -104,6 +115,7 @@ public class Task implements Comparable<Task> {
 		}
 	}
 
+	//@@author A0108355H
 	public String getLocation() {
 		return this.location;
 	}
@@ -116,6 +128,7 @@ public class Task implements Comparable<Task> {
 		return this.periodicRepeats;
 	}
 	
+	//@@author A0108355H
 	public String getAllInfo() {
 		return "Name: " + name + " Starting time: " + this.startingTime
 				+ " Ending Time: " + this.getEndingTime() + " Location: "
@@ -123,6 +136,7 @@ public class Task implements Comparable<Task> {
 				+ " Period Repeats " + this.periodicRepeats;
 	}
 
+	//@@author A0108355H
 	public boolean hasStartingTime() {
 		if (this.startingTime == null) {
 			return false;
@@ -131,6 +145,7 @@ public class Task implements Comparable<Task> {
 		}
 	}
 	
+	//@@author A0108355H
 	public boolean hasName() {
 		if(this.name != null) {
 			return true;
@@ -138,6 +153,7 @@ public class Task implements Comparable<Task> {
 			return false;		
 	}
 	
+	//@@author A0108355H
 	public boolean hasLocation() {
 		if(this.location != null) {
 			return true;
@@ -159,6 +175,7 @@ public class Task implements Comparable<Task> {
 		return false;
 	}
 	
+	//@@author A0108355H
 	public boolean hasEndingTime() {
 		if (this.endingTime == null) {
 			return false;
@@ -172,22 +189,26 @@ public class Task implements Comparable<Task> {
 		return this.isDone;
 	}
 
+	//@@author A0108355H
 	// change the name of the task
 	public boolean setName(String newName) {
 		this.name = newName;
 		return true;
 	}
 
+	//@@author A0108355H
 	public boolean setEndingTime(Calendar endingTime) {
 		this.endingTime = endingTime;
 		return true;
 	}
 
+	//@@author A0108355H
 	public boolean setStartingTime(Calendar startingTime) {
 		this.startingTime = startingTime;
 		return true;
 	}
 
+	//@@author A0108355H
 	public boolean setLocation(String location) {
 		this.location = location;
 		return true;

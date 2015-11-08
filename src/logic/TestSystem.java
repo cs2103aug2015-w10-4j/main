@@ -17,14 +17,14 @@ import parser.Parser;
 import storage.JsonFormatStorage;
 import storage.Storage;
 import logic.Logic;
-
+//@@author A0108355H
 public class TestSystem {
 	Logic logicObject = null;
 	Parser parserObj = null;
 	Storage storageObj = null;
 	
 
-	
+	//@@author A0108355H
 	@Before
 	public void setup(){
 			parserObj = new Parser();
@@ -40,6 +40,7 @@ public class TestSystem {
 	 * pass string from parser to logic, test adding a simple task
 	 * test on logic side, check whether the logic process command correct or not
 	 */
+	//@@author A0108355H
 	@Test
 	public void testLogicParserSimpleAdd() throws Exception {
 
@@ -55,6 +56,7 @@ public class TestSystem {
 	 * add task1 before testing
 	 * test on logic side, check whether the logic process command correct or not
 	 */
+	//@@author A0108355H
 	@Test
 	public void testLogicParserSimpleDelete() throws Exception {
         Command commandObject = parserObj.parseCommand("add task1");
@@ -74,6 +76,7 @@ public class TestSystem {
 	 * followed by passing the result task to storage and test whether the result stored is correct or not
 	 * add task1 before testing
 	 */
+	//@@author A0108355H
 	@Test
 	public void testLogicParserStorageSimpleUndo() throws Exception {
         Command commandObject = parserObj.parseCommand("add task1");
@@ -105,6 +108,7 @@ public class TestSystem {
 	 * followed by passing the result task to storage and test whether the result stored is correct or not
 	 * add task1, task2 before testing
 	 */
+	//@@author A0108355H
 	@Test
 	public void testLogicParserStorageSimpleRedo() throws Exception {
         Command commandObject = parserObj.parseCommand("add task1");
@@ -145,6 +149,7 @@ public class TestSystem {
 	 * followed by passing the result task to storage and test whether the result stored is correct or not
 	 * add task1 before testing
 	 */
+	//@@author A0108355H
 	@Test
 	public void testLogicParserStorageEditOne() throws Exception {
         Command commandObject = parserObj.parseCommand("add task1");
@@ -172,6 +177,7 @@ public class TestSystem {
 	 * followed by passing the result task to storage and test whether the result stored is correct or not
 	 * add task1,task2,task3 before testing
 	 */
+	//@@author A0108355H
 	@Test
 	public void testLogicParserStorageEditTwo() throws Exception {
         Command commandObject = parserObj.parseCommand("add task1");

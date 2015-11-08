@@ -35,6 +35,7 @@ public class TestJsonFormatStorage {
 	ArrayList<Task> result ;
 	String TEST_ITEMS = "item11\nitem12\nitem13\n";
 
+	//@@author A0108355H
 	@Before
 	public void setup(){
 		try {
@@ -65,6 +66,7 @@ public class TestJsonFormatStorage {
 	
 	}
 
+	//@@author A0108355H
 	@Test
 	public void testWriteItemList() throws IOException{
 	//Task newTask = new Task("item 1");
@@ -72,12 +74,14 @@ public class TestJsonFormatStorage {
 		assertEquals(true, message);
 	}
 
+	//@@author A0108355H
 	@Test
 	public void testSaveFileToPath() throws IOException{
 		boolean message = storageObject.saveFileToPath("newsave.txt");
 		assertEquals(true, message);
 	}
 
+	//@@author A0108355H
 	@Test
 	public void testGetItemList() throws IOException{
 		ArrayList<Task> message = storageObject.getItemList();
@@ -90,6 +94,7 @@ public class TestJsonFormatStorage {
 		assertEquals(TEST_ITEMS, resultStr);
 	}
 
+	//@@author A0108355H
 	@After
 	public void cleanup(){
 		File saveFile = new File("save.txt");
