@@ -528,7 +528,7 @@ public class UI {
 			displayAreaPanel.add(createInvisibleJPanel(INVISIBLE_JPANEL_WIDTH,
 					INVISIBLE_JPANEL_HEIGHT));
 		}
-		helpText.setText(HELP_MESSAGE);
+		helpText.setText("");
 		displayAreaPanel.add(helpText);	
 		
 		displayAreaPanel.revalidate();
