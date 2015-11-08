@@ -13,6 +13,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -115,7 +116,7 @@ public class UI {
 		"undo      undo\n" +
 		"redo      redo\n" +
 		"saveto    saveto new_file.txt\n" +
-		"exit      exit\n";
+		"exit      exit";
 
 	
 	public enum DisplayType {
@@ -130,13 +131,15 @@ public class UI {
 	private JScrollPane displayAreaScrollPane = new JScrollPane(displayAreaPanel);
 	private JLabel promptLabel = new JLabel(DEFAULT_PROMPT, PROMPT_LABEL_CHAR_COUNT);
 	private JTextField userInputField = new JTextField(USER_INPUT_FIELD_CHAR_COUNT);
+	private JTextArea HelpText = createJTextAreaWithMonospaceFont();
 	private StatusBar statusBar = new StatusBar();
 	
 	private TextFormatter taskListFormatter = new TextFormatter();
 	private UserInputHistory userInputHistory = new UserInputHistory();
 	
 	private boolean isTableTitleVisible = true;
-
+	private boolean isHelp = false;
+	
 	private final boolean useJTable = true;
 	
 	/*
@@ -266,6 +269,8 @@ public class UI {
 
 	//@@author A0134155M
 	private void prepareUserInput() {
+		
+		
 		userInputField.setEditable(false);
 		userInputField.setColumns(USER_INPUT_FIELD_CHAR_COUNT);
 		
@@ -342,7 +347,14 @@ public class UI {
 		@SuppressWarnings("serial")
 		Action displayHelp = new AbstractAction() {
 			public void actionPerformed(ActionEvent e) {
-				showToUser(HELP_MESSAGE);
+				if(isHelp == false){
+					redrawHelp();
+				isHelp = true;
+				} else if (isHelp == true){
+				//	System.out.println("true");
+					redrawHelp();
+					isHelp = false;
+				}
 			}
 		};
 		userInputField.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_F1, 0), displayHelp);
@@ -359,6 +371,32 @@ public class UI {
 		
 		displayAreaPanel.revalidate();
 		displayAreaPanel.repaint();
+	}
+	
+	private void redrawHelp() {
+        Component[] currentComponents = displayAreaPanel.getComponents();
+		
+        if(isHelp == false) {
+		for (Component component : currentComponents) {
+				component.setVisible(false);
+		}		
+		HelpText.setVisible(true);
+		HelpText.setText(HELP_MESSAGE);
+        }
+        
+        if(isHelp == true) {
+        	
+        	//HelpText.setVisible(false);
+	    for (Component component : currentComponents) {
+				component.setVisible(true);
+		}
+	    
+	   HelpText.setText("");
+	//   displayAreaPanel.remove(HelpText);	
+        }
+    	displayAreaPanel.revalidate();
+		displayAreaPanel.repaint();
+		
 	}
 	
 	//@@author A0134155M
@@ -480,7 +518,8 @@ public class UI {
 
 		VerticalLayout displayAreaPanelLayout = (VerticalLayout) displayAreaPanel.getLayout();
 		displayAreaPanelLayout.resetLayout();
-		
+	
+	
 		for (String filter : filters) {
 			JLabel label = new JLabel(filter);
 			displayAreaPanel.add(label);
@@ -496,6 +535,8 @@ public class UI {
 			displayAreaPanel.add(createInvisibleJPanel(INVISIBLE_JPANEL_WIDTH,
 					INVISIBLE_JPANEL_HEIGHT));
 		}
+		HelpText.setText(HELP_MESSAGE);
+		displayAreaPanel.add(HelpText);	
 		
 		displayAreaPanel.revalidate();
 		displayAreaPanel.repaint();
@@ -503,8 +544,10 @@ public class UI {
 		return true;
 	}
 	
+	
 	//@@author A0134155M
 	private boolean showToUserDefaultTable(TaskTableModel[] tableModels, List<String> titles) {
+
 		assert tableModels.length <= titles.size();
 		displayAreaPanel.removeAll();
 
@@ -539,7 +582,11 @@ public class UI {
 			displayAreaPanel.add(createInvisibleJPanel(INVISIBLE_JPANEL_WIDTH,
 					INVISIBLE_JPANEL_HEIGHT));
 		}
-	
+		
+		HelpText.setText("");
+		HelpText.setVisible(true);
+		displayAreaPanel.add(HelpText);
+
 		displayAreaPanel.revalidate();
 		displayAreaPanel.repaint();
 
@@ -561,6 +608,7 @@ public class UI {
 				DISPLAY_AREA_FONT_SIZE));
 		return textArea;
 	}
+	
 
 	//@@author A0134155M
 	/**
@@ -569,6 +617,7 @@ public class UI {
 	 * @return true if successful
 	 */
 	public boolean showTasks(List<Task> tasks, DisplayType displayType, List<String> titles) {
+
 		int minTable = -1;
 		int minRowCountPerTable = -1;
 		if (displayType == DisplayType.DEFAULT) {
