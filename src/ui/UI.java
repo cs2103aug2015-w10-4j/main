@@ -519,7 +519,7 @@ public class UI {
 		VerticalLayout displayAreaPanelLayout = (VerticalLayout) displayAreaPanel.getLayout();
 		displayAreaPanelLayout.resetLayout();
 	
-	
+		
 		for (String filter : filters) {
 			JLabel label = new JLabel(filter);
 			displayAreaPanel.add(label);
@@ -535,7 +535,7 @@ public class UI {
 			displayAreaPanel.add(createInvisibleJPanel(INVISIBLE_JPANEL_WIDTH,
 					INVISIBLE_JPANEL_HEIGHT));
 		}
-		HelpText.setText(HELP_MESSAGE);
+		HelpText.setText("");
 		displayAreaPanel.add(HelpText);	
 		
 		displayAreaPanel.revalidate();
