@@ -1142,9 +1142,9 @@ public class Logic {
 			addTitleForDate(listOfSecondDate, listOfTitles);
 			
 			if (listOfFloating.size() != 0) {
-				listOfTitles.add("Other tasks");
+				listOfTitles.add("Other Tasks");
 			} else {
-				listOfTitles.add("No other tasks");
+				listOfTitles.add("No Other Tasks");
 			}
 			
 			return UIObject.showTasks(listOfShownTasks, DisplayType.DEFAULT, listOfTitles);
@@ -1321,7 +1321,7 @@ public class Logic {
 			addTitleForDateHelper(listOfTitles, curDate, curMonth, curYear,
 					curItemDate, curItemMonth, curItemYear);
 		} else {
-			listOfTitles.add("No upcoming tasks");
+			listOfTitles.add("No Upcoming Tasks");
 		}
 	}
 
