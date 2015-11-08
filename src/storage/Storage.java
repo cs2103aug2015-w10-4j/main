@@ -45,7 +45,7 @@ public interface Storage {
 			String currentLine;
 			br = new BufferedReader(new FileReader(HELP_PATH));
 			while ((currentLine = br.readLine()) != null) {
-				mainStr += currentLine + "\n";
+				mainStr += currentLine + LINE_SEPARATOR;
 			}
 			br.close();
 		} catch (IOException e) {

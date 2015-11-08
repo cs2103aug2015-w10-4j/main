@@ -169,7 +169,7 @@ public class TestSystem {
 		resultStr = message.get(0).getAllInfo();
 		
 			
-		assertEquals("Name: homework Starting time: null Ending Time: java.util.GregorianCalendar[time=?,areFieldsSet=false,areAllFieldsSet=false,lenient=true,zone=sun.util.calendar.ZoneInfo[id=\"Asia/Singapore\",offset=28800000,dstSavings=0,useDaylight=false,transitions=9,lastRule=null],firstDayOfWeek=1,minimalDaysInFirstWeek=1,ERA=?,YEAR=2015,MONTH=10,WEEK_OF_YEAR=?,WEEK_OF_MONTH=?,DAY_OF_MONTH=7,DAY_OF_YEAR=?,DAY_OF_WEEK=?,DAY_OF_WEEK_IN_MONTH=?,AM_PM=0,HOUR=0,HOUR_OF_DAY=0,MINUTE=0,SECOND=0,MILLISECOND=?,ZONE_OFFSET=?,DST_OFFSET=?] Location: nus  Period Interval: null Period Repeats null", resultStr);
+		assertEquals("Name: homework Starting time: null Ending Time: java.util.GregorianCalendar[time=?,areFieldsSet=false,areAllFieldsSet=false,lenient=true,zone=sun.util.calendar.ZoneInfo[id=\"GMT+08:00\",offset=28800000,dstSavings=0,useDaylight=false,transitions=0,lastRule=null],firstDayOfWeek=1,minimalDaysInFirstWeek=1,ERA=?,YEAR=2015,MONTH=10,WEEK_OF_YEAR=?,WEEK_OF_MONTH=?,DAY_OF_MONTH=17,DAY_OF_YEAR=?,DAY_OF_WEEK=?,DAY_OF_WEEK_IN_MONTH=?,AM_PM=1,HOUR=11,HOUR_OF_DAY=23,MINUTE=59,SECOND=0,MILLISECOND=?,ZONE_OFFSET=?,DST_OFFSET=?] Location: nus Period Interval: null Period Repeats null", resultStr);
 	}
 	
 	/*
@@ -211,7 +211,7 @@ public class TestSystem {
 			resultStr += message.get(i).getAllInfo() +" ";
 			}
 	
-		assertEquals("Name: homework next tuesday Starting time: null Ending Time: null Location: nus  Period Interval: null Period Repeats null Name: task2 Starting time: null Ending Time: null Location: null Period Interval: null Period Repeats null Name: task3 Starting time: null Ending Time: null Location: null Period Interval: null Period Repeats null ", resultStr);
+		assertEquals("Name: homework next tuesday Starting time: null Ending Time: null Location: nus Period Interval: null Period Repeats null Name: task2 Starting time: null Ending Time: null Location: null Period Interval: null Period Repeats null Name: task3 Starting time: null Ending Time: null Location: null Period Interval: null Period Repeats null ", resultStr);
 	}
 	
 	
@@ -246,7 +246,7 @@ public class TestSystem {
 		resultStr += message.get(i).getAllInfo() +" ";
 		}
 			
-		assertEquals("Name: homework Starting time: null Ending Time: java.util.GregorianCalendar[time=?,areFieldsSet=false,areAllFieldsSet=false,lenient=true,zone=sun.util.calendar.ZoneInfo[id=\"Asia/Singapore\",offset=28800000,dstSavings=0,useDaylight=false,transitions=9,lastRule=null],firstDayOfWeek=1,minimalDaysInFirstWeek=1,ERA=?,YEAR=2015,MONTH=10,WEEK_OF_YEAR=?,WEEK_OF_MONTH=?,DAY_OF_MONTH=7,DAY_OF_YEAR=?,DAY_OF_WEEK=?,DAY_OF_WEEK_IN_MONTH=?,AM_PM=0,HOUR=0,HOUR_OF_DAY=0,MINUTE=0,SECOND=0,MILLISECOND=?,ZONE_OFFSET=?,DST_OFFSET=?] Location: nus  Period Interval: null Period Repeats null Name: task2 Starting time: null Ending Time: null Location: null Period Interval: null Period Repeats null Name: task3 Starting time: null Ending Time: null Location: null Period Interval: null Period Repeats null ", resultStr);
+		assertEquals("Name: homework Starting time: null Ending Time: java.util.GregorianCalendar[time=?,areFieldsSet=false,areAllFieldsSet=false,lenient=true,zone=sun.util.calendar.ZoneInfo[id=\"GMT+08:00\",offset=28800000,dstSavings=0,useDaylight=false,transitions=0,lastRule=null],firstDayOfWeek=1,minimalDaysInFirstWeek=1,ERA=?,YEAR=2015,MONTH=10,WEEK_OF_YEAR=?,WEEK_OF_MONTH=?,DAY_OF_MONTH=17,DAY_OF_YEAR=?,DAY_OF_WEEK=?,DAY_OF_WEEK_IN_MONTH=?,AM_PM=1,HOUR=11,HOUR_OF_DAY=23,MINUTE=59,SECOND=0,MILLISECOND=?,ZONE_OFFSET=?,DST_OFFSET=?] Location: nus Period Interval: null Period Repeats null Name: task2 Starting time: null Ending Time: null Location: null Period Interval: null Period Repeats null Name: task3 Starting time: null Ending Time: null Location: null Period Interval: null Period Repeats null ", resultStr);
 	}
 	
 	/*
