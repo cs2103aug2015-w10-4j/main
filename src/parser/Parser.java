@@ -458,6 +458,7 @@ public class Parser {
 		return false;
 	}
 
+	//@@author A0124093M
 	boolean extractDate(String commandString,
 			ArrayList<KeywordMarker> keywordMarkers, Task taskObject, boolean isNewTask) throws Exception {
 		// check deadline
@@ -521,6 +522,7 @@ public class Parser {
 
 	// if time not specified, it will be parsed to 11:59 PM
 	// TIME keyword in commandString must be capitalized
+	//@@author A0124093M
 	Calendar parseTime(String[] dateArgumentsTemp) throws Exception {
 		logger.fine("parseDate: parsing date");
 		int date, month, year, hour = 11, minute = 59, isAMorPM = 1;
@@ -745,7 +747,8 @@ public class Parser {
 		helperDate.set(Calendar.MINUTE, minute);
 		return helperDate;
 	}
-
+	
+	//@@author A0124093M
 	private int extractDate(String dateArgument) throws Exception {
 		int date = Integer.parseInt(dateArgument);
 		if (date < 0 || date > 31){
@@ -834,6 +837,7 @@ public class Parser {
 	 * Method created to search for TIME keywords. Can't use hasKeyword since 
 	 * the keyword is concatenated with the time itself, e.g. '6pm' instead of '6 pm'
 	*/
+	//@@author A0124093M
 	boolean hasTimeKeyword(String[] words, String[] keywords) {
 		for (int i = 0; i < words.length; i++) {
 			for (int n = 0; n < keywords.length; n++) {
@@ -948,7 +952,7 @@ public class Parser {
 	 * @return
 	 * @throws Exception
 	 */
-	ArrayList<KeywordMarker> getArrayOfKeywordMarkers(
+	ArrayList<KeywordMarker> getArrayOfKeywordMarkers (
 			String commandString) throws Exception {
 		ArrayList<KeywordMarker> keywordMarkerList = new ArrayList<KeywordMarker>();
 		getLocationField(keywordMarkerList, commandString);

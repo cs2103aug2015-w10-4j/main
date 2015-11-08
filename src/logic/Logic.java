@@ -1100,6 +1100,7 @@ public class Logic {
 			
 			ArrayList<Task> listOfFirstDate = new ArrayList<Task>();
 			ArrayList<Task> listOfSecondDate = new ArrayList<Task>();
+			//@@author A0124093M
 			if (listOfEventsDeadlines.size() != 0) {
 				Task firstTask;
 				Calendar todayDate = new GregorianCalendar();

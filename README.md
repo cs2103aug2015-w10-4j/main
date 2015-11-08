@@ -127,25 +127,22 @@ This is an example to mark task 1 that is showing on the screen completed, to vi
        
 This is an example to search any tasks that contain "task" in their name.
 
-noted we allowed multiple level of searching. for e.g. after the first search
+Multiple keywords can also be specified for a more precise filter, for e.g.
 
-1. task1 loc nus
-2. task2 loc home
-3. task3 loc school
+		search task
+		search 456
+		
+will only display tasks containing both keywords “task” and “456”.
+You can also filter the search by specific fields like date, loc etc.
 
-is displaying on the screen
+		search by today
 
-key in "search loc home"
+Will display tasks that are due today.
 
-1.task2 loc home 
+		search loc home
 
-will be shown on the screen
+Will display tasks that have the location “home”.
 
-we also allowed user to search according to time. for e.g.
-
-        search by today
-        
-tasks that due by today will be shown on the screen
 
 
 ## Exiting the program
