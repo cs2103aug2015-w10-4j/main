@@ -214,11 +214,13 @@ public class Task implements Comparable<Task> {
 		return true;
 	}
 
+	//@@author A0124093M
 	public boolean setPeriodicInterval(String periodicInterval) {
 		this.periodicInterval = periodicInterval;
 		return true;
 	}
-
+	 	
+	//@@author A0124093M
 	public boolean setPeriodicRepeats(String periodicInstances) {
 		this.periodicRepeats = periodicInstances;
 		return true;
