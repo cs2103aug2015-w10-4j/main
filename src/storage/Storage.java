@@ -39,7 +39,7 @@ public interface Storage {
 	
 	//@@author A0124093M
 	public default String getHelpMessage() {
-		BufferedReader br = null;
+		BufferedReader br;
 		String mainStr = "";
 		try {
 			String currentLine;
@@ -52,7 +52,6 @@ public interface Storage {
 			return ERROR_HELP;
 		}
 		return mainStr;
-
 	}
 	
 }
