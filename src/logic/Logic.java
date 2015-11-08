@@ -1108,7 +1108,8 @@ public class Logic {
 				int i = 0;
 				
 				boolean hasFirstDate = false;
-				while (!hasFirstDate) {
+				
+				while (i < listOfEventsDeadlines.size() && !hasFirstDate) {
 					// prepare first task in the list for comparison
 					firstTask = listOfEventsDeadlines.get(i);
 					firstDate = firstTask.getTime();

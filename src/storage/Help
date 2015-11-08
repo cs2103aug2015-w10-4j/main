@@ -1,6 +1,6 @@
 Commands  	Description											Example usage
 add       	Create new task entry with optional fields:			add task123
-			-Deadline 'by'/'from...to'/'start...end'			add task123 by tomorrow 6PM
+			-Deadline: 'by'/'from...to'/'start...end'			add task123 by tomorrow 6PM
 			-Location: 'at'/'loc'								add task123 at playground
 			-Periodic: 'every n days/weeks/years for n times'	add task123 by next thursday every 3 weeks for 10 times
 			

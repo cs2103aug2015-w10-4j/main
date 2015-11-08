@@ -187,6 +187,7 @@ public class Parser {
 	 * @param command
 	 * @return commandObject to be executed, or null if invalid
 	 */
+	//@@author A0124093M
 	public Command parseCommand(String commandString) throws Exception {
 		commandString = commandString.trim();
 		Command.Type commandType = identifyType(commandString);

@@ -1,26 +1,18 @@
 package storage;
 
-import java.io.File;
+import global.Task;
+
+import java.io.BufferedReader;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Scanner;
-
-import global.Task;
 
 public interface Storage {
 	static final String LINE_SEPARATOR = System.getProperty("line.separator");
-	static final String HELP_MESSAGE = "" +
-			"Commands  Example usage\n" +
-			"add       add task123 date 11 sep 2015\n" +
-			"display   display\n" +
-			"edit      edit 1 task456 date 12 sep 2015\n" +
-			"delete    delete 1\n" +
-			"search    search task123\n" +
-			"undo      undo\n" +
-			"redo      redo\n" +
-			"saveto    saveto new_file.txt\n" +
-			"exit      exit\n";
+	static final String HELP_PATH = "help.txt";
+	static final String ERROR_HELP = "Unable to retrieve help file!";
+
 	/**
 	 * Saves the list of tasks in the file
 	 * @param ArrayList<Task> ArrayList that stores the RAW tasks as Strings in text file
@@ -45,8 +37,22 @@ public interface Storage {
 	 */
 	public ArrayList<Task> getItemList() throws FileNotFoundException;
 	
-	public default String getHelpMessage()  {
-		return HELP_MESSAGE;
+	//@@author A0124093M
+	public default String getHelpMessage() {
+		BufferedReader br = null;
+		String mainStr = "";
+		try {
+			String currentLine;
+			br = new BufferedReader(new FileReader(HELP_PATH));
+			while ((currentLine = br.readLine()) != null) {
+				mainStr += currentLine + "\n";
+			}
+			br.close();
+		} catch (IOException e) {
+			return ERROR_HELP;
+		}
+		return mainStr;
+
 	}
 	
 }

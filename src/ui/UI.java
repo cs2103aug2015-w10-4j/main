@@ -60,8 +60,8 @@ public class UI {
 	 */
 	private Logger logger = Logger.getGlobal();
 	
-	private static final int DEFAULT_WIDTH = 480;
-	private static final int DEFAULT_HEIGHT = 320;
+	private static final int DEFAULT_WIDTH = 800;
+	private static final int DEFAULT_HEIGHT = 480;
 	private static final int USER_INPUT_FIELD_CHAR_COUNT = 50;
 	private static final int PROMPT_LABEL_CHAR_COUNT = 10;
 	
