@@ -16,6 +16,7 @@ public interface Storage {
 			"display   display\n" +
 			"edit      edit 1 task456 date 12 sep 2015\n" +
 			"delete    delete 1\n" +
+			"search    search task123\n" +
 			"undo      undo\n" +
 			"redo      redo\n" +
 			"saveto    saveto new_file.txt\n" +

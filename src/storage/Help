@@ -1,10 +1,25 @@
-Commands  Example usage
-add       add task123 date 11 sep 2015
-display   display
-edit      edit 1 task456 date 12 sep 2015
-delete    delete 1
-undo      undo
-redo      redo
-saveto    saveto new_file.txt
-exit      exit
+Commands  	Description											Example usage
+add       	Create new task entry with optional fields:			add task123
+			-Deadline 'by'/'from...to'/'start...end'			add task123 by tomorrow 6PM
+			-Location: 'at'/'loc'								add task123 at playground
+			-Periodic: 'every n days/weeks/years for n times'	add task123 by next thursday every 3 weeks for 10 times
+			
+display   	Display the default view of Tasky					display
+
+edit      	Edit task entry at specified index					edit 1 task456 from 12 sep to 15 sep
+																edit 1 at town
+
+delete    	Delete task entry at specific index					delete 1
+
+search		Search for a task with the specified keyword		search task456
+			or field+value										search loc home
+																search by 18 sep
+			
+undo      	Undo previous add, edit or delete					undo
+
+redo      	Redo previous add, edit or delete					redo
+
+saveto    	Specify the path of the savefile					saveto new_file.txt
+
+exit      	Exits the program									exit
 
