@@ -131,7 +131,7 @@ public class UI {
 	private JScrollPane displayAreaScrollPane = new JScrollPane(displayAreaPanel);
 	private JLabel promptLabel = new JLabel(DEFAULT_PROMPT, PROMPT_LABEL_CHAR_COUNT);
 	private JTextField userInputField = new JTextField(USER_INPUT_FIELD_CHAR_COUNT);
-	private JTextArea HelpText = createJTextAreaWithMonospaceFont();
+	private JTextArea helpText = createJTextAreaWithMonospaceFont();
 	private StatusBar statusBar = new StatusBar();
 	
 	private TextFormatter taskListFormatter = new TextFormatter();
@@ -337,8 +337,10 @@ public class UI {
 		@SuppressWarnings("serial")
 		Action toggleHeaderVisibility = new AbstractAction() {
 			public void actionPerformed(ActionEvent e) {
-				isTableTitleVisible ^= true;
-				redrawDisplayAreaPanel();
+				if (!isHelp) {
+					isTableTitleVisible ^= true;
+					redrawDisplayAreaPanel();
+				}
 			}
 		};
 		userInputField.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_F2, 0), 
@@ -347,14 +349,7 @@ public class UI {
 		@SuppressWarnings("serial")
 		Action displayHelp = new AbstractAction() {
 			public void actionPerformed(ActionEvent e) {
-				if(isHelp == false){
-					redrawHelp();
-				isHelp = true;
-				} else if (isHelp == true){
-				//	System.out.println("true");
-					redrawHelp();
-					isHelp = false;
-				}
+				redrawHelp();
 			}
 		};
 		userInputField.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_F1, 0), displayHelp);
@@ -376,25 +371,23 @@ public class UI {
 	private void redrawHelp() {
         Component[] currentComponents = displayAreaPanel.getComponents();
 		
-        if(isHelp == false) {
-		for (Component component : currentComponents) {
+		if (isHelp == false) {
+			for (Component component : currentComponents) {
 				component.setVisible(false);
-		}		
-		HelpText.setVisible(true);
-		HelpText.setText(HELP_MESSAGE);
-        }
-        
-        if(isHelp == true) {
+			}
+			helpText.setVisible(true);
+			helpText.setText(HELP_MESSAGE);
+			isHelp = true;
+		} else {
         	
-        	//HelpText.setVisible(false);
-	    for (Component component : currentComponents) {
+			for (Component component : currentComponents) {
 				component.setVisible(true);
+			}
+
+			helpText.setText("");
+			isHelp = false;
 		}
-	    
-	   HelpText.setText("");
-	//   displayAreaPanel.remove(HelpText);	
-        }
-    	displayAreaPanel.revalidate();
+		displayAreaPanel.revalidate();
 		displayAreaPanel.repaint();
 		
 	}
@@ -535,8 +528,8 @@ public class UI {
 			displayAreaPanel.add(createInvisibleJPanel(INVISIBLE_JPANEL_WIDTH,
 					INVISIBLE_JPANEL_HEIGHT));
 		}
-		HelpText.setText(HELP_MESSAGE);
-		displayAreaPanel.add(HelpText);	
+		helpText.setText(HELP_MESSAGE);
+		displayAreaPanel.add(helpText);	
 		
 		displayAreaPanel.revalidate();
 		displayAreaPanel.repaint();
@@ -583,9 +576,9 @@ public class UI {
 					INVISIBLE_JPANEL_HEIGHT));
 		}
 		
-		HelpText.setText("");
-		HelpText.setVisible(true);
-		displayAreaPanel.add(HelpText);
+		helpText.setText("");
+		helpText.setVisible(true);
+		displayAreaPanel.add(helpText);
 
 		displayAreaPanel.revalidate();
 		displayAreaPanel.repaint();
