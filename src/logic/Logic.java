@@ -121,7 +121,7 @@ public class Logic {
 	private static final String MESSAGE_SUCCESS_CHANGE_FILE_PATH = "File path successfully changed.";
 	private static final String MESSAGE_SUCCESS_NO_CHANGE_FILE_PATH = "File path not changed. Entered file path is the same as current one used.";
 	private static final String MESSAGE_DISPLAY_EMPTY = "No items to display.";
-	private static final String MESSAGE_SUCCESS_HELP = "Showing help message.";
+	private static final String MESSAGE_SUCCESS_HELP = "Toggling help message.";
 	private static final String IDENTIFIER_ALL = "all";
 	private static final String ERROR_WRITING_FILE = "Error: Unable to write file.";
 	private static final String ERROR_CREATING_FILE = "Error: Unable to create file.";
@@ -143,6 +143,8 @@ public class Logic {
 	private static final String WARNING_TIMING_CLASH = "WARNING: There are clashing timings between tasks.";
 	
 	private static final String WHITE_SPACE_REGEX = "\\s+";
+	
+	private boolean isHelpDisplayed = false;
 
 	/*
 	 * Main program
@@ -282,7 +284,7 @@ public class Logic {
 				String executionResult = executeCommand(commandObject, true,
 						true);
 				UIObject.showStatusToUser(executionResult);
-				if (commandObject.getCommandType() == Command.Type.HELP) {
+				if (commandObject.getCommandType() == Command.Type.HELP && isHelpDisplayed) {
 					showHelpMessage();
 				} else {
 					showUpdatedItems();
@@ -415,6 +417,7 @@ public class Logic {
 					logger.info("SEARCH command detected");
 					return addSearchFilter(userTasks);
 				case HELP:
+					toggleHelpDisplay();
 					return MESSAGE_SUCCESS_HELP;
 				case ALIAS:
 					logger.info("ALIAS command detected");
@@ -426,6 +429,10 @@ public class Logic {
 		}
 	}
 	
+	private void toggleHelpDisplay() {
+		isHelpDisplayed ^= true;
+	}
+
 	/**
 	 * Concatenates the newAlias to the current property value associated with
 	 * the key propertyType in propObject

@@ -107,18 +107,6 @@ public class UI {
 	
 	private static final int SCROLL_SPEED = 10;
 	
-	private static final String HELP_MESSAGE = "" +
-		"Commands  Example usage\n" +
-		"add       add task123 date 11 sep 2015\n" +
-		"display   display\n" +
-		"edit      edit 1 task456 date 12 sep 2015\n" +
-		"delete    delete 1\n" +
-		"undo      undo\n" +
-		"redo      redo\n" +
-		"saveto    saveto new_file.txt\n" +
-		"exit      exit";
-
-	
 	public enum DisplayType {
 		DEFAULT, FILTERED
 	}
@@ -131,15 +119,13 @@ public class UI {
 	private JScrollPane displayAreaScrollPane = new JScrollPane(displayAreaPanel);
 	private JLabel promptLabel = new JLabel(DEFAULT_PROMPT, PROMPT_LABEL_CHAR_COUNT);
 	private JTextField userInputField = new JTextField(USER_INPUT_FIELD_CHAR_COUNT);
-	private JTextArea helpText = createJTextAreaWithMonospaceFont();
 	private StatusBar statusBar = new StatusBar();
 	
 	private TextFormatter taskListFormatter = new TextFormatter();
 	private UserInputHistory userInputHistory = new UserInputHistory();
 	
 	private boolean isTableTitleVisible = true;
-	private boolean isHelp = false;
-	
+
 	private final boolean useJTable = true;
 	
 	/*
@@ -269,8 +255,6 @@ public class UI {
 
 	//@@author A0134155M
 	private void prepareUserInput() {
-		
-		
 		userInputField.setEditable(false);
 		userInputField.setColumns(USER_INPUT_FIELD_CHAR_COUNT);
 		
@@ -337,10 +321,8 @@ public class UI {
 		@SuppressWarnings("serial")
 		Action toggleHeaderVisibility = new AbstractAction() {
 			public void actionPerformed(ActionEvent e) {
-				if (!isHelp) {
-					isTableTitleVisible ^= true;
-					redrawDisplayAreaPanel();
-				}
+				isTableTitleVisible ^= true;
+				redrawDisplayAreaPanel();
 			}
 		};
 		userInputField.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_F2, 0), 
@@ -349,7 +331,10 @@ public class UI {
 		@SuppressWarnings("serial")
 		Action displayHelp = new AbstractAction() {
 			public void actionPerformed(ActionEvent e) {
-				redrawHelp();
+				userInputField.setText("help");
+				synchronized (userInputField) {
+					userInputField.notify();
+				}
 			}
 		};
 		userInputField.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_F1, 0), displayHelp);
@@ -366,30 +351,6 @@ public class UI {
 		
 		displayAreaPanel.revalidate();
 		displayAreaPanel.repaint();
-	}
-	//@@author A0108355H
-	private void redrawHelp() {
-        Component[] currentComponents = displayAreaPanel.getComponents();
-		
-		if (isHelp == false) {
-			for (Component component : currentComponents) {
-				component.setVisible(false);
-			}
-			helpText.setVisible(true);
-			helpText.setText(HELP_MESSAGE);
-			isHelp = true;
-		} else {
-        	
-			for (Component component : currentComponents) {
-				component.setVisible(true);
-			}
-
-			helpText.setText("");
-			isHelp = false;
-		}
-		displayAreaPanel.revalidate();
-		displayAreaPanel.repaint();
-		
 	}
 	
 	//@@author A0134155M
@@ -528,9 +489,7 @@ public class UI {
 			displayAreaPanel.add(createInvisibleJPanel(INVISIBLE_JPANEL_WIDTH,
 					INVISIBLE_JPANEL_HEIGHT));
 		}
-		helpText.setText("");
-		displayAreaPanel.add(helpText);	
-		
+
 		displayAreaPanel.revalidate();
 		displayAreaPanel.repaint();
 
@@ -575,10 +534,6 @@ public class UI {
 			displayAreaPanel.add(createInvisibleJPanel(INVISIBLE_JPANEL_WIDTH,
 					INVISIBLE_JPANEL_HEIGHT));
 		}
-		
-		helpText.setText("");
-		helpText.setVisible(true);
-		displayAreaPanel.add(helpText);
 
 		displayAreaPanel.revalidate();
 		displayAreaPanel.repaint();
