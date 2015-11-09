@@ -133,6 +133,8 @@ public class Logic {
 	private static final String ERROR_CREATING_FILE = "Error: Unable to create file.";
 	private static final String ERROR_FILE_NOT_FOUND = "Error: Data file not found.";
 	private static final String ERROR_LOG_FILE_INITIALIZE = "Error: Cannot initialize log file.";
+	private static final String ERROR_READ_CONFIG_FILE = "Error: Cannot read from configuration file.";
+	private static final String ERROR_CREATE_CONFIG_FILE = "Error: Cannot create configuration file.";
 	private static final String ERROR_INVALID_ARGUMENT = "Error: Invalid argument for command.";
 	private static final String ERROR_INVALID_COMMAND = "Error: Invalid command.";
 	private static final String ERROR_NO_COMMAND_HANDLER = "Error: Handler for this command type has not been defined.";
@@ -185,13 +187,32 @@ public class Logic {
 		propObject = new Properties();
 	}
 
-	void initializeConfigFile() throws FileNotFoundException,
-			IOException {
+	/**
+	 * Checks if there is an existing configuration file.
+	 * 
+	 * If there is, it assumes that the config file has not been incorrectly modified
+	 * and reads from it
+	 * 
+	 * Else, create a config file with default settings
+	 * 
+	 * At the end of this method, the latest properties should be set
+	 * 
+	 * @throws Exception with the respective status message
+	 */
+	void initializeConfigFile() throws Exception {
 		File configFile = new File(CONFIG_FILE_NAME);
-		if (configFile.exists()) { // assumes that the config file has not been incorrectly modified
-			readConfigFile();
+		if (configFile.exists()) {
+			try {
+				readConfigFile();
+			} catch (IOException e) {
+				throw new Exception(ERROR_READ_CONFIG_FILE);
+			}
 		} else {
-			createAndWriteConfigFile(configFile);
+			try {
+				createAndWriteConfigFile(configFile);
+			} catch (IOException e) {
+				throw new Exception(ERROR_CREATE_CONFIG_FILE);
+			}
 		}
 		setReadConfig();
 	}
@@ -200,7 +221,7 @@ public class Logic {
 		storageObject.saveFileToPath(propObject.getProperty(PROPERTY_KEY_SAVE_FILE));
 		String logLevelString = propObject.getProperty(PROPERTY_KEY_LOGGING_LEVEL);
 		displaySize = Integer.parseInt(propObject.getProperty(PROPERTY_KEY_DISPLAY_SIZE));
-		addAllConfigAlias(); 
+		addAllConfigAliasToParser(); 
 		switch (logLevelString) {
 			case "WARNING":
 				logger.setLevel(Level.WARNING);
@@ -262,7 +283,7 @@ public class Logic {
 	 * Add the alias lists read from the config file to the parser
 	 * @return
 	 */
-	void addAllConfigAlias(){
+	void addAllConfigAliasToParser(){
 		for (int i = 0; i < listOfDefaultKeywords.length
 				&& i < PROPERTY_KEY_ALIAS_LIST.length; i++) {
 			addConfigAlias(listOfDefaultKeywords[i],
