@@ -11,19 +11,14 @@ import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.logging.Logger;
 
-import logic.Logic;
-import storage.Storage;
-
 /**
- * To allow parser to parse a new field for task,
- * 1. Add to enum FieldType
- * 2. Define an array of keywords to identify field
- * 3. Define a new get<newfield>Field which adds a KeywordMarker to the list
- * and execute it in getArrayOfKeywordIndexes
- * 4. Define a new extract<newfield> method to handle parsing of arguments
- * and execute it in extractTaskInformation
- * Use getArgumentForField to retrieve the array of argument words
- *
+ * This class contains the parser class which the logic passes user commands to,
+ * to produce a command for execution.
+ * 
+ * It primarily provides 2 APIs to the Logic: parseCommand and addAlias.
+ * 
+ * If there are errors while parsing the user command using the parseCommand API,
+ * it will throw an Exception with the appropriate status message.
  */
 public class Parser {
     

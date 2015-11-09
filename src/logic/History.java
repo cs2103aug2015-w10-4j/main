@@ -6,6 +6,9 @@ import java.util.logging.Logger;
 
 import parser.Parser;
 
+/**
+ * This file contains the history class in which the Logic pushes its reversed command to
+ */
 public class History {
     Logger logger = Logger.getGlobal();
     ArrayList<Command> commandHistoryList  = new ArrayList<Command>();
