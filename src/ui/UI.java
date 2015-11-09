@@ -388,13 +388,13 @@ public class UI {
 		});
 	}
 
+	//@@author A0134155M
 	/**
 	 * Prompt message and obtain user input
 	 * @param prompt message to prompt user
 	 * @return userInput
 	 * @throws InterruptedException
 	 */
-	//@@author A0134155M
 	public String promptUser(String prompt) throws InterruptedException {
 		logger.info("Entering promptUser(prompt = " + prompt + ")");
 		
