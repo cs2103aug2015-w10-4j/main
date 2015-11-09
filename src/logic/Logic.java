@@ -271,7 +271,6 @@ public class Logic {
 	
 	 /**
 	  * Sets the empty string for all the alias properties
-	  * @return
 	  */
 	void setAllConfigAlias(){
 		for (int i = 0; i < PROPERTY_KEY_ALIAS_LIST.length; i++) {
@@ -281,7 +280,6 @@ public class Logic {
 	
 	/**
 	 * Add the alias lists read from the config file to the parser
-	 * @return
 	 */
 	void addAllConfigAliasToParser(){
 		for (int i = 0; i < listOfDefaultKeywords.length
@@ -295,7 +293,7 @@ public class Logic {
 	 * Adds the new aliasString to parser's list of command keywords
 	 * @param existingKeyword
 	 * @param aliasString
-	 * @return
+	 * @return true if added, false if unable to add
 	 */
 	boolean addConfigAlias(String existingKeyword, String aliasString){
 		String[] aliasWords = aliasString.split(SEPARATOR);
@@ -476,8 +474,8 @@ public class Logic {
 			}
 		}
 	}
-	//@@author
 	
+	//@@author A0134155M
 	void toggleHelpDisplay() {
 		isHelpDisplayed ^= true;
 	}

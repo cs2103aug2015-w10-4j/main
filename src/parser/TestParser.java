@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.GregorianCalendar;
 
 import org.junit.Before;
@@ -84,8 +85,8 @@ public class TestParser {
 	public void testParserEditNormal() throws Exception {
 		Command message;
 
-		message = parserObj.parseCommand("edit 1 task1 loc nus by next friday");
-		String actual = "Name: task1 Starting time: null Ending Time: java.util.GregorianCalendar[time=?,areFieldsSet=false,areAllFieldsSet=false,lenient=true,zone=sun.util.calendar.ZoneInfo[id=\"Asia/Singapore\",offset=28800000,dstSavings=0,useDaylight=false,transitions=9,lastRule=null],firstDayOfWeek=1,minimalDaysInFirstWeek=1,ERA=?,YEAR=2015,MONTH=10,WEEK_OF_YEAR=?,WEEK_OF_MONTH=?,DAY_OF_MONTH=13,DAY_OF_YEAR=?,DAY_OF_WEEK=?,DAY_OF_WEEK_IN_MONTH=?,AM_PM=0,HOUR=9,HOUR_OF_DAY=?,MINUTE=0,SECOND=?,MILLISECOND=?,ZONE_OFFSET=?,DST_OFFSET=?] Location: nus Period Interval: null Period Repeats null";
+		message = parserObj.parseCommand("edit 1 task1 loc nus by next friday"); // needs to change, next friday's always changes x.x
+		String actual = "Name: task1 Starting time: null Ending Time: java.util.GregorianCalendar[time=?,areFieldsSet=false,areAllFieldsSet=false,lenient=true,zone=sun.util.calendar.ZoneInfo[id=\"Asia/Singapore\",offset=28800000,dstSavings=0,useDaylight=false,transitions=9,lastRule=null],firstDayOfWeek=1,minimalDaysInFirstWeek=1,ERA=?,YEAR=2015,MONTH=10,WEEK_OF_YEAR=?,WEEK_OF_MONTH=?,DAY_OF_MONTH=13,DAY_OF_YEAR=?,DAY_OF_WEEK=?,DAY_OF_WEEK_IN_MONTH=?,AM_PM=1,HOUR=11,HOUR_OF_DAY=?,MINUTE=59,SECOND=?,MILLISECOND=?,ZONE_OFFSET=?,DST_OFFSET=?] Location: nus Period Interval: null Period Repeats null";
 				assertEquals(actual, message.getTask(0).getAllInfo());
 		
 	
@@ -157,12 +158,14 @@ public class TestParser {
 		Calendar expectedDate = new GregorianCalendar();
 		int year = expectedDate.get(Calendar.YEAR);
 		expectedDate.clear();
-		expectedDate.set(year, 8, 18);
+		expectedDate.set(2015, 8, 18);
+		expectedDate.set(Calendar.HOUR, 23);
+		expectedDate.set(Calendar.MINUTE, 59);
 		
 		String[] dateArgs = { "18", "sep", "2015"};
 		Calendar date = parserObj.parseTime(dateArgs);
 		
-		assertEquals(expectedDate,date);
+		assertEquals(expectedDate, date);
 		
 		
 		// this doesn't work because of milliseconds difference =.=
