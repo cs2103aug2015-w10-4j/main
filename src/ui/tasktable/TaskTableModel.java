@@ -70,8 +70,7 @@ public class TaskTableModel extends AbstractTableModel {
 	 * @return			Whether the task has been done or not.
 	 */
 	public boolean isTaskDone(int taskIndex) {
-		assert isDone[taskIndex] != null;
-		return isDone[taskIndex];
+		return isDone[taskIndex] != null ? isDone[taskIndex] : false;
 	}
 
 }

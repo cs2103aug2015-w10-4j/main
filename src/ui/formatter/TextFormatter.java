@@ -1,5 +1,7 @@
 package ui.formatter;
 
+import java.util.List;
+
 public class TextFormatter {
 
 	private static final String NULL_STRING_SUBSTITUTE = "";
@@ -11,22 +13,28 @@ public class TextFormatter {
 	private static final char HORIZONTAL_CHAR = '-';
 	private static final char VERTICAL_CHAR = '|';
 	
-	//@@author A0134155M-unused
+	//@@author A0134155M
 	/**
 	 * Format a given list of 3D Object array containing task data into a string table.
 	 * @param taskLists
 	 * @param lineCharLimit
 	 * @return string table containing all tasks data
 	 */
-	public String formatTaskList(Object[][][] taskLists, int lineCharLimit) {
-		//this is not used since text formatted table is not used anymore.
+	public String formatTaskList(Object[][][] taskLists, List<String> tableTitles, int lineCharLimit) {
 		if (isEmpty(taskLists)) {
 			return MESSAGE_DISPLAY_EMPTY;
 		}
 
 		StringBuilder result = new StringBuilder();
-		for (Object[][] taskList : taskLists) {
+		for (int taskListIndex = 0; taskListIndex < taskLists.length; taskListIndex++) {
+			Object[][] taskList = taskLists[taskListIndex];
 			ColumnInfo[] columnInfo = FormatterHelper.getColumnInfo(taskList, lineCharLimit);
+			
+			if (isValidIndex(tableTitles, taskListIndex)) {
+				String currentTableTitle = tableTitles.get(taskListIndex);
+				result.append(currentTableTitle);
+				result.append(MESSAGE_DISPLAY_NEWLINE);
+			}
 			
 			result.append(getRowSeparator(columnInfo));
 			result.append(getHeader(columnInfo));
@@ -43,9 +51,16 @@ public class TextFormatter {
 		return result.toString();
 	}
 
-	//@@author A0134155M-unused
+	private boolean isValidIndex(List<String> tableTitles, int taskListIndex) {
+		if (tableTitles == null) {
+			return false;
+		} else {
+			return 0 <= taskListIndex && taskListIndex < tableTitles.size();
+		}
+	}
+
+	//@@author A0134155M
 	private boolean isEmpty(Object[][][] taskLists) {
-		//this is not used since text formatted table is not used anymore.
 		int maxLength = 0;
 		for (Object[][] taskList : taskLists) {
 			if (taskList != null) {
@@ -55,9 +70,8 @@ public class TextFormatter {
 		return maxLength == 0;
 	}
 
-	//@@author A0134155M-unused
+	//@@author A0134155M
 	private String getTaskData(ColumnInfo[] columnInfo, Object[] task, int taskId, int lineCharLimit) {
-		//this is not used since text formatted table is not used anymore.
 		StringBuilder result = new StringBuilder();
 		
 		String[][] columnData = new String[columnInfo.length][];
@@ -93,9 +107,8 @@ public class TextFormatter {
 		return result.toString();
 	}
 
-	//@@author A0134155M-unused
+	//@@author A0134155M
 	private String getHeader(ColumnInfo[] columnInfo) {
-		//this is not used since text formatted table is not used anymore.
 		StringBuilder result = new StringBuilder();
 		
 		result.append(VERTICAL_CHAR);
@@ -110,9 +123,8 @@ public class TextFormatter {
 		return result.toString();
 	}
 
-	//@@author A0134155M-unused
+	//@@author A0134155M
 	private String getRowSeparator(ColumnInfo[] columnInfo) {
-		//this is not used since text formatted table is not used anymore.
 		StringBuilder result = new StringBuilder();
 		
 		result.append(INTERSECTION_CHAR);

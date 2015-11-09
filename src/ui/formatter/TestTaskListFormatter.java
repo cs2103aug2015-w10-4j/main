@@ -41,7 +41,7 @@ public class TestTaskListFormatter {
 		
 		Object[][][] taskListData = FormatterHelper.getTaskListData(taskList, false, 1, 0);
 
-		String result = formatter.formatTaskList(taskListData, ONE_BILLION);
+		String result = formatter.formatTaskList(taskListData, null, ONE_BILLION);
 		String expected = "+-----+--------------------------+----------------+----------------+----------+-------------+" + NEW_LINE
 				        + "| No. |       Description        | Starting Time  |  Ending Time   | Location |   Status    |" + NEW_LINE
 				        + "+-----+--------------------------+----------------+----------------+----------+-------------+" + NEW_LINE
@@ -67,7 +67,7 @@ public class TestTaskListFormatter {
 		
 		Object[][][] taskListData = FormatterHelper.getTaskListData(taskList, false, 1, 0);
 
-		String result = formatter.formatTaskList(taskListData, 30);
+		String result = formatter.formatTaskList(taskListData, null, 30);
 		String expected = "+-----+------------------------------+----------------+----------------+----------+-------------+" + NEW_LINE
 				        + "| No. |         Description          | Starting Time  |  Ending Time   | Location |   Status    |" + NEW_LINE
 				        + "+-----+------------------------------+----------------+----------------+----------+-------------+" + NEW_LINE

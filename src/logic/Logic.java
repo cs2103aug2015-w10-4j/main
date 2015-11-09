@@ -27,8 +27,10 @@ import java.util.logging.SimpleFormatter;
 import parser.Parser;
 import storage.Storage;
 import storage.JsonFormatStorage;
-import ui.UI;
+import ui.GraphicalUI;
+import ui.TextUI;
 import ui.UI.DisplayType;
+import ui.UI;
 
 /**
  * This file contains the main program of the command-line calendar, Tasky.
@@ -108,7 +110,7 @@ public class Logic {
 	 * Errors and messages
 	 */
 	private static final String MESSAGE_WELCOME = "Welcome to Tasky! This is an open source project.";
-	private static final String MESSAGE_PROMPT_COMMAND = "Command :";
+	private static final String MESSAGE_PROMPT_COMMAND = "Command : ";
 	private static final String MESSAGE_UNDO = "Undo : ";
 	private static final String MESSAGE_REDO = "Redo : ";
 	private static final String MESSAGE_SUCCESS_HISTORY_ADD = "Deleted item(s) restored.";
@@ -178,7 +180,7 @@ public class Logic {
 	}
 
 	void initializeComponentObjects() {
-		UIObject = new UI();
+		UIObject = new TextUI();
 		parserObject = new Parser();
 		storageObject = new JsonFormatStorage(true);
 		historyObject = new History();

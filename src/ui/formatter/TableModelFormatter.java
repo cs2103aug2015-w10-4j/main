@@ -26,13 +26,12 @@ public class TableModelFormatter {
 		Boolean[] isDone = new Boolean[taskList.length];
 		
 		for (int i = 0; i < taskList.length; i++) {
-			assert taskList[i][IS_DONE_FIELD_NUMBER] instanceof Boolean;
 			isDone[i] = (Boolean) taskList[i][IS_DONE_FIELD_NUMBER];
 			
 			for (int j = 0; j < COLUMN_COUNT; j++) {
 				tableModelData[i][j] = FormatterHelper.getStringRepresentation(taskList[i][j]);
 				
-				if (isDone[i] && USE_STRIKE_HTML_TAG) {
+				if (isDone[i] != null && isDone[i] && USE_STRIKE_HTML_TAG) {
 					tableModelData[i][j] = STRIKE_HTML_TAG_BEGIN + tableModelData[i][j] +
 							STRIKE_HTML_TAG_END;
 				}

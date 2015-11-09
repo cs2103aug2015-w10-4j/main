@@ -31,7 +31,7 @@ public class StringFormatter {
 		ALIGN_LEFT, ALIGN_CENTER, ALIGN_RIGHT
 	};
 	
-	//@@author A0134155M-unused
+	//@@author A0134155M
 	/**
 	 * Format a string so that its length would be equal to <code>width</code>
 	 * and it will be aligned according to <code>alignment</code>
@@ -41,8 +41,6 @@ public class StringFormatter {
 	 * @return
 	 */
 	public static String formatString(String str, Alignment alignment, int width) {
-		//this is not used since text formatted table is not used anymore, so there is no
-		//need for manual string formatting anymore.
 		assert str != null;
 		assert width >= str.length() : "Width must be larger than or equal to str";
 		

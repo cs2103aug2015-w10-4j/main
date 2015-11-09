@@ -99,7 +99,7 @@ public class FormatterHelper {
 		return null;
 	}
 
-	//@@author A0134155M-unused
+	//@@author A0134155M
 	/**
 	 * Split string to multiple lines according to character limit for a line as
 	 * specified in lineCharLimit
@@ -108,8 +108,6 @@ public class FormatterHelper {
 	 * @return an array of string representing the content of string after split
 	 */
 	public static String[] splitString(String string, int lineCharLimit) {
-		//this is not used since text formatted table is not used anymore, so there is no
-		//need for manual string formatting anymore.
 		if (string == null) {
 			return new String[] {EMPTY_STRING_SUBSTITUTE};
 		}
@@ -219,12 +217,6 @@ public class FormatterHelper {
 	private static Object[] createEmptyTaskData() {
 		Object[] emptyTaskData = new Object[COLUMN_COUNT];
 
-		//since the last field that represents whether a task has been done or not
-		//must be a boolean...
-		//empty task can't be done
-		
-		emptyTaskData[COLUMN_COUNT - 1] = new Boolean(false);
-		
 		return emptyTaskData;
 	}
 

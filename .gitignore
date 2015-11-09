@@ -3,3 +3,5 @@
 Tasky.jar
 *.log*
 config.properties
+Collate*
+collate*
