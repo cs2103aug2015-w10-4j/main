@@ -1118,23 +1118,21 @@ public class Logic {
 	}
 	
 	/**
-	 * Get the list of tasks that start on the date or has a deadline on the date
+	 * Get the list of tasks that start on the date or has a deadline on the date,
+	 * and add them to tasksInDay
 	 * @param listOfEventsDeadlines
 	 * @param date
 	 * @return
 	 */
-	ArrayList<Task> getTasksInDay(ArrayList<Task> listOfEventsDeadlines,
-			Calendar date) {
-		ArrayList<Task> listOfTasksInDay = new ArrayList<Task>();
+	void getTasksInDay(ArrayList<Task> listOfEventsDeadlines,
+			Calendar date, ArrayList<Task> tasksInDay) {
 		for (int i = 0; i < listOfEventsDeadlines.size(); i++) {
 			Task curTask = listOfEventsDeadlines.get(i);
 			Calendar itemTime = curTask.getTime();
 			if (isTimingInDay(itemTime, date)) {
-				listOfTasksInDay.add(curTask);
+				tasksInDay.add(curTask);
 			}
 		}
-
-		return listOfTasksInDay;
 	}
 	
 	/**
@@ -1162,61 +1160,15 @@ public class Logic {
 			ArrayList<Task> listOfFloating = new ArrayList<Task>();
 			ArrayList<Task> listOfEventsDeadlines = new ArrayList<Task>();
 			
-			for (int i = 0; i < listOfTasks.size(); i++) {
-				Task curTask = listOfTasks.get(i);
-				if (!curTask.isDone()) {
-					if (curTask.hasEndingTime()) {
-						listOfEventsDeadlines.add(curTask);
-					} else {
-						listOfFloating.add(curTask);
-					}
-				}
-			}
+			separateFloatingTasksFromOthers(listOfFloating,
+					listOfEventsDeadlines);
 			Collections.sort(listOfEventsDeadlines);
 			
 			ArrayList<Task> listOfFirstDate = new ArrayList<Task>();
 			ArrayList<Task> listOfSecondDate = new ArrayList<Task>();
-			if (listOfEventsDeadlines.size() != 0) {
-				Task firstTask;
-				Calendar todayDate = new GregorianCalendar();
-				Calendar firstDate = null, secondDate = null;
-				int i = 0;
-				
-				boolean hasFirstDate = false;
-				
-				while (i < listOfEventsDeadlines.size() && !hasFirstDate) {
-					// prepare first task in the list for comparison
-					firstTask = listOfEventsDeadlines.get(i);
-					firstDate = firstTask.getTime();
-					// compare to see if the task is before today's date. We only want tasks after/same as today's date
-					if (firstDate.before(todayDate)) {
-						// date is before today's date, continue to iterate
-						i++;
-						firstDate = null;
-					} else {
-						// first date is found
-						// so break loop and continue
-						hasFirstDate = true;
-					}
-				}
-				
-				if (firstDate != null) {
-					listOfFirstDate = getTasksInDay(listOfEventsDeadlines,
-							firstDate);
-					while (i < listOfEventsDeadlines.size() && secondDate == null) {
-						Task curTask = listOfEventsDeadlines.get(i);
-						Calendar curDate = curTask.getTime();
-						if (!isTimingInDay(curDate, firstDate)) {
-							secondDate = curDate;
-						}
-						i++;
-					}
-					if (secondDate != null) {
-						listOfSecondDate = getTasksInDay(listOfEventsDeadlines,
-								secondDate);
-					}
-				}
-			}
+			getTasksInFirstAndSecondDate(listOfEventsDeadlines,
+					listOfFirstDate, listOfSecondDate);
+			
 			addTasksToList(listOfFirstDate);
 			addTasksToList(listOfSecondDate);
 			addTasksToList(listOfFloating);
@@ -1224,12 +1176,7 @@ public class Logic {
 			List<String> listOfTitles = new ArrayList<String>();
 			addTitleForDate(listOfFirstDate, listOfTitles);
 			addTitleForDate(listOfSecondDate, listOfTitles);
-			
-			if (listOfFloating.size() != 0) {
-				listOfTitles.add("Other Tasks");
-			} else {
-				listOfTitles.add("No Other Tasks");
-			}
+			addTitleForFloating(listOfFloating, listOfTitles);
 			
 			return UIObject.showTasks(listOfShownTasks, DisplayType.DEFAULT, listOfTitles);
 		} else {
@@ -1237,36 +1184,144 @@ public class Logic {
 			listOfShownTasks = new ArrayList<Task>();
 			List<String> searchStrings = new ArrayList<String>();
 			
-			for (int i = 0; i < listOfTasks.size(); i++) {
-				Task curTask = listOfTasks.get(i);
-				if (curTask.isDone() && shouldShowDone) {
-					listOfShownTasks.add(curTask);
-				}
-				if (!curTask.isDone() && shouldShowUndone) {
-					listOfShownTasks.add(curTask);
-				}
-			}
+			filterTasksByDoneUndone();
 			
 			searchStrings.add(FILTER_TITLE_TASK_NAME);
 			searchStrings.add(FILTER_TITLE_TIME);
 			searchStrings.add(FILTER_TITLE_LOCATION);
-			
-			boolean isEmptyName = true;
-			boolean isEmptyTime = true;
-			boolean isEmptyLocation = true;
-			
-			// Filter by name, time, and location
-			for (int j = 0; j < listFilter.size(); j++) {
-				Task curFilter = listFilter.get(j);
-				isEmptyName = filterByName(searchStrings, isEmptyName,
-						curFilter);
-				isEmptyTime = filterByTime(searchStrings, isEmptyTime,
-						curFilter);
-				isEmptyLocation = filterByLocation(searchStrings,
-						isEmptyLocation, curFilter);
-			}
+			filterTasksAndGenerateSearchStrings(searchStrings);
 			
 			return UIObject.showTasks(listOfShownTasks, DisplayType.FILTERED, searchStrings);
+		}
+	}
+
+	/**
+	 * Filters tasks by done and undone depending on the
+	 * variable shouldShowDone & shouldShowUndone, and put
+	 * them into listOfShownTasks
+	 * 
+	 * If they are both true, this simply adds all tasks
+	 * in listOfTasks to listOfShownTasks
+	 */
+	void filterTasksByDoneUndone() {
+		for (int i = 0; i < listOfTasks.size(); i++) {
+			Task curTask = listOfTasks.get(i);
+			if (curTask.isDone() && shouldShowDone) {
+				listOfShownTasks.add(curTask);
+			}
+			if (!curTask.isDone() && shouldShowUndone) {
+				listOfShownTasks.add(curTask);
+			}
+		}
+	}
+
+	/**
+	 * Separates floating tasks from the rest (events and deadlines)
+	 * @param listOfFloating
+	 * @param listOfEventsDeadlines
+	 */
+	void separateFloatingTasksFromOthers(
+			ArrayList<Task> listOfFloating,
+			ArrayList<Task> listOfEventsDeadlines) {
+		for (int i = 0; i < listOfTasks.size(); i++) {
+			Task curTask = listOfTasks.get(i);
+			if (!curTask.isDone()) {
+				if (curTask.hasEndingTime()) {
+					listOfEventsDeadlines.add(curTask);
+				} else {
+					listOfFloating.add(curTask);
+				}
+			}
+		}
+	}
+
+	/**
+	 * Fills up listOfFirstDate and listOfSecondDate using the tasks
+	 * in listOfEventsDeadlines that are on the closest 2 dates
+	 * 
+	 * 
+	 * @param listOfEventsDeadlines sorted list of tasks, according to time
+	 * @param listOfFirstDate
+	 * @param listOfSecondDate
+	 */
+	void getTasksInFirstAndSecondDate(
+			ArrayList<Task> listOfEventsDeadlines,
+			ArrayList<Task> listOfFirstDate, ArrayList<Task> listOfSecondDate) {
+		if (listOfEventsDeadlines.size() != 0) {
+			Task firstTask;
+			Calendar todayDate = new GregorianCalendar();
+			Calendar firstDate = null, secondDate = null;
+			int i = 0;
+			
+			boolean hasFirstDate = false;
+			
+			while (i < listOfEventsDeadlines.size() && !hasFirstDate) {
+				// prepare first task in the list for comparison
+				firstTask = listOfEventsDeadlines.get(i);
+				firstDate = firstTask.getTime();
+				// compare to see if the task is before today's date. We only want tasks after/same as today's date
+				if (firstDate.before(todayDate)) {
+					// date is before today's date, continue to iterate
+					i++;
+					firstDate = null;
+				} else {
+					// first date is found
+					// so break loop and continue
+					hasFirstDate = true;
+				}
+			}
+			
+			if (firstDate != null) {
+				getTasksInDay(listOfEventsDeadlines, firstDate,
+						listOfFirstDate);
+				while (i < listOfEventsDeadlines.size()
+						&& secondDate == null) {
+					Task curTask = listOfEventsDeadlines.get(i);
+					Calendar curDate = curTask.getTime();
+					if (!isTimingInDay(curDate, firstDate)) {
+						secondDate = curDate;
+					}
+					i++;
+				}
+				if (secondDate != null) {
+					getTasksInDay(listOfEventsDeadlines, secondDate,
+							listOfSecondDate);
+				}
+			}
+		}
+	}
+
+	/**
+	 * Filter by the name, time and locations fields.
+	 * 
+	 * This method also adds the search filter titles
+	 * that are to be displayed to the user to searchStrings
+	 * 
+	 * @param searchStrings
+	 */
+	void filterTasksAndGenerateSearchStrings(List<String> searchStrings) {
+		boolean isEmptyName = true;
+		boolean isEmptyTime = true;
+		boolean isEmptyLocation = true;
+		
+		// Filter by name, time, and location
+		for (int j = 0; j < listFilter.size(); j++) {
+			Task curFilter = listFilter.get(j);
+			isEmptyName = filterByName(searchStrings, isEmptyName,
+					curFilter);
+			isEmptyTime = filterByTime(searchStrings, isEmptyTime,
+					curFilter);
+			isEmptyLocation = filterByLocation(searchStrings,
+					isEmptyLocation, curFilter);
+		}
+	}
+
+	void addTitleForFloating(ArrayList<Task> listOfFloating,
+			List<String> listOfTitles) {
+		if (listOfFloating.size() != 0) {
+			listOfTitles.add("Other Tasks");
+		} else {
+			listOfTitles.add("No Other Tasks");
 		}
 	}
 
