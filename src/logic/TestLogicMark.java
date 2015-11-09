@@ -21,6 +21,9 @@ public class TestLogicMark {
 		logicObject.listOfTasks.add(new Task("Item 1"));
 	}
 	
+	/**
+	 * Test the simplest case of marking and unmarking of a task
+	 */
 	@Test
 	public void TestMarkOne(){
 		ArrayList<Integer> indexList = new ArrayList<Integer>();

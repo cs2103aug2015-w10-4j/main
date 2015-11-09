@@ -133,7 +133,7 @@ public class Task implements Comparable<Task> {
 		return "Name: " + name + " Starting time: " + this.startingTime
 				+ " Ending Time: " + this.getEndingTime() + " Location: "
 				+ this.location + " Period Interval: " + this.periodicInterval
-				+ " Period Repeats " + this.periodicRepeats;
+				+ " Period Repeats: " + this.periodicRepeats + " Done: " + this.isDone;
 	}
 
 	//@@author A0108355H

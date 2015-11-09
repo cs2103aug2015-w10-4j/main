@@ -75,7 +75,7 @@ public class TestParser {
 		Command message;
 
 		message = parserObj.parseCommand("edit 1 every 2 days for 2");
-		assertEquals("Name: null Starting time: null Ending Time: null Location: null Period Interval: null Period Repeats null", message.getTask(0).getAllInfo());
+		assertEquals("Name: null Starting time: null Ending Time: null Location: null Period Interval: null Period Repeats: null Done: false", message.getTask(0).getAllInfo());
 		
 	
 	}
@@ -98,7 +98,7 @@ public class TestParser {
 		Command message;
 
 		message = parserObj.parseCommand("search task");
-		String actual ="Name: task Starting time: null Ending Time: null Location: null Period Interval: null Period Repeats null";
+		String actual ="Name: task Starting time: null Ending Time: null Location: null Period Interval: null Period Repeats: null Done: false";
 		assertEquals(actual, message.getTask(0).getAllInfo());
 		
 	
