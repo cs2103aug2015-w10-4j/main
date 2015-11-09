@@ -34,6 +34,7 @@ import global.Task;
 import ui.formatter.FormatterHelper;
 import ui.tasktable.TaskTableModel;
 
+//@@author A0134155M
 public class GraphicalUI implements UI {
 	
 	/*
@@ -115,14 +116,12 @@ public class GraphicalUI implements UI {
 	/*
 	 * Constructor
 	 */
-	//@@author A0134155M
 	public GraphicalUI() {
 		prepareComponents();
 		addComponentsToPane(frame.getContentPane());
 		displayFrame();
 	}
 	
-	//@@author A0134155M
 	private void addComponentsToPane(Container contentPane) {
 		addDisplayAreaScrollPane(contentPane);
 		addPromptLabel(contentPane);
@@ -130,7 +129,6 @@ public class GraphicalUI implements UI {
 		addStatusBar(contentPane);
 	}
 
-	//@@author A0134155M
 	private void addStatusBar(Container contentPane) {
 		GridBagConstraints constraint = new GridBagConstraints();
 		
@@ -147,7 +145,6 @@ public class GraphicalUI implements UI {
 		contentPane.add(statusBar, constraint);
 	}
 
-	//@@author A0134155M
 	private void addUserInputField(Container contentPane) {
 		GridBagConstraints constraint = new GridBagConstraints();
 		
@@ -166,7 +163,6 @@ public class GraphicalUI implements UI {
 		contentPane.add(userInputField, constraint);
 	}
 
-	//@@author A0134155M
 	private void addPromptLabel(Container contentPane) {
 		GridBagConstraints constraint = new GridBagConstraints();
 		
@@ -184,7 +180,6 @@ public class GraphicalUI implements UI {
 		contentPane.add(promptLabel, constraint);
 	}
 
-	//@@author A0134155M
 	private void addDisplayAreaScrollPane(Container contentPane) {
 		GridBagConstraints constraint = new GridBagConstraints();
 		constraint.fill = GridBagConstraints.BOTH;
@@ -203,14 +198,12 @@ public class GraphicalUI implements UI {
 		contentPane.add(displayAreaScrollPane, constraint);
 	}
 
-	//@@author A0134155M
 	private void displayFrame() {
 		frame.pack();
 		frame.setLocationRelativeTo(null);
 		frame.setVisible(true);
 	}
 
-	//@@author A0134155M
 	private void prepareComponents() {
 		prepareFrame();
 		prepareUserInput();
@@ -219,24 +212,20 @@ public class GraphicalUI implements UI {
 		preparePromptLabel();
 	}
 	
-	//@@author A0134155M
 	private void preparePromptLabel() {
 		promptLabel.setHorizontalAlignment(SwingConstants.CENTER);
 	}
 
-	//@@author A0134155M
 	private void prepareDisplayAreaScrollPane() {
 		displayAreaScrollPane.setPreferredSize(new Dimension(DEFAULT_WIDTH, DEFAULT_HEIGHT));
 	}
 	
-	//@@author A0134155M
 	private void prepareDisplayAreaPanel() {
 		displayAreaPanel.setLayout(new VerticalLayout());
 		displayAreaPanel.setBackground(Color.WHITE);
 		displayAreaPanel.setBorder(new RoundedBorder(THEME_COLOR, 10));
 	}
 
-	//@@author A0134155M
 	private void prepareUserInput() {
 		userInputField.setEditable(false);
 		userInputField.setColumns(USER_INPUT_FIELD_CHAR_COUNT);
@@ -336,7 +325,6 @@ public class GraphicalUI implements UI {
 		displayAreaPanel.repaint();
 	}
 	
-	//@@author A0134155M
 	private void movePosition(JViewport viewPort, Point position, int dx, int dy) {
 		position.x += dx;
 		position.y += dy;
@@ -348,17 +336,14 @@ public class GraphicalUI implements UI {
 		position.y = Math.min(position.y, getViewPortMaxY(viewPort));
 	}
 	
-	//@@author A0134155M
 	private int getViewPortMaxX(JViewport viewPort) {
 		return viewPort.getView().getWidth() - viewPort.getWidth();
 	}
 	
-	//@@author A0134155M
 	private int getViewPortMaxY(JViewport viewPort) {
 		return viewPort.getView().getHeight() - viewPort.getHeight();
 	}
 
-	//@@author A0134155M
 	private void prepareFrame() {
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(new GridBagLayout());
@@ -373,7 +358,6 @@ public class GraphicalUI implements UI {
 		});
 	}
 
-	//@@author A0134155M
 	@Override
 	public String promptUser(String prompt) {
 		logger.info("Entering promptUser(prompt = " + prompt + ")");
@@ -392,31 +376,26 @@ public class GraphicalUI implements UI {
 		return userInput;
 	}
 
-	//@@author A0134155M
 	private void cleanUserInputField() {
 		userInputField.setText(EMPTY_STRING);
 	}
 
-	//@@author A0134155M
 	private String getUserInput() {
 		return userInputField.getText();
 	}
 	
-	//@@author A0134155M
 	private void sanitizeUserInput() {
 		String userInput = userInputField.getText();
 		userInput = userInput.replaceAll("\t", " ");
 		userInputField.setText(userInput);
 	}
 
-	//@@author A0134155M
 	private void prepareComponentForUserInput(String prompt) {
 		promptLabel.setText(prompt);
 		userInputField.setEditable(true);
 		userInputField.grabFocus();
 	}
 
-	//@@author A0134155M
 	private void waitForUserInput() {
 		userInputField.getCaret().setVisible(true);
 		try {
@@ -430,7 +409,6 @@ public class GraphicalUI implements UI {
 		}
 	}
 	
-	//@@author A0134155M
 	@Override
 	public boolean showToUser(String stringToShow) {
 		JTextArea textArea = createJTextAreaWithMonospaceFont();
@@ -444,7 +422,6 @@ public class GraphicalUI implements UI {
 		return true;
 	}
 	
-	//@@author A0134155M
 	private boolean showToUserFilteredTable(TaskTableModel[] tableModels, List<String> filters) {
 		displayAreaPanel.removeAll();
 
@@ -475,7 +452,6 @@ public class GraphicalUI implements UI {
 	}
 	
 	
-	//@@author A0134155M
 	private boolean showToUserDefaultTable(TaskTableModel[] tableModels, List<String> titles) {
 
 		assert tableModels.length <= titles.size();
@@ -519,7 +495,6 @@ public class GraphicalUI implements UI {
 		return true;
 	}
 
-	//@@author A0134155M
 	private JPanel createInvisibleJPanel(int width, int height) {
 		JPanel invisiblePanel = new JPanel();
 		invisiblePanel.setSize(new Dimension(width, height));
@@ -527,7 +502,6 @@ public class GraphicalUI implements UI {
 		return invisiblePanel;
 	}
 
-	//@@author A0134155M
 	private JTextArea createJTextAreaWithMonospaceFont() {
 		JTextArea textArea = new JTextArea();
 		textArea.setFont(new Font(DISPLAY_AREA_FONT_NAME, DISPLAY_AREA_FONT_STYLE,
@@ -536,7 +510,6 @@ public class GraphicalUI implements UI {
 	}
 	
 
-	//@@author A0134155M
 	@Override
 	public boolean showTasks(List<Task> tasks, DisplayType displayType, List<String> titles) {
 
@@ -570,7 +543,6 @@ public class GraphicalUI implements UI {
 		}
 	}
 	
-	//@@author A0134155M
 	@Override
 	public boolean showStatusToUser(String stringToShow) {
 		logger.info("Entering showStatusToUser(stringToShow=" + stringToShow + ")");

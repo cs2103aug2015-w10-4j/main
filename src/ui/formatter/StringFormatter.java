@@ -1,5 +1,6 @@
 package ui.formatter;
 
+//@@author A0134155M
 public class StringFormatter {
 	
 	/* 
@@ -31,14 +32,14 @@ public class StringFormatter {
 		ALIGN_LEFT, ALIGN_CENTER, ALIGN_RIGHT
 	};
 	
-	//@@author A0134155M
 	/**
 	 * Format a string so that its length would be equal to <code>width</code>
 	 * and it will be aligned according to <code>alignment</code>
 	 * @param str the string to be formatted
 	 * @param alignment the alignment of the initial string in the resulting string.
 	 * @param width the final width of the resulting string.
-	 * @return
+	 * @return formatted string <code>str</code> with alignment <code>alignment</code> and
+	 * 		   width </code>width</code>
 	 */
 	public static String formatString(String str, Alignment alignment, int width) {
 		assert str != null;

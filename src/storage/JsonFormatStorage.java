@@ -25,20 +25,20 @@ public class JsonFormatStorage implements Storage {
 	
 	private Gson gson;
 
+	//@@author A0134155M
 	/**
 	 * Default constructor for JsonFormatStorage. Does not use pretty formatting for JSON.
 	 */
-	//@@author A0134155M
 	public JsonFormatStorage() {
 		gson = new GsonBuilder().serializeNulls().create();
 	}
 	
+	//@@author A0134155M
 	/**
 	 * Alternative constructor for JsonFormatStorage with option whether to prettify the
 	 * JSON or not.
 	 * @param usePrettyJson whether to format the JSON with pretty format or not
 	 */
-	//@@author A0134155M
 	public JsonFormatStorage(boolean usePrettyJson) {
 		if (usePrettyJson) {
 			gson = new GsonBuilder().serializeNulls().setPrettyPrinting().create();
@@ -47,12 +47,12 @@ public class JsonFormatStorage implements Storage {
 		}
 	}
 	
+	//@@author A0134155M
 	/**
 	 * {@inheritDoc}
 	 * 
 	 * It saves the data in JSON format.
 	 */
-	//@@author A0134155M
 	@Override
 	public boolean writeItemList(ArrayList<Task> tasks) throws IOException {
 		String jsonFormat = convertToJsonFormat(tasks);
@@ -78,10 +78,10 @@ public class JsonFormatStorage implements Storage {
 		return jsonFormat;
 	}
 
+	//@@author A0108355H
 	/* (non-Javadoc)
 	 * @see storage.Storage#saveFileToPath(java.lang.String)
 	 */
-	//@@author A0108355H
 	@Override
 	public boolean saveFileToPath(String path) throws IOException {
 		boolean isFilePathChanged = false;
@@ -137,11 +137,11 @@ public class JsonFormatStorage implements Storage {
 		fw.close();
 	}
 
+	//@@author A0134155M
 	/**
 	 * {@inheritDoc}
 	 * @throws IllegalStateException if the file does not contain a valid JSON.
 	 */
-	//@@author A0134155M
 	@Override	
 	public ArrayList<Task> getItemList() throws FileNotFoundException, IllegalStateException {
 		File inputFile = new File(currentFilePath);

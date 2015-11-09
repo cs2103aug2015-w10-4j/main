@@ -2,6 +2,7 @@ package ui.formatter;
 
 import java.util.List;
 
+//@@author A0134155M
 public class TextFormatter {
 
 	private static final String NULL_STRING_SUBSTITUTE = "";
@@ -13,7 +14,6 @@ public class TextFormatter {
 	private static final char HORIZONTAL_CHAR = '-';
 	private static final char VERTICAL_CHAR = '|';
 	
-	//@@author A0134155M
 	/**
 	 * Format a given list of 3D Object array containing task data into a string table.
 	 * @param taskLists
@@ -59,7 +59,6 @@ public class TextFormatter {
 		}
 	}
 
-	//@@author A0134155M
 	private boolean isEmpty(Object[][][] taskLists) {
 		int maxLength = 0;
 		for (Object[][] taskList : taskLists) {
@@ -70,7 +69,6 @@ public class TextFormatter {
 		return maxLength == 0;
 	}
 
-	//@@author A0134155M
 	private String getTaskData(ColumnInfo[] columnInfo, Object[] task, int taskId, int lineCharLimit) {
 		StringBuilder result = new StringBuilder();
 		
@@ -107,7 +105,6 @@ public class TextFormatter {
 		return result.toString();
 	}
 
-	//@@author A0134155M
 	private String getHeader(ColumnInfo[] columnInfo) {
 		StringBuilder result = new StringBuilder();
 		
@@ -123,7 +120,6 @@ public class TextFormatter {
 		return result.toString();
 	}
 
-	//@@author A0134155M
 	private String getRowSeparator(ColumnInfo[] columnInfo) {
 		StringBuilder result = new StringBuilder();
 		

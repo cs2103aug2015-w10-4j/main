@@ -7,6 +7,7 @@ import global.Task;
 import ui.formatter.FormatterHelper;
 import ui.formatter.TextFormatter;
 
+//@@author A0134155M
 public class TextUI implements UI {
 	
 	/*
@@ -20,39 +21,33 @@ public class TextUI implements UI {
 	private String currentTaskData = "";
 	private String currentStatus = "";
 	
-	//@@author A0134155M
 	@Override
 	public boolean showToUser(String stringToShow) {
 		System.out.println(stringToShow);
 		return true;
 	}
 	
-	//@@author A0134155M
 	private boolean refreshConsole() {
 		clearConsole();
 		outputNewData();
 		return true;
 	}
 
-	//@@author A0134155M
 	private void outputNewData() {
 		System.out.println(currentTaskData);
 		System.out.println(currentStatus);
 	}
 
-	//@@author A0134155M
 	@Override
 	public boolean showStatusToUser(String stringToShow) {
 		setNewStatus(stringToShow);
 		return refreshConsole();
 	}
 
-	//@@author A0134155M
 	private void setNewStatus(String stringToShow) {
 		currentStatus = stringToShow;
 	}
 
-	//@@author A0134155M
 	@Override
 	public boolean showTasks(List<Task> tasks, DisplayType displayType, List<String> titles) {
 		int minTable = -1;
@@ -78,19 +73,16 @@ public class TextUI implements UI {
 		return refreshConsole();
 	}
 
-	//@@author A0134155M
 	private void setNewTaskData(String formattedTaskList) {
 		currentTaskData = formattedTaskList;
 	}
 
-	//@@author A0134155M
 	private void clearConsole() {
 		for (int i = 0; i < MAX_CONSOLE_LINE; i++) {
 			System.out.println();
 		}
 	}
 
-	//@@author A0134155M
 	@Override
 	public String promptUser(String prompt) {
 		System.out.print(prompt);
@@ -98,7 +90,6 @@ public class TextUI implements UI {
 		return userInput;
 	}
 
-	//@@author A0134155M
 	private String readUserInput() {
 		String userInput = userInputScanner.nextLine();
 		return userInput;

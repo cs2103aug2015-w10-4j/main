@@ -10,6 +10,7 @@ import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.border.BevelBorder;
 
+//@@author A0134155M
 @SuppressWarnings("serial")
 public class StatusBar extends JPanel {
 	
@@ -18,21 +19,18 @@ public class StatusBar extends JPanel {
 	private static final String DEFAULT_STATUS_BAR_TEXT = "Tasky is ready.";
 	private JLabel statusLabel;
 	
-	//@@author A0134155M
 	public StatusBar() {
 		super(new FlowLayout(FlowLayout.LEFT));
 		initializeLabel();
 		initializeStatusBar();
 	}
 
-	//@@author A0134155M
 	private void initializeStatusBar() {
 		setBorder(new BevelBorder(BevelBorder.LOWERED));
 		add(statusLabel);
 		setPreferredSize(getPreferredSize());
 	}
 
-	//@@author A0134155M
 	private void initializeLabel() {
 		statusLabel = new JLabel(DEFAULT_STATUS_BAR_TEXT);
 		statusLabel.setHorizontalAlignment(SwingConstants.LEFT);
@@ -40,7 +38,6 @@ public class StatusBar extends JPanel {
 		statusLabel.setForeground(THEME_COLOR);
 	}
 	
-	//@@author A0134155M
 	public void setText(String text) {
 		logger.info("Entering setText(text=" + text + ")");
 		

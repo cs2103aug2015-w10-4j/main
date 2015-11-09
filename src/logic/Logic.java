@@ -902,7 +902,7 @@ public class Logic {
 	 * Identifies special keywords in the argumentlist, and returns a
 	 * usable arraylist of index strings
 	 * @param argumentList
-	 * @return
+	 * @return usable arraylist of index strings after processing
 	 * @throws NumberFormatException
 	 * @throws IndexOutOfBoundsException
 	 */

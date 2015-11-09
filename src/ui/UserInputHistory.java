@@ -3,6 +3,7 @@ package ui;
 import java.util.ArrayList;
 import java.util.List;
 
+//@@author A0134155M
 public class UserInputHistory {
 	
 	private static final String EMPTY_STRING = "";
@@ -14,7 +15,6 @@ public class UserInputHistory {
 	 * Add user input to user input history list.
 	 * @param userInput
 	 */
-	//@@author A0134155M
 	public void addToHistory(String userInput) {
 		userInputs.add(userInput);
 		position = userInputs.size();
@@ -26,7 +26,6 @@ public class UserInputHistory {
 	 * nothing happens to the pointer.
 	 * @return user input referred by the pointer
 	 */
-	//@@author A0134155M
 	public String moveUpInHistory() {
 		if (position > 0) {
 			position--;
@@ -40,7 +39,6 @@ public class UserInputHistory {
 	 * recent one, nothing happens to the pointer.
 	 * @return user input referred by the pointer
 	 */
-	//@@author A0134155M
 	public String moveDownInHistory() {
 		if (position + 1 <= userInputs.size()) {
 			position++;
@@ -55,7 +53,6 @@ public class UserInputHistory {
 	 * @param position
 	 * @return user input at the requested position
 	 */
-	//@@author A0134155M
 	public String getPosition(int position) {
 		if (position < 0 || position > userInputs.size()) {
 			throw new IndexOutOfBoundsException();

@@ -2,6 +2,7 @@ package ui.formatter;
 
 import global.Pair;
 
+//@@author A0134155M
 public class TableModelFormatter {
 	
 	private static final String STRIKE_HTML_TAG_BEGIN = "<html><strike>";
@@ -13,13 +14,13 @@ public class TableModelFormatter {
 	//minus one since we do not want the last field (isDone field)
 	private static final int COLUMN_COUNT = FormatterHelper.COLUMN_COUNT - 1;
 	
-	//@@author A0134155M
 	/**
 	 * Converts each field of the task in a task list data in a table produced by
 	 * FormatterHelper.getTaskListData() to their string representation. Also returns
 	 * a Boolean[] array denoting whether a task has been done or not.
 	 * @param taskList 2D object array denoting a task list.
-	 * @return
+	 * @return Pair of 2D object array and 1D boolean array denoting formatted <code>taskList</code>
+	 * 		   and array of whether a task at that position has been done.
 	 */
 	public Pair<Object[][], Boolean[]> formatTaskList(Object[][] taskList) {
 		Object[][] tableModelData = new Object[taskList.length][COLUMN_COUNT];

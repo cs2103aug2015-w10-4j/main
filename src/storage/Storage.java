@@ -43,6 +43,7 @@ public interface Storage {
 "undo       Reverts a previous add, edit, delete or mark        undo\n";
 	static final String ERROR_HELP = "Unable to retrieve help file!";
 
+	//@@author A0134155M
 	/**
 	 * Saves the list of tasks in the file
 	 * @param ArrayList<Task> ArrayList that stores the RAW tasks as Strings in text file
@@ -51,6 +52,7 @@ public interface Storage {
 	 */
 	public boolean writeItemList(ArrayList<Task> tasks) throws IOException;
 
+	//@@author A0134155M
 	/**
 	 * Saves path to text file
 	 *
@@ -60,6 +62,7 @@ public interface Storage {
 	 */
 	public boolean saveFileToPath(String path) throws IOException;
 
+	//@@author A0134155M
 	/**
 	 * Reads the saved file and returns the ArrayList of tasks
 	 * @return ArrayList of tasks read from file
