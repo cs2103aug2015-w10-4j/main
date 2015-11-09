@@ -16,116 +16,113 @@ import global.Task;
 
 public class ManualFormatStorage implements Storage {
 
-	//UI UIObject;
-	//Parser parserObject;
-	Storage storageObject;
-	//History historyObject;
+    //UI UIObject;
+    //Parser parserObject;
+    Storage storageObject;
+    //History historyObject;
 
-	private static final String ARGUMENTS_SEPARATOR = ";";
-	private static final String ARGUMENTS_DATE = "date ";
+    private static final String ARGUMENTS_SEPARATOR = ";";
+    private static final String ARGUMENTS_DATE = "date ";
 
-	public static String FILE_PATH = "save.txt";
-	public static String FILE_NEWLINE = "\r\n";
+    public static String FILE_PATH = "save.txt";
+    public static String FILE_NEWLINE = "\r\n";
 
-	// date format converter
-	private static SimpleDateFormat sdf = new SimpleDateFormat("dd MMM yyyy");
+    // date format converter
+    private static SimpleDateFormat sdf = new SimpleDateFormat("dd MMM yyyy");
 
-	/**
-	 * {@inheritDoc}
-	 * 
-	 * Task data is saved in the following format: "[task name];[date]" on each line. To be improved
-	 */
-	//@@author A0108355H
-	@Override
-	public boolean writeItemList(ArrayList<Task> task) throws IOException {
-		String content = "";
-		for (int i = 0; i < task.size(); i++) {
-			Task curTask = task.get(i);
-			if (curTask != null) {
-				content += curTask.getName();
-				if (curTask.getEndingTime() != null) {
-					content += ARGUMENTS_SEPARATOR + ARGUMENTS_DATE + sdf.format(task.get(i).getEndingTime().getTime());
-				}
-			}
-			content += FILE_NEWLINE;
-		}
+    /**
+     * {@inheritDoc}
+     * 
+     * Task data is saved in the following format: "[task name];[date]" on each line. To be improved
+     */
+    //@@author A0108355H
+    @Override
+    public boolean writeItemList(ArrayList<Task> task) throws IOException {
+        String content = "";
+        for (int i = 0; i < task.size(); i++) {
+            Task curTask = task.get(i);
+            if (curTask != null) {
+                content += curTask.getName();
+                if (curTask.getEndingTime() != null) {
+                    content += ARGUMENTS_SEPARATOR + ARGUMENTS_DATE + sdf.format(task.get(i).getEndingTime().getTime());
+                }
+            }
+            content += FILE_NEWLINE;
+        }
 
-		File file = new File(FILE_PATH);
-		FileWriter fw = new FileWriter(file.getAbsoluteFile());
-		BufferedWriter bw = new BufferedWriter(fw);
-		bw.write(content);
-		bw.close();
-		return true;
-	}
+        File file = new File(FILE_PATH);
+        FileWriter fw = new FileWriter(file.getAbsoluteFile());
+        BufferedWriter bw = new BufferedWriter(fw);
+        bw.write(content);
+        bw.close();
+        return true;
+    }
 
-	/* (non-Javadoc)
-	 * @see storage.Storage#saveFileToPath(java.lang.String)
-	 */
-	//@@author A0108355H
-	@Override
-	public boolean saveFileToPath(String path) throws IOException {
-		File file = new File(path);
-		String newFolderPath = "";
-		if (path.indexOf("/") != -1) {
-			newFolderPath = path.substring(0,path.lastIndexOf("/"));
-		}
-		if (path.indexOf("\\") != -1) {
-			newFolderPath = path.substring(0,path.lastIndexOf("\\"));
-		}
-		if (!newFolderPath.equals("")) {
-			File Folderpath = new File(newFolderPath);
-			if (!Folderpath.exists()) {
-				Folderpath.mkdirs();
-			}
-		}
+    /* (non-Javadoc)
+     * @see storage.Storage#saveFileToPath(java.lang.String)
+     */
+    //@@author A0108355H
+    @Override
+    public boolean saveFileToPath(String path) throws IOException {
+        File file = new File(path);
+        String newFolderPath = "";
+        if (path.indexOf("/") != -1) {
+            newFolderPath = path.substring(0,path.lastIndexOf("/"));
+        }
+        if (path.indexOf("\\") != -1) {
+            newFolderPath = path.substring(0,path.lastIndexOf("\\"));
+        }
+        if (!newFolderPath.equals("")) {
+            File Folderpath = new File(newFolderPath);
+            if (!Folderpath.exists()) {
+                Folderpath.mkdirs();
+            }
+        }
 
-		if (!file.exists()) {
-			file.createNewFile();
-			FILE_PATH = path;
-			return false;
-		}
-		FILE_PATH = path;
-		return true;
-	}
+        if (!file.exists()) {
+            file.createNewFile();
+            FILE_PATH = path;
+            return false;
+        }
+        FILE_PATH = path;
+        return true;
+    }
 
-	/* (non-Javadoc)
-	 * @see storage.Storage#getItemList()
-	 */
-	//@@author A0108355H
-	@Override
-	public ArrayList<Task> getItemList() throws FileNotFoundException {
-		File file = new File(FILE_PATH);
-		Scanner sc = new Scanner(file);
-		ArrayList<Task> taskList = new ArrayList<Task>();
+    /* (non-Javadoc)
+     * @see storage.Storage#getItemList()
+     */
+    //@@author A0108355H
+    @Override
+    public ArrayList<Task> getItemList() throws FileNotFoundException {
+        File file = new File(FILE_PATH);
+        Scanner sc = new Scanner(file);
+        ArrayList<Task> taskList = new ArrayList<Task>();
 
-		while (sc.hasNextLine()) {
-			String nextLine = sc.nextLine();
-			Task taskObj = new Task();
-			if (nextLine.contains(ARGUMENTS_DATE)) {
-				extractDate(nextLine, taskObj);
-			} else {
-				taskObj.setName(nextLine);
-			}
-			taskList.add(taskObj);
-		}
-		sc.close();
-		return taskList;
-	}
-	//@@author A0108355H
-	public void extractDate(String arg, Task taskObj) { // might want to store the date differently, up to you
-		String[] newArgs = arg.split(ARGUMENTS_DATE);
-		Calendar calendarRead = new GregorianCalendar();
-		try {
-			calendarRead.setTime(sdf.parse(newArgs[1]));
-		} catch (ParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		taskObj.setEndingTime(calendarRead);
-		taskObj.setName(arg.split(ARGUMENTS_SEPARATOR)[0]);
+        while (sc.hasNextLine()) {
+            String nextLine = sc.nextLine();
+            Task taskObj = new Task();
+            if (nextLine.contains(ARGUMENTS_DATE)) {
+                extractDate(nextLine, taskObj);
+            } else {
+                taskObj.setName(nextLine);
+            }
+            taskList.add(taskObj);
+        }
+        sc.close();
+        return taskList;
+    }
+    //@@author A0108355H
+    public void extractDate(String arg, Task taskObj) { // might want to store the date differently, up to you
+        String[] newArgs = arg.split(ARGUMENTS_DATE);
+        Calendar calendarRead = new GregorianCalendar();
+        try {
+            calendarRead.setTime(sdf.parse(newArgs[1]));
+        } catch (ParseException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        taskObj.setEndingTime(calendarRead);
+        taskObj.setName(arg.split(ARGUMENTS_SEPARATOR)[0]);
 
-	}
-
-
-
+    }
 }
