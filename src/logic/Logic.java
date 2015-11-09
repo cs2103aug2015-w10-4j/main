@@ -38,8 +38,33 @@ import ui.UI.DisplayType;
  *
  */
 public class Logic {
-	private static final String ERROR_START_TIME_WITHOUT_END_TIME = "Error: Cannot add start time without end time!";
-	private static final String ERROR_START_TIME_BEFORE_END_TIME = "Error: Starting time cannot be after ending time.";
+	
+	
+	/*
+	 * Declaration of object variables
+	 */
+	Logger logger = Logger.getGlobal();
+	UI UIObject;
+	Parser parserObject;
+	Storage storageObject;
+	History historyObject;
+	Properties propObject;
+	ArrayList<Task> listOfTasks = new ArrayList<Task>();
+	ArrayList<Task> listOfShownTasks = new ArrayList<Task>();
+	ArrayList<Task> listFilter = new ArrayList<Task>();
+	boolean shouldShowDone = true;
+	boolean shouldShowUndone = true;
+	boolean isHelpDisplayed = false;
+	
+	int displaySize = DEFAULT_DISPLAY_SIZE;
+	Level DEFAULT_LEVEL = Level.INFO;
+	
+	static SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM YY");
+	
+	/*
+	 * Static strings
+	 */
+	private static final String IDENTIFIER_ALL = "all";
 	private static final String FILTER_TITLE_LOCATION = "Location: ";
 	private static final String FILTER_TITLE_TASK_NAME = "Task: ";
 	private static final String FILTER_TITLE_TIME = "Time: ";
@@ -55,6 +80,8 @@ public class Logic {
 	private static final String PROPERTY_KEY_LOGGING_LEVEL = "loggingLevel";
 	private static final String PROPERTY_KEY_SAVE_FILE = "saveFile";
 	private static final String PROPERTY_KEY_DISPLAY_SIZE = "defaultDisplaySize";
+	
+	private static final String WHITE_SPACE_REGEX = "\\s+";
 
 	private static final String PROPERTY_KEY_ALIAS_ADD = "addAlias";
 	private static final String PROPERTY_KEY_ALIAS_EDIT = "editAlias";
@@ -78,29 +105,9 @@ public class Logic {
 	private static final String[] listOfDefaultKeywords = { "add", "edit", "delete", "mark",
 			"unmark", "undo", "redo", "exit", "display", "search",
 			"saveto", "help" }; // must be in same order as PROPERTY_KEY_ALIAS_LIST
-	
-	/*
-	 * Declaration of object variables
-	 */
-	Logger logger = Logger.getGlobal();
-	UI UIObject;
-	Parser parserObject;
-	Storage storageObject;
-	History historyObject;
-	Properties propObject;
-	ArrayList<Task> listOfTasks = new ArrayList<Task>();
-	ArrayList<Task> listOfShownTasks = new ArrayList<Task>();
-	ArrayList<Task> listFilter = new ArrayList<Task>();
-	boolean shouldShowDone = true;
-	boolean shouldShowUndone = true;
-	int displaySize = DEFAULT_DISPLAY_SIZE;
-	private static final Level DEFAULT_LEVEL = Level.INFO;
-	
-	// date format converter
-	static SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM YY");
 
 	/*
-	 * Static strings - errors and messages
+	 * Errors and messages
 	 */
 	private static final String MESSAGE_WELCOME = "Welcome to Tasky! This is an open source project.";
 	private static final String MESSAGE_PROMPT_COMMAND = "Command :";
@@ -122,7 +129,6 @@ public class Logic {
 	private static final String MESSAGE_SUCCESS_NO_CHANGE_FILE_PATH = "File path not changed. Entered file path is the same as current one used.";
 	private static final String MESSAGE_DISPLAY_EMPTY = "No items to display.";
 	private static final String MESSAGE_SUCCESS_HELP = "Toggling help message.";
-	private static final String IDENTIFIER_ALL = "all";
 	private static final String ERROR_WRITING_FILE = "Error: Unable to write file.";
 	private static final String ERROR_CREATING_FILE = "Error: Unable to create file.";
 	private static final String ERROR_FILE_NOT_FOUND = "Error: Data file not found.";
@@ -138,13 +144,12 @@ public class Logic {
 	private static final String ERROR_CANNOT_PARSE_PERIODIC_VALUES = "Error: Unable to parse values for periodic.";
 	private static final String ERROR_NO_FILTER = "Error: No filter detected for search.";
 	private static final String ERROR_EDIT_CANNOT_RECURRING = "Error: Cannot convert a normal task to recurring.";
+	private static final String ERROR_START_TIME_WITHOUT_END_TIME = "Error: Cannot add start time without end time!";
+	private static final String ERROR_START_TIME_BEFORE_END_TIME = "Error: Starting time cannot be after ending time.";
 	
-
 	private static final String WARNING_TIMING_CLASH = "WARNING: There are clashing timings between tasks.";
 	
-	private static final String WHITE_SPACE_REGEX = "\\s+";
 	
-	private boolean isHelpDisplayed = false;
 	/*
 	 * Main program
 	 */
@@ -158,59 +163,11 @@ public class Logic {
 	 * Constructor to initialize object variables
 	 */
 	public Logic() {
-		UIObject = new UI();
-		parserObject = new Parser();
-		storageObject = new JsonFormatStorage(true);
-		historyObject = new History();
-		propObject = new Properties();
 		try {
-			FileHandler logHandler = new FileHandler(LOG_FILE_NAME);
-			LogManager.getLogManager().reset(); // removes printout to console
-												// aka root handler
-			logHandler.setFormatter(new SimpleFormatter()); // set output to a
-															// human-readable
-															// log format
-			logger.addHandler(logHandler);
-			
-			File configFile = new File(CONFIG_FILE_NAME);
-			if (configFile.exists()) { // assumes that the config file has not been incorrectly modified
-				BufferedReader bufReader = new BufferedReader(new FileReader(
-						new File(CONFIG_FILE_NAME)));
-				propObject.load(bufReader);
-				bufReader.close();
-			} else {
-				configFile.createNewFile();
-				propObject.setProperty(PROPERTY_KEY_SAVE_FILE, DEFAULT_SAVE_FILE_PATH);
-				propObject.setProperty(PROPERTY_KEY_LOGGING_LEVEL, DEFAULT_LOGGING_LEVEL_STRING);
-				propObject.setProperty(PROPERTY_KEY_DISPLAY_SIZE, Integer.toString(DEFAULT_DISPLAY_SIZE));
-				setAllConfigAlias();
-				writeProperties();
-			}
-			storageObject.saveFileToPath(propObject.getProperty(PROPERTY_KEY_SAVE_FILE));
-			String logLevelString = propObject.getProperty(PROPERTY_KEY_LOGGING_LEVEL);
-			displaySize = Integer.parseInt(propObject.getProperty(PROPERTY_KEY_DISPLAY_SIZE));
-			addAllConfigAlias(); 
-			switch (logLevelString) {
-				case "WARNING":
-					logger.setLevel(Level.WARNING);
-					break;
-				case "INFO":
-					logger.setLevel(Level.INFO);
-					break;
-				case "FINE":
-					logger.setLevel(Level.FINE);
-					break;
-				case "FINER":
-					logger.setLevel(Level.FINER);
-					break;
-				case "FINEST":
-					logger.setLevel(Level.FINEST);
-					break;
-				default:
-					logger.setLevel(DEFAULT_LEVEL);
-			}
+			initializeComponentObjects();
+			initializeLogFile();
+			initializeConfigFile();
 			updateListOfTasks();
-			
 		} catch (FileNotFoundException e) {
 			UIObject.showToUser(ERROR_FILE_NOT_FOUND);
 		} catch (SecurityException | IOException | NumberFormatException e) {
@@ -219,28 +176,98 @@ public class Logic {
 			UIObject.showToUser(e.getMessage());
 		}
 	}
+
+	void initializeComponentObjects() {
+		UIObject = new UI();
+		parserObject = new Parser();
+		storageObject = new JsonFormatStorage(true);
+		historyObject = new History();
+		propObject = new Properties();
+	}
+
+	void initializeConfigFile() throws FileNotFoundException,
+			IOException {
+		File configFile = new File(CONFIG_FILE_NAME);
+		if (configFile.exists()) { // assumes that the config file has not been incorrectly modified
+			readConfigFile();
+		} else {
+			createAndWriteConfigFile(configFile);
+		}
+		setReadConfig();
+	}
+
+	void setReadConfig() throws IOException {
+		storageObject.saveFileToPath(propObject.getProperty(PROPERTY_KEY_SAVE_FILE));
+		String logLevelString = propObject.getProperty(PROPERTY_KEY_LOGGING_LEVEL);
+		displaySize = Integer.parseInt(propObject.getProperty(PROPERTY_KEY_DISPLAY_SIZE));
+		addAllConfigAlias(); 
+		switch (logLevelString) {
+			case "WARNING":
+				logger.setLevel(Level.WARNING);
+				break;
+			case "INFO":
+				logger.setLevel(Level.INFO);
+				break;
+			case "FINE":
+				logger.setLevel(Level.FINE);
+				break;
+			case "FINER":
+				logger.setLevel(Level.FINER);
+				break;
+			case "FINEST":
+				logger.setLevel(Level.FINEST);
+				break;
+			default:
+				logger.setLevel(DEFAULT_LEVEL);
+		}
+	}
+
+	void createAndWriteConfigFile(File configFile) throws IOException {
+		configFile.createNewFile();
+		propObject.setProperty(PROPERTY_KEY_SAVE_FILE, DEFAULT_SAVE_FILE_PATH);
+		propObject.setProperty(PROPERTY_KEY_LOGGING_LEVEL, DEFAULT_LOGGING_LEVEL_STRING);
+		propObject.setProperty(PROPERTY_KEY_DISPLAY_SIZE, Integer.toString(DEFAULT_DISPLAY_SIZE));
+		setAllConfigAlias();
+		writeProperties();
+	}
+
+	void readConfigFile() throws FileNotFoundException, IOException {
+		BufferedReader bufReader = new BufferedReader(new FileReader(
+				new File(CONFIG_FILE_NAME)));
+		propObject.load(bufReader);
+		bufReader.close();
+	}
+
+	void initializeLogFile() throws IOException {
+		FileHandler logHandler = new FileHandler(LOG_FILE_NAME);
+		LogManager.getLogManager().reset(); // removes printout to console
+											// aka root handler
+		logHandler.setFormatter(new SimpleFormatter()); // set output to a
+														// human-readable
+														// log format
+		logger.addHandler(logHandler);
+	}
+	
 	 /**
 	  * Sets the empty string for all the alias properties
 	  * @return
 	  */
-	boolean setAllConfigAlias(){
+	void setAllConfigAlias(){
 		for (int i = 0; i < PROPERTY_KEY_ALIAS_LIST.length; i++) {
 			propObject.setProperty(PROPERTY_KEY_ALIAS_LIST[i], "");
 		}
-		return true;
 	}
 	
 	/**
 	 * Add the alias lists read from the config file to the parser
 	 * @return
 	 */
-	boolean addAllConfigAlias(){
+	void addAllConfigAlias(){
 		for (int i = 0; i < listOfDefaultKeywords.length
 				&& i < PROPERTY_KEY_ALIAS_LIST.length; i++) {
 			addConfigAlias(listOfDefaultKeywords[i],
 					propObject.getProperty(PROPERTY_KEY_ALIAS_LIST[i]));
 		}
-		return true;//to be changed if there is error reading
 	}
 	
 	/**
