@@ -13,7 +13,7 @@ import org.junit.Test;
 public class TestLogicDelete {
 	Logic logicObject;
 	
-	
+	//@@author A0132760M
 	@Before
 	public void setup(){
 		File saveFile = new File("save1.txt");

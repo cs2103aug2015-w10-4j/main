@@ -145,10 +145,10 @@ public class Logic {
 	private static final String WHITE_SPACE_REGEX = "\\s+";
 	
 	private boolean isHelpDisplayed = false;
-
 	/*
 	 * Main program
 	 */
+	//@@author A0132760M
 	public static void main(String[] args) {
 		Logic logicObject = new Logic();
 		logicObject.start();
@@ -428,11 +428,13 @@ public class Logic {
 			}
 		}
 	}
+	//@@author
 	
 	private void toggleHelpDisplay() {
 		isHelpDisplayed ^= true;
 	}
 
+	//@@author A0132760M
 	/**
 	 * Concatenates the newAlias to the current property value associated with
 	 * the key propertyType in propObject
@@ -823,6 +825,7 @@ public class Logic {
 		return historyStatus;
 	}
 
+	//@@author 
 	/**
 	 * Identifies special keywords in the argumentlist, and returns a
 	 * usable arraylist of index strings
@@ -867,6 +870,7 @@ public class Logic {
 		}
 	}
 	
+	//@@author A0132760M
 	/**
 	 * Update the each of the clonedTask fields if the newTask fields
 	 * are not null
@@ -1061,9 +1065,9 @@ public class Logic {
 	
 	
 	
-	/*
-	 * show help message to UI
-	 * 
+	/**
+	 * This methods retrieves the help message from Storage
+	 * and shows it to the UI
 	 */
 	boolean showHelpMessage() {
 		UIObject.showToUser(storageObject.getHelpMessage());

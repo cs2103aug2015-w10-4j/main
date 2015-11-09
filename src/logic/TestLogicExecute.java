@@ -16,7 +16,7 @@ import org.junit.Test;
  * This class contains test cases of the executeCommand function of Logic
  */
 public class TestLogicExecute {
-
+	//@@author A0132760M
 	Logic logicObject;
 	File saveFile;
 	
