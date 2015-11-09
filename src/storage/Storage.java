@@ -2,9 +2,7 @@ package storage;
 
 import global.Task;
 
-import java.io.BufferedReader;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -12,7 +10,7 @@ public interface Storage {
 	static final String LINE_SEPARATOR = System.getProperty("line.separator");
 	static final String HELP_PATH = "help.txt";
 	static final String HELP_MESSAGE =
-"Commands  	Description                                         Example usage\n"+
+"Commands   Description                                         Example usage\n"+
 "add        Create new task entry with optional fields:         add task123\n"+
 "           - Deadline: 'by'/'from...to'/'start...end'          add task123 by tomorrow 6PM\n"+
 "           - Location: 'at'/'loc'                              add task123 at playground\n"+

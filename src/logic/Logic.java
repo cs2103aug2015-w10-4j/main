@@ -430,7 +430,7 @@ public class Logic {
 	}
 	//@@author
 	
-	private void toggleHelpDisplay() {
+	void toggleHelpDisplay() {
 		isHelpDisplayed ^= true;
 	}
 
@@ -497,7 +497,7 @@ public class Logic {
 	 * Converts a list of integer strings into list of integers
 	 * 
 	 * @param argumentList
-	 * @return
+	 * @return intList the resulting integer list
 	 */
 	ArrayList<Integer> parseIntList(ArrayList<String> argumentList) {
 		ArrayList<Integer> intList = new ArrayList<Integer>();
@@ -512,6 +512,7 @@ public class Logic {
 	 * 
 	 * Pushes a reversed command to history, and returns the
 	 * crafted status message
+	 * 
 	 * @param commandType
 	 * @param commandToPush
 	 * @param isUserInput determines whether the undo history list should be cleared,
@@ -585,8 +586,8 @@ public class Logic {
 	/**
 	 * Adds item(s) to the list of tasks in memory
 	 * 
-	 * Creates a reversed commands with the index array of
-	 * the items that have been added, the pushes it to history
+	 * Creates a reversed command with the index array of
+	 * the items that have been added, then pushes it to history
 	 * 
 	 * @param userTasks
 	 *            an arraylist of tasks to be added
@@ -602,7 +603,7 @@ public class Logic {
 	 */
 	String addItem(ArrayList<Task> userTasks, ArrayList<Integer> indexList,
 			boolean isUserInput, boolean isUndoHistory) {
-		if (userTasks == null || userTasks.isEmpty()) {
+		if (isEmptyTaskList(userTasks)) {
 			return ERROR_INVALID_ARGUMENT;
 		}
 		try {
@@ -718,7 +719,7 @@ public class Logic {
 				logger.fine("Task removed from list.");
 			} else {
 				int offset = 1;
-				while (tasksRemoved.size() != 0) {
+				while (!tasksRemoved.isEmpty()) {
 					listOfTasks.add(indexList.get(i + offset),
 							tasksRemoved.remove(0));
 					offset++;
@@ -764,7 +765,6 @@ public class Logic {
 	}
 	
 	String addSearchFilter(ArrayList<Task> userTasks) {
-
 		if (userTasks.isEmpty()) {
 			return ERROR_NO_FILTER;
 		} else {
@@ -801,7 +801,7 @@ public class Logic {
 		
 		for (int i = indexList.size() - 1; i >= 0; i--) {
 			int index = indexList.get(i);
-			argumentListForReverse[i] = String.valueOf(index); // for undo
+			argumentListForReverse[i] = String.valueOf(index);
 
 			// add to start of list to maintain order
 			Task taskRemoved = listOfTasks.remove(index);
@@ -872,8 +872,11 @@ public class Logic {
 	
 	//@@author A0132760M
 	/**
-	 * Update the each of the clonedTask fields if the newTask fields
-	 * are not null
+	 * Update each of the clonedTask fields if the newTask fields
+	 * are not null, abiding to the restrictions of the task fields
+	 * e.g. there should not be a start time without an end time
+	 * 
+	 * Not that this does not support conversion of a task into recurring tasks
 	 * 
 	 * @param newTask
 	 * @param clonedTask
@@ -934,7 +937,7 @@ public class Logic {
 	 */
 	String editItem(ArrayList<Task> userTasks, ArrayList<Integer> indexList,
 			boolean isUserInput, boolean isUndoHistory) {
-		if (isEmptyIndexList(indexList)) {
+		if (isEmptyIndexList(indexList) || indexList.size() != 1 || isEmptyTaskList(userTasks) || userTasks.size() != 1) {
 			return ERROR_INVALID_ARGUMENT;
 		}
 		Task userTask = userTasks.get(0); // should only have 1 item
@@ -1062,8 +1065,6 @@ public class Logic {
 
 		return listOfTasksInDay;
 	}
-	
-	
 	
 	/**
 	 * This methods retrieves the help message from Storage
@@ -1445,6 +1446,13 @@ public class Logic {
 	
 	boolean isEmptyIndexList(ArrayList<Integer> indexList) {
 		if (indexList == null || indexList.isEmpty()) {
+			return true;
+		}
+		return false;
+	}
+	
+	boolean isEmptyTaskList(ArrayList<Task> taskList) {
+		if (taskList == null || taskList.isEmpty()) {
 			return true;
 		}
 		return false;
