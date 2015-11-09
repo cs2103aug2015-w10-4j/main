@@ -52,7 +52,7 @@ public class FormatterHelper {
 		int[] columnLengths = new int[COLUMN_COUNT];
 		
 		for (int i = 0; i < columnLengths.length; i++) {
-			//coulumn length should be at least as long as the column name length
+			//column length should be at least as long as the column name length
 			int columnLength = TABLE_COLUMN_NAMES[i].length() + ADDITIONAL_SPACE;
 			
 			for (int j = 0; j < taskListData.length; j++) {

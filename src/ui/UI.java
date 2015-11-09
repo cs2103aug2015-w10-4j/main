@@ -202,7 +202,6 @@ public class UI {
 	//@@author A0134155M
 	private void addDisplayAreaScrollPane(Container contentPane) {
 		GridBagConstraints constraint = new GridBagConstraints();
-		
 		constraint.fill = GridBagConstraints.BOTH;
 		constraint.gridx = DISPLAY_AREA_POS_X;
 		constraint.gridy = DISPLAY_AREA_POS_Y;
