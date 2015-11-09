@@ -2,10 +2,12 @@ package ui;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.Font;
 
 import javax.swing.JLabel;
 import javax.swing.JTable;
+import javax.swing.JTextArea;
 import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.JTableHeader;
@@ -15,10 +17,26 @@ import javax.swing.table.TableColumnModel;
 
 import ui.formatter.FormatterHelper;
 import ui.tasktable.TaskTableModel;
+
 import javax.swing.border.LineBorder;
 
 @SuppressWarnings("serial")
 public class TaskTable extends JTable {
+	
+	private class TaskTableCellRenderer extends JTextArea implements
+			TableCellRenderer {
+
+		public TaskTableCellRenderer() {
+			setLineWrap(true);
+		}
+
+		public Component getTableCellRendererComponent(JTable table,
+				Object obj, boolean isSelected, boolean hasFocus, int row,
+				int column) {
+			setText((String) obj);
+			return this;
+		}
+	}
 	
 	private static final Color HEADER_COLOR = new Color(0x443266);
 	private static final Color DEFAULT_ROW_COLOR = Color.WHITE;
@@ -38,6 +56,7 @@ public class TaskTable extends JTable {
 	};
 	
 	private static final boolean[] SET_MAX_WIDTH = {true, false, false, false, false, false};
+	private static final int[] MAX_WIDTH = {20, 380, 150, 150, 150, 0};
 	
 	private TaskTableModel model = null;
 	
@@ -72,6 +91,8 @@ public class TaskTable extends JTable {
 		prepareTableHeader();
 		prepareTableAlignment();
 		prepareTableGrid();
+		
+		fixColumnHeight();
 		fixColumnWidth();
 	}
 	
@@ -86,14 +107,35 @@ public class TaskTable extends JTable {
 		}
 	}
 	
+	//@@author A0132760M
+	private void fixColumnHeight() {
+		int totalRows = this.getRowCount();
+		int totalCols = this.getColumnCount();
+		for(int i = 0; i < totalRows; i++) {
+			int defaultRowHeight = this.getRowHeight();
+			for(int j = 0; j < totalCols; j++){
+				TableCellRenderer tableCellRenderer = getCellRenderer(i, j);
+				Component component = prepareRenderer(tableCellRenderer, i, j);
+				int cellPreferredWidth = component.getPreferredSize().width + getIntercellSpacing().width;
+				int curWidth = MAX_WIDTH[j];
+				int minHeight = (int)Math.ceil((double)cellPreferredWidth/curWidth) * defaultRowHeight;
+				int rowHeight = (int)Math.max(minHeight, this.getRowHeight(i));
+				this.setRowHeight(i, rowHeight);
+			}
+		}
+	}
+	
 	//@@author A0134155M
 	private void setColumnWidth(int columnIndex, int columnWidth) {
+		//columnWidth = 300;
 		TableColumn tableColumn = getColumnModel().getColumn(columnIndex);
-		tableColumn.setPreferredWidth(columnWidth);
+		tableColumn.setPreferredWidth(MAX_WIDTH[columnIndex]);
+
+		// set custom renderer for line wrap
+		TaskTableCellRenderer wrapRenderer = new TaskTableCellRenderer();
+		this.getColumnModel().getColumn(columnIndex).setCellRenderer(wrapRenderer);
 		
-		if (SET_MAX_WIDTH[columnIndex]) {
-			tableColumn.setMaxWidth(columnWidth);
-		}
+		tableColumn.setMaxWidth(MAX_WIDTH[columnIndex]);
 	}
 	
 	//@@author A0134155M
