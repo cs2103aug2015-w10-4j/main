@@ -61,7 +61,7 @@ public class TaskTable extends JTable {
 	};
 	
 	private static final boolean[] SET_MAX_WIDTH = {true, false, false, false, false, false};
-	private static final int[] MAX_WIDTH = {20, 380, 150, 150, 150, 0};
+	private static final int[] MAX_WIDTH = {20, 368, 150, 150, 150, 0};
 	
 	private TaskTableModel model = null;
 	
@@ -97,7 +97,7 @@ public class TaskTable extends JTable {
 		prepareTableAlignment();
 		prepareTableGrid();
 		
-		fixColumnHeight();
+		//fixColumnHeight();
 		fixColumnWidth();
 	}
 	
@@ -112,8 +112,10 @@ public class TaskTable extends JTable {
 		}
 	}
 	
-	//@@author A0132760M
+	//@@author A0132760M-unused
 	private void fixColumnHeight() {
+		// problems implementing both linewrap and alignment simultaneously (JLabel vs JTextArea)
+		// chose alignment over linewrap, so there is no need to modify the height of the cell
 		int totalRows = this.getRowCount();
 		int totalCols = this.getColumnCount();
 		for(int i = 0; i < totalRows; i++) {
@@ -134,12 +136,7 @@ public class TaskTable extends JTable {
 	private void setColumnWidth(int columnIndex, int columnWidth) {
 		//columnWidth = 300;
 		TableColumn tableColumn = getColumnModel().getColumn(columnIndex);
-		tableColumn.setPreferredWidth(MAX_WIDTH[columnIndex]);
-
-		// set custom renderer for line wrap
-		TaskTableCellRenderer wrapRenderer = new TaskTableCellRenderer();
-		this.getColumnModel().getColumn(columnIndex).setCellRenderer(wrapRenderer);
-		
+		tableColumn.setPreferredWidth(MAX_WIDTH[columnIndex]);		
 		tableColumn.setMaxWidth(MAX_WIDTH[columnIndex]);
 	}
 	
