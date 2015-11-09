@@ -11,7 +11,7 @@ import org.junit.Test;
 
 public class TestLogicMark {
 	Logic logicObject = new Logic();
-	
+	//@@author A0132760M
 	@Before
 	public void setup(){
 		File saveFile = new File("save.txt");

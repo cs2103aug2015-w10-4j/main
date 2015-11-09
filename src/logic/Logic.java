@@ -215,6 +215,12 @@ public class Logic {
 		setReadConfig();
 	}
 
+	/**
+	 * Loads the data that is stored in propObject
+	 * Used after reading of the configuration file
+	 * 
+	 * @throws IOException
+	 */
 	void setReadConfig() throws IOException {
 		storageObject.saveFileToPath(propObject.getProperty(PROPERTY_KEY_SAVE_FILE));
 		String logLevelString = propObject.getProperty(PROPERTY_KEY_LOGGING_LEVEL);
@@ -241,6 +247,11 @@ public class Logic {
 		}
 	}
 
+	/**
+	 * Creates a configuration file and writes the default values to it
+	 * @param configFile
+	 * @throws IOException
+	 */
 	void createAndWriteConfigFile(File configFile) throws IOException {
 		configFile.createNewFile();
 		propObject.setProperty(PROPERTY_KEY_SAVE_FILE, DEFAULT_SAVE_FILE_PATH);
@@ -257,6 +268,12 @@ public class Logic {
 		bufReader.close();
 	}
 
+	/**
+	 * Initialize the log file, and set the logger output format
+	 * to human-readable
+	 * 
+	 * @throws IOException
+	 */
 	void initializeLogFile() throws IOException {
 		FileHandler logHandler = new FileHandler(LOG_FILE_NAME);
 		LogManager.getLogManager().reset(); // removes printout to console

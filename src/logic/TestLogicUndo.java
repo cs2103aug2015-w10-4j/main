@@ -25,9 +25,6 @@ Logic logicObject;
 		logicObject = new Logic();
 		File saveFile = new File("save.txt");
 		saveFile.delete();
-	
-		
-
 	}
 	
 	@Test
