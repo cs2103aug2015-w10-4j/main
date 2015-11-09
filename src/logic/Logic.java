@@ -394,15 +394,17 @@ public class Logic {
 		} else {
 			switch (commandType) {
 				case ADD :
+					logger.info("ADD command detected");
 					argumentList = removeDuplicates(argumentList);
 					indexList = parseIntList(argumentList);
 					// argumentList's order gets messed up after going through HashSet for size > 10
 					// So apply sort again
 					Collections.sort(indexList);
-					logger.info("ADD command detected");
+					logger.fine("Finished processing index.");
 					return addItem(userTasks, indexList, isUserInput,
 							isUndoHistory);
 				case DELETE :
+					logger.info("DELETE command detected");
 					argumentList = processIndexArguments(argumentList);
 					argumentList = removeDuplicates(argumentList);
 					if (isUserInput) {
@@ -414,9 +416,10 @@ public class Logic {
 					} else {
 						indexList = parseIntList(argumentList);
 					}
-					logger.info("DELETE command detected");
+					logger.fine("Finished processing index.");
 					return deleteItem(indexList, isUserInput, isUndoHistory);
 				case EDIT :
+					logger.info("EDIT command detected");
 					argumentList = processIndexArguments(argumentList);
 					argumentList = removeDuplicates(argumentList);
 					if (isUserInput) {
@@ -428,7 +431,7 @@ public class Logic {
 					} else {
 						indexList = parseIntList(argumentList);
 					}
-					logger.info("EDIT command detected");
+					logger.fine("Finished processing index.");
 					return editItem(userTasks, indexList, isUserInput,
 							isUndoHistory);
 				case DISPLAY :
@@ -459,6 +462,7 @@ public class Logic {
 					} else {
 						indexList = parseIntList(argumentList);
 					}
+					logger.fine("Finished processing index.");
 					return markDoneStatus(indexList, isUserInput, isUndoHistory, true);
 				case UNMARK:
 					logger.info("UNMARK command detected");
@@ -473,11 +477,13 @@ public class Logic {
 					} else {
 						indexList = parseIntList(argumentList);
 					}
+					logger.fine("Finished processing index.");
 					return markDoneStatus(indexList, isUserInput, isUndoHistory, false);
 				case SEARCH:
 					logger.info("SEARCH command detected");
 					return addSearchFilter(userTasks);
 				case HELP:
+					logger.info("HELP command detected");
 					toggleHelpDisplay();
 					return MESSAGE_SUCCESS_HELP;
 				case ALIAS:
@@ -585,6 +591,7 @@ public class Logic {
 		String normalStatus;
 		String undoStatus;
 		String redoStatus;
+		logger.finer("Crafting status messages.");
 		switch (commandType) {
 			case ADD:
 				normalStatus = MESSAGE_SUCCESS_ADD;
@@ -698,6 +705,9 @@ public class Logic {
 			String[] argumentListForReverse = new String[parsedIntList.size()];
 			Integer[] integerArr = new Integer[parsedIntList.size()];
 			parsedIntList.toArray(integerArr);
+			
+
+			logger.fine("Creating argumentList for reversed command.");
 			for (int i = 0; i < parsedIntList.size(); i++) {
 				argumentListForReverse[i] = String.valueOf(integerArr[i]);
 			}
@@ -886,7 +896,7 @@ public class Logic {
 		return historyStatus;
 	}
 
-	//@@author 
+	//@@author A0134155M
 	/**
 	 * Identifies special keywords in the argumentlist, and returns a
 	 * usable arraylist of index strings
@@ -1166,7 +1176,6 @@ public class Logic {
 			
 			ArrayList<Task> listOfFirstDate = new ArrayList<Task>();
 			ArrayList<Task> listOfSecondDate = new ArrayList<Task>();
-			//@@author A0124093M
 			if (listOfEventsDeadlines.size() != 0) {
 				Task firstTask;
 				Calendar todayDate = new GregorianCalendar();
