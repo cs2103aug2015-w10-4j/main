@@ -27,8 +27,15 @@ import storage.Storage;
  */
 public class Parser {
 	
-	//status messages
+	private static final int DEFAULT_AM_PM_FOR_END_TIME = 1;
+	private static final int DEFAULT_MINUTE_FOR_END_TIME = 59;
+	private static final int DEFAULT_HOUR_FOR_END_TIME = 11;
+
+	private static final int DEFAULT_AM_PM_FOR_START_TIME = 0;
+	private static final int DEFAULT_MINUTE_FOR_START_TIME = 0;
+	private static final int DEFAULT_HOUR_FOR_START_TIME = 9;
 	
+	//status messages
 	static final String ERROR_MISSING_INTERVAL = "Error: Missing repeat interval.";
 	static final String ERROR_MISSING_REPEATS = "Error: Missing number of repeats.";
 	static final String ERROR_INVALID_DATE_ARGUMENTS = "Error: Invalid arguments for date.";
@@ -94,7 +101,7 @@ public class Parser {
 	static final String[] MONTHS = { "jan", "feb", "mar", "apr", "may",
 			"jun", "jul", "aug", "sep", "oct", "nov", "dec" };
 	static final String[] DAYS = { "sunday" , "monday" , "tuesday" , "wednesday" , "thursday" ,"friday", "saturday" };
-	static final String[] DAYS_COMPACT = { "sun" , "mon" , "tue" , "wed" , "thu" ,"fri", "sat" };
+	static final String[] DAYS_COMPACT = { "sun" , "mon" , "tue" , "wed" , "thu" , "fri", "sat" };
 	
 
 	static final String[] PERIODIC = { "days" , "day" , "week" , "weeks" , "month" , "months" , "year" , "years" };
@@ -203,7 +210,7 @@ public class Parser {
 				commandObject.addTask(taskObject);
 				break;
 			case EDIT :
-				if (commandString.split(" ").length == 1) {// if insufficient arguments .eg "edit"
+				if (commandString.split(WHITE_SPACE_REGEX).length == 1) {// if insufficient arguments .eg "edit"
 					throw new Exception(ERROR_INVALID_NUMBER_OF_ARGUMENTS);
 				} else {
 					argumentArray = getParameterOneAsArray(commandString);
@@ -491,13 +498,13 @@ public class Parser {
 		
 		logger.fine("extractDate: got date arguments. attempting to parse dates");
 		if (deadlineArguments != null) {
-			Calendar argumentDate = parseTime(deadlineArguments);
+			Calendar argumentDate = parseTime(deadlineArguments, false);
 			taskObject.setEndingTime(argumentDate);
 			logger.fine("extractDate: deadline set");
 			return true;
 		} else if (startEventArguments != null && endEventArguments != null) {
-			Calendar argumentStartDate = parseTime(startEventArguments);
-			Calendar argumentEndDate = parseTime(endEventArguments);
+			Calendar argumentStartDate = parseTime(startEventArguments, true);
+			Calendar argumentEndDate = parseTime(endEventArguments, false);
 
 			if (argumentStartDate.before(argumentEndDate)) {
 				taskObject.setStartingTime(argumentStartDate);
@@ -511,11 +518,11 @@ public class Parser {
 				&& isNewTask) {
 			throw new Exception(ERROR_MISSING_START_OR_END_TIME);
 		} else if (startEventArguments != null) {
-			Calendar argumentStartDate = parseTime(startEventArguments);
+			Calendar argumentStartDate = parseTime(startEventArguments, true);
 			taskObject.setStartingTime(argumentStartDate);
 			return true;
 		} else if (endEventArguments != null) {
-			Calendar argumentEndDate = parseTime(endEventArguments);
+			Calendar argumentEndDate = parseTime(endEventArguments, false);
 			taskObject.setEndingTime(argumentEndDate);
 			return true;
 		} else {
@@ -526,9 +533,19 @@ public class Parser {
 	// if time not specified, it will be parsed to 11:59 PM
 	// TIME keyword in commandString must be capitalized
 	//@@author A0124093M
-	Calendar parseTime(String[] dateArgumentsTemp) throws Exception {
+	Calendar parseTime(String[] dateArgumentsTemp, boolean isStart) throws Exception {
 		logger.fine("parseDate: parsing date");
-		int date, month, year, hour = 11, minute = 59, isAMorPM = 1;
+		int date, month, year, hour, minute, isAMorPM;
+		if (isStart) {
+			hour = DEFAULT_HOUR_FOR_START_TIME;
+			minute = DEFAULT_MINUTE_FOR_START_TIME;
+			isAMorPM = DEFAULT_AM_PM_FOR_START_TIME;
+		} else {
+			hour = DEFAULT_HOUR_FOR_END_TIME;
+			minute = DEFAULT_MINUTE_FOR_END_TIME;
+			isAMorPM = DEFAULT_AM_PM_FOR_END_TIME;
+		}
+		
 		Integer hourOfDay = null;
 		Calendar helperDate;
 		

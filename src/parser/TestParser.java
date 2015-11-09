@@ -98,7 +98,7 @@ public class TestParser {
 		Command message;
 
 		message = parserObj.parseCommand("search task");
-		String actual ="Name: task Starting time: null Ending Time: null Location: null Period Interval: null Period Repeats: null Done: false";
+		String actual = "Name: task Starting time: null Ending Time: null Location: null Period Interval: null Period Repeats: null Done: false";
 		assertEquals(actual, message.getTask(0).getAllInfo());
 		
 	
@@ -109,7 +109,7 @@ public class TestParser {
 	public void testParserSaveto() throws Exception {
 		Command message;
 		message = parserObj.parseCommand("saveto new.txt");
-		String actual ="new.txt";
+		String actual = "new.txt";
 		assertEquals(actual, message.getArguments().get(0));	
 	}
 	
@@ -119,7 +119,7 @@ public class TestParser {
 	public void testParserMark() throws Exception {
 		Command message;
 		message = parserObj.parseCommand("mark 1");
-		String actual ="1";
+		String actual = "1";
 		assertEquals(actual, message.getArguments().get(0));	
 	}
 	
@@ -128,7 +128,7 @@ public class TestParser {
 	public void testParserUnMark() throws Exception {
 		Command message;
 		message = parserObj.parseCommand("unmark 1");
-		String actual ="1";
+		String actual = "1";
 		assertEquals(actual, message.getArguments().get(0));	
 	}
 	
@@ -156,28 +156,15 @@ public class TestParser {
 	@Test
 	public void testParseDate() throws Exception {
 		Calendar expectedDate = new GregorianCalendar();
-		int year = expectedDate.get(Calendar.YEAR);
 		expectedDate.clear();
 		expectedDate.set(2015, 8, 18);
 		expectedDate.set(Calendar.HOUR, 23);
 		expectedDate.set(Calendar.MINUTE, 59);
 		
 		String[] dateArgs = { "18", "sep", "2015"};
-		Calendar date = parserObj.parseTime(dateArgs);
+		Calendar date = parserObj.parseTime(dateArgs, false);
 		
 		assertEquals(expectedDate, date);
-		
-		
-		// this doesn't work because of milliseconds difference =.=
-		/*
-		expectedDate = new GregorianCalendar();
-		expectedDate.add(Calendar.DATE, 1);
-		
-		dateArgs = new String[] { "tomorrow" };
-		date = parserObj.parseDate(dateArgs);
-		
-		assertEquals(expectedDate, date);
-		*/
 	}
 
 	//@@author A0108355H
