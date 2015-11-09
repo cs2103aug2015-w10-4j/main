@@ -11,6 +11,9 @@ import javax.swing.SwingConstants;
 import javax.swing.border.BevelBorder;
 
 //@@author A0134155M
+/**
+ * This class implements a StatusBar-like widget using <code>Swing</code>
+ */
 @SuppressWarnings("serial")
 public class StatusBar extends JPanel {
     

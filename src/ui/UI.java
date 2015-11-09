@@ -5,6 +5,9 @@ import java.util.List;
 import global.Task;
 
 //@@author A0134155M
+/**
+ * This class serves as interface for GraphicalUI and TextUI
+ */
 public interface UI {
 
     public enum DisplayType {

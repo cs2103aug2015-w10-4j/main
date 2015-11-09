@@ -4,6 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 //@@author A0134155M
+/**
+ * This class is a data structure used to store user commands and also
+ * enable the user to access them.
+ */
 public class UserInputHistory {
     
     private static final String EMPTY_STRING = "";

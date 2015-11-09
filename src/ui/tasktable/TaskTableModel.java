@@ -5,6 +5,10 @@ import javax.swing.table.AbstractTableModel;
 import global.Pair;
 import ui.formatter.TableModelFormatter;
 
+/**
+ * This class is used as a model for <code>TaskTable</code><br>
+ * @see ui.TaskTable
+ */
 @SuppressWarnings("serial")
 public class TaskTableModel extends AbstractTableModel {
     
