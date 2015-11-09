@@ -1245,6 +1245,7 @@ public class Logic {
 	 * @param listOfFirstDate
 	 * @param listOfSecondDate
 	 */
+	//@@author A0124093M
 	void getTasksInFirstAndSecondDate(
 			ArrayList<Task> listOfEventsDeadlines,
 			ArrayList<Task> listOfFirstDate, ArrayList<Task> listOfSecondDate) {
@@ -1300,6 +1301,7 @@ public class Logic {
 	 * 
 	 * @param searchStrings
 	 */
+	//@@author A0132760M
 	void filterTasksAndGenerateSearchStrings(List<String> searchStrings) {
 		boolean isEmptyName = true;
 		boolean isEmptyTime = true;
