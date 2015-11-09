@@ -252,6 +252,7 @@ public class Task implements Comparable<Task> {
         return newTask;
     }
     
+    //@@author A0108355H
     public int compareTo(Task taskObj) {
         Calendar thisTime;
         Calendar objTime;
