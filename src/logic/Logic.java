@@ -28,9 +28,8 @@ import parser.Parser;
 import storage.Storage;
 import storage.JsonFormatStorage;
 import ui.GraphicalUI;
-import ui.TextUI;
-import ui.UI.DisplayType;
 import ui.UI;
+import ui.UI.DisplayType;
 
 /**
  * This file contains the main program of the command-line calendar, Tasky.
@@ -180,7 +179,7 @@ public class Logic {
 	}
 
 	void initializeComponentObjects() {
-		UIObject = new TextUI();
+		UIObject = new GraphicalUI();
 		parserObject = new Parser();
 		storageObject = new JsonFormatStorage(true);
 		historyObject = new History();

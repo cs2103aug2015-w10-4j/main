@@ -32,7 +32,6 @@ import javax.swing.table.TableColumnModel;
 
 import global.Task;
 import ui.formatter.FormatterHelper;
-import ui.formatter.TextFormatter;
 import ui.tasktable.TaskTableModel;
 
 public class GraphicalUI implements UI {
@@ -109,7 +108,6 @@ public class GraphicalUI implements UI {
 	private JTextField userInputField = new JTextField(USER_INPUT_FIELD_CHAR_COUNT);
 	private StatusBar statusBar = new StatusBar();
 	
-	private TextFormatter taskListFormatter = new TextFormatter();
 	private UserInputHistory userInputHistory = new UserInputHistory();
 	
 	private boolean isTableTitleVisible = true;

@@ -20,6 +20,7 @@ public interface UI {
 	static final int FILTERED_DISPLAY_MIN_ROW = 1;
 	static final int FILTERED_DISPLAY_MIN_TABLE = 1;
 	
+	//@@author A0134155M
 	/**
 	 * Asks the UI to display content to user
 	 * @param stringToShow
@@ -27,6 +28,7 @@ public interface UI {
 	 */
 	public boolean showToUser(String stringToShow);
 	
+	//@@author A0134155M
 	/**
 	 * Asks the UI to display content to user in the status bar
 	 * @param stringToShow
@@ -34,6 +36,7 @@ public interface UI {
 	 */
 	public boolean showStatusToUser(String stringToShow);
 	
+	//@@author A0134155M
 	/**
 	 * Asks the UI to display the list of tasks
 	 * @param tasks
@@ -41,6 +44,7 @@ public interface UI {
 	 */
 	public boolean showTasks(List<Task> tasks, DisplayType displayType, List<String> titles);
 	
+	//@@author A0134155M
 	/**
 	 * Prompt message and obtain user input
 	 * @param prompt message to prompt user
