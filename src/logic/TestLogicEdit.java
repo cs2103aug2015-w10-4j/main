@@ -12,7 +12,7 @@ import org.junit.Test;
 
 public class TestLogicEdit {
     Logic logicObject;
-    
+    //@@author A0132760M
     
     @Before
     public void setup(){

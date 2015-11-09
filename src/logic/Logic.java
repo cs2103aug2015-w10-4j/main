@@ -35,7 +35,7 @@ import ui.UI.DisplayType;
  * This file contains the main program of the command-line calendar, Tasky.
  * 
  * The Logic constructor will initialize all the other components, Parser, Logic and Storage,
- * as well as its own sub-component History. It also will initialize the log file and
+ * as well as its own sub-component History. It will also initialize the log file and
  * read from the configuration file if it exists.
  * 
  * Upon calling start(), Logic will begin requesting commands from the UI, and

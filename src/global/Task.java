@@ -120,10 +120,12 @@ public class Task implements Comparable<Task> {
         return this.location;
     }
 
+    //@@author A0132760M
     public String getPeriodicInterval() {
         return this.periodicInterval;
     }
-
+    
+    //@@author A0132760M
     public String getPeriodicRepeats() {
         return this.periodicRepeats;
     }
@@ -160,7 +162,8 @@ public class Task implements Comparable<Task> {
         }
         return false;
     }
-    
+
+    //@@author A0132760M
     public boolean hasPeriodicInterval() {
         if(this.periodicInterval != null) {
             return true;
@@ -168,6 +171,7 @@ public class Task implements Comparable<Task> {
         return false;
     }
     
+    //@@author A0132760M
     public boolean hasPeriodicRepeats() {
         if(this.periodicRepeats != null) {
             return true;
@@ -184,7 +188,7 @@ public class Task implements Comparable<Task> {
         }
     }
     
-    
+    //@@author A0132760M
     public boolean isDone(){
         return this.isDone;
     }
@@ -226,6 +230,7 @@ public class Task implements Comparable<Task> {
         return true;
     }
 
+    //@@author A0132760M
     public boolean setDone(boolean status) {
         this.isDone = status;
         return true;
