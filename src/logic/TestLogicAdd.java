@@ -80,14 +80,10 @@ public class TestLogicAdd {
 	 */
 	@Test
 	public void logicAddDeadlineOne(){
-		ArrayList<Task> newTasks = new ArrayList<Task>();
-		Task curTask = new Task("item 1");
 		Calendar curDate = Calendar.getInstance();
-		curTask.setEndingTime(curDate);
-		newTasks.add(curTask);
-		String message = logicObject.addItem(newTasks, null, true, true);
-		assertEquals("Item(s) successfully added.", message);
-	//	assertEquals(curDate, logicObject.listOfTasks.get(0).getEndingTime());
+		String result = addItem("item 1", curDate);
+		assertEquals("Item(s) successfully added.", result);
+		assertEquals(curDate, logicObject.listOfTasks.get(0).getEndingTime());
 	}
 	
 	/*
@@ -99,8 +95,8 @@ public class TestLogicAdd {
 		Calendar endingDate = Calendar.getInstance();
 		startingDate.set(2015, 12, 31);
 		endingDate.set(2016, 1, 1);
-		
 		String result = addItem("item 1", startingDate, endingDate);
+		
 		assertEquals("Item(s) successfully added.", result);
 		assertEquals(startingDate, logicObject.listOfTasks.get(0).getStartingTime());
 		assertEquals(endingDate, logicObject.listOfTasks.get(0).getEndingTime());

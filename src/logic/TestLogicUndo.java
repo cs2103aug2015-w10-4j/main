@@ -30,8 +30,6 @@ Logic logicObject;
 
 	}
 	
-
-	
 	@Test
 	public void logicUndoEmpty() throws Exception{
 		String message = logicObject.undoCommand();
@@ -65,28 +63,6 @@ Logic logicObject;
 		logicObject.deleteItem(indexList, true, true);
 		String message = logicObject.undoCommand();
 		assertEquals("Undo : Deleted item(s) restored.", message);
-	/*	logicObject.listOfTasks = new ArrayList<Task>();
-		addHelper(new Task("some item 1"));
-        addHelper(new Task("some item 2"));	
-		addHelper(new Task("some item 3"));
-		addHelper(new Task("some item 4"));
-		addHelper(new Task("some item 5"));	
-		addHelper(new Task("some item 6"));
-		
-		ArrayList<Integer> indexList = new ArrayList<Integer>();
-		
-		indexList.add(1);
-		indexList.add(3);
-		indexList.add(2);
-		indexList.add(1);
-		indexList.add(3);
-		indexList.add(2);
-		
-		logicObject.deleteItem(indexList, true, true);
-	
-	
-		String message = logicObject.undoCommand();		
-		assertEquals("Undo : Deleted item(s) restored.", message);*/
 	}
 	
 	@Test
@@ -98,17 +74,15 @@ Logic logicObject;
 		listToEdit.add(new Task("Old item 1"));
 		logicObject.addItem(listToEdit, new ArrayList<Integer>(), true, true);
 
-		indexList.add(1);
+		indexList.add(0);
 		listToEdit.clear();
 		listToEdit.add(new Task("New item 1"));
 		logicObject.editItem(listToEdit, indexList, true, true);
 
 		String message = logicObject.undoCommand();		
-		assertEquals("Undo : Added item(s) removed.", message);
+		assertEquals("Undo : Reverted edits.", message);
 		
-	//	assertEquals("Old item 1", logicObject.listOfTasks.get(0).getName());
-		/*assertEquals("some item 2", logicObject.listOfTasks.get(1).getName());
-		assertEquals("some item 3", logicObject.listOfTasks.get(2).getName());*/
+	    assertEquals("Old item 1", logicObject.listOfTasks.get(0).getName());
 	}
 	
 	@After

@@ -22,8 +22,6 @@ Logic logicObject;
 		File saveFile = new File("save.txt");
 		saveFile.delete();
 	}
-	
-
 
 	//@@author A0108355H
 	@Test
@@ -47,8 +45,6 @@ Logic logicObject;
 		assertEquals("Redo : Deleted item(s) restored.", message);
 		assertEquals("item 1", logicObject.listOfTasks.get(0).getName());
 	}
-	
-	
 
 	//@@author A0108355H
 	@Test

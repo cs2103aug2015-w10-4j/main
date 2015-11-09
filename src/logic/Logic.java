@@ -38,8 +38,6 @@ import ui.UI.DisplayType;
  *
  */
 public class Logic {
-	
-	
 	/*
 	 * Declaration of object variables
 	 */
@@ -358,8 +356,8 @@ public class Logic {
 	 * @param isUserInput
 	 *            false if command is called from redo
 	 * @param isUndoHistory
-	 *            true if command is called from undo false if command is called
-	 *            by user directly
+	 *            true if command is called from undo
+	 *            false if command is called by user directly
 	 * 
 	 * @return status string to be shown to user
 	 * @throws IOException 

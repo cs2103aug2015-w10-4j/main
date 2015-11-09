@@ -21,6 +21,9 @@ public class TestLogicDelete {
 		logicObject = new Logic();
 	}	
 	
+	/*
+	 * Tests corner cases of erroneous deletions
+	 */
 	@Test
 	public void logicDeleteOne(){
 		logicObject.listOfShownTasks = new ArrayList<Task>();
@@ -33,33 +36,36 @@ public class TestLogicDelete {
     
 		
 		ArrayList<Integer> argumentList = new ArrayList<Integer>();
-		String message;
+		String result;
 		argumentList.clear();
 		argumentList.add(4);
-		message = logicObject.deleteItem(argumentList, true, true);
-		assertEquals("Error: There is no item at this index.", message);
+		result = logicObject.deleteItem(argumentList, true, true);
+		assertEquals("Error: There is no item at this index.", result);
 		
 		argumentList.clear();
 		argumentList.add(-1);
-		message = logicObject.deleteItem(argumentList, true, true);
-		assertEquals("Error: There is no item at this index.", message);
+		result = logicObject.deleteItem(argumentList, true, true);
+		assertEquals("Error: There is no item at this index.", result);
 		
 		argumentList.clear();
 		argumentList.add(-2);
-		message = logicObject.deleteItem(argumentList, true, true);
-		assertEquals("Error: There is no item at this index.", message);
+		result = logicObject.deleteItem(argumentList, true, true);
+		assertEquals("Error: There is no item at this index.", result);
 		
 		argumentList.clear();
 		argumentList.add(55);
-		message = logicObject.deleteItem(argumentList, true, true);
-		assertEquals("Error: There is no item at this index.", message);
+		result = logicObject.deleteItem(argumentList, true, true);
+		assertEquals("Error: There is no item at this index.", result);
 		
 		argumentList.clear();
 		argumentList.add(2);
-		message = logicObject.deleteItem(argumentList, true, true);
-		assertEquals("Item(s) successfully deleted.", message);
+		result = logicObject.deleteItem(argumentList, true, true);
+		assertEquals("Item(s) successfully deleted.", result);
 	}
 	
+	/*
+	 * Tests multiple deletion
+	 */
 	@Test
 	public void logicDeleteMultipleOne(){
 		logicObject.listOfTasks = new ArrayList<Task>();
@@ -73,10 +79,13 @@ public class TestLogicDelete {
 		indexList.add(2);
 		indexList.add(1);
 		
-		String message = logicObject.deleteItem(indexList, true, true);
-		assertEquals("Item(s) successfully deleted.", message);
+		String result = logicObject.deleteItem(indexList, true, true);
+		assertEquals("Item(s) successfully deleted.", result);
 	}
 	
+	/*
+	 * Tests multiple deletion of a subset of tasks
+	 */
 	@Test
 	public void logicDeleteMultipleTwo(){
 		logicObject.listOfTasks = new ArrayList<Task>();
@@ -94,10 +103,13 @@ public class TestLogicDelete {
 		indexList.add(2);
 		indexList.add(1);
 		
-		String message = logicObject.deleteItem(indexList, true, true);
-		assertEquals("Item(s) successfully deleted.", message);
+		String result = logicObject.deleteItem(indexList, true, true);
+		assertEquals("Item(s) successfully deleted.", result);
 	}
 	
+	/*
+	 * Tests multiple deletion with invalid indexes
+	 */
 	@Test
 	public void logicDeleteMultipleThree(){
 		logicObject.listOfTasks = new ArrayList<Task>();
@@ -109,22 +121,19 @@ public class TestLogicDelete {
 		logicObject.listOfTasks.add(new Task("some item 6"));
 		
 		ArrayList<Integer> indexList = new ArrayList<Integer>();
-		String message;
+		String result;
 		
 		indexList.add(6);
 		indexList.add(22);
 		indexList.add(2);
-		indexList.add(4);
-		indexList.add(6);
-		indexList.add(6);
 		
-		message = logicObject.deleteItem(indexList, true, true);
-		assertEquals("Error: There is no item at this index.", message);
+		result = logicObject.deleteItem(indexList, true, true);
+		assertEquals("Error: There is no item at this index.", result);
 		assertEquals(logicObject.listOfTasks.size(), 6);
 	}
 	
 	/*
-	 * Try to delete tasks with several overlapping range delete
+	 * Tests multiple deletion when there are more tasks in list
 	 */
 	@Test
 	public void logicDeleteMultipleItemsSuccess() {
@@ -134,7 +143,7 @@ public class TestLogicDelete {
 		}
 		
 		ArrayList<Integer> indexList = new ArrayList<>();
-		String message;
+		String result;
 		
 		indexList.add(1);
 		indexList.add(2);
@@ -144,13 +153,13 @@ public class TestLogicDelete {
 		indexList.add(24);
 		indexList.add(25);
 		
-		message = logicObject.deleteItem(indexList, true, true);
-		assertEquals("Item(s) successfully deleted.", message);
+		result = logicObject.deleteItem(indexList, true, true);
+		assertEquals("Item(s) successfully deleted.", result);
 		assertEquals(logicObject.listOfTasks.size(), 19);
 	}
 	
 	/*
-	 * Try to delete a task with invalid index
+	 * Tests multiple deletion with invalid index
 	 */
 	@Test
 	public void logicDeleteMultipleItemsFail() {
@@ -160,15 +169,14 @@ public class TestLogicDelete {
 		}
 		
 		ArrayList<Integer> indexList = new ArrayList<>();
-		String message;
+		String result;
 		
 		indexList.add(-1);
 		indexList.add(2);
 		indexList.add(-3);
 		
-		
-		message = logicObject.deleteItem(indexList, true, true);
-		assertEquals("Error: There is no item at this index.", message);
+		result = logicObject.deleteItem(indexList, true, true);
+		assertEquals("Error: There is no item at this index.", result);
 		assertEquals(logicObject.listOfTasks.size(), 26);
 	}
 	

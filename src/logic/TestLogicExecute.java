@@ -35,10 +35,8 @@ public class TestLogicExecute {
 		try {
 			saveFile.createNewFile();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
 		
 		Task task_1 = new Task();
 		task_1.setName("Item 1");
@@ -123,6 +121,17 @@ public class TestLogicExecute {
 		args[0] = "save.txt";
 		commandObject = new Command(Command.Type.SAVETO, args);
 		assertEquals("File path successfully changed.", logicObject.executeCommand(commandObject, true, true));
+	}
+	
+	@Test
+	public void logicExecuteMark(){
+		Command commandObject;
+		String[] args;
+		
+		args = new String[1];
+		args[0] = "1";
+		commandObject = new Command(Command.Type.MARK, args);
+		assertEquals("Item(s) successfully marked as done.", logicObject.executeCommand(commandObject, true, true));
 	}
 	
 	@Test
