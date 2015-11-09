@@ -15,11 +15,13 @@ public class TestLogicUndo {
 	
 Logic logicObject;
 
+    //@@author A0108355H
 	public void addHelper(Task newTask) {
 		logicObject.listOfTasks.add(newTask);
 		logicObject.listOfShownTasks.add(newTask);
 	}
 	
+	//@@author A0108355H
 	@Before
 	public void setup(){
 		logicObject = new Logic();
@@ -30,12 +32,16 @@ Logic logicObject;
 
 	}
 	
+	//@@author A0108355H
+	//test undo without any next execution
 	@Test
 	public void logicUndoEmpty() throws Exception{
 		String message = logicObject.undoCommand();
 		assertEquals("Error: No history found.", message);
 	}
 	
+	//@@author A0108355H
+	//test undo before add
 	@Test
 	public void logicUndoAdd(){
 
@@ -46,7 +52,8 @@ Logic logicObject;
 		String message = logicObject.undoCommand();		
 		assertEquals("Undo : Added item(s) removed.", message);
 	}
-
+	//@@author A0108355H
+	//test undo before multiple delete
 	@Test
 	public void logicUndoMultipleDelete(){
 		logicObject.listOfTasks = new ArrayList<Task>();
@@ -65,6 +72,8 @@ Logic logicObject;
 		assertEquals("Undo : Deleted item(s) restored.", message);
 	}
 	
+	//@@author A0108355H
+	//test undo before edit
 	@Test
 	public void logicUndoEdit(){
 

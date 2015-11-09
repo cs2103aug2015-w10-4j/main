@@ -28,6 +28,7 @@ public class TestParser {
 
 
 	//@@author A0108355H
+	//test add without a name
 	@Test
 	public void testParserAddEmptyName() {
 		Command message;
@@ -42,6 +43,7 @@ public class TestParser {
 	}
 	
 	//@@author A0108355H
+	//test delete without a index
 	@Test
 	public void testParserDeleteEmptyName() {
 		Command message;
@@ -56,6 +58,7 @@ public class TestParser {
 	}
 	
 	//@@author A0108355H
+	//test edit without argument
 	@Test
 	public void testParserEditEmptyName() {
 		Command message;
@@ -70,6 +73,7 @@ public class TestParser {
 	}
 	
 	//@@author A0108355H
+	//test edit on special fields
 	@Test
 	public void testParserEditSpecial() throws Exception {
 		Command message;
@@ -81,6 +85,7 @@ public class TestParser {
 	}
 	
 	//@@author A0108355H
+	//test edit with a new task of full arguments
 	@Test
 	public void testParserEditNormal() throws Exception {
 		Command message;
@@ -93,6 +98,7 @@ public class TestParser {
 	}
 	
 	//@@author A0108355H
+	//test basic search
 	@Test
 	public void testParserSearch() throws Exception {
 		Command message;
@@ -105,6 +111,7 @@ public class TestParser {
 	}
 	
 	//@@author A0108355H
+	//test saveto
 	@Test
 	public void testParserSaveto() throws Exception {
 		Command message;
@@ -152,7 +159,7 @@ public class TestParser {
 		assertEquals("DELETE",message.getCommandType().toString());
 	}
 	
-	//@@author A0108355H
+
 	@Test
 	public void testParseDate() throws Exception {
 		Calendar expectedDate = new GregorianCalendar();
@@ -167,7 +174,7 @@ public class TestParser {
 		assertEquals(expectedDate, date);
 	}
 
-	//@@author A0108355H
+	
 	@Test
 	public void testGetNearestDate(){
 		Calendar date = new GregorianCalendar();
