@@ -16,8 +16,8 @@ public interface Storage {
 "           - Location: 'at'/'loc'                              add task123 at playground\n"+
 "           - Periodic: 'every n days/weeks/years for n times'  add task123 by next thursday every 3 weeks for 10 times\n"+
 "\n"+
-"alias      Adds a new alias specified by the user              alias add submit"+
-"                                                               alias delete remove"+
+"alias      Adds a new alias specified by the user              alias add submit\n"+
+"                                                               alias delete remove\n"+
 "\n"+
 "delete     Deletes task entry at specified index               delete 1\n"+
 "\n"+
