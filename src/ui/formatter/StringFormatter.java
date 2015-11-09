@@ -1,6 +1,9 @@
 package ui.formatter;
 
 //@@author A0134155M
+/**
+ * This class is used to reformat string with a particular width and / or alignment.
+ */
 public class StringFormatter {
     
     /* 

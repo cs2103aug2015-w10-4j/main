@@ -8,6 +8,10 @@ import ui.formatter.FormatterHelper;
 import ui.formatter.TextFormatter;
 
 //@@author A0134155M
+/**
+ * This class implements UI. This class mainly uses console to display data to and 
+ * interact with the user.
+ */
 public class TextUI implements UI {
     
     /*

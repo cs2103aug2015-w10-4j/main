@@ -9,6 +9,9 @@ import java.util.List;
 import global.Task;
 
 //@@author A0134155M
+/**
+ * This class contains several helper methods to other classes in ui.formatter package.
+ */
 public class FormatterHelper {
     
     private static final String EMPTY_STRING_SUBSTITUTE = " ";

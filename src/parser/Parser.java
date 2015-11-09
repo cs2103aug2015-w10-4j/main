@@ -448,6 +448,7 @@ public class Parser {
      * @return
      * @throws Exception
      */
+    //@@A0108355H
     boolean extractLocation(String commandString, ArrayList<KeywordMarker> keywordMarkers, Task taskObject) throws Exception{
         String[] locationArguments = getArgumentsForField(commandString, keywordMarkers, FieldType.LOCATION);
         String location = "";

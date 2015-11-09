@@ -125,6 +125,8 @@ public class JsonFormatStorage implements Storage {
     }
     
     //@@author A0108355H
+    //copy older saved file to newer saved file
+    // @throw IOException
     private void copyFile(String newPath, String oldPath) throws IOException {
         FileReader fr = new FileReader(oldPath);
         FileWriter fw = new FileWriter(newPath);

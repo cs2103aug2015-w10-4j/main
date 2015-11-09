@@ -35,6 +35,10 @@ import ui.formatter.FormatterHelper;
 import ui.tasktable.TaskTableModel;
 
 //@@author A0134155M
+/**
+ * This class implements UI. This class mainly uses <code>Swing</code> to display data to and 
+ * interact with the user.
+ */
 public class GraphicalUI implements UI {
     
     /*

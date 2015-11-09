@@ -20,6 +20,12 @@ import ui.tasktable.TaskTableModel;
 import javax.swing.border.LineBorder;
 
 @SuppressWarnings("serial")
+/**
+ * This class implements a JTable customized to display Task data. This class has to use 
+ * <code>TaskTableModel</code> as its model since it needs to check whether a particular 
+ * task has been done in order to give it green background color.<br>
+ * @see ui.tasktable.TaskTableModel
+ */
 public class TaskTable extends JTable {
     
     private static final Color HEADER_COLOR = new Color(0x443266);
