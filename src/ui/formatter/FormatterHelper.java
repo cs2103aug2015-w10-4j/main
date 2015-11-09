@@ -99,7 +99,7 @@ public class FormatterHelper {
 		return null;
 	}
 
-	//@@author A0134155M
+	//@@author A0134155M-unused
 	/**
 	 * Split string to multiple lines according to character limit for a line as
 	 * specified in lineCharLimit
@@ -108,6 +108,8 @@ public class FormatterHelper {
 	 * @return an array of string representing the content of string after split
 	 */
 	public static String[] splitString(String string, int lineCharLimit) {
+		//this is not used since text formatted table is not used anymore, so there is no
+		//need for manual string formatting anymore.
 		if (string == null) {
 			return new String[] {EMPTY_STRING_SUBSTITUTE};
 		}
@@ -139,7 +141,7 @@ public class FormatterHelper {
 	 * Extract the data in a List<Task> to 3D object array so that it will be easier
 	 * to put them into a table. The first dimension of the resulting Object array
 	 * denotes the index of the table (since different type of tasks will be displayed
-	 * on a different table, the second dimension denotes the task number for each
+	 * on a different table), the second dimension denotes the task number for each
 	 * table, and the last dimension denotes the fields that are in the Task data
 	 * structure.
 	 * @param tasks list of tasks to be extracted
@@ -148,7 +150,6 @@ public class FormatterHelper {
 	 * @param minRowCountPerTable minimum number of row for each table
 	 * @return
 	 */
-	//TODO: refine this, Object[][][] doesn't look good
 	public static Object[][][] getTaskListData(List<Task> tasks, boolean needTaskSplit,
 			int minTable, int minRowCountPerTable) {
 		List<List<Task>> taskLists = new ArrayList<List<Task>>();
@@ -159,7 +160,7 @@ public class FormatterHelper {
 		}
 
 		List<Object[][]> result = new ArrayList<Object[][]>();
-		//we want the numberings for all taskLists synchronized
+		//we want the numbering for all task list synchronized
 		int numberCounter = 0;
 		for (int taskListIndex = 0; taskListIndex < taskLists.size(); taskListIndex++) {
 			List<Task> currentTaskList = taskLists.get(taskListIndex);

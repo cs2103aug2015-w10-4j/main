@@ -224,6 +224,7 @@ public class TaskTable extends JTable {
 	}
 	
 	//@@author A0134155M
+	@Override
 	public Component prepareRenderer(TableCellRenderer renderer, int row, int column) {
 		Component c = super.prepareRenderer(renderer, row, column);
 		giveColour(c, row, column);
@@ -239,7 +240,7 @@ public class TaskTable extends JTable {
 		}
 		
 		//If the task is done, make it green
-		if (model.isTaskDone(row).equals(Boolean.TRUE)) {
+		if (model.isTaskDone(row)) {
 			c.setBackground(DONE_COLOR);
 		}
 	}

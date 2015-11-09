@@ -11,14 +11,15 @@ public class TextFormatter {
 	private static final char HORIZONTAL_CHAR = '-';
 	private static final char VERTICAL_CHAR = '|';
 	
-	//@@author A0134155M
+	//@@author A0134155M-unused
 	/**
 	 * Format a given list of 3D Object array containing task data into a string table.
 	 * @param taskLists
 	 * @param lineCharLimit
-	 * @return
+	 * @return string table containing all tasks data
 	 */
 	public String formatTaskList(Object[][][] taskLists, int lineCharLimit) {
+		//this is not used since text formatted table is not used anymore.
 		if (isEmpty(taskLists)) {
 			return MESSAGE_DISPLAY_EMPTY;
 		}
@@ -42,8 +43,9 @@ public class TextFormatter {
 		return result.toString();
 	}
 
-	//@@author A0134155M
+	//@@author A0134155M-unused
 	private boolean isEmpty(Object[][][] taskLists) {
+		//this is not used since text formatted table is not used anymore.
 		int maxLength = 0;
 		for (Object[][] taskList : taskLists) {
 			if (taskList != null) {
@@ -53,8 +55,9 @@ public class TextFormatter {
 		return maxLength == 0;
 	}
 
-	//@@author A0134155M
+	//@@author A0134155M-unused
 	private String getTaskData(ColumnInfo[] columnInfo, Object[] task, int taskId, int lineCharLimit) {
+		//this is not used since text formatted table is not used anymore.
 		StringBuilder result = new StringBuilder();
 		
 		String[][] columnData = new String[columnInfo.length][];
@@ -90,8 +93,9 @@ public class TextFormatter {
 		return result.toString();
 	}
 
-	//@@author A0134155M
+	//@@author A0134155M-unused
 	private String getHeader(ColumnInfo[] columnInfo) {
+		//this is not used since text formatted table is not used anymore.
 		StringBuilder result = new StringBuilder();
 		
 		result.append(VERTICAL_CHAR);
@@ -106,8 +110,9 @@ public class TextFormatter {
 		return result.toString();
 	}
 
-	//@@author A0134155M
+	//@@author A0134155M-unused
 	private String getRowSeparator(ColumnInfo[] columnInfo) {
+		//this is not used since text formatted table is not used anymore.
 		StringBuilder result = new StringBuilder();
 		
 		result.append(INTERSECTION_CHAR);

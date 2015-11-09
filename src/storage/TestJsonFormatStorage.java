@@ -67,6 +67,7 @@ public class TestJsonFormatStorage {
 	}
 
 	//@@author A0108355H
+	//test write tasks to file
 	@Test
 	public void testWriteItemList() throws IOException{
 	//Task newTask = new Task("item 1");

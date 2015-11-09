@@ -21,6 +21,14 @@ public class TaskTableModel extends AbstractTableModel {
 	private Boolean[] isDone;
 	
 	//@@author A0134155M
+	/**
+	 * Initialize TaskTableModel with 2D object array taskListData where the first dimension
+	 * is an array of tasks data, and the second dimension describes each field of the task.
+	 * Each element of taskListData is still a raw object based on the corresponding field in
+	 * the <code>Task</code> class. The constructor will then format the data as string so that
+	 * it can be displayed in the table.
+	 * @param taskListData 2D object array containing tasks data.
+	 */
 	public TaskTableModel(Object[][] taskListData) {
 		super();
 
@@ -56,7 +64,12 @@ public class TaskTableModel extends AbstractTableModel {
 	}
 	
 	//@@author A0134155M
-	public Boolean isTaskDone(int taskIndex) {
+	/**
+	 * Returns whether task at particular index has been done or not.
+	 * @param taskIndex Task index
+	 * @return			Whether the task has been done or not.
+	 */
+	public boolean isTaskDone(int taskIndex) {
 		assert isDone[taskIndex] != null;
 		return isDone[taskIndex];
 	}
