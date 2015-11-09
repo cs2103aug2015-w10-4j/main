@@ -840,7 +840,7 @@ public class Parser {
 	/**
 	 * Method created to search for TIME keywords. Can't use hasKeyword since 
 	 * the keyword is concatenated with the time itself, e.g. '6pm' instead of '6 pm'
-	*/
+	 */
 	//@@author A0124093M
 	boolean hasTimeKeyword(String[] words, String[] keywords) {
 		for (int i = 0; i < words.length; i++) {
@@ -853,7 +853,7 @@ public class Parser {
 		return false;
 	}
 	
-
+	//@@author A0132760M
 	/**
 	 * Method to obtain arguments after a keyword and before the
 	 * next keyword
@@ -966,6 +966,13 @@ public class Parser {
 		return keywordMarkerList;
 	}
 	
+	/**
+	 * Marks indexes at which the periodic arguments are found
+	 * @param curMarkerList
+	 * @param commandString
+	 * @return
+	 * @throws Exception
+	 */
 	boolean getPeriodicField(ArrayList<KeywordMarker> curMarkerList,
 			String commandString) throws Exception {
 		KeywordMarker markerForIntervalPeriodic = getKeywordMarker(commandString,
@@ -987,6 +994,12 @@ public class Parser {
 		}
 	}
 
+	/**
+	 * Marks indexes at which the location arguments are found
+	 * @param curMarkerList
+	 * @param commandString
+	 * @return
+	 */
 	boolean getLocationField(ArrayList<KeywordMarker> curMarkerList,
 			String commandString) {
 		KeywordMarker markerForLocation = getKeywordMarker(commandString,
@@ -999,6 +1012,13 @@ public class Parser {
 		return false;
 	}
 
+	/**
+	 * Marks indexes at which the date arguments are found
+	 * @param curMarkerList
+	 * @param commandString
+	 * @return
+	 * @throws Exception
+	 */
 	boolean getDateField(ArrayList<KeywordMarker> curMarkerList,
 			String commandString) throws Exception {
 		KeywordMarker markerForDeadline = getKeywordMarker(commandString,
@@ -1059,6 +1079,12 @@ public class Parser {
 		return null;
 	}
 	
+	/**
+	 * Adds the new alias newCommandKeyword to the existing keyword/alias existingCommandKeyword
+	 * @param existingCommandKeyword
+	 * @param newCommandKeyword
+	 * @return true if added, false if cannot be added
+	 */
 	public boolean addAlias(String existingCommandKeyword, String newCommandKeyword){
 		int i = 0;
 		while(i < keywordLists.size()){
